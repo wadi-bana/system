@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>شركة وادي بناء للنقل البري VIP | النظام المتكامل للأندرويد</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- External Libraries with fallback error handling -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-dark: #0b0d12;
+            --bg-card: #141822;
+            --bg-card-hover: #1c2230;
+            --gold-primary: #d4af37;
+            --gold-light: #f3cf65;
+            --gold-dark: #997b15;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: #242b3b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 80px; /* space for bottom nav */
+            overflow-x: hidden;
+        }
+
+        /* Top Header */
+        .app-header {
+            background: linear-gradient(180deg, #181d2a 0%, #0b0d12 100%);
+            border-bottom: 2px solid var(--gold-primary);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.15);
+        }
+
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid var(--gold-primary);
+            object-fit: cover;
+            background: var(--bg-card);
+        }
+
+        .brand-titles h1 {
+            font-size: 1rem;
+            font-weight: 900;
+            color: var(--gold-primary);
+            line-height: 1.1;
+        }
+
+        .brand-titles p {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* Container Layout */
+        .app-container {
+            padding: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Android Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 65px;
+            background: #141822;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.72rem;
+            font-weight: 700;
+            gap: 3px;
+            width: 25%;
+            height: 100%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+        }
+
+        .nav-item.active {
+            color: var(--gold-primary);
+            background: rgba(212, 175, 55, 0.05);
+            border-top: 3px solid var(--gold-primary);
+        }
+
+        /* Cards & Forms */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--gold-light);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .form-control {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+            width: 100%;
+        }
+
+        .form-control:focus {
+            border-color: var(--gold-primary);
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-primary) 100%);
+            color: #0b0d12;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
+        }
+
+        .btn-jpeg {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #fff;
+        }
+
+        .btn-excel {
+            background: #107c41;
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        /* Tables */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            font-size: 0.82rem;
+            min-width: 600px;
+        }
+
+        .custom-table th {
+            background: rgba(255,255,255,0.03);
+            color: var(--gold-primary);
+            padding: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .custom-table td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Printable Invoice Preview Container (Light Theme) */
+        .print-preview-card {
+            background: #ffffff;
+            color: #0f172a;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+            border: 2px solid var(--gold-primary);
+            position: relative;
+        }
+
+        .paid-stamp-watermark {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-20deg);
+            border: 3px double #10b981;
+            color: #10b981;
+            font-size: 2rem;
+            font-weight: 900;
+            padding: 4px 20px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            opacity: 0.85;
+            pointer-events: none;
+            display: none;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 15px;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--gold-primary);
+            border-radius: 14px;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            .print-preview-card, .print-preview-card * { visibility: visible; }
+            .print-preview-card { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- App Header -->
+    <header class="app-header">
+        <div class="brand-box">
+            <div class="brand-logo" style="display:flex;align-items:center;justify-content:center;color:var(--gold-primary);"><i class="fa-solid fa-bus-simple"></i></div>
+            <div class="brand-titles">
+                <h1>شركة وادي بناء للنقل البري VIP</h1>
+                <p>الإمارات ⇄ سلطنة عُمان ⇄ اليمن</p>
+            </div>
+        </div>
+        <div>
+            <button class="btn btn-gold" style="padding: 5px 10px; font-size: 0.75rem;" onclick="openBackupModal()"><i class="fa-solid fa-database"></i> نسخ</button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <div class="app-container">
+
+        <!-- TAB 1: PASSENGERS / TICKETS -->
+        <div id="secPassengers" class="app-section">
+            <div class="card">
+                <div class="card-title">
+                    <span><i class="fa-solid fa-ticket-simple"></i> حجز تذكرة سفر VIP</span>
+                    <small style="color: var(--gold-light); font-size: 0.75rem;">درهم إماراتي (AED)</small>
+                </div>
+                <form id="ticketForm" onsubmit="handleTicketSubmit(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>نقطة الصعود (محصورة)</label>
+                            <select id="tFrom" class="form-control" required>
+                                <option value="عجمان (الإمارات)">عجمان (الإمارات - المقر الرئيسي)</option>
+                                <option value="بني ياس (الإمارات)">بني ياس (الإمارات)</option>
+                                <option value="عُمان (سلطنة عُمان)">عُمان (سلطنة عُمان)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>وجهة الوصول</label>
+                            <select id="tTo" class="form-control" required>
+                                <option value="عدن (اليمن)">عدن (اليمن)</option>
+                                <option value="صنعاء (اليمن)">صنعاء (اليمن)</option>
+                                <option value="تعز (اليمن)">تعز (اليمن)</option>
+                                <option value="المكلا (اليمن)">المكلا (اليمن)</option>
+                                <option value="إب (اليمن)">إب (اليمن)</option>
+                                <option value="الغيضة (اليمن)">الغيضة (اليمن)</option>
+                                <option value="عجمان (الإمارات)">عجمان (الإمارات)</option>
+                                <option value="بني ياس (الإمارات)">بني ياس (الإمارات)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>اسم المسافر الكامل</label>
+                            <input type="text" id="tName" class="form-control" placeholder="اسم المسافر" required>
+                        </div>
+                        <div class="form-group">
+                            <label>رقم الهاتف</label>
+                            <input type="tel" id="tPhone" class="form-control" placeholder="00971..." required>
+                        </div>
+                        <div class="form-group">
+                            <label>تاريخ السفر</label>
+                            <input type="date" id="tDate" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>عدد المسافرين</label>
+                            <input type="number" id="tCount" class="form-control" value="1" min="1" oninput="calcTicketTotal()" required>
+                        </div>
+                        <div class="form-group">
+                            <label>سعر التذكرة (درهم)</label>
+                            <input type="number" id="tPrice" class="form-control" value="400" oninput="calcTicketTotal()" required>
+                        </div>
+                        <div class="form-group">
+                            <label>المبلغ الإجمالي (AED)</label>
+                            <input type="number" id="tTotal" class="form-control" style="color:var(--gold-light); font-weight:bold;" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>حالة السداد</label>
+                            <select id="tPaid" class="form-control">
+                                <option value="مدفوع">مدفوع بالكامل</option>
+                                <option value="آجل">آجل / الدفع عند الصعود</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-gold"><i class="fa-solid fa-check-circle"></i> إصدار وحفظ التذكرة</button>
+                </form>
+            </div>
+
+            <!-- Ticket Print/Preview Card -->
+            <div id="ticketPreviewCard" class="print-preview-card" style="display: none;">
+                <div class="paid-stamp-watermark" id="ticketPaidStamp">PAID - مدفوع</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #1e3a8a; padding-bottom:8px; margin-bottom:12px;">
+                    <div>
+                        <h3 style="color:#1e3a8a; font-size:1.1rem; font-weight:900;">شركة وادي بناء للنقل البري VIP</h3>
+                        <p style="font-size:0.7rem; color:#64748b;">تذكرة سفر وقطع مقعد معتمدة</p>
+                    </div>
+                    <div style="text-align:left;">
+                        <span id="pvTicketNo" style="font-weight:900; color:#d4af37; font-size:1.1rem;">#WB-100</span>
+                    </div>
+                </div>
+                <div style="grid-template-columns:1fr 1fr; display:grid; gap:8px; font-size:0.85rem; margin-bottom:12px;">
+                    <div><strong>من:</strong> <span id="pvFrom">-</span></div>
+                    <div><strong>إلى:</strong> <span id="pvTo">-</span></div>
+                    <div><strong>الراكب:</strong> <span id="pvName">-</span></div>
+                    <div><strong>الهاتف:</strong> <span id="pvPhone">-</span></div>
+                    <div><strong>التاريخ:</strong> <span id="pvDate">-</span></div>
+                    <div><strong>العدد:</strong> <span id="pvCount">-</span></div>
+                    <div><strong>الإجمالي:</strong> <span id="pvTotal" style="color:#0284c7; font-weight:bold;">-</span></div>
+                    <div><strong>الحالة:</strong> <span id="pvStatus">-</span></div>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-gold" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة A5</button>
+                    <button class="btn btn-jpeg" onclick="exportCardAsJpeg('ticketPreviewCard', 'تذكرة_سفر')"><i class="fa-solid fa-file-image"></i> تصدير صورة JPEG</button>
+                </div>
+            </div>
+
+            <!-- History Table -->
+            <div class="card" style="margin-top:20px;">
+                <div class="card-title"><span><i class="fa-solid fa-list"></i> سجل التذاكر</span></div>
+                <div class="table-responsive">
+                    <table class="custom-table" id="ticketsTable">
+                        <thead>
+                            <tr><th>التذكرة</th><th>الراكب</th><th>المسار</th><th>التاريخ</th><th>المبلغ</th><th>الحالة</th><th>إجراء</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: CARGO INVOICE -->
+        <div id="secCargo" class="app-section" style="display:none;">
+            <div class="card">
+                <div class="card-title">
+                    <span><i class="fa-solid fa-boxes-packing"></i> فاتورة استلام شحنة جديدة</span>
+                    <small style="color:var(--gold-light);">أصناف متعددة</small>
+                </div>
+                <form id="cargoForm" onsubmit="handleCargoSubmit(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>نقطة الصعود / الشحن</label>
+                            <select id="cFrom" class="form-control" required>
+                                <option value="عجمان (الإمارات)">عجمان (الإمارات)</option>
+                                <option value="بني ياس (الإمارات)">بني ياس (الإمارات)</option>
+                                <option value="عُمان (سلطنة عُمان)">عُمان (سلطنة عُمان)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>المرسل</label>
+                            <input type="text" id="cSender" class="form-control" placeholder="اسم المرسل" required>
+                        </div>
+                        <div class="form-group">
+                            <label>المستلم</label>
+                            <input type="text" id="cReceiver" class="form-control" placeholder="اسم المستلم" required>
+                        </div>
+                        <div class="form-group">
+                            <label>رقم هاتف المستلم</label>
+                            <input type="tel" id="cPhone" class="form-control" placeholder="00967..." required>
+                        </div>
+                        <div class="form-group">
+                            <label>وجهة التسليم</label>
+                            <select id="cTo" class="form-control" required>
+                                <option value="عدن">عدن</option>
+                                <option value="صنعاء">صنعاء</option>
+                                <option value="تعز">تعز</option>
+                                <option value="المكلا">المكلا</option>
+                                <option value="إب">إب</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>مكان الدفع</label>
+                            <select id="cPayLoc" class="form-control">
+                                <option value="الإمارات">الإمارات (AED)</option>
+                                <option value="اليمن عند الاستلام">اليمن عند الاستلام</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Items Table Input -->
+                    <div style="margin-top:15px;">
+                        <label style="color:var(--gold-light); font-weight:bold; font-size:0.85rem;">المحتويات والأصناف</label>
+                        <table class="custom-table" id="cargoItemsInputTable" style="margin-top:8px;">
+                            <thead><tr><th>الصنف</th><th>العدد</th><th>السعر</th><th>الإجمالي</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="text" class="form-control item-desc" placeholder="كرتون / طرد" required></td>
+                                    <td><input type="number" class="form-control item-qty" value="1" min="1" oninput="calcCargoRow(this)" required></td>
+                                    <td><input type="number" class="form-control item-price" value="50" oninput="calcCargoRow(this)" required></td>
+                                    <td><input type="number" class="form-control item-total" value="50" readonly></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-gold" style="width:auto; padding:5px 10px; margin-top:8px;" onclick="addCargoRow()"><i class="fa-solid fa-plus"></i> إضافة صنف</button>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; background:rgba(212,175,55,0.1); padding:10px; border-radius:8px;">
+                        <span>إجمالي الفاتورة:</span>
+                        <strong id="cGrandTotal" style="color:var(--gold-light); font-size:1.2rem;">50 درهم</strong>
+                    </div>
+
+                    <button type="submit" class="btn btn-gold" style="margin-top:15px;"><i class="fa-solid fa-file-invoice"></i> حفظ وإنشاء الفاتورة</button>
+                </form>
+            </div>
+
+            <!-- Cargo Print/Preview Card -->
+            <div id="cargoPreviewCard" class="print-preview-card" style="display: none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #1e3a8a; padding-bottom:8px;">
+                    <h3>شركة وادي بناء للنقل البري - بوليصة شحن</h3>
+                    <strong id="pvcInvNo" style="color:#d4af37; font-size:1.1rem;">#C-41</strong>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:10px 0; font-size:0.85rem;">
+                    <div><strong>المرسل:</strong> <span id="pvcSender">-</span></div>
+                    <div><strong>المستلم:</strong> <span id="pvcReceiver">-</span></div>
+                    <div><strong>الهاتف:</strong> <span id="pvcPhone">-</span></div>
+                    <div><strong>الوجهة:</strong> <span id="pvcTo">-</span></div>
+                </div>
+                <div style="margin-top:10px;">
+                    <strong>المبلغ الإجمالي: </strong><span id="pvcTotal" style="color:#0284c7; font-weight:bold;">0 AED</span>
+                </div>
+                <div style="display:flex; gap:8px; margin-top:15px;">
+                    <button class="btn btn-gold" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة A5</button>
+                    <button class="btn btn-jpeg" onclick="exportCardAsJpeg('cargoPreviewCard', 'فاتورة_شحن')"><i class="fa-solid fa-file-image"></i> تصدير صورة JPEG</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: TRUSTS & AMANAT -->
+        <div id="secTrusts" class="app-section" style="display:none;">
+            <div class="card">
+                <div class="card-title">
+                    <span><i class="fa-solid fa-clipboard-list"></i> كشوفات الأمانات والسامان</span>
+                    <button class="btn btn-excel" style="width:auto; padding:5px 10px;" onclick="exportTrustsToExcel()"><i class="fa-solid fa-file-excel"></i> إكسل</button>
+                </div>
+                <form id="trustForm" onsubmit="handleTrustSubmit(event)">
+                    <div class="form-grid">
+                        <div class="form-group"><label>رقم السند/الفاتورة</label><input type="text" id="trInv" class="form-control" required></div>
+                        <div class="form-group"><label>اسم المستلم</label><input type="text" id="trRec" class="form-control" required></div>
+                        <div class="form-group"><label>رقم المستلم</label><input type="tel" id="trPhone" class="form-control" required></div>
+                        <div class="form-group"><label>وصف الأمانة / السامان</label><input type="text" id="trContent" class="form-control" placeholder="حقيبة، أوراق، طرد" required></div>
+                        <div class="form-group"><label>المبلغ المطلوب (درهم)</label><input type="number" id="trAmount" class="form-control" value="0"></div>
+                    </div>
+                    <button type="submit" class="btn btn-gold"><i class="fa-solid fa-plus"></i> إضافة للسجل</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="custom-table" id="trustsTable">
+                        <thead><tr><th>السند</th><th>المستلم</th><th>الهاتف</th><th>المحتوى</th><th>المبلغ</th><th>إجراء</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: DEBTS & FINANCIALS -->
+        <div id="secDebts" class="app-section" style="display:none;">
+            <div class="card">
+                <div class="card-title">
+                    <span><i class="fa-solid fa-file-invoice-dollar"></i> كشف المديونيات والمطالبات الشامل</span>
+                    <button class="btn btn-jpeg" style="width:auto; padding:5px 10px;" onclick="exportCardAsJpeg('debtReportPrintArea', 'كشف_المديونيات')"><i class="fa-solid fa-file-image"></i> تصدير JPEG</button>
+                </div>
+                <div id="debtReportPrintArea" style="background:#141822; padding:10px; border-radius:8px;">
+                    <div class="table-responsive">
+                        <table class="custom-table" id="debtsTable">
+                            <thead><tr><th>الاسم</th><th>الهاتف</th><th>النوع</th><th>المرجع</th><th>المبلغ</th><th>مكان الدفع</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Backup Modal -->
+    <div id="backupModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <h3 style="color:var(--gold-light); margin-bottom:15px;"><i class="fa-solid fa-database"></i> النسخ الاحتياطي وإدارة البيانات</h3>
+            <button class="btn btn-gold" onclick="exportFullBackup()"><i class="fa-solid fa-download"></i> تحميل نسخة احتياطية (JSON)</button>
+            <div style="margin-top:15px;">
+                <label style="font-size:0.8rem; color:var(--text-muted);">استعادة نسخة سابقة:</label>
+                <input type="file" id="importFile" accept=".json" class="form-control" style="margin-top:5px;" onchange="importFullBackup(event)">
+            </div>
+            <button class="btn btn-danger" style="margin-top:20px;" onclick="closeBackupModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- Android Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('secPassengers', this)"><i class="fa-solid fa-ticket"></i>الركاب</div>
+        <div class="nav-item" onclick="switchTab('secCargo', this)"><i class="fa-solid fa-boxes-packing"></i>الشحن</div>
+        <div class="nav-item" onclick="switchTab('secTrusts', this)"><i class="fa-solid fa-clipboard-list"></i>الأمانات</div>
+        <div class="nav-item" onclick="switchTab('secDebts', this)"><i class="fa-solid fa-wallet"></i>المالية</div>
+    </nav>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // App State & Data Stores
+        let tickets = JSON.parse(localStorage.getItem('wb_tickets')) || [];
+        let cargoInvoices = JSON.parse(localStorage.getItem('wb_cargo')) || [];
+        let trustItems = JSON.parse(localStorage.getItem('wb_trusts')) || [];
+        
+        let ticketCounter = parseInt(localStorage.getItem('wb_t_cnt')) || 100;
+        let cargoCounter = parseInt(localStorage.getItem('wb_c_cnt')) || 41;
+
+        // Safe Initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                document.getElementById('tDate').value = new Date().toISOString().split('T')[0];
+                calcTicketTotal();
+                renderTicketsTable();
+                renderCargoHistory();
+                renderTrustsTable();
+                renderDebtsTable();
+            } catch(e) { console.error("Initialization error:", e); }
+        });
+
+        // Tab Switching Engine
+        function switchTab(sectionId, navEl) {
+            document.querySelectorAll('.app-section').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(sectionId).style.display = 'block';
+            if(navEl) navEl.classList.add('active');
+            if(sectionId === 'secDebts') renderDebtsTable();
+        }
+
+        // Calculation Helpers
+        function calcTicketTotal() {
+            const cnt = parseFloat(document.getElementById('tCount').value) || 0;
+            const prc = parseFloat(document.getElementById('tPrice').value) || 0;
+            document.getElementById('tTotal').value = cnt * prc;
+        }
+
+        function addCargoRow() {
+            const tbody = document.querySelector('#cargoItemsInputTable tbody');
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td><input type="text" class="form-control item-desc" placeholder="صنف" required></td>
+                <td><input type="number" class="form-control item-qty" value="1" min="1" oninput="calcCargoRow(this)" required></td>
+                <td><input type="number" class="form-control item-price" value="50" oninput="calcCargoRow(this)" required></td>
+                <td><input type="number" class="form-control item-total" value="50" readonly></td>
+            `;
+        }
+
+        function calcCargoRow(el) {
+            const row = el.closest('tr');
+            const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+            const prc = parseFloat(row.querySelector('.item-price').value) || 0;
+            row.querySelector('.item-total').value = qty * prc;
+            
+            let gTotal = 0;
+            document.querySelectorAll('.item-total').forEach(i => gTotal += parseFloat(i.value) || 0);
+            document.getElementById('cGrandTotal').innerText = gTotal + ' درهم';
+        }
+
+        // Submissions
+        function handleTicketSubmit(e) {
+            e.preventDefault();
+            const tData = {
+                code: 'WB-' + ticketCounter++,
+                from: document.getElementById('tFrom').value,
+                to: document.getElementById('tTo').value,
+                name: document.getElementById('tName').value,
+                phone: document.getElementById('tPhone').value,
+                date: document.getElementById('tDate').value,
+                count: document.getElementById('tCount').value,
+                total: document.getElementById('tTotal').value + ' AED',
+                paid: document.getElementById('tPaid').value
+            };
+            tickets.unshift(tData);
+            localStorage.setItem('wb_tickets', JSON.stringify(tickets));
+            localStorage.setItem('wb_t_cnt', ticketCounter);
+            
+            // Render Preview Card
+            document.getElementById('pvTicketNo').innerText = '#' + tData.code;
+            document.getElementById('pvFrom').innerText = tData.from;
+            document.getElementById('pvTo').innerText = tData.to;
+            document.getElementById('pvName').innerText = tData.name;
+            document.getElementById('pvPhone').innerText = tData.phone;
+            document.getElementById('pvDate').innerText = tData.date;
+            document.getElementById('pvCount').innerText = tData.count;
+            document.getElementById('pvTotal').innerText = tData.total;
+            document.getElementById('pvStatus').innerText = tData.paid;
+            document.getElementById('ticketPaidStamp').style.display = tData.paid === 'مدفوع' ? 'block' : 'none';
+            document.getElementById('ticketPreviewCard').style.display = 'block';
+
+            renderTicketsTable();
+            alert("تم حفظ التذكرة بنجاح!");
+        }
+
+        function renderTicketsTable() {
+            const tbody = document.querySelector('#ticketsTable tbody');
+            tbody.innerHTML = '';
+            tickets.forEach((t, idx) => {
+                tbody.insertRow().innerHTML = `
+                    <td>${t.code}</td>
+                    <td>${t.name}</td>
+                    <td>${t.from} ← ${t.to}</td>
+                    <td>${t.date}</td>
+                    <td>${t.total}</td>
+                    <td>${t.paid}</td>
+                    <td><button class="btn btn-danger" style="padding:2px 6px;" onclick="tickets.splice(${idx},1); localStorage.setItem('wb_tickets', JSON.stringify(tickets)); renderTicketsTable();"><i class="fa-solid fa-trash"></i></button></td>
+                `;
+            });
+        }
+
+        function handleCargoSubmit(e) {
+            e.preventDefault();
+            const cData = {
+                code: 'C-' + cargoCounter++,
+                from: document.getElementById('cFrom').value,
+                sender: document.getElementById('cSender').value,
+                receiver: document.getElementById('cReceiver').value,
+                phone: document.getElementById('cPhone').value,
+                to: document.getElementById('cTo').value,
+                total: document.getElementById('cGrandTotal').innerText
+            };
+            cargoInvoices.unshift(cData);
+            localStorage.setItem('wb_cargo', JSON.stringify(cargoInvoices));
+            localStorage.setItem('wb_c_cnt', cargoCounter);
+
+            document.getElementById('pvcInvNo').innerText = '#' + cData.code;
+            document.getElementById('pvcSender').innerText = cData.sender;
+            document.getElementById('pvcReceiver').innerText = cData.receiver;
+            document.getElementById('pvcPhone').innerText = cData.phone;
+            document.getElementById('pvcTo').innerText = cData.to;
+            document.getElementById('pvcTotal').innerText = cData.total;
+            document.getElementById('cargoPreviewCard').style.display = 'block';
+
+            renderCargoHistory();
+            alert("تم حفظ فاتورة الشحن!");
+        }
+
+        function renderCargoHistory() { /* Optional inline rendering if needed */ }
+
+        function handleTrustSubmit(e) {
+            e.preventDefault();
+            trustItems.unshift({
+                inv: document.getElementById('trInv').value,
+                rec: document.getElementById('trRec').value,
+                phone: document.getElementById('trPhone').value,
+                content: document.getElementById('trContent').value,
+                amount: document.getElementById('trAmount').value + ' AED'
+            });
+            localStorage.setItem('wb_trusts', JSON.stringify(trustItems));
+            renderTrustsTable();
+        }
+
+        function renderTrustsTable() {
+            const tbody = document.querySelector('#trustsTable tbody');
+            tbody.innerHTML = '';
+            trustItems.forEach((item, idx) => {
+                tbody.insertRow().innerHTML = `
+                    <td>${item.inv}</td><td>${item.rec}</td><td>${item.phone}</td><td>${item.content}</td><td>${item.amount}</td>
+                    <td><button class="btn btn-danger" style="padding:2px 6px;" onclick="trustItems.splice(${idx},1); localStorage.setItem('wb_trusts', JSON.stringify(trustItems)); renderTrustsTable();"><i class="fa-solid fa-trash"></i></button></td>
+                `;
+            });
+        }
+
+        function renderDebtsTable() {
+            const tbody = document.querySelector('#debtsTable tbody');
+            tbody.innerHTML = '';
+            tickets.filter(t => t.paid !== 'مدفوع').forEach(t => {
+                tbody.insertRow().innerHTML = `<td>${t.name}</td><td>${t.phone}</td><td>تذكرة سفر</td><td>${t.code}</td><td>${t.total}</td><td>باليمن / آجل</td>`;
+            });
+            cargoInvoices.forEach(c => {
+                tbody.insertRow().innerHTML = `<td>${c.sender}</td><td>${c.phone}</td><td>شحنة طرود</td><td>${c.code}</td><td>${c.total}</td><td>عند الاستلام</td>`;
+            });
+        }
+
+        // Export as JPEG via html2canvas (With Safe Error Catching)
+        function exportCardAsJpeg(elementId, filename) {
+            try {
+                if(typeof html2canvas === 'undefined') {
+                    alert("يرجى التأكد من توفر الاتصال بالإنترنت لتحميل مكتبة الصور.");
+                    return;
+                }
+                const target = document.getElementById(elementId);
+                html2canvas(target, { scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = filename + '_' + Date.now() + '.jpg';
+                    link.href = canvas.toDataURL('image/jpeg', 0.95);
+                    link.click();
+                });
+            } catch(err) {
+                alert("تعذر تصدير الصورة: " + err.message);
+            }
+        }
+
+        function exportTrustsToExcel() {
+            try {
+                if(typeof XLSX === 'undefined') { alert("مكتبة الإكسل غير متوفرة حالياً."); return; }
+                const ws = XLSX.utils.json_to_sheet(trustItems);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "الأمانات");
+                XLSX.writeFile(wb, "كشف_الأمانات.xlsx");
+            } catch(e) { alert(e.message); }
+        }
+
+        // Backup Controls
+        function openBackupModal() { document.getElementById('backupModal').style.display = 'flex'; }
+        function closeBackupModal() { document.getElementById('backupModal').style.display = 'none'; }
+        
+        function exportFullBackup() {
+            const data = { tickets, cargoInvoices, trustItems };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'WadiBina_Backup.json';
+            a.click();
+        }
+
+        function importFullBackup(e) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const d = JSON.parse(evt.target.result);
+                    if(d.tickets) { tickets = d.tickets; localStorage.setItem('wb_tickets', JSON.stringify(tickets)); }
+                    if(d.cargoInvoices) { cargoInvoices = d.cargoInvoices; localStorage.setItem('wb_cargo', JSON.stringify(cargoInvoices)); }
+                    if(d.trustItems) { trustItems = d.trustItems; localStorage.setItem('wb_trusts', JSON.stringify(trustItems)); }
+                    alert("تم استعادة البيانات بنجاح!");
+                    location.reload();
+                } catch(err) { alert("ملف النسخة الاحتياطية غير صالحة."); }
+            };
+            reader.readAsText(e.target.files[0]);
+        }
+    </script>
+</body>
+</html>
