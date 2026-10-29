@@ -311,7 +311,7 @@
     <div class="modal-overlay" id="loginOverlay">
         <div class="modal-card" style="max-width: 420px;">
             <h2 class="text-xl font-black text-gold mb-2 text-center">تسجيل الدخول للنظام</h2>
-            <p class="text-zinc-400 text-xs mb-5 text-center">أدخل بيانات الحساب للدخول (الافتراضي: admin / admin123)</p>
+            <p class="text-zinc-400 text-xs mb-5 text-center">أدخل بيانات الحساب للدخول (المدير: وليد السيد / 708090)</p>
             <form onsubmit="handleLogin(event)">
                 <div class="mb-4">
                     <label class="block text-xs font-bold text-zinc-300 mb-2">اسم المستخدم</label>
@@ -649,7 +649,7 @@
                                 <img src="logo.jpeg" alt="شعار" class="w-11 h-11 rounded-full border border-gold object-cover">
                                 <div><h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل البري VIP</h2><p class="text-xs text-slate-500">راحة تليق بك ... طريق يوصلك بأمان</p></div>
                             </div>
-                            <div class="text-left"><strong class="tNoClass text-base text-slate-900">#WB-100</strong><br><small class="text-slate-500 text-[10px]">حجز VIP</small></div>
+                            <div class="text-left"><strong class="tNoClass text-base text-slate-900">#100</strong><br><small class="text-slate-500 text-[10px]">حجز VIP</small></div>
                         </div>
                         <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg mb-3 border border-slate-200">
                             <div><p class="text-[10px] text-slate-500">الصعود</p><h4 class="text-sm font-extrabold text-slate-900 tFromClass">عجمان</h4></div>
@@ -1027,8 +1027,23 @@
         }
 
         function initSystemUsers() {
-            const defaultUsers = [{ username: 'admin', password: 'admin123', role: 'مدير' }];
-            if (!localStorage.getItem('sysUsers')) { localStorage.setItem('sysUsers', JSON.stringify(defaultUsers)); }
+            const defaultUsers = [
+                { username: 'وليد السيد', password: '708090', role: 'مدير' },
+                { username: 'محمود', password: '102030', role: 'موظف' },
+                { username: 'يوسف', password: '405060', role: 'موظف' },
+                { username: 'محمد', password: '104070', role: 'موظف' }
+            ];
+            
+            let existingUsers = JSON.parse(localStorage.getItem('sysUsers'));
+            if (!existingUsers) {
+                localStorage.setItem('sysUsers', JSON.stringify(defaultUsers));
+            } else {
+                // التأكد من وجود المدير الجديد وليد السيد إذا كان النظام قديماً
+                if (!existingUsers.some(u => u.username === 'وليد السيد')) {
+                    existingUsers.unshift({ username: 'وليد السيد', password: '708090', role: 'مدير' });
+                    localStorage.setItem('sysUsers', JSON.stringify(existingUsers));
+                }
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -1082,7 +1097,7 @@
             e.preventDefault();
             const usernameInput = document.getElementById('loginUser').value.trim();
             const passwordInput = document.getElementById('loginPass').value.trim();
-            const users = JSON.parse(localStorage.getItem('sysUsers')) || [{ username: 'admin', password: 'admin123', role: 'مدير' }];
+            const users = JSON.parse(localStorage.getItem('sysUsers')) || [];
             const foundUser = users.find(u => u.username === usernameInput && u.password === passwordInput);
 
             if (foundUser) {
@@ -1135,7 +1150,7 @@
         function closeUserManagementModal() { document.getElementById('userManagementOverlay').style.display = 'none'; }
         
         function renderUsersTable() {
-            const users = JSON.parse(localStorage.getItem('sysUsers')) || [{ username: 'admin', password: 'admin123', role: 'مدير' }];
+            const users = JSON.parse(localStorage.getItem('sysUsers')) || [];
             const tbody = document.getElementById('usersTable').getElementsByTagName('tbody')[0];
             tbody.innerHTML = '';
             users.forEach((u, index) => {
@@ -1150,7 +1165,7 @@
             const username = document.getElementById('newUsername').value.trim();
             const pass = document.getElementById('newUserPass').value.trim();
             const role = document.getElementById('newUserRole').value;
-            let users = JSON.parse(localStorage.getItem('sysUsers')) || [{ username: 'admin', password: 'admin123', role: 'مدير' }];
+            let users = JSON.parse(localStorage.getItem('sysUsers')) || [];
             
             if(users.some(u => u.username === username)) { alert("اسم المستخدم موجود مسبقاً!"); return; }
             users.push({ username, password: pass, role });
@@ -1287,7 +1302,7 @@
             [...busBookings].reverse().forEach((b, index) => {
                 let actualIndex = busBookings.length - 1 - index;
                 let imgCell = b.passport_image ? `<a href="${b.passport_image}" target="_blank" class="action-link"><i class="fa-solid fa-image"></i> عرض الجواز</a>` : 'لا يوجد';
-                let userColHTML = isAdmin ? `<td><span class="text-gold font-bold">${b.createdBy || 'admin'}</span></td>` : '';
+                let userColHTML = isAdmin ? `<td><span class="text-gold font-bold">${b.createdBy || 'وليد السيد'}</span></td>` : '';
                 
                 tbody.insertRow().innerHTML = `
                     <td><strong>#${b.code}</strong></td>
@@ -1487,7 +1502,7 @@
             [...cargoInvoices].reverse().forEach((c, index) => {
                 let actualIndex = cargoInvoices.length - 1 - index;
                 let summaryDesc = c.items.map(i => `${i.qty} ${i.desc}`).join('، ');
-                let userColHTML = isAdmin ? `<td><span class="text-gold font-bold">${c.createdBy || 'admin'}</span></td>` : '';
+                let userColHTML = isAdmin ? `<td><span class="text-gold font-bold">${c.createdBy || 'وليد السيد'}</span></td>` : '';
 
                 tbody.insertRow().innerHTML = `
                     <td><strong>#${c.invNo}</strong></td>
