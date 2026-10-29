@@ -315,11 +315,11 @@
             <form onsubmit="handleLogin(event)">
                 <div class="mb-4">
                     <label class="block text-xs font-bold text-zinc-300 mb-2">اسم المستخدم</label>
-                    <label for="loginUser"></label><input type="text" id="loginUser" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
+                    <input type="text" id="loginUser" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
                 </div>
                 <div class="mb-6">
                     <label class="block text-xs font-bold text-zinc-300 mb-2">كلمة المرور</label>
-                    <label for="loginPass"></label><input type="password" id="loginPass" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
+                    <input type="password" id="loginPass" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
                 </div>
                 <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3 px-6 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
                     <i class="fa-solid fa-right-to-bracket"></i> دخول النظام
@@ -336,49 +336,74 @@
             <form onsubmit="handleChangePassword(event)">
                 <div class="mb-4">
                     <label class="block text-xs font-bold text-zinc-300 mb-2">كلمة المرور الحالية</label>
-                    <label for="oldPassword"></label><input type="password" id="oldPassword" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
+                    <input type="password" id="oldPassword" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
                 </div>
                 <div class="mb-4">
                     <label class="block text-xs font-bold text-zinc-300 mb-2">كلمة المرور الجديدة</label>
-                    <label for="newPassword"></label><input type="password" id="newPassword" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
+                    <input type="password" id="newPassword" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
                 </div>
                 <div class="mb-6">
                     <label class="block text-xs font-bold text-zinc-300 mb-2">تأكيد كلمة المرور الجديدة</label>
-                    <label for="confirmNewPassword"></label><input type="password" id="confirmNewPassword" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
+                    <input type="password" id="confirmNewPassword" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
                 </div>
                 <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3 px-6 rounded-xl shadow-lg transition"><i class="fa-solid fa-key"></i> حفظ كلمة المرور</button>
             </form>
         </div>
     </div>
 
-    <!-- 3. USER MANAGEMENT MODAL -->
+    <!-- 3. USER MANAGEMENT MODAL (ADMIN CONTROL) -->
     <div class="modal-overlay" id="userManagementOverlay" style="display: none;">
         <div class="modal-card" style="max-width: 850px;">
             <button class="close-modal-btn" onclick="closeUserManagementModal()"><i class="fa-solid fa-xmark"></i></button>
-            <h2 class="text-xl font-black text-gold mb-4"><i class="fa-solid fa-users-gear"></i> إدارة المستخدمين والصلاحيات</h2>
+            <h2 class="text-xl font-black text-gold mb-4"><i class="fa-solid fa-users-gear"></i> إدارة المستخدمين والصلاحيات (لوحة المدير)</h2>
             <form onsubmit="handleCreateUser(event)" class="bg-darkBg p-4 rounded-xl mb-5 border border-zinc-800">
-                <div class="font-bold text-gold mb-3 text-sm"><i class="fa-solid fa-user-plus"></i> إضافة مستخدم جديد</div>
+                <div class="font-bold text-gold mb-3 text-sm"><i class="fa-solid fa-user-plus"></i> إضافة مستخدم جديد للنظام</div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
-                    <div><label class="block text-xs text-zinc-400 mb-1">اسم المستخدم</label><label
-                            for="newUsername"></label><input type="text" id="newUsername" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">كلمة المرور</label><label
-                            for="newUserPass"></label><input type="password" id="newUserPass" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">اسم المستخدم</label><input type="text" id="newUsername" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">كلمة المرور</label><input type="text" id="newUserPass" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
                     <div><label class="block text-xs text-zinc-400 mb-1">الصلاحية</label>
-                        <label for="newUserRole"></label><select id="newUserRole" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100"><option value="موظف">موظف</option><option value="مدير">مدير</option></select>
+                        <select id="newUserRole" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100"><option value="موظف">موظف</option><option value="مدير">مدير</option></select>
                     </div>
                 </div>
                 <button type="submit" class="gold-gradient-bg text-black font-bold px-4 py-2 rounded-lg text-xs">إنشاء الحساب</button>
             </form>
             <div class="overflow-x-auto max-h-60">
                 <table class="custom-table" id="usersTable">
-                    <thead><tr><th>اسم المستخدم</th><th>الصلاحية</th><th>إجراءات</th></tr></thead>
+                    <thead><tr><th>اسم المستخدم</th><th>كلمة المرور</th><th>الصلاحية</th><th>إجراءات التعديل والحذف</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- 4. EDIT TICKET MODAL -->
+    <!-- 4. EDIT USER MODAL (ADMIN ONLY) -->
+    <div class="modal-overlay" id="editUserModal" style="display: none;">
+        <div class="modal-card" style="max-width: 450px;">
+            <button class="close-modal-btn" onclick="closeEditUserModal()"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-xl font-black text-gold mb-4"><i class="fa-solid fa-user-pen"></i> تعديل بيانات المستخدم</h2>
+            <form onsubmit="saveEditedUser(event)">
+                <input type="hidden" id="editUserIndex">
+                <div class="mb-4">
+                    <label class="block text-xs text-zinc-400 mb-1">اسم المستخدم</label>
+                    <input type="text" id="editUsernameInput" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-xs text-zinc-400 mb-1">كلمة المرور الجديدة</label>
+                    <input type="text" id="editUserPassInput" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-xs text-zinc-400 mb-1">الصلاحية</label>
+                    <select id="editUserRoleInput" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100">
+                        <option value="موظف">موظف</option>
+                        <option value="مدير">مدير</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3 rounded-xl shadow-lg">حفظ التعديلات</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 5. EDIT TICKET MODAL -->
     <div class="modal-overlay" id="editTicketModal" style="display: none;">
         <div class="modal-card" style="max-width: 600px;">
             <button class="close-modal-btn" onclick="closeEditTicketModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -386,26 +411,17 @@
             <form onsubmit="saveEditedTicket(event)">
                 <input type="hidden" id="editTicketIndex">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div><label class="block text-xs text-zinc-400 mb-1">رقم البوليصة</label><label
-                            for="editTicketCode"></label><input type="text" id="editTicketCode" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">اسم المسافر</label><label
-                            for="editTicketName"></label><input type="text" id="editTicketName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">رقم الهاتف</label><label
-                            for="editTicketPhone"></label><input type="tel" id="editTicketPhone" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">رقم الجواز / الهوية</label><label
-                            for="editTicketPassport"></label><input type="text" id="editTicketPassport" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">مكان الصعود</label><label
-                            for="editTicketFrom"></label><input type="text" id="editTicketFrom" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">وجهة الوصول</label><label
-                            for="editTicketTo"></label><input type="text" id="editTicketTo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">تاريخ السفر</label><label
-                            for="editTicketDate"></label><input type="date" id="editTicketDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">عدد المسافرين</label><label
-                            for="editTicketCount"></label><input type="number" id="editTicketCount" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" min="1" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">المبلغ الإجمالي</label><label
-                            for="editTicketPrice"></label><input type="text" id="editTicketPrice" class="w-full bg-darkBg border border-gold rounded-xl px-3 py-2 text-sm text-gold font-bold" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">رقم البوليصة</label><input type="text" id="editTicketCode" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">اسم المسافر</label><input type="text" id="editTicketName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">رقم الهاتف</label><input type="tel" id="editTicketPhone" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">رقم الجواز / الهوية</label><input type="text" id="editTicketPassport" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">مكان الصعود</label><input type="text" id="editTicketFrom" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">وجهة الوصول</label><input type="text" id="editTicketTo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">تاريخ السفر</label><input type="date" id="editTicketDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">عدد المسافرين</label><input type="number" id="editTicketCount" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" min="1" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">المبلغ الإجمالي</label><input type="text" id="editTicketPrice" class="w-full bg-darkBg border border-gold rounded-xl px-3 py-2 text-sm text-gold font-bold" required></div>
                     <div><label class="block text-xs text-zinc-400 mb-1">طريقة السداد / الحالة</label>
-                        <label for="editTicketPayment"></label><select id="editTicketPayment" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100">
+                        <select id="editTicketPayment" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100">
                             <option value="باليمن">باليمن (غير مدفوع)</option>
                             <option value="الدفع عند الصعود">الدفع عند الصعود (غير مدفوع)</option>
                             <option value="مدفوع">مدفوع</option>
@@ -417,7 +433,7 @@
         </div>
     </div>
 
-    <!-- 5. EDIT CARGO INVOICE MODAL -->
+    <!-- 6. EDIT CARGO INVOICE MODAL -->
     <div class="modal-overlay" id="editCargoModal" style="display: none;">
         <div class="modal-card" style="max-width: 600px;">
             <button class="close-modal-btn" onclick="closeEditCargoModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -425,22 +441,15 @@
             <form onsubmit="saveEditedCargo(event)">
                 <input type="hidden" id="editCargoIndex">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div><label class="block text-xs text-zinc-400 mb-1">رقم الفاتورة</label><label
-                            for="editCargoInvNo"></label><input type="text" id="editCargoInvNo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">تاريخ الاستلام</label><label
-                            for="editCargoDate"></label><input type="date" id="editCargoDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">اسم المرسل</label><label
-                            for="editSenderName"></label><input type="text" id="editSenderName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">هاتف المرسل</label><label
-                            for="editSenderPhone"></label><input type="tel" id="editSenderPhone" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">اسم المستلم</label><label
-                            for="editReceiverName"></label><input type="text" id="editReceiverName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">هاتف المستلم</label><label
-                            for="editReceiverPhone"></label><input type="tel" id="editReceiverPhone" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">الإجمالي النهائي (درهم)</label><label
-                            for="editCargoTotal"></label><input type="number" id="editCargoTotal" class="w-full bg-darkBg border border-gold rounded-xl px-3 py-2 text-sm text-gold font-bold" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">رقم الفاتورة</label><input type="text" id="editCargoInvNo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">تاريخ الاستلام</label><input type="date" id="editCargoDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">اسم المرسل</label><input type="text" id="editSenderName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">هاتف المرسل</label><input type="tel" id="editSenderPhone" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">اسم المستلم</label><input type="text" id="editReceiverName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">هاتف المستلم</label><input type="tel" id="editReceiverPhone" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">الإجمالي النهائي (درهم)</label><input type="number" id="editCargoTotal" class="w-full bg-darkBg border border-gold rounded-xl px-3 py-2 text-sm text-gold font-bold" required></div>
                     <div><label class="block text-xs text-zinc-400 mb-1">حالة الفاتورة</label>
-                        <label for="editCargoStatus"></label><select id="editCargoStatus" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100">
+                        <select id="editCargoStatus" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100">
                             <option value="مدفوع">مدفوع</option>
                             <option value="غير مدفوع">غير مدفوع / آجل</option>
                         </select>
@@ -451,7 +460,7 @@
         </div>
     </div>
 
-    <!-- 6. EDIT GENERAL INVOICE MODAL -->
+    <!-- 7. EDIT GENERAL INVOICE MODAL -->
     <div class="modal-overlay" id="editInvoiceModal" style="display: none;">
         <div class="modal-card" style="max-width: 600px;">
             <button class="close-modal-btn" onclick="closeEditInvoiceModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -459,30 +468,25 @@
             <form onsubmit="saveEditedInvoice(event)">
                 <input type="hidden" id="editInvIndex">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div><label class="block text-xs text-zinc-400 mb-1">رقم الفاتورة</label><label
-                            for="editInvNumber"></label><input type="text" id="editInvNumber" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">تاريخ الفاتورة</label><label
-                            for="editInvDate"></label><input type="date" id="editInvDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">اسم العميل / الجهة</label><label
-                            for="editInvClientName"></label><input type="text" id="editInvClientName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">رقم الفاتورة</label><input type="text" id="editInvNumber" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">تاريخ الفاتورة</label><input type="date" id="editInvDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">اسم العميل / الجهة</label><input type="text" id="editInvClientName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
                     <div><label class="block text-xs text-zinc-400 mb-1">نوع الخدمة / البيان</label>
-                        <label for="editInvType"></label><select id="editInvType" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100">
+                        <select id="editInvType" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100">
                             <option value="شحن أمتعة وبضائع">شحن أمتعة وبضائع</option>
                             <option value="حجز تذكرة سفر">حجز تذكرة سفر</option>
                             <option value="خدمات نقل VIP">خدمات نقل VIP</option>
                             <option value="أخرى">أخرى</option>
                         </select>
                     </div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">المبلغ (درهم)</label><label
-                            for="editInvAmount"></label><input type="number" id="editInvAmount" class="w-full bg-darkBg border border-gold rounded-xl px-3 py-2 text-sm text-gold font-bold" required></div>
+                    <div><label class="block text-xs text-zinc-400 mb-1">المبلغ (درهم)</label><input type="number" id="editInvAmount" class="w-full bg-darkBg border border-gold rounded-xl px-3 py-2 text-sm text-gold font-bold" required></div>
                     <div><label class="block text-xs text-zinc-400 mb-1">حالة السداد</label>
-                        <label for="editInvStatus"></label><select id="editInvStatus" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100">
+                        <select id="editInvStatus" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100">
                             <option value="مدفوع">مدفوع</option>
                             <option value="معلق / آجل">معلق / آجل</option>
                         </select>
                     </div>
-                    <div class="md:col-span-2"><label class="block text-xs text-zinc-400 mb-1">ملاحظات إضافية</label><label
-                            for="editInvNotes"></label><input type="text" id="editInvNotes" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100"></div>
+                    <div class="md:col-span-2"><label class="block text-xs text-zinc-400 mb-1">ملاحظات إضافية</label><input type="text" id="editInvNotes" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100"></div>
                 </div>
                 <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3 rounded-xl shadow-lg"><i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات</button>
             </form>
@@ -510,7 +514,7 @@
                 <i class="fa-solid fa-user-check text-gold"></i>
                 <span id="activeUsername" class="font-bold">المستخدم</span>
                 <span id="activeUserRole" class="badge-role badge-staff">موظف</span>
-                <button class="action-link" id="adminUsersBtn" onclick="openUserManagementModal()" style="display: none;"><i class="fa-solid fa-users-gear"></i> المستخدمين</button>
+                <button class="action-link" id="adminUsersBtn" onclick="openUserManagementModal()" style="display: none;"><i class="fa-solid fa-users-gear"></i> إدارة المستخدمين</button>
                 <button class="action-link" onclick="openChangePasswordModal()"><i class="fa-solid fa-key"></i> كلمة المرور</button>
                 <button class="logout-btn" onclick="handleLogout()" title="خروج"><i class="fa-solid fa-right-from-bracket"></i></button>
             </div>
@@ -537,37 +541,40 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
                                 <label class="block text-xs font-bold text-zinc-300 mb-2">مكان الصعود للباص</label>
-                                <label for="boardingLocation"></label><select id="boardingLocation" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" onchange="updateRouteSummary()" required>
-                                    <option value="عجمان">عجمان</option><option value="بني ياس">بني ياس</option><option value="عدن">عدن</option><option value="المكلا">المكلا</option><option value="الغيضة">الغيضة</option><option value="عُمان">عُمان</option>
+                                <select id="boardingLocation" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" onchange="updateRouteSummary()" required>
+                                    <option value="عجمان">عجمان</option>
+                                    <option value="بني ياس">بني ياس</option>
+                                    <option value="العين">العين</option>
+                                    <option value="عُمان">عُمان</option>
+                                    <option value="ثمرريت">ثمرريت</option>
+                                    <option value="عدن">عدن</option>
+                                    <option value="المكلا">المكلا</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-zinc-300 mb-2">وجهة الوصول</label>
-                                <label for="dropoffLocation"></label><select id="dropoffLocation" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" onchange="updateRouteSummary()" required>
-                                    <option value="عدن" selected>عدن</option><option value="عجمان">عجمان</option><option value="بني ياس">بني ياس</option><option value="المكلا">المكلا</option><option value="الغيضة">الغيضة</option><option value="عُمان">عُمان</option>
+                                <select id="dropoffLocation" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" onchange="updateRouteSummary()" required>
+                                    <option value="عدن" selected>عدن</option>
+                                    <option value="المكلا">المكلا</option>
+                                    <option value="القيضة">القيضة</option>
+                                    <option value="عُمان">عُمان</option>
                                 </select>
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">تاريخ السفر</label><label
-                                    for="departureDate"></label><input type="date" id="departureDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required></div>
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">وقت الحضور</label><label
-                                    for="reportingTime"></label><input type="text" id="reportingTime" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" value="07:00 صباحاً" oninput="updatePriceCalculation()" required></div>
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">عدد المسافرين</label><label
-                                    for="passengerCount"></label><input type="number" id="passengerCount" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" value="1" min="1" max="10" oninput="updatePriceCalculation()" required></div>
+                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">تاريخ السفر</label><input type="date" id="departureDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required></div>
+                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">وقت الحضور</label><input type="text" id="reportingTime" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" value="07:00 صباحاً" oninput="updatePriceCalculation()" required></div>
+                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">عدد المسافرين</label><input type="number" id="passengerCount" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" value="1" min="1" max="10" oninput="updatePriceCalculation()" required></div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">الاسم الكامل</label><label
-                                    for="passengerName"></label><input type="text" id="passengerName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" placeholder="الاسم كامل" required></div>
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم الجواز / الهوية</label><label
-                                    for="passportNo"></label><input type="text" id="passportNo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" placeholder="A00000000" required></div>
+                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">الاسم الكامل</label><input type="text" id="passengerName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" placeholder="الاسم كامل" required></div>
+                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم الجواز / الهوية</label><input type="text" id="passportNo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" placeholder="A00000000" required></div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم الهاتف</label><label
-                                    for="phoneNo"></label><input type="tel" id="phoneNo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" placeholder="0000000000" required></div>
+                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم الهاتف</label><input type="tel" id="phoneNo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" placeholder="0000000000" required></div>
                             <div>
                                 <label class="block text-xs font-bold text-zinc-300 mb-2">طريقة السداد / جهة الدفع</label>
-                                <label for="paymentMethod"></label><select id="paymentMethod" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none">
+                                <select id="paymentMethod" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none">
                                     <option value="باليمن">باليمن (غير مدفوع)</option>
                                     <option value="الدفع عند الصعود">الدفع عند الصعود للباص (غير مدفوع)</option>
                                     <option value="مدفوع">مدفوع</option>
@@ -579,10 +586,8 @@
                             <input type="file" id="passportImageFile" class="w-full bg-darkBg border border-zinc-700 rounded-xl p-2.5 text-sm text-zinc-100 outline-none" accept="image/*">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                            <div><label class="block text-xs font-bold text-gold mb-2">سعر التذكرة للفرد (درهم)</label><label
-                                    for="singleTicketPrice"></label><input type="number" id="singleTicketPrice" class="w-full bg-darkBg border border-gold rounded-xl px-4 py-3 text-sm text-gold font-bold outline-none" value="400" oninput="updatePriceCalculation()" required></div>
-                            <div><label class="block text-xs font-bold text-gold mb-2">المبلغ الإجمالي (درهم)</label><label
-                                    for="customAmount"></label><input type="number" id="customAmount" class="w-full bg-darkBg border border-gold rounded-xl px-4 py-3 text-sm text-gold font-bold outline-none" oninput="updatePriceFromInput()" required></div>
+                            <div><label class="block text-xs font-bold text-gold mb-2">سعر التذكرة للفرد (درهم)</label><input type="number" id="singleTicketPrice" class="w-full bg-darkBg border border-gold rounded-xl px-4 py-3 text-sm text-gold font-bold outline-none" value="400" oninput="updatePriceCalculation()" required></div>
+                            <div><label class="block text-xs font-bold text-gold mb-2">المبلغ الإجمالي (درهم)</label><input type="number" id="customAmount" class="w-full bg-darkBg border border-gold rounded-xl px-4 py-3 text-sm text-gold font-bold outline-none" oninput="updatePriceFromInput()" required></div>
                         </div>
                         <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3.5 rounded-xl shadow-lg transition"><i class="fa-solid fa-ticket-simple"></i> حفظ وطباعة التذكرة (A5)</button>
                     </form>
@@ -605,7 +610,21 @@
                 <div class="p-6 border-b border-zinc-800 font-bold text-gold text-lg"><i class="fa-solid fa-list-check"></i> الحجوزات والتذاكر المسجلة محلياً</div>
                 <div class="overflow-x-auto">
                     <table class="custom-table" id="bookingsHistoryTable">
-                        <thead><tr><th>رقم البوليصة</th><th>المستخدم</th><th>الاسم</th><th>الهاتف</th><th>المسار</th><th>التاريخ</th><th>العدد</th><th>المبلغ</th><th>السداد</th><th>جواز السفر</th><th>الإجراءات</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>رقم البوليصة</th>
+                                <th class="admin-only-col" style="display:none;">المستخدم المدخل</th>
+                                <th>الاسم</th>
+                                <th>الهاتف</th>
+                                <th>المسار</th>
+                                <th>التاريخ</th>
+                                <th>العدد</th>
+                                <th>المبلغ</th>
+                                <th>السداد</th>
+                                <th>جواز السفر</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
                         <tbody></tbody>
                     </table>
                 </div>
@@ -664,17 +683,15 @@
                 <div class="flex items-center gap-2 text-gold font-bold text-lg mb-4 border-b border-zinc-800 pb-3"><i class="fa-solid fa-file-invoice"></i> إنشاء وطباعة فاتورة استلام أمتعة للشحن (أصناف متعددة)</div>
                 <form id="cargoForm" onsubmit="submitCargoInvoice(event)">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                        <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم الفاتورة / الشحنة</label><label
-                                for="cargoInvNo"></label><input type="text" id="cargoInvNo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-gold font-bold" readonly></div>
-                        <div><label class="block text-xs font-bold text-zinc-300 mb-2">تاريخ الاستلام</label><label
-                                for="cargoDate"></label><input type="date" id="cargoDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required></div>
+                        <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم الفاتورة / الشحنة</label><input type="text" id="cargoInvNo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-gold font-bold" readonly></div>
+                        <div><label class="block text-xs font-bold text-zinc-300 mb-2">تاريخ الاستلام</label><input type="date" id="cargoDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required></div>
                         <div><label class="block text-xs font-bold text-zinc-300 mb-2">جهة الدفع</label>
-                            <label for="cargoPayLocation"></label><select id="cargoPayLocation" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
+                            <select id="cargoPayLocation" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
                                 <option value="الإمارات - عجمان">الإمارات - عجمان</option><option value="الإمارات - أبوظبي">الإمارات - أبوظبي</option><option value="اليمن - عدن">اليمن - عدن</option><option value="عُمان">عُمان</option>
                             </select>
                         </div>
                         <div><label class="block text-xs font-bold text-zinc-300 mb-2">حالة الفاتورة</label>
-                            <label for="cargoPaidStatus"></label><select id="cargoPaidStatus" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none">
+                            <select id="cargoPaidStatus" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none">
                                 <option value="غير مدفوع">غير مدفوع / آجل (ينتقل للمديونيات)</option><option value="مدفوع">مدفوع (ختم أحمر)</option>
                             </select>
                         </div>
@@ -682,21 +699,15 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
                         <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800">
                             <h4 class="text-gold font-bold text-sm mb-3">بيانات المرسل (تُستخدم في كشف المديونيات إذا كان غير مدفوع)</h4>
-                            <div class="mb-3"><label class="block text-xs text-zinc-400 mb-1">الاسم</label><label
-                                    for="senderName"></label><input type="text" id="senderName" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
-                            <div class="mb-3"><label class="block text-xs text-zinc-400 mb-1">الهاتف</label><label
-                                    for="senderPhone"></label><input type="text" id="senderPhone" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
-                            <div><label class="block text-xs text-zinc-400 mb-1">العنوان</label><label
-                                    for="senderAddress"></label><input type="text" id="senderAddress" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
+                            <div class="mb-3"><label class="block text-xs text-zinc-400 mb-1">الاسم</label><input type="text" id="senderName" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
+                            <div class="mb-3"><label class="block text-xs text-zinc-400 mb-1">الهاتف</label><input type="text" id="senderPhone" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
+                            <div><label class="block text-xs text-zinc-400 mb-1">العنوان</label><input type="text" id="senderAddress" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
                         </div>
                         <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800">
                             <h4 class="text-gold font-bold text-sm mb-3">بيانات المستلم</h4>
-                            <div class="mb-3"><label class="block text-xs text-zinc-400 mb-1">الاسم</label><label
-                                    for="receiverName"></label><input type="text" id="receiverName" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
-                            <div class="mb-3"><label class="block text-xs text-zinc-400 mb-1">الهاتف</label><label
-                                    for="receiverPhone"></label><input type="text" id="receiverPhone" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
-                            <div><label class="block text-xs text-zinc-400 mb-1">العنوان</label><label
-                                    for="receiverAddress"></label><input type="text" id="receiverAddress" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
+                            <div class="mb-3"><label class="block text-xs text-zinc-400 mb-1">الاسم</label><input type="text" id="receiverName" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
+                            <div class="mb-3"><label class="block text-xs text-zinc-400 mb-1">الهاتف</label><input type="text" id="receiverPhone" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
+                            <div><label class="block text-xs text-zinc-400 mb-1">العنوان</label><input type="text" id="receiverAddress" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
                         </div>
                     </div>
                     <div class="mb-4">
@@ -710,18 +721,10 @@
                                 <tbody>
                                     <tr>
                                         <td>1</td>
-                                        <td><label>
-                                            <input type="text" class="form-control item-desc w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-zinc-100" placeholder="مثال: شنطة، كرتون..." required>
-                                        </label></td>
-                                        <td><label>
-                                            <input type="number" class="form-control item-qty w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-zinc-100" value="1" min="1" oninput="calcCargoRow(this)" required>
-                                        </label></td>
-                                        <td><label>
-                                            <input type="number" class="form-control item-price w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-zinc-100" value="0" oninput="calcCargoRow(this)" required>
-                                        </label></td>
-                                        <td><label>
-                                            <input type="number" class="form-control item-total w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-gold font-bold" value="0" readonly>
-                                        </label></td>
+                                        <td><input type="text" class="form-control item-desc w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-zinc-100" placeholder="مثال: شنطة، كرتون..." required></td>
+                                        <td><input type="number" class="form-control item-qty w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-zinc-100" value="1" min="1" oninput="calcCargoRow(this)" required></td>
+                                        <td><input type="number" class="form-control item-price w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-zinc-100" value="0" oninput="calcCargoRow(this)" required></td>
+                                        <td><input type="number" class="form-control item-total w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-gold font-bold" value="0" readonly></td>
                                         <td><button type="button" class="bg-red-600 text-white p-2 rounded" onclick="removeCargoRow(this)"><i class="fa-solid fa-trash"></i></button></td>
                                     </tr>
                                 </tbody>
@@ -740,7 +743,20 @@
                 <div class="p-6 border-b border-zinc-800 font-bold text-gold text-lg"><i class="fa-solid fa-clock-rotate-left"></i> فواتير الشحن المسجلة محلياً</div>
                 <div class="overflow-x-auto">
                     <table class="custom-table" id="cargoHistoryTable">
-                        <thead><tr><th>رقم الفاتورة</th><th>التاريخ</th><th>المرسل</th><th>هاتف المرسل</th><th>المستلم</th><th>الوجهة</th><th>الإجمالي</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>رقم الفاتورة</th>
+                                <th class="admin-only-col" style="display:none;">المستخدم المدخل</th>
+                                <th>التاريخ</th>
+                                <th>المرسل</th>
+                                <th>هاتف المرسل</th>
+                                <th>المستلم</th>
+                                <th>الوجهة</th>
+                                <th>الإجمالي</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
                         <tbody></tbody>
                     </table>
                 </div>
@@ -809,26 +825,21 @@
                     <div class="flex items-center gap-2 text-gold font-bold text-lg mb-4 border-b border-zinc-800 pb-3"><i class="fa-solid fa-file-invoice"></i> إصدار فاتورة مالية جديدة</div>
                     <form id="invoiceForm" onsubmit="submitInvoice(event)">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم الفاتورة</label><label
-                                    for="invNumber"></label><input type="text" id="invNumber" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" value="INV-5001" required></div>
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">تاريخ الفاتورة</label><label
-                                    for="invDate"></label><input type="date" id="invDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" required></div>
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">اسم العميل / الجهة</label><label
-                                    for="invClientName"></label><input type="text" id="invClientName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" placeholder="اسم العميل الكامل" required></div>
+                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم الفاتورة</label><input type="text" id="invNumber" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" value="100" required></div>
+                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">تاريخ الفاتورة</label><input type="date" id="invDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" required></div>
+                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">اسم العميل / الجهة</label><input type="text" id="invClientName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" placeholder="اسم العميل الكامل" required></div>
                             <div><label class="block text-xs font-bold text-zinc-300 mb-2">نوع الخدمة / البيان</label>
-                                <label for="invType"></label><select id="invType" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100">
+                                <select id="invType" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100">
                                     <option value="شحن أمتعة وبضائع">شحن أمتعة وبضائع</option><option value="حجز تذكرة سفر">حجز تذكرة سفر</option><option value="خدمات نقل VIP">خدمات نقل VIP</option><option value="أخرى">أخرى</option>
                                 </select>
                             </div>
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">المبلغ (درهم)</label><label
-                                    for="invAmount"></label><input type="number" id="invAmount" class="w-full bg-darkBg border border-gold rounded-xl px-4 py-3 text-sm text-gold font-bold" placeholder="0.00" required></div>
+                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">المبلغ (درهم)</label><input type="number" id="invAmount" class="w-full bg-darkBg border border-gold rounded-xl px-4 py-3 text-sm text-gold font-bold" placeholder="0.00" required></div>
                             <div><label class="block text-xs font-bold text-zinc-300 mb-2">حالة السداد</label>
-                                <label for="invStatus"></label><select id="invStatus" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100">
+                                <select id="invStatus" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100">
                                     <option value="مدفوع">مدفوع</option><option value="معلق / آجل">معلق / آجل</option>
                                 </select>
                             </div>
-                            <div class="md:col-span-2"><label class="block text-xs font-bold text-zinc-300 mb-2">ملاحظات إضافية</label><label
-                                    for="invNotes"></label><input type="text" id="invNotes" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" placeholder="أي تفاصيل إضافية..."></div>
+                            <div class="md:col-span-2"><label class="block text-xs font-bold text-zinc-300 mb-2">ملاحظات إضافية</label><input type="text" id="invNotes" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" placeholder="أي تفاصيل إضافية..."></div>
                         </div>
                         <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3.5 rounded-xl shadow-lg"><i class="fa-solid fa-floppy-disk"></i> حفظ وإصدار الفاتورة</button>
                     </form>
@@ -839,16 +850,12 @@
                         <div class="flex items-center gap-2 text-gold font-bold text-lg mb-4 border-b border-zinc-800 pb-3"><i class="fa-solid fa-file-circle-plus"></i> تسجيل مديونية / مطالبة يدوية</div>
                         <form id="manualDebtForm" onsubmit="submitManualDebt(event)">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <div><label class="block text-xs font-bold text-zinc-300 mb-2">اسم المدين / العميل</label><label
-                                        for="debtName"></label><input type="text" id="debtName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" placeholder="الاسم الكامل" required></div>
-                                <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم التلفون</label><label
-                                        for="debtPhone"></label><input type="tel" id="debtPhone" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" placeholder="0500000000" required></div>
-                                <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم المستند / مرجع المطالبة</label><label
-                                        for="debtDocNo"></label><input type="text" id="debtDocNo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" value="DEBT-101" required></div>
-                                <div><label class="block text-xs font-bold text-zinc-300 mb-2">المبلغ المطلوب (درهم)</label><label
-                                        for="debtAmount"></label><input type="number" id="debtAmount" class="w-full bg-darkBg border border-gold rounded-xl px-4 py-3 text-sm text-gold font-bold" placeholder="0.00" required></div>
+                                <div><label class="block text-xs font-bold text-zinc-300 mb-2">اسم المدين / العميل</label><input type="text" id="debtName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" placeholder="الاسم الكامل" required></div>
+                                <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم التلفون</label><input type="tel" id="debtPhone" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" placeholder="0500000000" required></div>
+                                <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم المستند / مرجع المطالبة</label><input type="text" id="debtDocNo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" value="100" required></div>
+                                <div><label class="block text-xs font-bold text-zinc-300 mb-2">المبلغ المطلوب (درهم)</label><input type="number" id="debtAmount" class="w-full bg-darkBg border border-gold rounded-xl px-4 py-3 text-sm text-gold font-bold" placeholder="0.00" required></div>
                                 <div class="md:col-span-2"><label class="block text-xs font-bold text-zinc-300 mb-2">جهة الدفع</label>
-                                    <label for="debtPayLoc"></label><select id="debtPayLoc" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100">
+                                    <select id="debtPayLoc" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100">
                                         <option value="باليمن">باليمن</option><option value="بالإمارات">بالإمارات</option>
                                     </select>
                                 </div>
@@ -943,7 +950,7 @@
         <div style="max-width: 650px; margin: 0 auto; border: 2px solid #1e3a8a; padding: 25px; border-radius: 12px; background: #fff; color: #000;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1e3a8a; padding-bottom: 12px; margin-bottom: 15px;">
                 <div><h2 style="color: #1e3a8a; font-size: 1.2rem; font-weight: 900;">شركة وادي بناء للنقل البري VIP</h2><p style="font-size: 0.75rem; color: #555;">فاتورة مالية رسمية</p></div>
-                <div style="text-align: left;"><strong style="font-size: 1.1rem; color: #1e3a8a;" id="singleInvPrintNo">#INV-5001</strong><br><small style="font-size: 0.8rem; color: #555;" id="singleInvPrintDate">2026-10-17</small></div>
+                <div style="text-align: left;"><strong style="font-size: 1.1rem; color: #1e3a8a;" id="singleInvPrintNo">#100</strong><br><small style="font-size: 0.8rem; color: #555;" id="singleInvPrintDate">2026-10-17</small></div>
             </div>
             <div style="margin-bottom: 15px; font-size: 0.9rem; line-height: 1.6;">
                 <div><strong>اسم العميل / الجهة:</strong> <span id="singleInvPrintClient">---</span></div>
@@ -971,9 +978,9 @@
         let manualDebts = JSON.parse(localStorage.getItem('manualDebts')) || [];
 
         let nextTicketNumber = parseInt(localStorage.getItem('nextTicketNumber')) || 100;
-        let nextCargoNumber = parseInt(localStorage.getItem('nextCargoNumber')) || 41;
-        let nextInvoiceNumber = parseInt(localStorage.getItem('nextInvoiceNumber')) || 5001;
-        let nextDebtNumber = parseInt(localStorage.getItem('nextDebtNumber')) || 101;
+        let nextCargoNumber = parseInt(localStorage.getItem('nextCargoNumber')) || 100;
+        let nextInvoiceNumber = parseInt(localStorage.getItem('nextInvoiceNumber')) || 100;
+        let nextDebtNumber = parseInt(localStorage.getItem('nextDebtNumber')) || 100;
 
         function exportSystemBackup() {
             const backupData = {
@@ -1035,10 +1042,10 @@
             if (invDateEl) invDateEl.value = today;
 
             const invNoEl = document.getElementById('invNumber');
-            if (invNoEl) invNoEl.value = 'INV-' + nextInvoiceNumber;
+            if (invNoEl) invNoEl.value = nextInvoiceNumber;
 
             const debtDocNoEl = document.getElementById('debtDocNo');
-            if (debtDocNoEl) debtDocNoEl.value = 'DEBT-' + nextDebtNumber;
+            if (debtDocNoEl) debtDocNoEl.value = nextDebtNumber;
 
             updateRouteSummary();
             updatePriceCalculation();
@@ -1096,10 +1103,19 @@
                 document.getElementById('activeUsername').innerText = currentUser.username;
                 const roleBadge = document.getElementById('activeUserRole');
                 roleBadge.innerText = currentUser.role;
+
+                // Show/Hide admin-only columns based on role
+                const adminCols = document.querySelectorAll('.admin-only-col');
                 if (currentUser.role === 'مدير') {
                     roleBadge.className = 'badge-role badge-admin';
                     document.getElementById('adminUsersBtn').style.display = 'inline-block';
+                    adminCols.forEach(el => el.style.display = '');
+                } else {
+                    roleBadge.className = 'badge-role badge-staff';
+                    document.getElementById('adminUsersBtn').style.display = 'none';
+                    adminCols.forEach(el => el.style.display = 'none');
                 }
+
                 loadSavedBookings();
                 loadSavedCargoInvoices();
                 renderDebtTable();
@@ -1123,8 +1139,9 @@
             const tbody = document.getElementById('usersTable').getElementsByTagName('tbody')[0];
             tbody.innerHTML = '';
             users.forEach((u, index) => {
-                let deleteBtn = users.length > 1 ? `<button class="bg-red-600 text-white px-2 py-1 rounded text-xs" onclick="deleteUser(${index})"><i class="fa-solid fa-trash"></i></button>` : '-';
-                tbody.insertRow().innerHTML = `<td><strong>${u.username}</strong></td><td>${u.role}</td><td>${deleteBtn}</td>`;
+                let deleteBtn = users.length > 1 ? `<button class="bg-red-600 text-white px-2.5 py-1 rounded text-xs font-bold" onclick="deleteUser(${index})"><i class="fa-solid fa-trash"></i> حذف</button>` : '-';
+                let editBtn = `<button class="bg-gold text-black px-2.5 py-1 rounded text-xs font-bold ml-1" onclick="openEditUserModal(${index})"><i class="fa-solid fa-pen"></i> تعديل</button>`;
+                tbody.insertRow().innerHTML = `<td><strong>${u.username}</strong></td><td>${u.password}</td><td>${u.role}</td><td>${editBtn} ${deleteBtn}</td>`;
             });
         }
 
@@ -1142,6 +1159,33 @@
             document.getElementById('newUsername').value = '';
             document.getElementById('newUserPass').value = '';
             renderUsersTable();
+        }
+
+        function openEditUserModal(index) {
+            const users = JSON.parse(localStorage.getItem('sysUsers')) || [];
+            const u = users[index];
+            document.getElementById('editUserIndex').value = index;
+            document.getElementById('editUsernameInput').value = u.username;
+            document.getElementById('editUserPassInput').value = u.password;
+            document.getElementById('editUserRoleInput').value = u.role;
+            document.getElementById('editUserModal').style.display = 'flex';
+        }
+
+        function closeEditUserModal() { document.getElementById('editUserModal').style.display = 'none'; }
+
+        function saveEditedUser(e) {
+            e.preventDefault();
+            const index = document.getElementById('editUserIndex').value;
+            let users = JSON.parse(localStorage.getItem('sysUsers')) || [];
+            users[index] = {
+                username: document.getElementById('editUsernameInput').value.trim(),
+                password: document.getElementById('editUserPassInput').value.trim(),
+                role: document.getElementById('editUserRoleInput').value
+            };
+            localStorage.setItem('sysUsers', JSON.stringify(users));
+            closeEditUserModal();
+            renderUsersTable();
+            alert("تم تحديث بيانات المستخدم بنجاح!");
         }
 
         function deleteUser(index) {
@@ -1202,7 +1246,7 @@
             const priceVal = document.getElementById('customAmount').value;
             const price = priceVal + ' درهم';
             const paymentMethod = document.getElementById('paymentMethod').value;
-            const code = 'WB-' + nextTicketNumber;
+            const code = nextTicketNumber;
             const fileInput = document.getElementById('passportImageFile');
 
             const processBookingData = (imgData) => {
@@ -1238,12 +1282,17 @@
             const tbody = document.getElementById('bookingsHistoryTable').getElementsByTagName('tbody')[0];
             if (!tbody) return;
             tbody.innerHTML = '';
+            const isAdmin = currentUser && currentUser.role === 'مدير';
+
             [...busBookings].reverse().forEach((b, index) => {
                 let actualIndex = busBookings.length - 1 - index;
                 let imgCell = b.passport_image ? `<a href="${b.passport_image}" target="_blank" class="action-link"><i class="fa-solid fa-image"></i> عرض الجواز</a>` : 'لا يوجد';
+                let userColHTML = isAdmin ? `<td><span class="text-gold font-bold">${b.createdBy || 'admin'}</span></td>` : '';
                 
                 tbody.insertRow().innerHTML = `
-                    <td><strong>#${b.code}</strong></td><td>${b.createdBy || 'admin'}</td><td>${b.name}</td><td>${b.phone || '-'}</td><td>${b.from} ← ${b.to}</td><td>${b.date}</td><td>${b.count}</td><td>${b.price}</td><td><span style="color: ${b.paymentMethod === 'مدفوع' ? '#10b981' : '#f59e0b'}; font-weight:bold;">${b.paymentMethod}</span></td><td>${imgCell}</td>
+                    <td><strong>#${b.code}</strong></td>
+                    ${userColHTML}
+                    <td>${b.name}</td><td>${b.phone || '-'}</td><td>${b.from} ← ${b.to}</td><td>${b.date}</td><td>${b.count}</td><td>${b.price}</td><td><span style="color: ${b.paymentMethod === 'مدفوع' ? '#10b981' : '#f59e0b'}; font-weight:bold;">${b.paymentMethod}</span></td><td>${imgCell}</td>
                     <td>
                         <button class="bg-gold text-black px-2.5 py-1 rounded text-xs font-bold" onclick="openEditTicketModal(${actualIndex})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
                         <button class="bg-zinc-800 text-zinc-100 px-2.5 py-1 rounded text-xs font-bold border border-zinc-700" onclick='previewTicketView(${JSON.stringify(b)})'><i class="fa-solid fa-print"></i> عرض</button>
@@ -1433,11 +1482,17 @@
             const tbody = document.getElementById('cargoHistoryTable').getElementsByTagName('tbody')[0];
             if (!tbody) return;
             tbody.innerHTML = '';
+            const isAdmin = currentUser && currentUser.role === 'مدير';
+
             [...cargoInvoices].reverse().forEach((c, index) => {
                 let actualIndex = cargoInvoices.length - 1 - index;
                 let summaryDesc = c.items.map(i => `${i.qty} ${i.desc}`).join('، ');
+                let userColHTML = isAdmin ? `<td><span class="text-gold font-bold">${c.createdBy || 'admin'}</span></td>` : '';
+
                 tbody.insertRow().innerHTML = `
-                    <td><strong>#${c.invNo}</strong></td><td>${c.date}</td><td>${c.sender.name}</td><td>${c.sender.phone}</td><td>${c.receiver.name}</td><td><small>${summaryDesc}</small></td><td><strong>${c.grandTotal} درهم</strong></td><td><span style="color: ${c.paidStatus === 'مدفوع' ? '#10b981' : '#f59e0b'}; font-weight:bold;">${c.paidStatus}</span></td>
+                    <td><strong>#${c.invNo}</strong></td>
+                    ${userColHTML}
+                    <td>${c.date}</td><td>${c.sender.name}</td><td>${c.sender.phone}</td><td>${c.receiver.name}</td><td><small>${summaryDesc}</small></td><td><strong>${c.grandTotal} درهم</strong></td><td><span style="color: ${c.paidStatus === 'مدفوع' ? '#10b981' : '#f59e0b'}; font-weight:bold;">${c.paidStatus}</span></td>
                     <td>
                         <button class="bg-gold text-black px-2.5 py-1 rounded text-xs font-bold" onclick="openEditCargoModal(${actualIndex})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
                         <button class="bg-zinc-800 text-zinc-100 px-2.5 py-1 rounded text-xs font-bold border border-zinc-700" onclick='previewCargoInvoice(${JSON.stringify(c)})'><i class="fa-solid fa-print"></i> عرض</button>
@@ -1536,7 +1591,7 @@
             localStorage.setItem('nextDebtNumber', nextDebtNumber);
 
             document.getElementById('manualDebtForm').reset();
-            document.getElementById('debtDocNo').value = 'DEBT-' + nextDebtNumber;
+            document.getElementById('debtDocNo').value = nextDebtNumber;
             renderDebtTable();
             alert("تم تسجيل المديونية بنجاح!");
         }
@@ -1627,7 +1682,7 @@
             localStorage.setItem('nextInvoiceNumber', nextInvoiceNumber);
 
             document.getElementById('invoiceForm').reset();
-            document.getElementById('invNumber').value = 'INV-' + nextInvoiceNumber;
+            document.getElementById('invNumber').value = nextInvoiceNumber;
             document.getElementById('invDate').value = new Date().toISOString().split('T')[0];
             renderInvoicesTable();
             alert("تم اصدار وحفظ الفاتورة بنجاح!");
