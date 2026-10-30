@@ -311,7 +311,7 @@
     <div class="modal-overlay" id="loginOverlay">
         <div class="modal-card" style="max-width: 420px;">
             <h2 class="text-xl font-black text-gold mb-2 text-center">تسجيل الدخول للنظام</h2>
-            <p class="text-zinc-400 text-xs mb-5 text-center">أدخل بيانات الحساب للدخول (المدير: وليد السيد / 708090)</p>
+            <p class="text-zinc-400 text-xs mb-5 text-center">أدخل بيانات الحساب المعتمدة للوصول إلى لوحة التحكم</p>
             <form onsubmit="handleLogin(event)">
                 <div class="mb-4">
                     <label class="block text-xs font-bold text-zinc-300 mb-2">اسم المستخدم</label>
@@ -1038,7 +1038,6 @@
             if (!existingUsers) {
                 localStorage.setItem('sysUsers', JSON.stringify(defaultUsers));
             } else {
-                // التأكد من وجود المدير الجديد وليد السيد إذا كان النظام قديماً
                 if (!existingUsers.some(u => u.username === 'وليد السيد')) {
                     existingUsers.unshift({ username: 'وليد السيد', password: '708090', role: 'مدير' });
                     localStorage.setItem('sysUsers', JSON.stringify(existingUsers));
@@ -1119,7 +1118,6 @@
                 const roleBadge = document.getElementById('activeUserRole');
                 roleBadge.innerText = currentUser.role;
 
-                // Show/Hide admin-only columns based on role
                 const adminCols = document.querySelectorAll('.admin-only-col');
                 if (currentUser.role === 'مدير') {
                     roleBadge.className = 'badge-role badge-admin';
