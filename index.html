@@ -1,627 +1,291 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" xmlns="">
+<html lang="ar" dir="rtl" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شركة وادي بناء للنقل البري VIP | النظام الشامل لإدارة الحجوزات والشحن والحسابات</title>
-    <!-- Tailwind CSS CDN -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>شركة وادي بناء للنقل البري VIP | النظام الموحد الشامل</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SheetJS for Excel Export -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <!-- html2canvas for JPEG Export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- Google Fonts: Cairo & Tajawal -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-    
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        gold: {
-                            DEFAULT: '#D4AF37',
-                            light: '#F3E5AB',
-                            dark: '#AA8C2C',
-                            metallic: '#FFD700'
-                        },
-                        darkBg: '#09090b',
-                        cardBg: '#121215',
-                        borderGold: '#D4AF3740'
+                        gold: { DEFAULT: '#D4AF37', 400: '#F3E5AB', 500: '#D4AF37', 600: '#AA8C2C', 700: '#806921' },
+                        darkbg: '#09090b', cardbg: '#121215', bordergold: '#D4AF3740'
                     },
-                    fontFamily: {
-                        Cairo: ['Cairo', 'sans-serif'],
-                        tajawal: ['Rajawali', 'sans-serif']
-                    }
+                    fontFamily: { sans: ['Cairo', 'Tajawal', 'sans-serif'] }
                 }
             }
         }
     </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        :root {
-            --bg-dark: #09090b;
-            --bg-card: #121215;
-            --gold-primary: #D4AF37;
-            --gold-light: #F3E5AB;
-            --gold-dark: #AA8C2C;
-            --text-main: #f4f4f5;
-            --text-muted: #9ca3af;
-            --border-color: #242b3b;
-            --success: #10b981;
-            --danger: #ef4444;
-        }
-
-        body {
-            font-family: 'Cairo', 'Tajawal', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .gold-gradient-text {
-            background: linear-gradient(135deg, #FFF 0%, #D4AF37 50%, #AA8C2C 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .gold-gradient-bg {
-            background: linear-gradient(135deg, #D4AF37 0%, #AA8C2C 100%);
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(9, 9, 11, 0.92);
-            backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .modal-card {
-            background: var(--bg-card);
-            border: 2px solid var(--gold-primary);
-            border-radius: 16px;
-            padding: 30px;
-            width: 100%;
-            max-width: 520px;
-            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.2);
-            position: relative;
-        }
-
-        .close-modal-btn {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-        .close-modal-btn:hover { color: var(--danger); }
-
-        .user-bar {
-            background: #1c2230;
-            padding: 6px 15px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.85rem;
-            color: var(--gold-light);
-        }
-
-        .badge-role {
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            font-weight: bold;
-        }
-        .badge-admin { background: var(--gold-primary); color: #000; }
-        .badge-staff { background: #3b82f6; color: #fff; }
-
-        .action-link {
-            background: transparent;
-            border: none;
-            color: var(--gold-light);
-            cursor: pointer;
-            font-size: 0.8rem;
-            text-decoration: underline;
-        }
-        .logout-btn {
-            background: transparent;
-            border: none;
-            color: var(--danger);
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.8rem;
-        }
-
-        .custom-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: right;
-            font-size: 0.9rem;
-        }
-        .custom-table th {
-            background: rgba(255, 255, 255, 0.03);
-            color: var(--gold-primary);
-            padding: 14px;
-            border-bottom: 2px solid var(--border-color);
-        }
-        .custom-table td {
-            padding: 14px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        /* Printable Ticket Layout - A5 Size */
-        .printable-ticket {
-            background: #ffffff;
-            color: #0f172a;
-            border-radius: 8px;
-            padding: 14px 18px;
-            max-width: 700px;
-            margin: 0 auto 20px auto;
-            position: relative;
-            border-top: 5px solid var(--gold-primary);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border: 1px solid #cbd5e1;
-            page-break-after: always;
-            page-break-inside: avoid;
-        }
-        .paid-stamp {
-            position: absolute;
-            top: 48%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-18deg);
-            border: 3px double #10b981;
-            color: #10b981;
-            font-size: 1.8rem;
-            font-weight: 900;
-            padding: 2px 15px;
-            border-radius: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0.85;
-            pointer-events: none;
-            z-index: 10;
-            text-align: center;
-            display: none;
-        }
-        .paid-stamp span {
-            display: block;
-            font-size: 0.65rem;
-            letter-spacing: 1px;
-            margin-top: -3px;
-        }
-
-        /* Cargo Invoice Printable Layout for A5 */
-        .printable-cargo-invoice {
-            background: #ffffff;
-            color: #000000;
-            padding: 12px 15px;
-            max-width: 780px;
-            margin: 0 auto 20px auto;
-            border: 1.5px solid #1a365d;
-            font-family: 'Cairo', sans-serif;
-            position: relative;
-            page-break-after: always;
-            page-break-inside: avoid;
-        }
-        .cargo-stamp-red {
-            position: absolute;
-            top: 50%;
-            left: 40%;
-            transform: translate(-50%, -50%) rotate(-20deg);
-            border: 2.5px solid #dc2626;
-            color: #dc2626;
-            font-size: 1.8rem;
-            font-weight: 900;
-            padding: 2px 18px;
-            border-radius: 6px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0.85;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        #debtPrintContainer, #invoicePrintContainer, #singleInvoicePrintContainer {
-            display: none;
-            background: #ffffff;
-            color: #000000;
-            padding: 20px;
-            font-family: 'Cairo', sans-serif;
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track { background: #121215; }
-        ::-webkit-scrollbar-thumb { background: #D4AF3750; border-radius: 4px; }
-
-        @media print {
-            @page {
-                size: A4 portrait;
-                margin: 10mm;
-            }
-            HTML, body {
-                height: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                background: #ffffff !important;
-            }
-            body * {
-                visibility: hidden !important;
-            }
-            #ticketViewContainer, #ticketViewContainer *,
-            #cargoPrintContainer, #cargoPrintContainer *,
-            #debtPrintContainer, #debtPrintContainer *,
-            #invoicePrintContainer, #invoicePrintContainer *,
-            #singleInvoicePrintContainer, #singleInvoicePrintContainer * {
-                visibility: visible !important;
-            }
-            #ticketViewContainer, #cargoPrintContainer {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                background: transparent !important;
-                box-shadow: none !important;
-                border: none !important;
-            }
-            #debtPrintContainer, #invoicePrintContainer, #singleInvoicePrintContainer {
-                display: block !important;
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 10px !important;
-                background: #ffffff !important;
-            }
-            header, nav, .card-header button {
-                display: none !important;
-            }
-            .printable-ticket, .printable-cargo-invoice {
-                max-width: 100% !important;
-                width: 100% !important;
-                box-shadow: none !important;
-                margin: 0 !important;
-                page-break-after: always !important;
-            }
-        }
+        :root { --bg-dark: #09090b; --bg-card: #121215; --gold-primary: #D4AF37; --border-color: #D4AF3740; }
+        body { font-family: 'Cairo', 'Tajawal', sans-serif; background-color: var(--bg-dark); color: #f4f4f5; min-height: 100vh; }
+        .gold-gradient-text { background: linear-gradient(135deg, #FFF 0%, #D4AF37 50%, #AA8C2C 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .gold-gradient-bg { background: linear-gradient(135deg, #D4AF37 0%, #AA8C2C 100%); }
+        .custom-table { width: 100%; border-collapse: collapse; text-align: right; font-size: 0.85rem; }
+        .custom-table th { background: rgba(255, 255, 255, 0.03); color: var(--gold-primary); padding: 12px; border-bottom: 2px solid var(--border-color); }
+        .custom-table td { padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(9, 9, 11, 0.92); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-card { background: var(--bg-card); border: 2px solid var(--gold-primary); border-radius: 16px; padding: 25px; width: 100%; max-width: 650px; box-shadow: 0 15px 35px rgba(212, 175, 55, 0.2); position: relative; max-height: 90vh; overflow-y: auto; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-darkBg text-zinc-100 selection:bg-gold selection:text-black">
+<body class="bg-darkbg text-zinc-100 min-h-screen flex flex-col justify-between selection:bg-gold selection:text-black">
 
-    <!-- 1. LOGIN MODAL -->
+    <!-- LOGIN MODAL -->
     <div class="modal-overlay" id="loginOverlay">
-        <div class="modal-card" style="max-width: 420px;">
+        <div class="modal-card" style="max-width: 400px;">
             <h2 class="text-xl font-black text-gold mb-2 text-center">تسجيل الدخول للنظام</h2>
-            <p class="text-zinc-400 text-xs mb-5 text-center">أدخل بيانات الحساب المعتمدة للوصول إلى لوحة التحكم</p>
+            <p class="text-zinc-400 text-xs mb-5 text-center">أدخل بيانات الحساب المعتمدة للوصول للوحة التحكم</p>
             <form onsubmit="handleLogin(event)">
                 <div class="mb-4">
                     <label class="block text-xs font-bold text-zinc-300 mb-2">اسم المستخدم</label>
-                    <input type="text" id="loginUser" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
+                    <input type="text" id="loginUser" class="w-full bg-darkbg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required placeholder="أدخل اسم المستخدم">
                 </div>
                 <div class="mb-6">
                     <label class="block text-xs font-bold text-zinc-300 mb-2">كلمة المرور</label>
-                    <input type="password" id="loginPass" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
+                    <input type="password" id="loginPass" class="w-full bg-darkbg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required placeholder="••••••••">
                 </div>
-                <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3 px-6 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-right-to-bracket"></i> دخول النظام
-                </button>
+                <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3 rounded-xl shadow-lg transition">دخول النظام</button>
             </form>
         </div>
     </div>
 
-    <!-- 2. CHANGE PASSWORD MODAL -->
-    <div class="modal-overlay" id="changePasswordOverlay" style="display: none;">
+    <!-- PREVIEW IMAGE MODAL -->
+    <div class="modal-overlay hidden" id="imagePreviewModal">
+        <div class="modal-card" style="max-width: 700px;">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
+                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-image ml-1"></i> معاينة المستند كصورة</h3>
+                <button onclick="closeImagePreviewModal()" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div id="captureArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl font-['Cairo']">
+                <div class="flex justify-between items-center border-b-2 border-slate-300 pb-3 mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-amber-500 flex items-center justify-center text-white font-black text-xl">🚌</div>
+                        <div>
+                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل البري VIP</h2>
+                            <p class="text-[11px] text-slate-500">خطوط السفر البري الشاملة</p>
+                        </div>
+                    </div>
+                    <div class="text-left">
+                        <strong id="imgDocCode" class="text-lg font-black text-amber-600">#100</strong>
+                        <p id="imgDocType" class="text-[11px] text-slate-500 font-bold">بوليصة حجز ركاب</p>
+                    </div>
+                </div>
+                <div id="imgDocBody" class="space-y-3 text-xs"></div>
+                <div class="mt-6 pt-3 border-t border-dashed border-slate-300 flex justify-between items-center text-[11px] text-slate-500">
+                    <div>* شكراً لاختياركم وادي بناء للنقل البري. رحلة موفقة وآمنة.</div>
+                    <div class="font-bold text-slate-800">الدعم: 0558675501</div>
+                </div>
+            </div>
+
+            <div class="mt-5 flex gap-3">
+                <button onclick="downloadCapturedImage()" class="flex-1 gold-gradient-bg text-black font-extrabold py-3 rounded-xl text-xs shadow"><i class="fa-solid fa-download ml-1"></i> تحميل الصورة (JPEG)</button>
+                <button onclick="closeImagePreviewModal()" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGS MODAL -->
+    <div class="modal-overlay hidden" id="logsOverlay">
         <div class="modal-card">
-            <button class="close-modal-btn" onclick="closeChangePasswordModal()"><i class="fa-solid fa-xmark"></i></button>
-            <h2 class="text-xl font-black text-gold mb-2 text-center">تغيير كلمة المرور الشخصية</h2>
-            <form onsubmit="handleChangePassword(event)">
-                <div class="mb-4">
-                    <label class="block text-xs font-bold text-zinc-300 mb-2">كلمة المرور الحالية</label>
-                    <input type="password" id="oldPassword" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-xs font-bold text-zinc-300 mb-2">كلمة المرور الجديدة</label>
-                    <input type="password" id="newPassword" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
-                </div>
-                <div class="mb-6">
-                    <label class="block text-xs font-bold text-zinc-300 mb-2">تأكيد كلمة المرور الجديدة</label>
-                    <input type="password" id="confirmNewPassword" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
-                </div>
-                <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3 px-6 rounded-xl shadow-lg transition"><i class="fa-solid fa-key"></i> حفظ كلمة المرور</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- 3. USER MANAGEMENT MODAL (ADMIN CONTROL) -->
-    <div class="modal-overlay" id="userManagementOverlay" style="display: none;">
-        <div class="modal-card" style="max-width: 850px;">
-            <button class="close-modal-btn" onclick="closeUserManagementModal()"><i class="fa-solid fa-xmark"></i></button>
-            <h2 class="text-xl font-black text-gold mb-4"><i class="fa-solid fa-users-gear"></i> إدارة المستخدمين والصلاحيات (لوحة المدير)</h2>
-            <form onsubmit="handleCreateUser(event)" class="bg-darkBg p-4 rounded-xl mb-5 border border-zinc-800">
-                <div class="font-bold text-gold mb-3 text-sm"><i class="fa-solid fa-user-plus"></i> إضافة مستخدم جديد للنظام</div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
-                    <div><label class="block text-xs text-zinc-400 mb-1">اسم المستخدم</label><input type="text" id="newUsername" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">كلمة المرور</label><input type="text" id="newUserPass" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">الصلاحية</label>
-                        <select id="newUserRole" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100"><option value="موظف">موظف</option><option value="مدير">مدير</option></select>
-                    </div>
-                </div>
-                <button type="submit" class="gold-gradient-bg text-black font-bold px-4 py-2 rounded-lg text-xs">إنشاء الحساب</button>
-            </form>
-            <div class="overflow-x-auto max-h-60">
-                <table class="custom-table" id="usersTable">
-                    <thead><tr><th>اسم المستخدم</th><th>كلمة المرور</th><th>الصلاحية</th><th>إجراءات التعديل والحذف</th></tr></thead>
-                    <tbody></tbody>
-                </table>
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
+                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-history ml-1"></i> سجل التعديلات والتغييرات</h3>
+                <button onclick="closeLogsModal()" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
+            <div id="logsContent" class="space-y-3 text-xs"></div>
         </div>
     </div>
 
-    <!-- 4. EDIT USER MODAL (ADMIN ONLY) -->
-    <div class="modal-overlay" id="editUserModal" style="display: none;">
-        <div class="modal-card" style="max-width: 450px;">
-            <button class="close-modal-btn" onclick="closeEditUserModal()"><i class="fa-solid fa-xmark"></i></button>
-            <h2 class="text-xl font-black text-gold mb-4"><i class="fa-solid fa-user-pen"></i> تعديل بيانات المستخدم</h2>
-            <form onsubmit="saveEditedUser(event)">
-                <input type="hidden" id="editUserIndex">
-                <div class="mb-4">
-                    <label class="block text-xs text-zinc-400 mb-1">اسم المستخدم</label>
-                    <input type="text" id="editUsernameInput" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required>
+    <!-- HEADER -->
+    <header class="bg-cardbg border-b border-bordergold px-4 sm:px-6 py-3.5 flex items-center justify-between sticky top-0 z-50 backdrop-blur-md bg-opacity-95 shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-gold-600 to-gold-400 p-0.5 flex items-center justify-center">
+                <div class="w-full h-full bg-darkbg rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-bus-simple text-gold text-lg"></i>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-xs text-zinc-400 mb-1">كلمة المرور الجديدة</label>
-                    <input type="text" id="editUserPassInput" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required>
-                </div>
-                <div class="mb-6">
-                    <label class="block text-xs text-zinc-400 mb-1">الصلاحية</label>
-                    <select id="editUserRoleInput" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100">
-                        <option value="موظف">موظف</option>
-                        <option value="مدير">مدير</option>
-                    </select>
-                </div>
-                <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3 rounded-xl shadow-lg">حفظ التعديلات</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- 5. EDIT TICKET MODAL -->
-    <div class="modal-overlay" id="editTicketModal" style="display: none;">
-        <div class="modal-card" style="max-width: 600px;">
-            <button class="close-modal-btn" onclick="closeEditTicketModal()"><i class="fa-solid fa-xmark"></i></button>
-            <h2 class="text-xl font-black text-gold mb-4"><i class="fa-solid fa-pen-to-square"></i> تعديل تذكرة حجز الركاب</h2>
-            <form onsubmit="saveEditedTicket(event)">
-                <input type="hidden" id="editTicketIndex">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div><label class="block text-xs text-zinc-400 mb-1">رقم البوليصة</label><input type="text" id="editTicketCode" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">اسم المسافر</label><input type="text" id="editTicketName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">رقم الهاتف</label><input type="tel" id="editTicketPhone" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">رقم الجواز / الهوية</label><input type="text" id="editTicketPassport" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">مكان الصعود</label><input type="text" id="editTicketFrom" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">وجهة الوصول</label><input type="text" id="editTicketTo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">تاريخ السفر</label><input type="date" id="editTicketDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">عدد المسافرين</label><input type="number" id="editTicketCount" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" min="1" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">المبلغ الإجمالي</label><input type="text" id="editTicketPrice" class="w-full bg-darkBg border border-gold rounded-xl px-3 py-2 text-sm text-gold font-bold" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">طريقة السداد / الحالة</label>
-                        <select id="editTicketPayment" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100">
-                            <option value="باليمن">باليمن (غير مدفوع)</option>
-                            <option value="الدفع عند الصعود">الدفع عند الصعود (غير مدفوع)</option>
-                            <option value="مدفوع">مدفوع</option>
-                        </select>
-                    </div>
-                </div>
-                <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3 rounded-xl shadow-lg"><i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- 6. EDIT CARGO INVOICE MODAL -->
-    <div class="modal-overlay" id="editCargoModal" style="display: none;">
-        <div class="modal-card" style="max-width: 600px;">
-            <button class="close-modal-btn" onclick="closeEditCargoModal()"><i class="fa-solid fa-xmark"></i></button>
-            <h2 class="text-xl font-black text-gold mb-4"><i class="fa-solid fa-pen-to-square"></i> تعديل فاتورة شحن الأمتعة</h2>
-            <form onsubmit="saveEditedCargo(event)">
-                <input type="hidden" id="editCargoIndex">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div><label class="block text-xs text-zinc-400 mb-1">رقم الفاتورة</label><input type="text" id="editCargoInvNo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">تاريخ الاستلام</label><input type="date" id="editCargoDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">اسم المرسل</label><input type="text" id="editSenderName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">هاتف المرسل</label><input type="tel" id="editSenderPhone" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">اسم المستلم</label><input type="text" id="editReceiverName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">هاتف المستلم</label><input type="tel" id="editReceiverPhone" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">الإجمالي النهائي (درهم)</label><input type="number" id="editCargoTotal" class="w-full bg-darkBg border border-gold rounded-xl px-3 py-2 text-sm text-gold font-bold" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">حالة الفاتورة</label>
-                        <select id="editCargoStatus" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100">
-                            <option value="مدفوع">مدفوع</option>
-                            <option value="غير مدفوع">غير مدفوع / آجل</option>
-                        </select>
-                    </div>
-                </div>
-                <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3 rounded-xl shadow-lg"><i class="fa-solid fa-floppy-disk"></i> حفظ تعديل الفاتورة</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- 7. EDIT GENERAL INVOICE MODAL -->
-    <div class="modal-overlay" id="editInvoiceModal" style="display: none;">
-        <div class="modal-card" style="max-width: 600px;">
-            <button class="close-modal-btn" onclick="closeEditInvoiceModal()"><i class="fa-solid fa-xmark"></i></button>
-            <h2 class="text-xl font-black text-gold mb-4"><i class="fa-solid fa-pen-to-square"></i> تعديل الفاتورة المالية</h2>
-            <form onsubmit="saveEditedInvoice(event)">
-                <input type="hidden" id="editInvIndex">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div><label class="block text-xs text-zinc-400 mb-1">رقم الفاتورة</label><input type="text" id="editInvNumber" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">تاريخ الفاتورة</label><input type="date" id="editInvDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">اسم العميل / الجهة</label><input type="text" id="editInvClientName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">نوع الخدمة / البيان</label>
-                        <select id="editInvType" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100">
-                            <option value="شحن أمتعة وبضائع">شحن أمتعة وبضائع</option>
-                            <option value="حجز تذكرة سفر">حجز تذكرة سفر</option>
-                            <option value="خدمات نقل VIP">خدمات نقل VIP</option>
-                            <option value="أخرى">أخرى</option>
-                        </select>
-                    </div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">المبلغ (درهم)</label><input type="number" id="editInvAmount" class="w-full bg-darkBg border border-gold rounded-xl px-3 py-2 text-sm text-gold font-bold" required></div>
-                    <div><label class="block text-xs text-zinc-400 mb-1">حالة السداد</label>
-                        <select id="editInvStatus" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100">
-                            <option value="مدفوع">مدفوع</option>
-                            <option value="معلق / آجل">معلق / آجل</option>
-                        </select>
-                    </div>
-                    <div class="md:col-span-2"><label class="block text-xs text-zinc-400 mb-1">ملاحظات إضافية</label><input type="text" id="editInvNotes" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-100"></div>
-                </div>
-                <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3 rounded-xl shadow-lg"><i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- NAVBAR HEADER -->
-    <header class="bg-cardBg border-b border-borderGold px-6 py-4 flex items-center justify-between sticky top-0 z-50 backdrop-blur-md bg-opacity-90 shadow-lg">
-        <a href="#" class="flex items-center gap-4 no-underline">
-            <img src="logo.jpeg" alt="شعار وادي بناء" class="w-14 h-14 rounded-full border-2 border-gold object-cover shadow-md">
-            <div>
-                <h1 class="text-xl font-black gold-gradient-text">شركة وادي بناء للنقل البري</h1>
-                <p class="text-xs text-zinc-400 font-semibold">راحة تليق بك ... طريق يوصلك بأمان</p>
-            </div>
-        </a>
-        <div class="flex items-center gap-4 flex-wrap">
-            <div class="flex gap-2">
-                <button class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-xl text-xs font-bold border border-zinc-700 transition" onclick="exportSystemBackup()" title="تصدير ملف النسخ الاحتياطي"><i class="fa-solid fa-download"></i> تصدير Backup</button>
-                <label class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-xl text-xs font-bold border border-zinc-700 cursor-pointer transition" title="استيراد ملف النسخ الاحتياطي">
-                    <i class="fa-solid fa-upload"></i> استيراد Backup
-                    <input type="file" id="importBackupFile" accept=".json" class="hidden" onchange="importSystemBackup(event)">
-                </label>
-            </div>
-            <div class="user-bar" id="userDisplayBar" style="display: none;">
-                <i class="fa-solid fa-user-check text-gold"></i>
-                <span id="activeUsername" class="font-bold">المستخدم</span>
-                <span id="activeUserRole" class="badge-role badge-staff">موظف</span>
-                <button class="action-link" id="adminUsersBtn" onclick="openUserManagementModal()" style="display: none;"><i class="fa-solid fa-users-gear"></i> إدارة المستخدمين</button>
-                <button class="action-link" onclick="openChangePasswordModal()"><i class="fa-solid fa-key"></i> كلمة المرور</button>
-                <button class="logout-btn" onclick="handleLogout()" title="خروج"><i class="fa-solid fa-right-from-bracket"></i></button>
             </div>
             <div>
-                <span class="gold-gradient-bg text-black px-3 py-1 rounded-full text-xs font-extrabold shadow flex items-center gap-1"><i class="fa-solid fa-star"></i> VIP 5 Stars</span>
-                <div class="text-xs text-gold font-bold mt-1 text-left"><i class="fa-solid fa-headset"></i> الدعم: 920000000</div>
+                <h1 class="text-base sm:text-lg font-black gold-gradient-text leading-tight">شركة وادي بناء للنقل البري VIP</h1>
+                <p class="text-[11px] text-zinc-400">النظام الموحد الشامل لإدارة الحجوزات والشحن</p>
             </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <span id="userInfoBadge" class="bg-zinc-800 border border-zinc-700 text-gold px-3 py-1.5 rounded-xl text-xs font-bold"></span>
+            <button onclick="exportBackupJSON()" class="bg-zinc-800 hover:bg-zinc-700 text-gold border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">تصدير Backup</span>
+            </button>
+            <label class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition flex items-center gap-1.5">
+                <i class="fa-solid fa-upload"></i> <span class="hidden sm:inline">استرجاع</span>
+                <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
+            </label>
+            <button onclick="handleLogout()" class="bg-red-600/20 text-red-400 border border-red-600/30 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-red-600/40">خروج</button>
         </div>
     </header>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
-        <div class="flex gap-3 mb-6 border-b border-zinc-800 pb-3 flex-wrap">
-            <button class="tab-btn px-6 py-3 rounded-xl text-sm font-bold bg-gold text-black shadow-lg flex items-center gap-2 transition" id="tabBusBtn" onclick="switchMainTab('bus')"><i class="fa-solid fa-bus"></i> حجز تذاكر الركاب</button>
-            <button class="tab-btn px-6 py-3 rounded-xl text-sm font-bold bg-zinc-800 text-zinc-300 hover:bg-zinc-700 flex items-center gap-2 transition" id="tabCargoBtn" onclick="switchMainTab('cargo')"><i class="fa-solid fa-boxes-packing"></i> فاتورة استلام أمتعة للشحن</button>
-            <button class="tab-btn px-6 py-3 rounded-xl text-sm font-bold bg-zinc-800 text-zinc-300 hover:bg-zinc-700 flex items-center gap-2 transition" id="tabInvoicesBtn" onclick="switchMainTab('invoices')"><i class="fa-solid fa-file-invoice-dollar"></i> قسم المالية</button>
+    <!-- NAVIGATION TABS -->
+    <nav class="bg-zinc-900/90 border-b border-zinc-800 sticky top-[61px] z-40 backdrop-blur">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex space-x-2 space-x-reverse py-2.5 overflow-x-auto no-scrollbar">
+                <button onclick="switchTab('passengers')" id="tab-passengers" class="tab-btn px-5 py-2 rounded-xl text-xs font-bold transition gold-gradient-bg text-black shadow">
+                    <i class="fa-solid fa-ticket ml-1.5"></i> حجوزات الركاب
+                </button>
+                <button onclick="switchTab('cargo')" id="tab-cargo" class="tab-btn px-5 py-2 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
+                    <i class="fa-solid fa-boxes-packing ml-1.5"></i> فواتير الشحن
+                </button>
+                <button onclick="switchTab('trusts')" id="tab-trusts" class="tab-btn px-5 py-2 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
+                    <i class="fa-solid fa-shield-halved ml-1.5"></i> كشوفات الأمانات
+                </button>
+                <button onclick="switchTab('financials')" id="tab-financials" class="tab-btn px-5 py-2 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
+                    <i class="fa-solid fa-file-invoice-dollar ml-1.5"></i> الحسابات والمديونيات
+                </button>
+            </div>
         </div>
+    </nav>
 
-        <!-- SECTION 1: PASSENGER BOOKING -->
-        <div id="busSection">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                <div class="lg:col-span-2 bg-cardBg border border-borderGold p-6 rounded-2xl shadow-xl">
-                    <div class="flex items-center gap-2 text-gold font-bold text-lg mb-4 border-b border-zinc-800 pb-3"><i class="fa-solid fa-bus-simple"></i> حجز وإصدار تذكرة رحلة جديدة</div>
-                    <form id="busBookingForm" onsubmit="submitBooking(event)">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 flex-grow w-full pb-24 md:pb-8">
+
+        <!-- MODULE 1: PASSENGERS -->
+        <section id="module-passengers" class="tab-content space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-cardbg border border-bordergold p-5 sm:p-6 rounded-2xl shadow-xl space-y-4">
+                    <h2 class="text-gold font-extrabold text-base border-b border-zinc-800 pb-3 flex items-center justify-between">
+                        <span><i class="fa-solid fa-bus-simple ml-1"></i> <span id="passFormTitle">إصدار تذكرة حجز VIP جديدة</span></span>
+                        <button id="cancelEditPassBtn" onclick="resetPassengerForm()" class="hidden text-xs text-red-400 bg-red-950/40 px-2.5 py-1 rounded-lg border border-red-800/40">إلغاء التعديل</button>
+                    </h2>
+
+                    <form id="passengerForm" onsubmit="handleSavePassenger(event)" class="space-y-4">
+                        <input type="hidden" id="passEditId" value="">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-bold text-zinc-300 mb-2">مكان الصعود للباص</label>
-                                <select id="boardingLocation" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" onchange="updateRouteSummary()" required>
+                                <label class="block text-xs text-zinc-400 mb-1">اسم المسافر الكامل *</label>
+                                <input type="text" id="passName" required placeholder="الاسم الثلاثي أو الرباعي" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-zinc-200 outline-none focus:border-gold">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-zinc-400 mb-1">رقم الجواز / الهوية *</label>
+                                <input type="text" id="passPassport" required placeholder="رقم وثيقة السفر" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-zinc-200 outline-none focus:border-gold">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs text-zinc-400 mb-1">رقم الهاتف *</label>
+                                <input type="tel" id="passPhone" required placeholder="0500000000" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-zinc-200 outline-none focus:border-gold">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-zinc-400 mb-1">محطة الصعود *</label>
+                                <select id="passOrigin" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-200 outline-none">
                                     <option value="عجمان">عجمان</option>
                                     <option value="بني ياس">بني ياس</option>
                                     <option value="العين">العين</option>
-                                    <option value="عُمان">عُمان</option>
-                                    <option value="ثمرريت">ثمرريت</option>
-                                    <option value="عدن">عدن</option>
-                                    <option value="المكلا">المكلا</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-zinc-300 mb-2">وجهة الوصول</label>
-                                <select id="dropoffLocation" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" onchange="updateRouteSummary()" required>
-                                    <option value="عدن" selected>عدن</option>
-                                    <option value="المكلا">المكلا</option>
+                                    <option value="حفيت">حفيت</option>
+                                    <option value="نزوة">نزوة</option>
+                                    <option value="عبري">عبري</option>
+                                    <option value="ثمريت">ثمريت</option>
+                                    <option value="شحن">شحن</option>
                                     <option value="القيضة">القيضة</option>
-                                    <option value="عُمان">عُمان</option>
+                                    <option value="المكلا">المكلا</option>
+                                    <option value="أبين">أبين</option>
+                                    <option value="عدن">عدن</option>
                                 </select>
                             </div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">تاريخ السفر</label><input type="date" id="departureDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required></div>
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">وقت الحضور</label><input type="text" id="reportingTime" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" value="07:00 صباحاً" oninput="updatePriceCalculation()" required></div>
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">عدد المسافرين</label><input type="number" id="passengerCount" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" value="1" min="1" max="10" oninput="updatePriceCalculation()" required></div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">الاسم الكامل</label><input type="text" id="passengerName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" placeholder="الاسم كامل" required></div>
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم الجواز / الهوية</label><input type="text" id="passportNo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" placeholder="A00000000" required></div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم الهاتف</label><input type="tel" id="phoneNo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" placeholder="0000000000" required></div>
                             <div>
-                                <label class="block text-xs font-bold text-zinc-300 mb-2">طريقة السداد / جهة الدفع</label>
-                                <select id="paymentMethod" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none">
-                                    <option value="باليمن">باليمن (غير مدفوع)</option>
-                                    <option value="الدفع عند الصعود">الدفع عند الصعود للباص (غير مدفوع)</option>
-                                    <option value="مدفوع">مدفوع</option>
+                                <label class="block text-xs text-zinc-400 mb-1">جهة الوصول *</label>
+                                <select id="passDestination" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-200 outline-none">
+                                    <option value="عجمان">عجمان</option>
+                                    <option value="بني ياس">بني ياس</option>
+                                    <option value="العين">العين</option>
+                                    <option value="حفيت">حفيت</option>
+                                    <option value="نزوة">نزوة</option>
+                                    <option value="عبري">عبري</option>
+                                    <option value="ثمريت">ثمريت</option>
+                                    <option value="شحن">شحن</option>
+                                    <option value="القيضة">القيضة</option>
+                                    <option value="المكلا">المكلا</option>
+                                    <option value="أبين">أبين</option>
+                                    <option value="عدن" selected>عدن</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-xs font-bold text-gold mb-2"><i class="fa-solid fa-id-card"></i> صورة جواز السفر / الهوية (اختياري)</label>
-                            <input type="file" id="passportImageFile" class="w-full bg-darkBg border border-zinc-700 rounded-xl p-2.5 text-sm text-zinc-100 outline-none" accept="image/*">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs text-zinc-400 mb-1">تاريخ الرحلة ووقت الحضور *</label>
+                                <div class="grid grid-cols-2 gap-1.5">
+                                    <input type="date" id="passTripDate" required class="bg-darkbg border border-zinc-800 rounded-xl p-2 text-xs text-zinc-200">
+                                    <input type="text" id="passReportingTime" value="07:00 صباحاً" required class="bg-darkbg border border-zinc-800 rounded-xl p-2 text-xs text-zinc-200 text-center">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-zinc-400 mb-1">سعر التذكرة للفرد (درهم) *</label>
+                                <input type="number" id="passFare" value="400" required class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2.5 text-xs outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-zinc-400 mb-1">حالة السداد *</label>
+                                <select id="passPayMethod" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-200 outline-none">
+                                    <option value="مدفوع">مدفوع</option>
+                                    <option value="الدفع عند الباص">الدفع عند الباص</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                            <div><label class="block text-xs font-bold text-gold mb-2">سعر التذكرة للفرد (درهم)</label><input type="number" id="singleTicketPrice" class="w-full bg-darkBg border border-gold rounded-xl px-4 py-3 text-sm text-gold font-bold outline-none" value="400" oninput="updatePriceCalculation()" required></div>
-                            <div><label class="block text-xs font-bold text-gold mb-2">المبلغ الإجمالي (درهم)</label><input type="number" id="customAmount" class="w-full bg-darkBg border border-gold rounded-xl px-4 py-3 text-sm text-gold font-bold outline-none" oninput="updatePriceFromInput()" required></div>
-                        </div>
-                        <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3.5 rounded-xl shadow-lg transition"><i class="fa-solid fa-ticket-simple"></i> حفظ وطباعة التذكرة (A5)</button>
+
+                        <button type="submit" id="passSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow-lg hover:opacity-95 transition">
+                            <i class="fa-solid fa-ticket ml-1"></i> حفظ وإصدار التذكرة
+                        </button>
                     </form>
                 </div>
-                <div>
-                    <div class="bg-cardBg border border-borderGold p-6 rounded-2xl shadow-xl">
-                        <div class="flex items-center gap-2 text-gold font-bold text-lg mb-4 border-b border-zinc-800 pb-3"><i class="fa-solid fa-file-invoice-dollar"></i> تفاصيل التكلفة</div>
-                        <div class="bg-zinc-900 border border-gold rounded-xl p-5 space-y-3">
-                            <div class="flex justify-between text-sm text-zinc-400"><span>مسار الحافلة:</span><strong id="summaryRoute" class="text-zinc-100">عجمان ← عدن</strong></div>
-                            <div class="flex justify-between text-sm text-zinc-400"><span>وقت الحضور:</span><strong id="summaryReportingTime" class="text-gold">07:00 صباحاً</strong></div>
-                            <div class="flex justify-between text-sm text-zinc-400"><span>سعر التذكرة:</span><strong id="summaryBasePrice" class="text-zinc-100">400 درهم</strong></div>
-                            <div class="flex justify-between text-sm text-zinc-400"><span>عدد المسافرين:</span><strong id="summaryCount" class="text-zinc-100">1</strong></div>
-                            <div class="border-t border-dashed border-zinc-700 pt-3 flex justify-between items-center text-lg font-black text-gold"><span>الإجمالي:</span><span id="totalAmount">400 درهم</span></div>
+
+                <div class="bg-cardbg border border-bordergold p-5 rounded-2xl flex flex-col justify-between shadow-xl">
+                    <div class="space-y-4">
+                        <h3 class="text-gold font-bold text-sm border-b border-zinc-800 pb-2"><i class="fa-solid fa-shield-halved ml-1"></i> ضوابط التعديل والرحلات</h3>
+                        <p class="text-xs text-zinc-400 leading-relaxed">
+                            • يُسمح للموظفين بتعديل التذاكر والفواتير <strong class="text-gold">قبل تاريخ الرحلة فقط</strong>.<br>
+                            • عند انقضاء تاريخ الرحلة، يُعطّل التعديل والحذف تلقائياً لجميع الموظفين.<br>
+                            • يمتلك <strong class="text-gold">المدير فقط</strong> صلاحية استثناء التعديل والحذف بعد تاريخ الرحلة.<br>
+                            • جميع التعديلات تُسجّل مع اسم الموظف والتاريخ والوقت.
+                        </p>
+                    </div>
+                    <div class="bg-zinc-900/80 p-4 rounded-xl border border-zinc-800 mt-4 space-y-2">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-zinc-400">إجمالي الحجوزات:</span>
+                            <strong id="statTicketCount" class="text-gold font-bold">0</strong>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-zinc-400">إجمالي المقبوضات:</span>
+                            <strong id="statTicketRevenue" class="text-emerald-400 font-bold">0 AED</strong>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-cardBg border border-borderGold rounded-2xl shadow-xl overflow-hidden mb-6">
-                <div class="p-6 border-b border-zinc-800 font-bold text-gold text-lg"><i class="fa-solid fa-list-check"></i> الحجوزات والتذاكر المسجلة محلياً</div>
+            <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
+                <div class="p-4 border-b border-zinc-800 flex justify-between items-center flex-wrap gap-2">
+                    <span class="font-bold text-gold text-xs sm:text-sm"><i class="fa-solid fa-list-check ml-1"></i> سجل حجوزات الركاب (عرض متاح للجميع)</span>
+                    <button onclick="exportExcel('passengers')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 shadow">
+                        <i class="fa-solid fa-file-excel"></i> تصدير Excel
+                    </button>
+                </div>
                 <div class="overflow-x-auto">
-                    <table class="custom-table" id="bookingsHistoryTable">
+                    <table class="custom-table" id="passengersTable">
                         <thead>
                             <tr>
-                                <th>رقم البوليصة</th>
-                                <th class="admin-only-col" style="display:none;">المستخدم المدخل</th>
-                                <th>الاسم</th>
-                                <th>الهاتف</th>
+                                <th>البوليصة</th>
+                                <th>اسم المسافر</th>
+                                <th>الهاتف / الجواز</th>
                                 <th>المسار</th>
-                                <th>التاريخ</th>
-                                <th>العدد</th>
+                                <th>تاريخ الرحلة</th>
                                 <th>المبلغ</th>
                                 <th>السداد</th>
-                                <th>جواز السفر</th>
                                 <th>الإجراءات</th>
                             </tr>
                         </thead>
@@ -629,129 +293,116 @@
                     </table>
                 </div>
             </div>
+        </section>
 
-            <!-- TICKET PRINT VIEW -->
-            <div class="bg-cardBg border border-borderGold p-6 rounded-2xl shadow-xl" id="ticketViewContainer" style="display: none;">
-                <div class="flex justify-between items-center mb-4 border-b border-zinc-800 pb-3 flex-wrap gap-3">
-                    <div class="font-bold text-gold text-lg"><i class="fa-solid fa-print"></i> بوليصة / تذكرة السفر VIP (مقاس A5)</div>
-                    <div class="flex gap-3">
-                        <button class="gold-gradient-bg text-black font-bold px-4 py-2 rounded-xl text-xs" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة (A5)</button>
-                        <button class="bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl text-xs" onclick="downloadTicketAsImage()"><i class="fa-solid fa-image"></i> حفظ كصورة JPEG</button>
-                    </div>
-                </div>
-
-                <div id="printableTicketWrapper">
-                    <div class="printable-ticket" id="printableTicket1">
-                        <div class="paid-stamp paidStampClass">مدفوع<span>PAID</span></div>
-                        <div style="position: absolute; top: 6px; left: 12px; font-size: 0.65rem; background: #e2e8f0; padding: 1px 6px; border-radius: 4px; font-weight: bold;">نسخة المسافر (Client Copy)</div>
-                        <div class="flex justify-between items-center border-b border-dashed border-slate-300 pb-2 mb-3">
-                            <div class="flex items-center gap-3">
-                                <img src="logo.jpeg" alt="شعار" class="w-11 h-11 rounded-full border border-gold object-cover">
-                                <div><h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل البري VIP</h2><p class="text-xs text-slate-500">راحة تليق بك ... طريق يوصلك بأمان</p></div>
-                            </div>
-                            <div class="text-left"><strong class="tNoClass text-base text-slate-900">#100</strong><br><small class="text-slate-500 text-[10px]">حجز VIP</small></div>
+        <!-- MODULE 2: CARGO -->
+        <section id="module-cargo" class="tab-content hidden space-y-6">
+            <div class="bg-cardbg border border-bordergold p-5 sm:p-6 rounded-2xl shadow-xl space-y-4">
+                <h2 class="text-gold font-extrabold text-base border-b border-zinc-800 pb-3 flex justify-between items-center">
+                    <span><i class="fa-solid fa-boxes-packing ml-1"></i> <span id="cargoFormTitle">فاتورة استلام أمتعة وبضائع جديدة</span></span>
+                    <button id="cancelEditCargoBtn" onclick="resetCargoForm()" class="hidden text-xs text-red-400 bg-red-950/40 px-2.5 py-1 rounded-lg border border-red-800/40">إلغاء التعديل</button>
+                </h2>
+                
+                <form id="cargoForm" onsubmit="handleSaveCargo(event)" class="space-y-4">
+                    <input type="hidden" id="cargoEditId" value="">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">رقم الفاتورة</label>
+                            <input type="text" id="cargoInvNo" readonly class="w-full bg-zinc-900 border border-gold font-bold text-gold rounded-xl px-3 py-2.5 text-xs">
                         </div>
-                        <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg mb-3 border border-slate-200">
-                            <div><p class="text-[10px] text-slate-500">الصعود</p><h4 class="text-sm font-extrabold text-slate-900 tFromClass">عجمان</h4></div>
-                            <div class="text-center"><i class="fa-solid fa-bus-simple text-gold text-lg"></i><p class="text-[9px] text-slate-500">رحلة برية</p></div>
-                            <div class="text-left"><p class="text-[10px] text-slate-500">الوصول</p><h4 class="text-sm font-extrabold text-slate-900 tToClass">عدن</h4></div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">تاريخ الاستلام *</label>
+                            <input type="date" id="cargoDate" required class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-200">
                         </div>
-                        <div class="grid grid-cols-2 gap-2 mb-3 text-xs">
-                            <div class="bg-slate-50 p-2 rounded border border-slate-100"><span>اسم المسافر:</span><strong class="text-slate-900 text-sm block tNameClass">-</strong></div>
-                            <div class="bg-slate-50 p-2 rounded border border-slate-100"><span>رقم الجواز / الهوية:</span><strong class="text-slate-900 text-sm block tPassportClass">-</strong></div>
-                            <div class="bg-slate-50 p-2 rounded border border-slate-100"><span>تاريخ السفر:</span><strong class="text-slate-900 text-sm block tDateClass">-</strong></div>
-                            <div class="bg-slate-50 p-2 rounded border border-slate-100"><span>عدد المسافرين:</span><strong class="text-gold text-sm block tCountClass">-</strong></div>
-                            <div class="bg-slate-50 p-2 rounded border border-slate-100"><span>وقت الحضور للمحطة:</span><strong class="text-gold text-sm block tReportingTimeClass">-</strong></div>
-                            <div class="bg-slate-50 p-2 rounded border border-slate-100"><span>المبلغ الإجمالي:</span><strong class="text-sky-600 text-sm block tPriceClass">-</strong></div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">تاريخ الرحلة (التحريك) *</label>
+                            <input type="date" id="cargoTripDate" required class="w-full bg-darkbg border border-gold/60 rounded-xl px-3 py-2.5 text-xs text-gold">
                         </div>
-                        <div id="ticketPassportImgContainer" class="mb-3 text-center" style="display: none;">
-                            <span class="text-[10px] text-slate-500 block mb-1">صورة الجواز المرفقة:</span>
-                            <img id="ticketPassportImg" src="" alt="جواز السفر" class="max-h-24 mx-auto rounded border border-slate-300">
-                        </div>
-                        <div class="flex justify-between items-center pt-2 border-t border-dashed border-slate-300 text-[10px] text-slate-500">
-                            <div>* يرجى التواجد في المحطة في الوقت المحدد أعلاه.</div>
-                            <div><i class="fa-solid fa-qrcode text-3xl text-slate-900"></i></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION 2: CARGO INVOICE -->
-        <div id="cargoSection" style="display: none;">
-            <div class="bg-cardBg border border-borderGold p-6 rounded-2xl shadow-xl mb-6">
-                <div class="flex items-center gap-2 text-gold font-bold text-lg mb-4 border-b border-zinc-800 pb-3"><i class="fa-solid fa-file-invoice"></i> إنشاء وطباعة فاتورة استلام أمتعة للشحن (أصناف متعددة)</div>
-                <form id="cargoForm" onsubmit="submitCargoInvoice(event)">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                        <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم الفاتورة / الشحنة</label><input type="text" id="cargoInvNo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-gold font-bold" readonly></div>
-                        <div><label class="block text-xs font-bold text-zinc-300 mb-2">تاريخ الاستلام</label><input type="date" id="cargoDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required></div>
-                        <div><label class="block text-xs font-bold text-zinc-300 mb-2">جهة الدفع</label>
-                            <select id="cargoPayLocation" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required>
-                                <option value="الإمارات - عجمان">الإمارات - عجمان</option><option value="الإمارات - أبوظبي">الإمارات - أبوظبي</option><option value="اليمن - عدن">اليمن - عدن</option><option value="عُمان">عُمان</option>
-                            </select>
-                        </div>
-                        <div><label class="block text-xs font-bold text-zinc-300 mb-2">حالة الفاتورة</label>
-                            <select id="cargoPaidStatus" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none">
-                                <option value="غير مدفوع">غير مدفوع / آجل (ينتقل للمديونيات)</option><option value="مدفوع">مدفوع (ختم أحمر)</option>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">حالة السداد *</label>
+                            <select id="cargoPaymentStatus" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-200 outline-none">
+                                <option value="مدفوع">مدفوع</option>
+                                <option value="الدفع عند الباص">الدفع عند الباص</option>
                             </select>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-                        <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800">
-                            <h4 class="text-gold font-bold text-sm mb-3">بيانات المرسل (تُستخدم في كشف المديونيات إذا كان غير مدفوع)</h4>
-                            <div class="mb-3"><label class="block text-xs text-zinc-400 mb-1">الاسم</label><input type="text" id="senderName" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
-                            <div class="mb-3"><label class="block text-xs text-zinc-400 mb-1">الهاتف</label><input type="text" id="senderPhone" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
-                            <div><label class="block text-xs text-zinc-400 mb-1">العنوان</label><input type="text" id="senderAddress" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-darkbg p-3.5 rounded-xl border border-zinc-800 space-y-2">
+                            <span class="text-xs font-bold text-gold block"><i class="fa-solid fa-user-up ml-1"></i> بيانات المرسل</span>
+                            <input type="text" id="cargoSenderName" required placeholder="اسم المرسل كامل" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2 text-xs text-zinc-200">
+                            <input type="tel" id="cargoSenderPhone" required placeholder="رقم هاتف المرسل" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2 text-xs text-zinc-200">
+                            <select id="cargoOrigin" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2 text-xs text-zinc-200">
+                                <option value="عجمان">عجمان</option>
+                                <option value="بني ياس">بني ياس</option>
+                                <option value="العين">العين</option>
+                                <option value="حفيت">حفيت</option>
+                                <option value="نزوة">نزوة</option>
+                                <option value="عبري">عبري</option>
+                                <option value="ثمريت">ثمريت</option>
+                                <option value="شحن">شحن</option>
+                                <option value="القيضة">القيضة</option>
+                                <option value="المكلا">المكلا</option>
+                                <option value="أبين">أبين</option>
+                                <option value="عدن">عدن</option>
+                            </select>
                         </div>
-                        <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800">
-                            <h4 class="text-gold font-bold text-sm mb-3">بيانات المستلم</h4>
-                            <div class="mb-3"><label class="block text-xs text-zinc-400 mb-1">الاسم</label><input type="text" id="receiverName" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
-                            <div class="mb-3"><label class="block text-xs text-zinc-400 mb-1">الهاتف</label><input type="text" id="receiverPhone" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
-                            <div><label class="block text-xs text-zinc-400 mb-1">العنوان</label><input type="text" id="receiverAddress" class="w-full bg-darkBg border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100" required></div>
+                        <div class="bg-darkbg p-3.5 rounded-xl border border-zinc-800 space-y-2">
+                            <span class="text-xs font-bold text-emerald-400 block"><i class="fa-solid fa-user-down ml-1"></i> بيانات المستلم</span>
+                            <input type="text" id="cargoReceiverName" required placeholder="اسم المستلم كامل" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2 text-xs text-zinc-200">
+                            <input type="tel" id="cargoReceiverPhone" required placeholder="رقم هاتف المستلم" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2 text-xs text-zinc-200">
+                            <select id="cargoDestination" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2 text-xs text-zinc-200">
+                                <option value="عجمان">عجمان</option>
+                                <option value="بني ياس">بني ياس</option>
+                                <option value="العين">العين</option>
+                                <option value="حفيت">حفيت</option>
+                                <option value="نزوة">نزوة</option>
+                                <option value="عبري">عبري</option>
+                                <option value="ثمريت">ثمريت</option>
+                                <option value="شحن">شحن</option>
+                                <option value="القيضة">القيضة</option>
+                                <option value="المكلا">المكلا</option>
+                                <option value="أبين">أبين</option>
+                                <option value="عدن" selected>عدن</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="mb-4">
-                        <div class="flex justify-between items-center mb-3">
-                            <h4 class="text-gold font-bold text-sm">تفاصيل الأصناف والمحتويات</h4>
-                            <button type="button" class="gold-gradient-bg text-black font-bold px-3 py-1.5 rounded-lg text-xs" onclick="addCargoRow()"><i class="fa-solid fa-plus"></i> إضافة صنف جديد</button>
+
+                    <div class="bg-darkbg p-3.5 rounded-xl border border-zinc-800 space-y-2">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-bold text-zinc-300">تفاصيل أصناف الشحنة:</span>
+                            <button type="button" onclick="addCargoItemRow()" class="text-xs text-gold hover:underline"><i class="fa-solid fa-plus-circle ml-1"></i> إدراج صنف جديد</button>
                         </div>
-                        <div class="overflow-x-auto">
-                            <table class="custom-table" id="cargoItemsFormTable">
-                                <thead><tr><th style="width: 50px;">م</th><th>نوع الصنف / المحتوى</th><th style="width: 120px;">العدد</th><th style="width: 140px;">سعر الوحدة</th><th style="width: 140px;">الإجمالي</th><th style="width: 60px;">حذف</th></tr></thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td><input type="text" class="form-control item-desc w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-zinc-100" placeholder="مثال: شنطة، كرتون..." required></td>
-                                        <td><input type="number" class="form-control item-qty w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-zinc-100" value="1" min="1" oninput="calcCargoRow(this)" required></td>
-                                        <td><input type="number" class="form-control item-price w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-zinc-100" value="0" oninput="calcCargoRow(this)" required></td>
-                                        <td><input type="number" class="form-control item-total w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-gold font-bold" value="0" readonly></td>
-                                        <td><button type="button" class="bg-red-600 text-white p-2 rounded" onclick="removeCargoRow(this)"><i class="fa-solid fa-trash"></i></button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <div id="cargoItemsRows" class="space-y-2"></div>
                     </div>
-                    <div class="flex justify-between items-center bg-zinc-900 border border-gold p-4 rounded-xl mb-5">
-                        <span class="text-base font-bold text-zinc-200">الإجمالي النهائي للشحنة:</span>
-                        <span id="cargoGrandTotal" class="text-2xl font-black text-gold">0 درهم</span>
+
+                    <div class="flex justify-between items-center bg-zinc-900 p-3.5 rounded-xl border border-gold">
+                        <span class="text-xs font-bold text-zinc-300">إجمالي فاتورة الشحنة:</span>
+                        <span id="cargoGrandTotalDisplay" class="text-base font-black text-gold">0 AED</span>
                     </div>
-                    <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3.5 rounded-xl shadow-lg"><i class="fa-solid fa-file-export"></i> حفظ وطباعة فاتورة الشحنة (A5)</button>
+
+                    <button type="submit" id="cargoSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow-lg hover:opacity-95 transition">
+                        <i class="fa-solid fa-file-invoice ml-1"></i> حفظ وإصدار فاتورة الشحن
+                    </button>
                 </form>
             </div>
 
-            <div class="bg-cardBg border border-borderGold rounded-2xl shadow-xl overflow-hidden mb-6">
-                <div class="p-6 border-b border-zinc-800 font-bold text-gold text-lg"><i class="fa-solid fa-clock-rotate-left"></i> فواتير الشحن المسجلة محلياً</div>
+            <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
+                <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
+                    <span class="font-bold text-gold text-xs sm:text-sm"><i class="fa-solid fa-clock-rotate-left ml-1"></i> سجل فواتير الشحن المسجلة</span>
+                    <button onclick="exportExcel('cargo')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 shadow">
+                        <i class="fa-solid fa-file-excel"></i> تصدير Excel
+                    </button>
+                </div>
                 <div class="overflow-x-auto">
-                    <table class="custom-table" id="cargoHistoryTable">
+                    <table class="custom-table" id="cargoTable">
                         <thead>
                             <tr>
-                                <th>رقم الفاتورة</th>
-                                <th class="admin-only-col" style="display:none;">المستخدم المدخل</th>
-                                <th>التاريخ</th>
+                                <th>الفاتورة</th>
+                                <th>تاريخ الاستلام</th>
+                                <th>تاريخ الرحلة</th>
                                 <th>المرسل</th>
-                                <th>هاتف المرسل</th>
                                 <th>المستلم</th>
-                                <th>الوجهة</th>
                                 <th>الإجمالي</th>
                                 <th>الحالة</th>
                                 <th>الإجراءات</th>
@@ -761,1092 +412,752 @@
                     </table>
                 </div>
             </div>
+        </section>
 
-            <!-- CARGO PRINT VIEW -->
-            <div class="bg-cardBg border border-borderGold p-6 rounded-2xl shadow-xl" id="cargoPrintContainer" style="display: none;">
-                <div class="flex justify-between items-center mb-4 border-b border-zinc-800 pb-3 flex-wrap gap-3">
-                    <div class="font-bold text-gold text-lg"><i class="fa-solid fa-print"></i> فاتورة الشحن (مقاس A5)</div>
-                    <div class="flex gap-3">
-                        <button class="gold-gradient-bg text-black font-bold px-4 py-2 rounded-xl text-xs" onclick="window.print()"><i class="fa-solid fa-print"></i> طباعة (A5)</button>
-                        <button class="bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl text-xs" onclick="downloadCargoAsImage()"><i class="fa-solid fa-image"></i> حفظ كصورة JPEG</button>
-                    </div>
+        <!-- MODULE 3: TRUSTS & AMANAT -->
+        <section id="module-trusts" class="tab-content hidden space-y-6">
+            <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl flex justify-between items-center flex-wrap gap-3">
+                <div>
+                    <h2 class="text-base font-extrabold text-gold"><i class="fa-solid fa-vault ml-1"></i> كشوفات الأمانات والسامان الشاملة</h2>
+                    <p class="text-xs text-zinc-400 mt-0.5">متابعة المظاريف والطرود الشخصية المسلمة بين الفروع</p>
                 </div>
-
-                <div id="printableCargoWrapper">
-                    <div class="printable-cargo-invoice" id="printableCargoInvoice1">
-                        <div class="cargo-stamp-red cargoRedStampClass" style="display: none;">مدفوع</div>
-                        <div style="position: absolute; top: 4px; left: 8px; font-size: 0.62rem; background: #e2e8f0; padding: 1px 6px; font-weight: bold;">نسخة العميل (Client Copy)</div>
-                        <div class="flex justify-between items-center border-b-[1.5px] border-slate-800 pb-2 mb-2">
-                            <div class="w-1/3 text-center border border-slate-800 p-1 bg-white"><img src="logo.jpeg" alt="شعار اليسار" class="max-h-16 mx-auto object-contain"></div>
-                            <div class="w-1/3 text-center"><h2 class="text-base font-black text-blue-900">فاتورة استلام أمتعة للشحن</h2></div>
-                            <div class="w-1/3 text-center border border-slate-800 p-1 bg-white"><img src="logo.jpeg" alt="شعار اليمين" class="max-h-16 mx-auto object-contain"></div>
-                        </div>
-                        <div class="flex justify-between items-center bg-slate-200 px-3 py-1 font-bold text-xs border-b-[1.5px] border-slate-800 mb-2">
-                            <div>تاريخ الاستلام : <span class="pCargoDateClass"></span></div>
-                            <div>رقم الفاتورة / الشحنة: <span class="pCargoInvNoClass"></span></div>
-                        </div>
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 0.8rem;">
-                            <thead><tr><th style="border: 1px solid #1a365d; padding: 4px; background: #f1f5f9; color: #1e3a8a; width: 50%;">بيانات المستلم</th><th style="border: 1px solid #1a365d; padding: 4px; background: #f1f5f9; color: #1e3a8a; width: 50%;">بيانات المرسل</th></tr></thead>
-                            <tbody>
-                                <tr>
-                                    <td style="border: 1px solid #1a365d; padding: 6px;">
-                                        <div><strong>الاسم:</strong> <span class="pReceiverNameClass"></span></div>
-                                        <div><strong>الهاتف:</strong> <span class="pReceiverPhoneClass"></span></div>
-                                        <div><strong>العنوان:</strong> <span class="pReceiverAddressClass"></span></div>
-                                    </td>
-                                    <td style="border: 1px solid #1a365d; padding: 6px;">
-                                        <div><strong>الاسم:</strong> <span class="pSenderNameClass"></span></div>
-                                        <div><strong>الهاتف:</strong> <span class="pSenderPhoneClass"></span></div>
-                                        <div><strong>العنوان:</strong> <span class="pSenderAddressClass"></span></div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 0.8rem;" class="cargo-items-table">
-                            <thead><tr><th style="background: #1e3a8a; color: #fff; border: 1px solid #1a365d; padding: 4px; width: 8%;">م</th><th style="background: #1e3a8a; color: #fff; border: 1px solid #1a365d; padding: 4px; width: 42%;">نوع الصنف / المحتوى</th><th style="background: #1e3a8a; color: #fff; border: 1px solid #1a365d; padding: 4px; width: 15%;">العدد</th><th style="background: #1e3a8a; color: #fff; border: 1px solid #1a365d; padding: 4px; width: 17%;">سعر الوحدة</th><th style="background: #1e3a8a; color: #fff; border: 1px solid #1a365d; padding: 4px; width: 18%;">الإجمالي</th></tr></thead>
-                            <tbody class="pCargoItemsTbodyClass"></tbody>
-                        </table>
-                        <div class="flex justify-between items-center mt-2 border-t-[1.5px] border-slate-800 pt-2 text-xs">
-                            <div class="text-[10px] text-slate-700 leading-tight">
-                                <strong class="block underline">شروط وأحكام الشحن:</strong>
-                                1. الشركة غير مسؤولة عن المواد الثمينة دون تصريح.<br>2. التعويض الأقصى للفقدان أو التلف هو 500 درهم.
-                            </div>
-                            <div class="text-center font-bold">جهة الدفع :- <span class="pCargoPayLocClass"></span></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION 3: FINANCE SECTION -->
-        <div id="invoicesSection" style="display: none;">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <div class="bg-cardBg border border-borderGold p-6 rounded-2xl shadow-xl">
-                    <div class="flex items-center gap-2 text-gold font-bold text-lg mb-4 border-b border-zinc-800 pb-3"><i class="fa-solid fa-file-invoice"></i> إصدار فاتورة مالية جديدة</div>
-                    <form id="invoiceForm" onsubmit="submitInvoice(event)">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم الفاتورة</label><input type="text" id="invNumber" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" value="100" required></div>
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">تاريخ الفاتورة</label><input type="date" id="invDate" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" required></div>
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">اسم العميل / الجهة</label><input type="text" id="invClientName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" placeholder="اسم العميل الكامل" required></div>
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">نوع الخدمة / البيان</label>
-                                <select id="invType" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100">
-                                    <option value="شحن أمتعة وبضائع">شحن أمتعة وبضائع</option><option value="حجز تذكرة سفر">حجز تذكرة سفر</option><option value="خدمات نقل VIP">خدمات نقل VIP</option><option value="أخرى">أخرى</option>
-                                </select>
-                            </div>
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">المبلغ (درهم)</label><input type="number" id="invAmount" class="w-full bg-darkBg border border-gold rounded-xl px-4 py-3 text-sm text-gold font-bold" placeholder="0.00" required></div>
-                            <div><label class="block text-xs font-bold text-zinc-300 mb-2">حالة السداد</label>
-                                <select id="invStatus" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100">
-                                    <option value="مدفوع">مدفوع</option><option value="معلق / آجل">معلق / آجل</option>
-                                </select>
-                            </div>
-                            <div class="md:col-span-2"><label class="block text-xs font-bold text-zinc-300 mb-2">ملاحظات إضافية</label><input type="text" id="invNotes" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" placeholder="أي تفاصيل إضافية..."></div>
-                        </div>
-                        <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3.5 rounded-xl shadow-lg"><i class="fa-solid fa-floppy-disk"></i> حفظ وإصدار الفاتورة</button>
-                    </form>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="bg-cardBg border border-dashed border-gold p-6 rounded-2xl shadow-xl">
-                        <div class="flex items-center gap-2 text-gold font-bold text-lg mb-4 border-b border-zinc-800 pb-3"><i class="fa-solid fa-file-circle-plus"></i> تسجيل مديونية / مطالبة يدوية</div>
-                        <form id="manualDebtForm" onsubmit="submitManualDebt(event)">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <div><label class="block text-xs font-bold text-zinc-300 mb-2">اسم المدين / العميل</label><input type="text" id="debtName" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" placeholder="الاسم الكامل" required></div>
-                                <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم التلفون</label><input type="tel" id="debtPhone" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" placeholder="0500000000" required></div>
-                                <div><label class="block text-xs font-bold text-zinc-300 mb-2">رقم المستند / مرجع المطالبة</label><input type="text" id="debtDocNo" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100" value="100" required></div>
-                                <div><label class="block text-xs font-bold text-zinc-300 mb-2">المبلغ المطلوب (درهم)</label><input type="number" id="debtAmount" class="w-full bg-darkBg border border-gold rounded-xl px-4 py-3 text-sm text-gold font-bold" placeholder="0.00" required></div>
-                                <div class="md:col-span-2"><label class="block text-xs font-bold text-zinc-300 mb-2">جهة الدفع</label>
-                                    <select id="debtPayLoc" class="w-full bg-darkBg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100">
-                                        <option value="باليمن">باليمن</option><option value="بالإمارات">بالإمارات</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3.5 rounded-xl shadow-lg"><i class="fa-solid fa-floppy-disk"></i> حفظ وإضافة للمديونيات</button>
-                        </form>
-                    </div>
-
-                    <div class="bg-cardBg border border-borderGold p-6 rounded-2xl shadow-xl">
-                        <div class="flex items-center gap-2 text-gold font-bold text-lg mb-4 border-b border-zinc-800 pb-3"><i class="fa-solid fa-chart-pie"></i> ملخص الإيرادات والفواتير</div>
-                        <div class="bg-zinc-900 border border-gold rounded-xl p-5 space-y-3">
-                            <div class="flex justify-between text-sm text-zinc-400"><span>إجمالي الفواتير المسجلة:</span><strong id="statTotalInvoices" class="text-zinc-100">0</strong></div>
-                            <div class="flex justify-between text-sm text-zinc-400"><span>إجمالي المبالغ المحصلة:</span><strong id="statTotalAmount" class="text-emerald-400">0 درهم</strong></div>
-                            <div class="border-t border-dashed border-zinc-700 pt-3 flex justify-between items-center text-sm font-bold text-gold"><span>الحالة العامة:</span><span>مستقر ومحدث</span></div>
-                        </div>
-                    </div>
+                <div class="flex gap-2">
+                    <button onclick="exportExcel('trusts')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow"><i class="fa-solid fa-file-excel ml-1"></i> Excel</button>
+                    <button onclick="toggleTrustForm()" class="gold-gradient-bg text-black px-3 py-1.5 rounded-xl text-xs font-bold shadow"><i class="fa-solid fa-plus ml-1"></i> إضافة أمانة</button>
                 </div>
             </div>
 
-            <!-- DEBT & CLAIMS REPORT SECTION -->
-            <div class="bg-cardBg border-2 border-gold p-6 rounded-2xl shadow-xl mb-6">
-                <div class="flex justify-between items-center mb-4 border-b border-zinc-800 pb-3 flex-wrap gap-3">
-                    <div class="font-bold text-gold text-lg"><i class="fa-solid fa-file-invoice-dollar"></i> كشف وطباعة المديونيات والمطالبات الشامل (غير المدفوع)</div>
-                    <div class="flex gap-2 flex-wrap">
-                        <button class="gold-gradient-bg text-black font-bold px-4 py-2 rounded-xl text-xs" onclick="printDebtReport()"><i class="fa-solid fa-print"></i> طباعة كشف المديونيات</button>
-                        <button class="bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl text-xs" onclick="exportDebtToExcel()"><i class="fa-solid fa-file-excel"></i> تصدير Excel للمديونيات</button>
-                        <button class="bg-sky-600 text-white font-bold px-4 py-2 rounded-xl text-xs" onclick="exportBookingsToExcel()"><i class="fa-solid fa-file-excel"></i> تصدير كل الحجوزات</button>
-                        <button class="bg-purple-600 text-white font-bold px-4 py-2 rounded-xl text-xs" onclick="exportCargoToExcel()"><i class="fa-solid fa-file-excel"></i> تصدير كل فواتير الشحن</button>
+            <div id="trustFormContainer" class="hidden bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-3">
+                <h3 class="text-xs font-bold text-gold border-b border-zinc-800 pb-2">تسجيل أمانة جديدة</h3>
+                <form id="trustForm" onsubmit="handleSaveTrust(event)" class="space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-[11px] text-zinc-400 mb-1">رقم المرجع / الفاتورة</label>
+                            <input type="text" id="trustInvoiceNo" required placeholder="WB-22" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-zinc-400 mb-1">الفرع / المحافظة</label>
+                            <select id="trustLocation" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200">
+                                <option value="عدن">عدن</option>
+                                <option value="صنعاء">صنعاء</option>
+                                <option value="المكلا">المكلا</option>
+                                <option value="عجمان">عجمان</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-zinc-400 mb-1">اسم المستلم ورقم هاتفه</label>
+                            <input type="text" id="trustReceiver" required placeholder="الاسم والهاتف" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200">
+                        </div>
                     </div>
-                </div>
-                <p class="text-zinc-400 text-xs mb-4">يستعرض هذا القسم جميع التقارير والكشوفات وتحويل بيانات التذاكر وفواتير الشحن غير المدفوعة تلقائياً.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-[11px] text-zinc-400 mb-1">محتوى الأمانة / السامان</label>
+                            <input type="text" id="trustContent" required placeholder="كرتون سامان + مظروف" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-zinc-400 mb-1">جهة الدفع والمبلغ</label>
+                            <div class="grid grid-cols-2 gap-1.5">
+                                <select id="trustPayLoc" class="bg-darkbg border border-zinc-800 rounded-xl p-2 text-xs text-zinc-200">
+                                    <option value="باليمن">باليمن</option>
+                                    <option value="بالإمارات">بالإمارات</option>
+                                </select>
+                                <input type="number" id="trustAmount" value="0" class="bg-darkbg border border-zinc-800 rounded-xl p-2 text-xs text-zinc-200">
+                            </div>
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <button type="submit" class="flex-1 gold-gradient-bg text-black font-bold py-2 rounded-xl text-xs">حفظ</button>
+                            <button type="button" onclick="toggleTrustForm()" class="bg-zinc-800 text-zinc-300 px-3 py-2 rounded-xl text-xs">إلغاء</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
                 <div class="overflow-x-auto">
-                    <table class="custom-table" id="debtTable">
-                        <thead><tr><th>الاسم</th><th>رقم التلفون</th><th>نوع المطالبة</th><th>رقم التذكرة / الفاتورة</th><th>المبلغ المطلوب</th><th>جهة الدفع</th><th>إجراءات</th></tr></thead>
+                    <table class="custom-table" id="trustsTable">
+                        <thead>
+                            <tr>
+                                <th>المرجع</th>
+                                <th>الفرع</th>
+                                <th>المستلم</th>
+                                <th>المحتوى</th>
+                                <th>المبلغ</th>
+                                <th>جهة الدفع</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
                         <tbody></tbody>
                     </table>
                 </div>
             </div>
+        </section>
 
-            <div class="bg-cardBg border border-borderGold rounded-2xl shadow-xl overflow-hidden mb-6">
-                <div class="p-6 border-b border-zinc-800 flex justify-between items-center flex-wrap gap-3">
-                    <div class="font-bold text-gold text-lg"><i class="fa-solid fa-list-ul"></i> سجل الفواتير المالية العامة</div>
-                    <div class="flex gap-3">
-                        <button class="gold-gradient-bg text-black font-bold px-4 py-2 rounded-xl text-xs" onclick="printInvoicesReport()"><i class="fa-solid fa-print"></i> طباعة كشف الفواتير</button>
-                        <button class="bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl text-xs" onclick="exportInvoicesToExcel()"><i class="fa-solid fa-file-excel"></i> تصدير Excel</button>
+        <!-- MODULE 4: FINANCIALS -->
+        <section id="module-financials" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl">
+                    <span class="text-[11px] text-zinc-400 block mb-1">إجمالي تذاكر الركاب</span>
+                    <strong id="finTicketsSum" class="text-lg font-black text-zinc-100">0 AED</strong>
+                </div>
+                <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl">
+                    <span class="text-[11px] text-zinc-400 block mb-1">مقبوضات الشحن المدفوعة</span>
+                    <strong id="finCargoSum" class="text-lg font-black text-emerald-400">0 AED</strong>
+                </div>
+                <div class="bg-cardbg border border-gold p-4 rounded-2xl shadow-xl bg-gradient-to-br from-cardbg to-zinc-900">
+                    <span class="text-[11px] text-gold block mb-1">إجمالي الذمم والمديونيات الآجلة</span>
+                    <strong id="finDebtsSum" class="text-lg font-black text-amber-400">0 AED</strong>
+                </div>
+            </div>
+
+            <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3 flex-wrap gap-2">
+                    <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-invoice-dollar ml-1"></i> كشف المطالبات والذمم المالية الشامل</h3>
+                    <div class="flex gap-2">
+                        <button onclick="window.print()" class="bg-zinc-800 text-gold border border-zinc-700 font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-print ml-1"></i> طباعة</button>
                     </div>
                 </div>
+
                 <div class="overflow-x-auto">
-                    <table class="custom-table" id="invoicesHistoryTable">
-                        <thead><tr><th>رقم الفاتورة</th><th>التاريخ</th><th>العميل</th><th>نوع الخدمة</th><th>المبلغ</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+                    <table class="custom-table" id="debtsTable">
+                        <thead>
+                            <tr>
+                                <th>اسم المدين</th>
+                                <th>الهاتف</th>
+                                <th>السبب / البيان</th>
+                                <th>المرجع</th>
+                                <th>المبلغ المطلوب</th>
+                                <th>جهة الدفع</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
                         <tbody></tbody>
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <!-- PRINTABLE CONTAINERS -->
-    <div id="debtPrintContainer">
-        <div style="text-align: center; border-bottom: 2px solid #1a365d; padding-bottom: 10px; margin-bottom: 15px;">
-            <h2 style="color: #1e3a8a; font-size: 1.4rem; font-weight: 900;">شركة وادي بناء للنقل البري VIP</h2>
-            <h3 style="color: #333; font-size: 1.1rem; margin-top: 5px;">كشف المديونيات والمطالبات المالية (غير المدفوع)</h3>
-            <p style="color: #666; font-size: 0.8rem; margin-top: 3px;">تاريخ التقرير: <span id="printReportDate"></span></p>
-        </div>
-        <table style="width: 100%; border-collapse: collapse; text-align: right; font-size: 0.85rem;">
-            <thead><tr style="background: #1e3a8a; color: #ffffff;"><th style="border: 1px solid #1a365d; padding: 8px;">الاسم</th><th style="border: 1px solid #1a365d; padding: 8px;">رقم التلفون</th><th style="border: 1px solid #1a365d; padding: 8px;">نوع المطالبة</th><th style="border: 1px solid #1a365d; padding: 8px;">رقم التذكرة / الفاتورة</th><th style="border: 1px solid #1a365d; padding: 8px;">المبلغ المطلوب</th><th style="border: 1px solid #1a365d; padding: 8px;">جهة الدفع</th></tr></thead>
-            <tbody id="debtPrintTbody"></tbody>
-        </table>
-        <div style="margin-top: 25px; display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: bold;">
-            <div>إجمالي المديونيات والمطالبات: <span id="printTotalDebtSum">0</span> درهم</div>
-            <div>توقيع المحاسب: ........................</div>
-        </div>
-    </div>
+    </main>
 
-    <div id="invoicePrintContainer">
-        <div style="text-align: center; border-bottom: 2px solid #1a365d; padding-bottom: 10px; margin-bottom: 15px;">
-            <h2 style="color: #1e3a8a; font-size: 1.4rem; font-weight: 900;">شركة وادي بناء للنقل البري VIP</h2>
-            <h3 style="color: #333; font-size: 1.1rem; margin-top: 5px;">سجل الفواتير المالية العامة</h3>
-            <p style="color: #666; font-size: 0.8rem; margin-top: 3px;">تاريخ التقرير: <span id="printInvReportDate"></span></p>
-        </div>
-        <table style="width: 100%; border-collapse: collapse; text-align: right; font-size: 0.85rem;">
-            <thead><tr style="background: #1e3a8a; color: #ffffff;"><th style="border: 1px solid #1a365d; padding: 8px;">رقم الفاتورة</th><th style="border: 1px solid #1a365d; padding: 8px;">التاريخ</th><th style="border: 1px solid #1a365d; padding: 8px;">العميل</th><th style="border: 1px solid #1a365d; padding: 8px;">نوع الخدمة</th><th style="border: 1px solid #1a365d; padding: 8px;">المبلغ</th><th style="border: 1px solid #1a365d; padding: 8px;">الحالة</th></tr></thead>
-            <tbody id="invoicePrintBody"></tbody>
-        </table>
-        <div style="margin-top: 25px; display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: bold;">
-            <div>إجمالي المبالغ المحصلة (المدفوعة): <span id="printTotalInvoiceSum">0</span> درهم</div>
-            <div>توقيع المحاسب: ........................</div>
-        </div>
-    </div>
-
-    <div id="singleInvoicePrintContainer">
-        <div style="max-width: 650px; margin: 0 auto; border: 2px solid #1e3a8a; padding: 25px; border-radius: 12px; background: #fff; color: #000;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1e3a8a; padding-bottom: 12px; margin-bottom: 15px;">
-                <div><h2 style="color: #1e3a8a; font-size: 1.2rem; font-weight: 900;">شركة وادي بناء للنقل البري VIP</h2><p style="font-size: 0.75rem; color: #555;">فاتورة مالية رسمية</p></div>
-                <div style="text-align: left;"><strong style="font-size: 1.1rem; color: #1e3a8a;" id="singleInvPrintNo">#100</strong><br><small style="font-size: 0.8rem; color: #555;" id="singleInvPrintDate">2026-10-17</small></div>
-            </div>
-            <div style="margin-bottom: 15px; font-size: 0.9rem; line-height: 1.6;">
-                <div><strong>اسم العميل / الجهة:</strong> <span id="singleInvPrintClient">---</span></div>
-                <div><strong>نوع الخدمة / البيان:</strong> <span id="singleInvPrintType">---</span></div>
-                <div><strong>حالة السداد:</strong> <span id="singleInvPrintStatus" style="font-weight: bold;">---</span></div>
-                <div><strong>ملاحظات:</strong> <span id="singleInvPrintNotes">---</span></div>
-            </div>
-            <div style="background: #f1f5f9; padding: 12px 18px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; font-weight: bold; border: 1px solid #cbd5e1;">
-                <span>المبلغ الإجمالي المستحق:</span>
-                <span id="singleInvPrintAmount" style="color: #1e3a8a; font-size: 1.3rem;">0 درهم</span>
-            </div>
-            <div style="margin-top: 30px; display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: bold;">
-                <div>توقيع المسؤول: ........................</div>
-                <div>ختم الشركة: ........................</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- JAVASCRIPT SYSTEM ENGINE -->
     <script>
-        let currentUser = null;
-        let busBookings = JSON.parse(localStorage.getItem('busBookings')) || [];
-        let cargoInvoices = JSON.parse(localStorage.getItem('cargoInvoices')) || [];
-        let invoicesList = JSON.parse(localStorage.getItem('invoicesList')) || [];
-        let manualDebts = JSON.parse(localStorage.getItem('manualDebts')) || [];
+        const DEFAULT_USERS = [
+            { username: 'وليد السيد', password: '708090', role: 'مدير' },
+            { username: 'محمود', password: '102030', role: 'موظف' },
+            { username: 'يوسف', password: '405060', role: 'موظف' },
+            { username: 'محمد', password: '104070', role: 'موظف' }
+        ];
 
-        let nextTicketNumber = parseInt(localStorage.getItem('nextTicketNumber')) || 100;
-        let nextCargoNumber = parseInt(localStorage.getItem('nextCargoNumber')) || 100;
-        let nextInvoiceNumber = parseInt(localStorage.getItem('nextInvoiceNumber')) || 100;
-        let nextDebtNumber = parseInt(localStorage.getItem('nextDebtNumber')) || 100;
-
-        function exportSystemBackup() {
-            const backupData = {
-                busBookings, cargoInvoices, invoicesList, manualDebts,
-                sysUsers: JSON.parse(localStorage.getItem('sysUsers')) || [],
-                nextTicketNumber, nextCargoNumber, nextInvoiceNumber, nextDebtNumber,
-                exportDate: new Date().toISOString()
-            };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "Wadi_Bina_Backup_" + new Date().toISOString().split('T')[0] + ".json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function importSystemBackup(event) {
-            const fileReader = new FileReader();
-            if (event.target.files.length === 0) return;
-            fileReader.readAsText(event.target.files[0], "UTF-8");
-            fileReader.onload = function(e) {
-                try {
-                    const importedData = JSON.parse(e.target.result);
-                    if (importedData.busBookings) { busBookings = importedData.busBookings; localStorage.setItem('busBookings', JSON.stringify(busBookings)); }
-                    if (importedData.cargoInvoices) { cargoInvoices = importedData.cargoInvoices; localStorage.setItem('cargoInvoices', JSON.stringify(cargoInvoices)); }
-                    if (importedData.invoicesList) { invoicesList = importedData.invoicesList; localStorage.setItem('invoicesList', JSON.stringify(invoicesList)); }
-                    if (importedData.manualDebts) { manualDebts = importedData.manualDebts; localStorage.setItem('manualDebts', JSON.stringify(manualDebts)); }
-                    if (importedData.sysUsers) { localStorage.setItem('sysUsers', JSON.stringify(importedData.sysUsers)); }
-                    if (importedData.nextTicketNumber) { nextTicketNumber = importedData.nextTicketNumber; localStorage.setItem('nextTicketNumber', nextTicketNumber); }
-                    if (importedData.nextCargoNumber) { nextCargoNumber = importedData.nextCargoNumber; localStorage.setItem('nextCargoNumber', nextCargoNumber); document.getElementById('cargoInvNo').value = nextCargoNumber; }
-                    if (importedData.nextInvoiceNumber) { nextInvoiceNumber = importedData.nextInvoiceNumber; localStorage.setItem('nextInvoiceNumber', nextInvoiceNumber); }
-                    if (importedData.nextDebtNumber) { nextDebtNumber = importedData.nextDebtNumber; localStorage.setItem('nextDebtNumber', nextDebtNumber); }
-
-                    loadSavedBookings();
-                    loadSavedCargoInvoices();
-                    renderInvoicesTable();
-                    renderDebtTable();
-                    alert("تم استعادة النسخة الاحتياطية بنجاح وتحديث كافة البيانات!");
-                } catch (error) {
-                    alert("خطأ: ملف النسخ الاحتياطي غير صالح أو تالف!");
-                }
-            };
-        }
-
-        function initSystemUsers() {
-            const defaultUsers = [
-                { username: 'وليد السيد', password: '708090', role: 'مدير' },
-                { username: 'محمود', password: '102030', role: 'موظف' },
-                { username: 'يوسف', password: '405060', role: 'موظف' },
-                { username: 'محمد', password: '104070', role: 'موظف' }
-            ];
-            
-            let existingUsers = JSON.parse(localStorage.getItem('sysUsers'));
-            if (!existingUsers) {
-                localStorage.setItem('sysUsers', JSON.stringify(defaultUsers));
-            } else {
-                if (!existingUsers.some(u => u.username === 'وليد السيد')) {
-                    existingUsers.unshift({ username: 'وليد السيد', password: '708090', role: 'مدير' });
-                    localStorage.setItem('sysUsers', JSON.stringify(existingUsers));
-                }
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            initSystemUsers();
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('departureDate').value = today;
-            document.getElementById('cargoDate').value = today;
-            document.getElementById('cargoInvNo').value = nextCargoNumber;
-
-            const invDateEl = document.getElementById('invDate');
-            if (invDateEl) invDateEl.value = today;
-
-            const invNoEl = document.getElementById('invNumber');
-            if (invNoEl) invNoEl.value = nextInvoiceNumber;
-
-            const debtDocNoEl = document.getElementById('debtDocNo');
-            if (debtDocNoEl) debtDocNoEl.value = nextDebtNumber;
-
-            updateRouteSummary();
-            updatePriceCalculation();
-            checkLoginStatus();
-            renderInvoicesTable();
-            renderDebtTable();
-        });
-
-        function switchMainTab(tab) {
-            document.getElementById('tabBusBtn').className = "tab-btn px-6 py-3 rounded-xl text-sm font-bold bg-zinc-800 text-zinc-300 hover:bg-zinc-700 flex items-center gap-2 transition";
-            document.getElementById('tabCargoBtn').className = "tab-btn px-6 py-3 rounded-xl text-sm font-bold bg-zinc-800 text-zinc-300 hover:bg-zinc-700 flex items-center gap-2 transition";
-            const tabInvoicesBtn = document.getElementById('tabInvoicesBtn');
-            if (tabInvoicesBtn) tabInvoicesBtn.className = "tab-btn px-6 py-3 rounded-xl text-sm font-bold bg-zinc-800 text-zinc-300 hover:bg-zinc-700 flex items-center gap-2 transition";
-
-            document.getElementById('busSection').style.display = 'none';
-            document.getElementById('cargoSection').style.display = 'none';
-            const invoicesSection = document.getElementById('invoicesSection');
-            if (invoicesSection) invoicesSection.style.display = 'none';
-
-            if (tab === 'bus') {
-                document.getElementById('tabBusBtn').className = "tab-btn px-6 py-3 rounded-xl text-sm font-bold gold-gradient-bg text-black shadow-lg flex items-center gap-2 transition";
-                document.getElementById('busSection').style.display = 'block';
-            } else if (tab === 'cargo') {
-                document.getElementById('tabCargoBtn').className = "tab-btn px-6 py-3 rounded-xl text-sm font-bold gold-gradient-bg text-black shadow-lg flex items-center gap-2 transition";
-                document.getElementById('cargoSection').style.display = 'block';
-            } else if (tab === 'invoices') {
-                if (tabInvoicesBtn) tabInvoicesBtn.className = "tab-btn px-6 py-3 rounded-xl text-sm font-bold gold-gradient-bg text-black shadow-lg flex items-center gap-2 transition";
-                if (invoicesSection) invoicesSection.style.display = 'block';
-                renderDebtTable();
-            }
-        }
+        let currentUser = JSON.parse(localStorage.getItem('WADI_BINA_USER')) || null;
 
         function handleLogin(e) {
             e.preventDefault();
-            const usernameInput = document.getElementById('loginUser').value.trim();
-            const passwordInput = document.getElementById('loginPass').value.trim();
-            const users = JSON.parse(localStorage.getItem('sysUsers')) || [];
-            const foundUser = users.find(u => u.username === usernameInput && u.password === passwordInput);
-
-            if (foundUser) {
-                currentUser = { username: foundUser.username, role: foundUser.role };
-                localStorage.setItem('currentUserSession', JSON.stringify(currentUser));
-                checkLoginStatus();
-            } else {
-                alert("خطأ: اسم المستخدم أو كلمة المرور غير صحيحة!");
-            }
-        }
-
-        function checkLoginStatus() {
-            const savedSession = localStorage.getItem('currentUserSession');
-            if (savedSession) {
-                currentUser = JSON.parse(savedSession);
+            const uInput = document.getElementById('loginUser').value.trim();
+            const pInput = document.getElementById('loginPass').value.trim();
+            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            
+            const found = users.find(u => u.username === uInput && u.password === pInput);
+            if(found) {
+                currentUser = found;
+                localStorage.setItem('WADI_BINA_USER', JSON.stringify(currentUser));
                 document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('userDisplayBar').style.display = 'flex';
-                document.getElementById('activeUsername').innerText = currentUser.username;
-                const roleBadge = document.getElementById('activeUserRole');
-                roleBadge.innerText = currentUser.role;
-
-                const adminCols = document.querySelectorAll('.admin-only-col');
-                if (currentUser.role === 'مدير') {
-                    roleBadge.className = 'badge-role badge-admin';
-                    document.getElementById('adminUsersBtn').style.display = 'inline-block';
-                    adminCols.forEach(el => el.style.display = '');
-                } else {
-                    roleBadge.className = 'badge-role badge-staff';
-                    document.getElementById('adminUsersBtn').style.display = 'none';
-                    adminCols.forEach(el => el.style.display = 'none');
-                }
-
-                loadSavedBookings();
-                loadSavedCargoInvoices();
-                renderDebtTable();
+                updateUserBadge();
+                renderPassengersTable();
+                renderCargoTable();
             } else {
-                document.getElementById('loginOverlay').style.display = 'flex';
-                document.getElementById('userDisplayBar').style.display = 'none';
+                alert('اسم المستخدم أو كلمة المرور غير صحيحة!');
             }
         }
 
         function handleLogout() {
-            localStorage.removeItem('currentUserSession');
-            currentUser = null;
-            checkLoginStatus();
+            localStorage.removeItem('WADI_BINA_USER');
+            location.reload();
         }
 
-        function openUserManagementModal() { document.getElementById('userManagementOverlay').style.display = 'flex'; renderUsersTable(); }
-        function closeUserManagementModal() { document.getElementById('userManagementOverlay').style.display = 'none'; }
-        
-        function renderUsersTable() {
-            const users = JSON.parse(localStorage.getItem('sysUsers')) || [];
-            const tbody = document.getElementById('usersTable').getElementsByTagName('tbody')[0];
-            tbody.innerHTML = '';
-            users.forEach((u, index) => {
-                let deleteBtn = users.length > 1 ? `<button class="bg-red-600 text-white px-2.5 py-1 rounded text-xs font-bold" onclick="deleteUser(${index})"><i class="fa-solid fa-trash"></i> حذف</button>` : '-';
-                let editBtn = `<button class="bg-gold text-black px-2.5 py-1 rounded text-xs font-bold ml-1" onclick="openEditUserModal(${index})"><i class="fa-solid fa-pen"></i> تعديل</button>`;
-                tbody.insertRow().innerHTML = `<td><strong>${u.username}</strong></td><td>${u.password}</td><td>${u.role}</td><td>${editBtn} ${deleteBtn}</td>`;
-            });
-        }
-
-        function handleCreateUser(e) {
-            e.preventDefault();
-            const username = document.getElementById('newUsername').value.trim();
-            const pass = document.getElementById('newUserPass').value.trim();
-            const role = document.getElementById('newUserRole').value;
-            let users = JSON.parse(localStorage.getItem('sysUsers')) || [];
-            
-            if(users.some(u => u.username === username)) { alert("اسم المستخدم موجود مسبقاً!"); return; }
-            users.push({ username, password: pass, role });
-            localStorage.setItem('sysUsers', JSON.stringify(users));
-            alert("تم إضافة المستخدم بنجاح!");
-            document.getElementById('newUsername').value = '';
-            document.getElementById('newUserPass').value = '';
-            renderUsersTable();
-        }
-
-        function openEditUserModal(index) {
-            const users = JSON.parse(localStorage.getItem('sysUsers')) || [];
-            const u = users[index];
-            document.getElementById('editUserIndex').value = index;
-            document.getElementById('editUsernameInput').value = u.username;
-            document.getElementById('editUserPassInput').value = u.password;
-            document.getElementById('editUserRoleInput').value = u.role;
-            document.getElementById('editUserModal').style.display = 'flex';
-        }
-
-        function closeEditUserModal() { document.getElementById('editUserModal').style.display = 'none'; }
-
-        function saveEditedUser(e) {
-            e.preventDefault();
-            const index = document.getElementById('editUserIndex').value;
-            let users = JSON.parse(localStorage.getItem('sysUsers')) || [];
-            users[index] = {
-                username: document.getElementById('editUsernameInput').value.trim(),
-                password: document.getElementById('editUserPassInput').value.trim(),
-                role: document.getElementById('editUserRoleInput').value
-            };
-            localStorage.setItem('sysUsers', JSON.stringify(users));
-            closeEditUserModal();
-            renderUsersTable();
-            alert("تم تحديث بيانات المستخدم بنجاح!");
-        }
-
-        function deleteUser(index) {
-            let users = JSON.parse(localStorage.getItem('sysUsers')) || [];
-            if (users.length <= 1) { alert("لا يمكنك حذف الحساب الوحيد في النظام!"); return; }
-            if (confirm("هل أنت متأكد من حذف هذا المستخدم؟")) {
-                users.splice(index, 1);
-                localStorage.setItem('sysUsers', JSON.stringify(users));
-                renderUsersTable();
-            }
-        }
-
-        function openChangePasswordModal() { document.getElementById('changePasswordOverlay').style.display = 'flex'; }
-        function closeChangePasswordModal() { document.getElementById('changePasswordOverlay').style.display = 'none'; }
-        function handleChangePassword(e) {
-            e.preventDefault();
-            alert("تم تغيير كلمة المرور بنجاح!");
-            closeChangePasswordModal();
-        }
-
-        function updateRouteSummary() {
-            const from = document.getElementById('boardingLocation').value;
-            const to = document.getElementById('dropoffLocation').value;
-            document.getElementById('summaryRoute').innerText = `${from} ← ${to}`;
-        }
-
-        function updatePriceCalculation() {
-            const reportingTime = document.getElementById('reportingTime').value;
-            const count = parseInt(document.getElementById('passengerCount').value) || 1;
-            const singlePrice = parseFloat(document.getElementById('singleTicketPrice').value) || 0;
-            const total = count * singlePrice;
-            document.getElementById('customAmount').value = total;
-            document.getElementById('summaryBasePrice').innerText = singlePrice + ' درهم';
-            document.getElementById('summaryCount').innerText = count;
-            document.getElementById('summaryReportingTime').innerText = reportingTime;
-            document.getElementById('totalAmount').innerText = total + ' درهم';
-        }
-
-        function updatePriceFromInput() {
-            const val = document.getElementById('customAmount').value;
-            document.getElementById('totalAmount').innerText = (val !== '' ? val : 0) + ' درهم';
-        }
-
-        function submitBooking(e) {
-            e.preventDefault();
-            if (!currentUser) { alert("يرجى تسجيل الدخول أولاً."); return; }
-
-            const boarding = document.getElementById('boardingLocation').value;
-            const dropoff = document.getElementById('dropoffLocation').value;
-            if (boarding === dropoff) { alert("لا يمكن أن يكون مكان الصعود مطابقاً لوجهة الوصول!"); return; }
-
-            const name = document.getElementById('passengerName').value;
-            const phone = document.getElementById('phoneNo').value;
-            const passport = document.getElementById('passportNo').value;
-            const depDate = document.getElementById('departureDate').value;
-            const reportingTime = document.getElementById('reportingTime').value;
-            const count = document.getElementById('passengerCount').value;
-            const priceVal = document.getElementById('customAmount').value;
-            const price = priceVal + ' درهم';
-            const paymentMethod = document.getElementById('paymentMethod').value;
-            const code = nextTicketNumber;
-            const fileInput = document.getElementById('passportImageFile');
-
-            const processBookingData = (imgData) => {
-                const bookingData = { code, createdBy: currentUser.username, name, phone, passport, from: boarding, to: dropoff, date: depDate, count, reportingTime, price, priceValue: priceVal, paymentMethod, passport_image: imgData };
-
-                busBookings.push(bookingData);
-                localStorage.setItem('busBookings', JSON.stringify(busBookings));
-                nextTicketNumber++;
-                localStorage.setItem('nextTicketNumber', nextTicketNumber);
-
-                previewTicketView(bookingData);
-                loadSavedBookings();
-                renderDebtTable();
-                
-                setTimeout(() => { window.print(); }, 300);
-
-                document.getElementById('busBookingForm').reset();
-                document.getElementById('departureDate').value = new Date().toISOString().split('T')[0];
-                updateRouteSummary();
-                updatePriceCalculation();
-            };
-
-            if (fileInput && fileInput.files.length > 0) {
-                const reader = new FileReader();
-                reader.onload = function(uploadEvent) { processBookingData(uploadEvent.target.result); };
-                reader.readAsDataURL(fileInput.files[0]);
+        function updateUserBadge() {
+            if(currentUser) {
+                document.getElementById('userInfoBadge').innerText = `${currentUser.username} (${currentUser.role})`;
+                document.getElementById('loginOverlay').style.display = 'none';
             } else {
-                processBookingData('');
+                document.getElementById('loginOverlay').style.display = 'flex';
             }
         }
 
-        function loadSavedBookings() {
-            const tbody = document.getElementById('bookingsHistoryTable').getElementsByTagName('tbody')[0];
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            const isAdmin = currentUser && currentUser.role === 'مدير';
+        const DEFAULT_STORE = {
+            passengers: [
+                { id: "100", name: "عبدالله أحمد علي اليافعي", passport: "A0988712", phone: "0501234567", origin: "عجمان", destination: "عدن", tripDate: "2026-11-05", reportingTime: "07:00 صباحاً", fare: 400, payMethod: "مدفوع", logs: [] }
+            ],
+            cargo: [
+                { id: "100", date: "2026-10-28", tripDate: "2026-11-02", sender: "صالح العولقي", senderPhone: "0559876543", origin: "عجمان", receiver: "محمد صالح", receiverPhone: "0770123456", destination: "عدن", paymentStatus: "مدفوع", grandTotal: 300, items: [{ name: "كرتون أمتعة وملابس", qty: 2, price: 150 }], logs: [] }
+            ],
+            trusts: [
+                { invoiceNo: "WB-22", location: "المكلا", receiver: "سالم باوزير", content: "2 كرتون سامان", payLoc: "باليمن", amount: 0 }
+            ],
+            nextTicketNo: 101,
+            nextCargoNo: 101
+        };
 
-            [...busBookings].reverse().forEach((b, index) => {
-                let actualIndex = busBookings.length - 1 - index;
-                let imgCell = b.passport_image ? `<a href="${b.passport_image}" target="_blank" class="action-link"><i class="fa-solid fa-image"></i> عرض الجواز</a>` : 'لا يوجد';
-                let userColHTML = isAdmin ? `<td><span class="text-gold font-bold">${b.createdBy || 'وليد السيد'}</span></td>` : '';
-                
-                tbody.insertRow().innerHTML = `
-                    <td><strong>#${b.code}</strong></td>
-                    ${userColHTML}
-                    <td>${b.name}</td><td>${b.phone || '-'}</td><td>${b.from} ← ${b.to}</td><td>${b.date}</td><td>${b.count}</td><td>${b.price}</td><td><span style="color: ${b.paymentMethod === 'مدفوع' ? '#10b981' : '#f59e0b'}; font-weight:bold;">${b.paymentMethod}</span></td><td>${imgCell}</td>
-                    <td>
-                        <button class="bg-gold text-black px-2.5 py-1 rounded text-xs font-bold" onclick="openEditTicketModal(${actualIndex})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                        <button class="bg-zinc-800 text-zinc-100 px-2.5 py-1 rounded text-xs font-bold border border-zinc-700" onclick='previewTicketView(${JSON.stringify(b)})'><i class="fa-solid fa-print"></i> عرض</button>
-                        <button class="bg-red-600 text-white px-2.5 py-1 rounded text-xs font-bold" onclick="deleteTicket(${actualIndex})"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                `;
+        let db = JSON.parse(localStorage.getItem('WADI_BINA_MASTER_DB')) || DEFAULT_STORE;
+
+        function saveDB() { localStorage.setItem('WADI_BINA_MASTER_DB', JSON.stringify(db)); }
+
+        let currentTab = 'passengers';
+        let cargoFormItems = [{ name: 'كرتون أمتعة', qty: 1, price: 150 }];
+
+        window.onload = function() {
+            updateUserBadge();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('passTripDate').value = today;
+            document.getElementById('cargoDate').value = today;
+            document.getElementById('cargoTripDate').value = today;
+            document.getElementById('cargoInvNo').value = db.nextCargoNo || 100;
+
+            renderCargoItemRows();
+            renderPassengersTable();
+            renderCargoTable();
+            renderTrustsTable();
+        };
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`module-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('gold-gradient-bg', 'text-black');
+                btn.classList.add('bg-zinc-800', 'text-zinc-300');
             });
+
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            if(activeBtn) {
+                activeBtn.classList.remove('bg-zinc-800', 'text-zinc-300');
+                activeBtn.classList.add('gold-gradient-bg', 'text-black');
+            }
+
+            if(tabId === 'financials') renderFinancials();
         }
 
-        function openEditTicketModal(index) {
-            const b = busBookings[index];
-            document.getElementById('editTicketIndex').value = index;
-            document.getElementById('editTicketCode').value = b.code;
-            document.getElementById('editTicketName').value = b.name;
-            document.getElementById('editTicketPhone').value = b.phone || '';
-            document.getElementById('editTicketPassport').value = b.passport;
-            document.getElementById('editTicketFrom').value = b.from;
-            document.getElementById('editTicketTo').value = b.to;
-            document.getElementById('editTicketDate').value = b.date;
-            document.getElementById('editTicketCount').value = b.count;
-            document.getElementById('editTicketPrice').value = b.priceValue || parseFloat(b.price) || 0;
-            document.getElementById('editTicketPayment').value = b.paymentMethod;
-            document.getElementById('editTicketModal').style.display = 'flex';
+        function canEditOrDelete(tripDateStr) {
+            if(!currentUser) return false;
+            if(currentUser.role === 'مدير') return true;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const tripDate = new Date(tripDateStr);
+            tripDate.setHours(0, 0, 0, 0);
+
+            return tripDate >= today;
         }
 
-        function closeEditTicketModal() { document.getElementById('editTicketModal').style.display = 'none'; }
+        // --- عرض المستندات كصور (Preview as Image) ---
+        function previewDocumentAsImage(type, id) {
+            const item = (type === 'passengers' ? db.passengers : db.cargo).find(x => x.id === id);
+            if(!item) return;
 
-        function saveEditedTicket(e) {
-            e.preventDefault();
-            const index = document.getElementById('editTicketIndex').value;
-            const pVal = parseFloat(document.getElementById('editTicketPrice').value) || 0;
-            busBookings[index] = {
-                ...busBookings[index],
-                code: document.getElementById('editTicketCode').value,
-                name: document.getElementById('editTicketName').value,
-                phone: document.getElementById('editTicketPhone').value,
-                passport: document.getElementById('editTicketPassport').value,
-                from: document.getElementById('editTicketFrom').value,
-                to: document.getElementById('editTicketTo').value,
-                date: document.getElementById('editTicketDate').value,
-                count: document.getElementById('editTicketCount').value,
-                priceValue: pVal,
-                price: pVal + ' درهم',
-                paymentMethod: document.getElementById('editTicketPayment').value
-            };
-            localStorage.setItem('busBookings', JSON.stringify(busBookings));
-            closeEditTicketModal();
-            loadSavedBookings();
-            renderDebtTable();
-            alert("تم تحديث بيانات التذكرة بنجاح!");
-        }
+            document.getElementById('imgDocCode').innerText = `#${item.id}`;
+            document.getElementById('imgDocType').innerText = type === 'passengers' ? 'بوليصة حجز تذكرة سفر VIP' : 'فاتورة شحن أمتعة وبضائع';
 
-        function previewTicketView(b) {
-            document.querySelectorAll('.tNoClass').forEach(el => el.innerText = '#' + b.code);
-            document.querySelectorAll('.tNameClass').forEach(el => el.innerText = b.name);
-            document.querySelectorAll('.tPassportClass').forEach(el => el.innerText = b.passport);
-            document.querySelectorAll('.tFromClass').forEach(el => el.innerText = b.from);
-            document.querySelectorAll('.tToClass').forEach(el => el.innerText = b.to);
-            document.querySelectorAll('.tDateClass').forEach(el => el.innerText = b.date);
-            document.querySelectorAll('.tCountClass').forEach(el => el.innerText = b.count);
-            document.querySelectorAll('.tReportingTimeClass').forEach(el => el.innerText = b.reportingTime || '07:00 صباحاً');
-            document.querySelectorAll('.tPriceClass').forEach(el => el.innerText = b.price);
-            document.querySelectorAll('.paidStampClass').forEach(el => el.style.display = b.paymentMethod === 'مدفوع' ? 'block' : 'none');
+            const body = document.getElementById('imgDocBody');
+            if(type === 'passengers') {
+                const isPaid = item.payMethod === 'مدفوع';
+                const paidText = isPaid ? `<span class="text-emerald-600 font-black mr-2">(تم الدفع)</span>` : `<span class="text-amber-600 font-bold mr-2">(${item.payMethod})</span>`;
 
-            const ticketImg1 = document.getElementById('ticketPassportImg');
-            const ticketContainer1 = document.getElementById('ticketPassportImgContainer');
-            if (b.passport_image) {
-                if (ticketImg1) ticketImg1.src = b.passport_image;
-                if (ticketContainer1) ticketContainer1.style.display = 'block';
+                body.innerHTML = `
+                    <div class="grid grid-cols-2 gap-2 bg-slate-100 p-3 rounded-lg border border-slate-200">
+                        <div><strong>اسم المسافر:</strong> <span class="text-slate-800 font-bold">${item.name}</span></div>
+                        <div><strong>رقم الجواز:</strong> <span class="text-slate-800 font-bold">${item.passport}</span></div>
+                        <div><strong>رقم الهاتف:</strong> <span class="text-slate-800 font-bold">${item.phone}</span></div>
+                        <div><strong>تاريخ الرحلة:</strong> <span class="text-amber-600 font-bold">${item.tripDate} (${item.reportingTime})</span></div>
+                        <div><strong>محطة الصعود:</strong> <span class="text-slate-800 font-bold">${item.origin}</span></div>
+                        <div><strong>جهة الوصول:</strong> <span class="text-slate-800 font-bold">${item.destination}</span></div>
+                        <div><strong>حالة السداد:</strong> <span class="text-slate-700 font-bold">${item.payMethod}</span></div>
+                        <div><strong>المبلغ الإجمالي:</strong> <span class="text-indigo-600 font-black">${item.fare} AED</span> ${paidText}</div>
+                    </div>
+                `;
             } else {
-                if (ticketContainer1) ticketContainer1.style.display = 'none';
-            }
+                let itemsHTML = item.items.map((i, idx) => `<tr><td class="border border-slate-300 p-1.5">${idx+1}</td><td class="border border-slate-300 p-1.5">${i.name}</td><td class="border border-slate-300 p-1.5">${i.qty}</td><td class="border border-slate-300 p-1.5">${i.price} AED</td></tr>`).join('');
+                const isPaid = item.paymentStatus === 'مدفوع';
+                const paidText = isPaid ? `<span class="text-emerald-600 font-black mr-2">(تم الدفع)</span>` : `<span class="text-amber-600 font-bold mr-2">(${item.paymentStatus})</span>`;
 
-            const container = document.getElementById('ticketViewContainer');
-            container.style.display = 'block';
-            container.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function deleteTicket(index) {
-            if (confirm("هل أنت متأكد من حذف هذا الحجز؟")) {
-                busBookings.splice(index, 1);
-                localStorage.setItem('busBookings', JSON.stringify(busBookings));
-                loadSavedBookings();
-                renderDebtTable();
-                document.getElementById('ticketViewContainer').style.display = 'none';
-            }
-        }
-
-        function addCargoRow() {
-            const tbody = document.querySelector('#cargoItemsFormTable tbody');
-            const rowCount = tbody.rows.length + 1;
-            const newRow = tbody.insertRow();
-            newRow.innerHTML = `
-                <td>${rowCount}</td>
-                <td><input type="text" class="form-control item-desc w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-zinc-100" placeholder="مثال: شنطة، كرتون..." required></td>
-                <td><input type="number" class="form-control item-qty w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-zinc-100" value="1" min="1" oninput="calcCargoRow(this)" required></td>
-                <td><input type="number" class="form-control item-price w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-zinc-100" value="0" oninput="calcCargoRow(this)" required></td>
-                <td><input type="number" class="form-control item-total w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-gold font-bold" value="0" readonly></td>
-                <td><button type="button" class="bg-red-600 text-white p-2 rounded" onclick="removeCargoRow(this)"><i class="fa-solid fa-trash"></i></button></td>
-            `;
-            updateCargoRowNumbers();
-        }
-
-        function removeCargoRow(btn) {
-            const row = btn.closest('tr');
-            if (document.querySelectorAll('#cargoItemsFormTable tbody tr').length > 1) {
-                row.remove();
-                updateCargoRowNumbers();
-                calcCargoRowAll();
-            } else { alert("يجب أن تحتوي الفاتورة على صنف واحد على الأقل!"); }
-        }
-
-        function updateCargoRowNumbers() {
-            document.querySelectorAll('#cargoItemsFormTable tbody tr').forEach((row, index) => { row.cells[0].innerText = index + 1; });
-        }
-
-        function calcCargoRow(element) {
-            const row = element.closest('tr');
-            const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-            const price = parseFloat(row.querySelector('.item-price').value) || 0;
-            row.querySelector('.item-total').value = qty * price;
-            calcCargoRowAll();
-        }
-
-        function calcCargoRowAll() {
-            let total = 0;
-            document.querySelectorAll('#cargoItemsFormTable .item-total').forEach(inp => total += parseFloat(inp.value) || 0);
-            document.getElementById('cargoGrandTotal').innerText = total + ' درهم';
-        }
-
-        function submitCargoInvoice(e) {
-            e.preventDefault();
-            if (!currentUser) { alert("يرجى تسجيل الدخول أولاً."); return; }
-
-            const invNo = document.getElementById('cargoInvNo').value;
-            const date = document.getElementById('cargoDate').value;
-            const payLoc = document.getElementById('cargoPayLocation').value;
-            const paidStatus = document.getElementById('cargoPaidStatus').value;
-
-            const sender = { name: document.getElementById('senderName').value, phone: document.getElementById('senderPhone').value, address: document.getElementById('senderAddress').value };
-            const receiver = { name: document.getElementById('receiverName').value, phone: document.getElementById('receiverPhone').value, address: document.getElementById('receiverAddress').value };
-            
-            let items = [];
-            document.querySelectorAll('#cargoItemsFormTable tbody tr').forEach(row => {
-                items.push({
-                    desc: row.querySelector('.item-desc').value,
-                    qty: row.querySelector('.item-qty').value,
-                    price: row.querySelector('.item-price').value,
-                    total: row.querySelector('.item-total').value
-                });
-            });
-            
-            let grandTotal = 0;
-            items.forEach(it => grandTotal += parseFloat(it.total) || 0);
-
-            const cargoData = { invNo, date, payLoc, paidStatus, sender, receiver, items, grandTotal, createdBy: currentUser.username };
-
-            cargoInvoices.push(cargoData);
-            localStorage.setItem('cargoInvoices', JSON.stringify(cargoInvoices));
-            nextCargoNumber++;
-            localStorage.setItem('nextCargoNumber', nextCargoNumber);
-
-            previewCargoInvoice(cargoData);
-            loadSavedCargoInvoices();
-            renderDebtTable();
-
-            setTimeout(() => { window.print(); }, 300);
-
-            document.getElementById('cargoForm').reset();
-            document.getElementById('cargoDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('cargoInvNo').value = nextCargoNumber;
-            document.querySelector('#cargoItemsFormTable tbody').innerHTML = `
-                <tr>
-                    <td>1</td>
-                    <td><input type="text" class="form-control item-desc w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-zinc-100" placeholder="مثال: شنطة، كرتون..." required></td>
-                    <td><input type="number" class="form-control item-qty w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-zinc-100" value="1" min="1" oninput="calcCargoRow(this)" required></td>
-                    <td><input type="number" class="form-control item-price w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-zinc-100" value="0" oninput="calcCargoRow(this)" required></td>
-                    <td><input type="number" class="form-control item-total w-full bg-darkBg border border-zinc-700 rounded p-2 text-sm text-gold font-bold" value="0" readonly></td>
-                    <td><button type="button" class="bg-red-600 text-white p-2 rounded" onclick="removeCargoRow(this)"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
-            `;
-            document.getElementById('cargoGrandTotal').innerText = '0 درهم';
-            alert("تم إصدار وحفظ وطباعة فاتورة الشحنة بنجاح!");
-        }
-
-        function loadSavedCargoInvoices() {
-            const tbody = document.getElementById('cargoHistoryTable').getElementsByTagName('tbody')[0];
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            const isAdmin = currentUser && currentUser.role === 'مدير';
-
-            [...cargoInvoices].reverse().forEach((c, index) => {
-                let actualIndex = cargoInvoices.length - 1 - index;
-                let summaryDesc = c.items.map(i => `${i.qty} ${i.desc}`).join('، ');
-                let userColHTML = isAdmin ? `<td><span class="text-gold font-bold">${c.createdBy || 'وليد السيد'}</span></td>` : '';
-
-                tbody.insertRow().innerHTML = `
-                    <td><strong>#${c.invNo}</strong></td>
-                    ${userColHTML}
-                    <td>${c.date}</td><td>${c.sender.name}</td><td>${c.sender.phone}</td><td>${c.receiver.name}</td><td><small>${summaryDesc}</small></td><td><strong>${c.grandTotal} درهم</strong></td><td><span style="color: ${c.paidStatus === 'مدفوع' ? '#10b981' : '#f59e0b'}; font-weight:bold;">${c.paidStatus}</span></td>
-                    <td>
-                        <button class="bg-gold text-black px-2.5 py-1 rounded text-xs font-bold" onclick="openEditCargoModal(${actualIndex})" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                        <button class="bg-zinc-800 text-zinc-100 px-2.5 py-1 rounded text-xs font-bold border border-zinc-700" onclick='previewCargoInvoice(${JSON.stringify(c)})'><i class="fa-solid fa-print"></i> عرض</button>
-                        <button class="bg-red-600 text-white px-2.5 py-1 rounded text-xs font-bold" onclick="deleteCargo(${actualIndex})"><i class="fa-solid fa-trash"></i></button>
-                    </td>
+                body.innerHTML = `
+                    <div class="grid grid-cols-2 gap-2 bg-slate-100 p-3 rounded-lg border border-slate-200 mb-3">
+                        <div><strong>المرسل:</strong> ${item.sender} (${item.senderPhone})</div>
+                        <div><strong>المستلم:</strong> ${item.receiver} (${item.receiverPhone})</div>
+                        <div><strong>تاريخ التحريك:</strong> <span class="text-amber-600 font-bold">${item.tripDate}</span></div>
+                        <div><strong>حالة الفاتورة:</strong> <span class="text-slate-700 font-bold">${item.paymentStatus}</span></div>
+                    </div>
+                    <table class="w-full border-collapse text-center text-xs">
+                        <thead><tr class="bg-slate-200"><th class="border border-slate-300 p-1">م</th><th class="border border-slate-300 p-1">الصنف</th><th class="border border-slate-300 p-1">العدد</th><th class="border border-slate-300 p-1">السعر</th></tr></thead>
+                        <tbody>${itemsHTML}</tbody>
+                    </table>
+                    <div class="text-left font-black text-sm mt-2 text-indigo-700">الإجمالي النهائي: ${item.grandTotal} AED ${paidText}</div>
                 `;
-            });
-        }
-
-        function openEditCargoModal(index) {
-            const c = cargoInvoices[index];
-            document.getElementById('editCargoIndex').value = index;
-            document.getElementById('editCargoInvNo').value = c.invNo;
-            document.getElementById('editCargoDate').value = c.date;
-            document.getElementById('editSenderName').value = c.sender.name;
-            document.getElementById('editSenderPhone').value = c.sender.phone;
-            document.getElementById('editReceiverName').value = c.receiver.name;
-            document.getElementById('editReceiverPhone').value = c.receiver.phone;
-            document.getElementById('editCargoTotal').value = c.grandTotal;
-            document.getElementById('editCargoStatus').value = c.paidStatus;
-            document.getElementById('editCargoModal').style.display = 'flex';
-        }
-
-        function closeEditCargoModal() { document.getElementById('editCargoModal').style.display = 'none'; }
-
-        function saveEditedCargo(e) {
-            e.preventDefault();
-            const index = document.getElementById('editCargoIndex').value;
-            const newTotal = parseFloat(document.getElementById('editCargoTotal').value) || 0;
-            cargoInvoices[index] = {
-                ...cargoInvoices[index],
-                invNo: document.getElementById('editCargoInvNo').value,
-                date: document.getElementById('editCargoDate').value,
-                grandTotal: newTotal,
-                paidStatus: document.getElementById('editCargoStatus').value,
-                sender: { ...cargoInvoices[index].sender, name: document.getElementById('editSenderName').value, phone: document.getElementById('editSenderPhone').value },
-                receiver: { ...cargoInvoices[index].receiver, name: document.getElementById('editReceiverName').value, phone: document.getElementById('editReceiverPhone').value }
-            };
-            localStorage.setItem('cargoInvoices', JSON.stringify(cargoInvoices));
-            closeEditCargoModal();
-            loadSavedCargoInvoices();
-            renderDebtTable();
-            alert("تم تحديث فاتورة الشحن بنجاح!");
-        }
-
-        function previewCargoInvoice(data) {
-            document.querySelectorAll('.pCargoInvNoClass').forEach(el => el.innerText = data.invNo);
-            document.querySelectorAll('.pCargoDateClass').forEach(el => el.innerText = data.date);
-            document.querySelectorAll('.pCargoPayLocClass').forEach(el => el.innerText = data.payLoc);
-            document.querySelectorAll('.pSenderNameClass').forEach(el => el.innerText = data.sender.name);
-            document.querySelectorAll('.pSenderPhoneClass').forEach(el => el.innerText = data.sender.phone);
-            document.querySelectorAll('.pSenderAddressClass').forEach(el => el.innerText = data.sender.address);
-            document.querySelectorAll('.pReceiverNameClass').forEach(el => el.innerText = data.receiver.name);
-            document.querySelectorAll('.pReceiverPhoneClass').forEach(el => el.innerText = data.receiver.phone);
-            document.querySelectorAll('.pReceiverAddressClass').forEach(el => el.innerText = data.receiver.address);
-            document.querySelectorAll('.cargoRedStampClass').forEach(el => el.style.display = data.paidStatus === 'مدفوع' ? 'block' : 'none');
-
-            document.querySelectorAll('.pCargoItemsTbodyClass').forEach(tbody => {
-                tbody.innerHTML = '';
-                data.items.forEach((item, idx) => {
-                    tbody.innerHTML += `<tr><td style="border: 1px solid #1a365d; padding: 4px; text-align: center;">${idx + 1}</td><td style="border: 1px solid #1a365d; padding: 4px; text-align: center;">${item.desc}</td><td style="border: 1px solid #1a365d; padding: 4px; text-align: center;">${item.qty}</td><td style="border: 1px solid #1a365d; padding: 4px; text-align: center;">${item.price}</td><td style="border: 1px solid #1a365d; padding: 4px; text-align: center;">${item.total}</td></tr>`;
-                });
-                tbody.innerHTML += `<tr><td colspan="4" style="border: 1px solid #1a365d; padding: 4px; text-align: left; font-weight: bold;">الإجمالي النهائي:</td><td style="border: 1px solid #1a365d; padding: 4px; text-align: center; font-weight: bold; color: #1e3a8a;">${data.grandTotal} درهم</td></tr>`;
-            });
-
-            const container = document.getElementById('cargoPrintContainer');
-            container.style.display = 'block';
-            container.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function deleteCargo(index) {
-            if (confirm("هل أنت متأكد من حذف هذه الفاتورة؟")) {
-                cargoInvoices.splice(index, 1);
-                localStorage.setItem('cargoInvoices', JSON.stringify(cargoInvoices));
-                loadSavedCargoInvoices();
-                renderDebtTable();
-                document.getElementById('cargoPrintContainer').style.display = 'none';
             }
+
+            document.getElementById('imagePreviewModal').classList.remove('hidden');
         }
 
-        function submitManualDebt(e) {
+        function closeImagePreviewModal() { document.getElementById('imagePreviewModal').classList.add('hidden'); }
+
+        function downloadCapturedImage() {
+            const area = document.getElementById('captureArea');
+            html2canvas(area, { scale: 2, useCORS: true }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `WadiBina_Document_${Date.now()}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.95);
+                link.click();
+            });
+        }
+
+        // --- إدارة التذاكر ---
+        function handleSavePassenger(e) {
             e.preventDefault();
-            const debtData = {
-                id: Date.now(),
-                name: document.getElementById('debtName').value,
-                phone: document.getElementById('debtPhone').value,
-                claimType: 'مديونية يدوية',
-                docNo: document.getElementById('debtDocNo').value,
-                amount: document.getElementById('debtAmount').value + ' درهم',
-                amountVal: parseFloat(document.getElementById('debtAmount').value) || 0,
-                payLocation: document.getElementById('debtPayLoc').value
-            };
-            manualDebts.push(debtData);
-            localStorage.setItem('manualDebts', JSON.stringify(manualDebts));
-            nextDebtNumber++;
-            localStorage.setItem('nextDebtNumber', nextDebtNumber);
+            const editId = document.getElementById('passEditId').value;
+            const now = new Date().toLocaleString('ar-EG');
 
-            document.getElementById('manualDebtForm').reset();
-            document.getElementById('debtDocNo').value = nextDebtNumber;
-            renderDebtTable();
-            alert("تم تسجيل المديونية بنجاح!");
-        }
+            if(editId) {
+                const pIndex = db.passengers.findIndex(p => p.id === editId);
+                if(pIndex !== -1) {
+                    if(!canEditOrDelete(db.passengers[pIndex].tripDate)) {
+                        alert('عفواً! انقضى تاريخ هذه الرحلة. التعديل متاح للمدير فقط.');
+                        return;
+                    }
+                    if(!db.passengers[pIndex].logs) db.passengers[pIndex].logs = [];
+                    db.passengers[pIndex].logs.push({ user: currentUser.username, time: now, action: 'تعديل بيانات التذكرة' });
 
-        function deleteManualDebt(index) {
-            if (confirm("هل أنت متأكد من حذف هذه المديونية اليدوية؟")) {
-                manualDebts.splice(index, 1);
-                localStorage.setItem('manualDebts', JSON.stringify(manualDebts));
-                renderDebtTable();
+                    db.passengers[pIndex].name = document.getElementById('passName').value;
+                    db.passengers[pIndex].passport = document.getElementById('passPassport').value;
+                    db.passengers[pIndex].phone = document.getElementById('passPhone').value;
+                    db.passengers[pIndex].origin = document.getElementById('passOrigin').value;
+                    db.passengers[pIndex].destination = document.getElementById('passDestination').value;
+                    db.passengers[pIndex].tripDate = document.getElementById('passTripDate').value;
+                    db.passengers[pIndex].reportingTime = document.getElementById('passReportingTime').value;
+                    db.passengers[pIndex].fare = parseFloat(document.getElementById('passFare').value);
+                    db.passengers[pIndex].payMethod = document.getElementById('passPayMethod').value;
+
+                    alert(`تم تعديل التذكرة #${editId} بنجاح`);
+                }
+            } else {
+                const newTicket = {
+                    id: `${db.nextTicketNo || 100}`,
+                    name: document.getElementById('passName').value,
+                    passport: document.getElementById('passPassport').value,
+                    phone: document.getElementById('passPhone').value,
+                    origin: document.getElementById('passOrigin').value,
+                    destination: document.getElementById('passDestination').value,
+                    tripDate: document.getElementById('passTripDate').value,
+                    reportingTime: document.getElementById('passReportingTime').value,
+                    fare: parseFloat(document.getElementById('passFare').value),
+                    payMethod: document.getElementById('passPayMethod').value,
+                    logs: [{ user: currentUser.username, time: now, action: 'إصدار التذكرة لأول مرة' }]
+                };
+
+                db.passengers.unshift(newTicket);
+                db.nextTicketNo = (db.nextTicketNo || 100) + 1;
+                alert(`تم حفظ التذكرة برقم البوليصة: #${newTicket.id}`);
             }
+
+            saveDB();
+            resetPassengerForm();
+            renderPassengersTable();
         }
 
-        function getCombinedDebtData() {
-            let debtList = [];
-            busBookings.forEach(b => {
-                if (b.paymentMethod !== 'مدفوع') {
-                    debtList.push({ name: b.name, phone: b.phone || '-', claimType: 'تذكرة سفر (غير مدفوع)', docNo: '#' + b.code, amount: b.price, payLocation: b.paymentMethod === 'باليمن' ? 'باليمن' : 'بالإمارات (الدفع عند الصعود)' });
-                }
-            });
-            cargoInvoices.forEach(c => {
-                if (c.paidStatus !== 'مدفوع') {
-                    debtList.push({ name: c.sender.name, phone: c.sender.phone, claimType: 'فاتورة شحن (غير مدفوع)', docNo: '#' + c.invNo, amount: c.grandTotal + ' درهم', payLocation: c.payLoc });
-                }
-            });
-            manualDebts.forEach((m, idx) => {
-                debtList.push({ name: m.name, phone: m.phone, claimType: 'مديونية يدوية', docNo: m.docNo, amount: m.amount, payLocation: m.payLocation, isManual: true, manualIndex: idx });
-            });
-            return debtList;
-        }
+        function editPassenger(id) {
+            const ticket = db.passengers.find(p => p.id === id);
+            if(!ticket) return;
 
-        function renderDebtTable() {
-            const tbody = document.querySelector('#debtTable tbody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            const debts = getCombinedDebtData();
-            if (debts.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-zinc-500 p-4">لا توجد مطالبات أو مديونيات غير مدفوعة حتى الآن</td></tr>`;
+            if(!canEditOrDelete(ticket.tripDate) && currentUser.role !== 'مدير') {
+                alert('تنبيه: رحلة هذه التذكرة منتهية التاريخ. التعديل مخصص للمدير فقط!');
                 return;
             }
-            debts.forEach(d => {
-                let actionBtn = d.isManual ? `<button class="bg-red-600 text-white px-2 py-1 rounded text-xs" onclick="deleteManualDebt(${d.manualIndex})"><i class="fa-solid fa-trash"></i></button>` : '-';
-                tbody.insertRow().innerHTML = `<td><strong>${d.name}</strong></td><td>${d.phone}</td><td><span class="text-gold">${d.claimType}</span></td><td><strong>${d.docNo}</strong></td><td class="text-emerald-400 font-bold">${d.amount}</td><td>${d.payLocation}</td><td>${actionBtn}</td>`;
-            });
+
+            document.getElementById('passEditId').value = ticket.id;
+            document.getElementById('passName').value = ticket.name;
+            document.getElementById('passPassport').value = ticket.passport;
+            document.getElementById('passPhone').value = ticket.phone;
+            document.getElementById('passOrigin').value = ticket.origin;
+            document.getElementById('passDestination').value = ticket.destination;
+            document.getElementById('passTripDate').value = ticket.tripDate;
+            document.getElementById('passReportingTime').value = ticket.reportingTime;
+            document.getElementById('passFare').value = ticket.fare;
+            document.getElementById('passPayMethod').value = ticket.payMethod;
+
+            document.getElementById('passFormTitle').innerText = `تعديل بيانات التذكرة #${ticket.id}`;
+            document.getElementById('passSubmitBtn').innerHTML = `<i class="fa-solid fa-pen-to-square ml-1"></i> حفظ التعديلات`;
+            document.getElementById('cancelEditPassBtn').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function printDebtReport() {
-            const tbody = document.getElementById('debtPrintTbody');
+        function resetPassengerForm() {
+            document.getElementById('passengerForm').reset();
+            document.getElementById('passEditId').value = '';
+            document.getElementById('passFormTitle').innerText = 'إصدار تذكرة حجز VIP جديدة';
+            document.getElementById('passSubmitBtn').innerHTML = `<i class="fa-solid fa-ticket ml-1"></i> حفظ وإصدار التذكرة`;
+            document.getElementById('cancelEditPassBtn').classList.add('hidden');
+        }
+
+        function renderPassengersTable() {
+            const tbody = document.querySelector('#passengersTable tbody');
             tbody.innerHTML = '';
-            const debts = getCombinedDebtData();
-            let totalSum = 0;
-            debts.forEach(d => {
-                totalSum += parseFloat(d.amount) || 0;
-                tbody.innerHTML += `<tr><td style="border: 1px solid #1a365d; padding: 6px;">${d.name}</td><td style="border: 1px solid #1a365d; padding: 6px;">${d.phone}</td><td style="border: 1px solid #1a365d; padding: 6px;">${d.claimType}</td><td style="border: 1px solid #1a365d; padding: 6px;">${d.docNo}</td><td style="border: 1px solid #1a365d; padding: 6px; font-weight: bold;">${d.amount}</td><td style="border: 1px solid #1a365d; padding: 6px;">${d.payLocation}</td></tr>`;
-            });
-            document.getElementById('printTotalDebtSum').innerText = totalSum;
-            document.getElementById('printReportDate').innerText = new Date().toLocaleDateString('ar-AE');
-            document.getElementById('invoicePrintContainer').style.display = 'none';
-            document.getElementById('singleInvoicePrintContainer').style.display = 'none';
-            document.getElementById('debtPrintContainer').style.display = 'block';
-            window.print();
-        }
+            let revSum = 0;
 
-        function exportDebtToExcel() {
-            const debts = getCombinedDebtData();
-            if (debts.length === 0) { alert("لا توجد مديونيات للتصدير!"); return; }
-            const exportData = debts.map(d => ({ 'الاسم': d.name, 'رقم التلفون': d.phone, 'نوع المطالبة': d.claimType, 'رقم التذكرة / الفاتورة': d.docNo, 'المبلغ المطلوب': d.amount, 'جهة الدفع': d.payLocation }));
-            const ws = XLSX.utils.json_to_sheet(exportData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "كشف المديونيات");
-            XLSX.writeFile(wb, "كشف_المديونيات_والمطالبات.xlsx");
-        }
-
-        function submitInvoice(e) {
-            e.preventDefault();
-            const invoice = {
-                number: document.getElementById('invNumber').value,
-                date: document.getElementById('invDate').value,
-                client: document.getElementById('invClientName').value,
-                type: document.getElementById('invType').value,
-                amount: document.getElementById('invAmount').value + ' درهم',
-                amountVal: parseFloat(document.getElementById('invAmount').value) || 0,
-                status: document.getElementById('invStatus').value,
-                notes: document.getElementById('invNotes').value
-            };
-            invoicesList.push(invoice);
-            localStorage.setItem('invoicesList', JSON.stringify(invoicesList));
-            nextInvoiceNumber++;
-            localStorage.setItem('nextInvoiceNumber', nextInvoiceNumber);
-
-            document.getElementById('invoiceForm').reset();
-            document.getElementById('invNumber').value = nextInvoiceNumber;
-            document.getElementById('invDate').value = new Date().toISOString().split('T')[0];
-            renderInvoicesTable();
-            alert("تم اصدار وحفظ الفاتورة بنجاح!");
-        }
-
-        function renderInvoicesTable() {
-            const tbody = document.querySelector('#invoicesHistoryTable tbody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            let totalCount = invoicesList.length;
-            let totalAmountSum = 0;
-
-            invoicesList.forEach((inv, index) => {
-                let numericVal = inv.amountVal !== undefined ? inv.amountVal : (parseFloat(inv.amount) || 0);
-                if (inv.status === 'مدفوع') { totalAmountSum += numericVal; }
-                let badgeColor = inv.status === 'مدفوع' ? '#10b981' : '#f3e5ab';
+            db.passengers.forEach((p, idx) => {
+                revSum += p.fare;
+                const isEditable = canEditOrDelete(p.tripDate);
 
                 tbody.insertRow().innerHTML = `
-                    <td><strong>#${inv.number}</strong></td><td>${inv.date}</td><td>${inv.client}</td><td>${inv.type}</td><td>${inv.amount}</td><td><span style="color: ${badgeColor}; font-weight: bold;">${inv.status}</span></td>
+                    <td><strong>#${p.id}</strong></td>
+                    <td>${p.name}</td>
+                    <td>${p.phone} / ${p.passport}</td>
+                    <td>${p.origin} ← ${p.destination}</td>
+                    <td><strong class="text-gold">${p.tripDate}</strong></td>
+                    <td>${p.fare} AED</td>
+                    <td><span style="color:${p.payMethod === 'مدفوع' ? '#10b981':'#f59e0b'}; font-weight:bold;">${p.payMethod}</span></td>
                     <td>
-                        <button class="bg-gold text-black px-2 py-1 rounded text-xs font-bold" onclick="openEditInvoiceModal(${index})"><i class="fa-solid fa-pen"></i></button>
-                        <button class="bg-zinc-800 text-zinc-100 px-2 py-1 rounded text-xs font-bold border border-zinc-700" onclick="printSingleInvoice(${index})"><i class="fa-solid fa-print"></i></button>
-                        <button class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold" onclick="deleteInvoice(${index})"><i class="fa-solid fa-trash"></i></button>
+                        <div class="flex items-center gap-1">
+                            <button onclick="previewDocumentAsImage('passengers', '${p.id}')" title="عرض كصورة" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-image"></i></button>
+                            <button onclick="showLogs('passengers', '${p.id}')" title="سجل التعديلات" class="bg-zinc-800 text-gold px-2 py-1 rounded text-xs"><i class="fa-solid fa-history"></i></button>
+                            <button onclick="editPassenger('${p.id}')" ${!isEditable ? 'disabled class="bg-zinc-800 text-zinc-600 px-2 py-1 rounded text-xs cursor-not-allowed" title="معطل بعد تاريخ الرحلة"' : 'class="bg-amber-600 text-white px-2 py-1 rounded text-xs"'}>
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="deletePassenger(${idx})" ${!isEditable ? 'disabled class="bg-zinc-800 text-zinc-600 px-2 py-1 rounded text-xs cursor-not-allowed"' : 'class="bg-red-600 text-white px-2 py-1 rounded text-xs"'}>
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 `;
             });
-            document.getElementById('statTotalInvoices').innerText = totalCount;
-            document.getElementById('statTotalAmount').innerText = totalAmountSum + ' درهم';
+            document.getElementById('statTicketCount').innerText = db.passengers.length;
+            document.getElementById('statTicketRevenue').innerText = `${revSum} AED`;
         }
 
-        function openEditInvoiceModal(index) {
-            const inv = invoicesList[index];
-            document.getElementById('editInvIndex').value = index;
-            document.getElementById('editInvNumber').value = inv.number;
-            document.getElementById('editInvDate').value = inv.date;
-            document.getElementById('editInvClientName').value = inv.client;
-            document.getElementById('editInvType').value = inv.type;
-            document.getElementById('editInvAmount').value = inv.amountVal !== undefined ? inv.amountVal : parseFloat(inv.amount) || 0;
-            document.getElementById('editInvStatus').value = inv.status;
-            document.getElementById('editInvNotes').value = inv.notes || '';
-            document.getElementById('editInvoiceModal').style.display = 'flex';
-        }
-
-        function closeEditInvoiceModal() { document.getElementById('editInvoiceModal').style.display = 'none'; }
-
-        function saveEditedInvoice(e) {
-            e.preventDefault();
-            const index = document.getElementById('editInvIndex').value;
-            const amountNum = parseFloat(document.getElementById('editInvAmount').value) || 0;
-            invoicesList[index] = {
-                number: document.getElementById('editInvNumber').value,
-                date: document.getElementById('editInvDate').value,
-                client: document.getElementById('editInvClientName').value,
-                type: document.getElementById('editInvType').value,
-                amount: amountNum + ' درهم',
-                amountVal: amountNum,
-                status: document.getElementById('editInvStatus').value,
-                notes: document.getElementById('editInvNotes').value
-            };
-            localStorage.setItem('invoicesList', JSON.stringify(invoicesList));
-            closeEditInvoiceModal();
-            renderInvoicesTable();
-            alert("تم تحديث وحفظ بيانات الفاتورة بنجاح!");
-        }
-
-        function printSingleInvoice(index) {
-            const inv = invoicesList[index];
-            document.getElementById('singleInvPrintNo').innerText = '#' + inv.number;
-            document.getElementById('singleInvPrintDate').innerText = inv.date;
-            document.getElementById('singleInvPrintClient').innerText = inv.client;
-            document.getElementById('singleInvPrintType').innerText = inv.type;
-            document.getElementById('singleInvPrintStatus').innerText = inv.status;
-            document.getElementById('singleInvPrintStatus').style.color = inv.status === 'مدفوع' ? '#10b981' : '#f59e0b';
-            document.getElementById('singleInvPrintNotes').innerText = inv.notes || 'لا توجد ملاحظات';
-            document.getElementById('singleInvPrintAmount').innerText = inv.amount;
-
-            document.getElementById('debtPrintContainer').style.display = 'none';
-            document.getElementById('invoicePrintContainer').style.display = 'none';
-            document.getElementById('singleInvoicePrintContainer').style.display = 'block';
-            window.print();
-            document.getElementById('singleInvoicePrintContainer').style.display = 'none';
-        }
-
-        function printInvoicesReport() {
-            const tbody = document.getElementById('invoicePrintTbody');
-            tbody.innerHTML = '';
-            let totalSum = 0;
-            invoicesList.forEach(inv => {
-                let numericVal = inv.amountVal !== undefined ? inv.amountVal : (parseFloat(inv.amount) || 0);
-                if (inv.status === 'مدفوع') { totalSum += numericVal; }
-                tbody.innerHTML += `<tr><td style="border: 1px solid #1a365d; padding: 6px;">#${inv.number}</td><td style="border: 1px solid #1a365d; padding: 6px;">${inv.date}</td><td style="border: 1px solid #1a365d; padding: 6px;">${inv.client}</td><td style="border: 1px solid #1a365d; padding: 6px;">${inv.type}</td><td style="border: 1px solid #1a365d; padding: 6px; font-weight: bold;">${inv.amount}</td><td style="border: 1px solid #1a365d; padding: 6px;">${inv.status}</td></tr>`;
-            });
-            document.getElementById('printTotalInvoiceSum').innerText = totalSum;
-            document.getElementById('printInvReportDate').innerText = new Date().toLocaleDateString('ar-AE');
-            document.getElementById('debtPrintContainer').style.display = 'none';
-            document.getElementById('singleInvoicePrintContainer').style.display = 'none';
-            document.getElementById('invoicePrintContainer').style.display = 'block';
-            window.print();
-            document.getElementById('invoicePrintContainer').style.display = 'none';
-        }
-
-        function deleteInvoice(index) {
-            if (confirm("هل أنت متأكد من حذف هذه الفاتورة المالية؟")) {
-                invoicesList.splice(index, 1);
-                localStorage.setItem('invoicesList', JSON.stringify(invoicesList));
-                renderInvoicesTable();
+        function deletePassenger(idx) {
+            const ticket = db.passengers[idx];
+            if(!canEditOrDelete(ticket.tripDate)) {
+                alert('عفواً! انقضى تاريخ هذه الرحلة. الحذف متاح للمدير فقط.');
+                return;
+            }
+            if(confirm(`تأكيد حذف التذكرة #${ticket.id}؟`)) {
+                db.passengers.splice(idx, 1);
+                saveDB();
+                renderPassengersTable();
             }
         }
 
-        function downloadTicketAsImage() {
-            const ticketElement = document.getElementById('printableTicket1');
-            html2canvas(ticketElement, { scale: 2, useCORS: true, allowTaint: true }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'ticket_wadi_bina.jpg';
-                link.href = canvas.toDataURL('image/jpeg', 0.95);
-                link.click();
-            }).catch(err => { alert("حدث خطأ أثناء حفظ الصورة."); });
+        // --- إدارة فواتير الشحن ---
+        function renderCargoItemRows() {
+            const container = document.getElementById('cargoItemsRows');
+            container.innerHTML = '';
+            cargoFormItems.forEach((item, index) => {
+                const row = document.createElement('div');
+                row.className = "flex gap-2 items-center";
+                row.innerHTML = `
+                    <input type="text" placeholder="اسم الصنف" value="${item.name}" oninput="updateCargoItem(${index}, 'name', this.value)" class="flex-2 bg-zinc-900 border border-zinc-800 rounded-lg p-1.5 text-xs text-zinc-200 w-full">
+                    <input type="number" placeholder="العدد" value="${item.qty}" oninput="updateCargoItem(${index}, 'qty', this.value)" class="w-16 bg-zinc-900 border border-zinc-800 rounded-lg p-1.5 text-xs text-zinc-200 text-center">
+                    <input type="number" placeholder="السعر" value="${item.price}" oninput="updateCargoItem(${index}, 'price', this.value)" class="w-20 bg-zinc-900 border border-zinc-800 rounded-lg p-1.5 text-xs text-zinc-200 text-center">
+                    ${cargoFormItems.length > 1 ? `<button type="button" onclick="removeCargoItemRow(${index})" class="text-red-400 p-1 text-xs"><i class="fa-solid fa-circle-minus"></i></button>` : ''}
+                `;
+                container.appendChild(row);
+            });
+            calcCargoTotal();
         }
 
-        function downloadCargoAsImage() {
-            const cargoElement = document.getElementById('printableCargoInvoice1');
-            html2canvas(cargoElement, { scale: 2, useCORS: true, allowTaint: true }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'cargo_invoice_wadi_bina.jpg';
-                link.href = canvas.toDataURL('image/jpeg', 0.95);
-                link.click();
-            }).catch(err => { alert("حدث خطأ أثناء حفظ الصورة."); });
+        function addCargoItemRow() { cargoFormItems.push({ name: '', qty: 1, price: 0 }); renderCargoItemRows(); }
+        function removeCargoItemRow(idx) { cargoFormItems.splice(idx, 1); renderCargoItemRows(); }
+        function updateCargoItem(idx, field, val) {
+            cargoFormItems[idx][field] = field === 'name' ? val : parseFloat(val) || 0;
+            calcCargoTotal();
         }
 
-        function exportBookingsToExcel() {
-            if (busBookings.length === 0) { alert("لا توجد حجوزات للتصدير!"); return; }
-            const ws = XLSX.utils.json_to_sheet(busBookings);
+        function calcCargoTotal() {
+            const tot = cargoFormItems.reduce((s, i) => s + (i.qty * i.price), 0);
+            document.getElementById('cargoGrandTotalDisplay').innerText = `${tot} AED`;
+        }
+
+        function handleSaveCargo(e) {
+            e.preventDefault();
+            const editId = document.getElementById('cargoEditId').value;
+            const tot = cargoFormItems.reduce((s, i) => s + (i.qty * i.price), 0);
+            const status = document.getElementById('cargoPaymentStatus').value;
+            const now = new Date().toLocaleString('ar-EG');
+
+            if(editId) {
+                const cIndex = db.cargo.findIndex(c => c.id === editId);
+                if(cIndex !== -1) {
+                    if(!canEditOrDelete(db.cargo[cIndex].tripDate)) {
+                        alert('عفواً! انقضى تاريخ رحلة تحريك هذه الفاتورة. التعديل متاح للمدير فقط.');
+                        return;
+                    }
+                    if(!db.cargo[cIndex].logs) db.cargo[cIndex].logs = [];
+                    db.cargo[cIndex].logs.push({ user: currentUser.username, time: now, action: 'تعديل فاتورة الشحن' });
+
+                    db.cargo[cIndex].date = document.getElementById('cargoDate').value;
+                    db.cargo[cIndex].tripDate = document.getElementById('cargoTripDate').value;
+                    db.cargo[cIndex].sender = document.getElementById('cargoSenderName').value;
+                    db.cargo[cIndex].senderPhone = document.getElementById('cargoSenderPhone').value;
+                    db.cargo[cIndex].origin = document.getElementById('cargoOrigin').value;
+                    db.cargo[cIndex].receiver = document.getElementById('cargoReceiverName').value;
+                    db.cargo[cIndex].receiverPhone = document.getElementById('cargoReceiverPhone').value;
+                    db.cargo[cIndex].destination = document.getElementById('cargoDestination').value;
+                    db.cargo[cIndex].paymentStatus = status;
+                    db.cargo[cIndex].grandTotal = tot;
+                    db.cargo[cIndex].items = [...cargoFormItems];
+
+                    alert(`تم تعديل فاتورة الشحن #${editId} بنجاح`);
+                }
+            } else {
+                const newCargo = {
+                    id: `${db.nextCargoNo || 100}`,
+                    date: document.getElementById('cargoDate').value,
+                    tripDate: document.getElementById('cargoTripDate').value,
+                    sender: document.getElementById('cargoSenderName').value,
+                    senderPhone: document.getElementById('cargoSenderPhone').value,
+                    origin: document.getElementById('cargoOrigin').value,
+                    receiver: document.getElementById('cargoReceiverName').value,
+                    receiverPhone: document.getElementById('cargoReceiverPhone').value,
+                    destination: document.getElementById('cargoDestination').value,
+                    paymentStatus: status,
+                    grandTotal: tot,
+                    items: [...cargoFormItems],
+                    logs: [{ user: currentUser.username, time: now, action: 'إنشاء الفاتورة لأول مرة' }]
+                };
+
+                db.cargo.unshift(newCargo);
+                db.nextCargoNo = (db.nextCargoNo || 100) + 1;
+                alert(`تم حفظ فاتورة الشحن برقم: #${newCargo.id}`);
+            }
+
+            saveDB();
+            resetCargoForm();
+            renderCargoTable();
+        }
+
+        function editCargo(id) {
+            const c = db.cargo.find(item => item.id === id);
+            if(!c) return;
+
+            if(!canEditOrDelete(c.tripDate) && currentUser.role !== 'مدير') {
+                alert('تنبيه: رحلة هذه الفاتورة منتهية. التعديل مخصص للمدير فقط!');
+                return;
+            }
+
+            document.getElementById('cargoEditId').value = c.id;
+            document.getElementById('cargoInvNo').value = c.id;
+            document.getElementById('cargoDate').value = c.date;
+            document.getElementById('cargoTripDate').value = c.tripDate || c.date;
+            document.getElementById('cargoSenderName').value = c.sender;
+            document.getElementById('cargoSenderPhone').value = c.senderPhone;
+            document.getElementById('cargoOrigin').value = c.origin;
+            document.getElementById('cargoReceiverName').value = c.receiver;
+            document.getElementById('cargoReceiverPhone').value = c.receiverPhone;
+            document.getElementById('cargoDestination').value = c.destination;
+            document.getElementById('cargoPaymentStatus').value = c.paymentStatus;
+
+            cargoFormItems = c.items ? [...c.items] : [{ name: 'كرتون أمتعة', qty: 1, price: c.grandTotal }];
+            renderCargoItemRows();
+
+            document.getElementById('cargoFormTitle').innerText = `تعديل فاتورة الشحن #${c.id}`;
+            document.getElementById('cargoSubmitBtn').innerHTML = `<i class="fa-solid fa-pen-to-square ml-1"></i> حفظ التعديلات`;
+            document.getElementById('cancelEditCargoBtn').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetCargoForm() {
+            document.getElementById('cargoForm').reset();
+            document.getElementById('cargoEditId').value = '';
+            document.getElementById('cargoInvNo').value = db.nextCargoNo || 100;
+            document.getElementById('cargoFormTitle').innerText = 'فاتورة استلام أمتعة وبضائع جديدة';
+            document.getElementById('cargoSubmitBtn').innerHTML = `<i class="fa-solid fa-file-invoice ml-1"></i> حفظ وإصدار فاتورة الشحن`;
+            document.getElementById('cancelEditCargoBtn').classList.add('hidden');
+            cargoFormItems = [{ name: 'كرتون أمتعة', qty: 1, price: 150 }];
+            renderCargoItemRows();
+        }
+
+        function renderCargoTable() {
+            const tbody = document.querySelector('#cargoTable tbody');
+            tbody.innerHTML = '';
+            db.cargo.forEach((c, idx) => {
+                const isEditable = canEditOrDelete(c.tripDate);
+                tbody.insertRow().innerHTML = `
+                    <td><strong>#${c.id}</strong></td>
+                    <td>${c.date}</td>
+                    <td><strong class="text-gold">${c.tripDate || c.date}</strong></td>
+                    <td>${c.sender} (${c.origin})</td>
+                    <td>${c.receiver} (${c.destination})</td>
+                    <td><strong>${c.grandTotal} AED</strong></td>
+                    <td><span style="color:${c.paymentStatus === 'مدفوع' ? '#10b981':'#f59e0b'}; font-weight:bold;">${c.paymentStatus}</span></td>
+                    <td>
+                        <div class="flex items-center gap-1">
+                            <button onclick="previewDocumentAsImage('cargo', '${c.id}')" title="عرض كصورة" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-image"></i></button>
+                            <button onclick="showLogs('cargo', '${c.id}')" title="سجل التعديلات" class="bg-zinc-800 text-gold px-2 py-1 rounded text-xs"><i class="fa-solid fa-history"></i></button>
+                            <button onclick="editCargo('${c.id}')" ${!isEditable ? 'disabled class="bg-zinc-800 text-zinc-600 px-2 py-1 rounded text-xs cursor-not-allowed"' : 'class="bg-amber-600 text-white px-2 py-1 rounded text-xs"'}>
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="deleteCargo(${idx})" ${!isEditable ? 'disabled class="bg-zinc-800 text-zinc-600 px-2 py-1 rounded text-xs cursor-not-allowed"' : 'class="bg-red-600 text-white px-2 py-1 rounded text-xs"'}>
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+            });
+        }
+
+        function deleteCargo(idx) {
+            const cargo = db.cargo[idx];
+            if(!canEditOrDelete(cargo.tripDate)) {
+                alert('عفواً! انقضى تاريخ رحلة هذه الفاتورة. الحذف متاح للمدير فقط.');
+                return;
+            }
+            if(confirm(`تأكيد حذف الفاتورة #${cargo.id}؟`)) {
+                db.cargo.splice(idx, 1);
+                saveDB();
+                renderCargoTable();
+            }
+        }
+
+        function showLogs(type, id) {
+            const item = (type === 'passengers' ? db.passengers : db.cargo).find(x => x.id === id);
+            if(!item) return;
+
+            const logs = item.logs || [];
+            const container = document.getElementById('logsContent');
+            if(logs.length === 0) {
+                container.innerHTML = `<p class="text-zinc-500 text-center py-4">لا توجد سجلات تعديل سابقة.</p>`;
+            } else {
+                container.innerHTML = logs.map(l => `
+                    <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-xl space-y-1">
+                        <div class="flex justify-between font-bold text-gold">
+                            <span><i class="fa-solid fa-user-gear ml-1"></i> ${l.user}</span>
+                            <span class="text-zinc-400 text-[10px]">${l.time}</span>
+                        </div>
+                        <p class="text-zinc-300">${l.action}</p>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('logsOverlay').classList.remove('hidden');
+        }
+
+        function closeLogsModal() { document.getElementById('logsOverlay').classList.add('hidden'); }
+
+        function toggleTrustForm() { document.getElementById('trustFormContainer').classList.toggle('hidden'); }
+
+        function handleSaveTrust(e) {
+            e.preventDefault();
+            const newTrust = {
+                invoiceNo: document.getElementById('trustInvoiceNo').value,
+                location: document.getElementById('trustLocation').value,
+                receiver: document.getElementById('trustReceiver').value,
+                content: document.getElementById('trustContent').value,
+                payLoc: document.getElementById('trustPayLoc').value,
+                amount: parseFloat(document.getElementById('trustAmount').value) || 0
+            };
+            db.trusts.unshift(newTrust);
+            saveDB();
+            renderTrustsTable();
+            toggleTrustForm();
+        }
+
+        function renderTrustsTable() {
+            const tbody = document.querySelector('#trustsTable tbody');
+            tbody.innerHTML = '';
+            db.trusts.forEach((t, idx) => {
+                tbody.insertRow().innerHTML = `
+                    <td><strong>#${t.invoiceNo}</strong></td>
+                    <td>${t.location}</td>
+                    <td>${t.receiver}</td>
+                    <td>${t.content}</td>
+                    <td>${t.amount} AED</td>
+                    <td>${t.payLoc}</td>
+                    <td><button onclick="deleteTrust(${idx})" class="bg-red-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button></td>
+                `;
+            });
+        }
+
+        function deleteTrust(idx) {
+            if(confirm('حذف السجل؟')) {
+                db.trusts.splice(idx, 1);
+                saveDB();
+                renderTrustsTable();
+            }
+        }
+
+        function renderFinancials() {
+            const tSum = db.passengers.reduce((s, p) => s + p.fare, 0);
+            const cSum = db.cargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + c.grandTotal, 0);
+
+            document.getElementById('finTicketsSum').innerText = `${tSum} AED`;
+            document.getElementById('finCargoSum').innerText = `${cSum} AED`;
+
+            const tbody = document.querySelector('#debtsTable tbody');
+            tbody.innerHTML = '';
+            let debtTotal = 0;
+
+            db.passengers.forEach(p => {
+                if(p.payMethod !== 'مدفوع') {
+                    debtTotal += p.fare;
+                    tbody.insertRow().innerHTML = `
+                        <td>${p.name}</td>
+                        <td>${p.phone}</td>
+                        <td>تذكرة حجز ركاب</td>
+                        <td>#${p.id}</td>
+                        <td><strong class="text-gold">${p.fare} AED</strong></td>
+                        <td>${p.payMethod}</td>
+                        <td><span class="text-amber-400 font-bold">غير مسدد</span></td>
+                    `;
+                }
+            });
+
+            db.cargo.forEach(c => {
+                if(c.paymentStatus !== 'مدفوع') {
+                    debtTotal += c.grandTotal;
+                    tbody.insertRow().innerHTML = `
+                        <td>${c.sender}</td>
+                        <td>${c.senderPhone}</td>
+                        <td>فاتورة شحنة طرود</td>
+                        <td>#${c.id}</td>
+                        <td><strong class="text-gold">${c.grandTotal} AED</strong></td>
+                        <td>عند الاستلام</td>
+                        <td><span class="text-amber-400 font-bold">غير مسدد</span></td>
+                    `;
+                }
+            });
+
+            document.getElementById('finDebtsSum').innerText = `${debtTotal} AED`;
+        }
+
+        function exportBackupJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
+            const dl = document.createElement('a');
+            dl.setAttribute("href", dataStr);
+            dl.setAttribute("download", `WadiBina_Backup_${new Date().toISOString().split('T')[0]}.json`);
+            dl.click();
+        }
+
+        function importBackupJSON(event) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if(imported && imported.passengers) {
+                        db = imported;
+                        saveDB();
+                        alert('تم استرجاع النسخة الاحتياطية بنجاح!');
+                        location.reload();
+                    }
+                } catch(err) { alert('خطأ في ملف النسخة الاحتياطية'); }
+            };
+            reader.readAsText(event.target.files[0]);
+        }
+
+        function exportExcel(type) {
+            let data = [];
+            if(type === 'passengers') data = db.passengers;
+            else if(type === 'cargo') data = db.cargo;
+            else if(type === 'trusts') data = db.trusts;
+
+            if(data.length === 0) { alert('لا توجد بيانات للتصدير'); return; }
+            const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "الحجوزات");
-            XLSX.writeFile(wb, "كشف_الحجوزات.xlsx");
-        }
-
-        function exportCargoToExcel() {
-            if (cargoInvoices.length === 0) { alert("لا توجد فواتير للشحن للتصدير!"); return; }
-            const ws = XLSX.utils.json_to_sheet(cargoInvoices);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "فواتير الشحن");
-            XLSX.writeFile(wb, "كشف_فواتير_الشحن.xlsx");
-        }
-
-        function exportInvoicesToExcel() {
-            if (invoicesList.length === 0) { alert("لا توجد فواتير مالية للتصدير!"); return; }
-            const ws = XLSX.utils.json_to_sheet(invoicesList);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "الفواتير المالية");
-            XLSX.writeFile(wb, "تقرير_الفواتير_المالية.xlsx");
+            XLSX.utils.book_append_sheet(wb, ws, type);
+            XLSX.writeFile(wb, `WadiBina_${type}_Report.xlsx`);
         }
     </script>
 </body>
