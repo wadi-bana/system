@@ -27,7 +27,7 @@
     <style>
         :root { --bg-dark: #09090b; --bg-card: #121215; --gold-primary: #D4AF37; --border-color: #D4AF3740; }
         body { font-family: 'Cairo', 'Tajawal', sans-serif; background-color: var(--bg-dark); color: #f4f4f5; min-height: 100vh; }
-        .gold-gradient-text { background: linear-gradient(135deg, #FFF 0%, #D4AF37 50%, #AA8C2C 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .gold-gradient-text { background: linear-gradient(135deg, #FFF 0%, #D4AF37 50%, #AA8C2C 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .gold-gradient-bg { background: linear-gradient(135deg, #D4AF37 0%, #AA8C2C 100%); }
         .custom-table { width: 100%; border-collapse: collapse; text-align: right; font-size: 0.85rem; }
         .custom-table th { background: rgba(255, 255, 255, 0.03); color: var(--gold-primary); padding: 12px; border-bottom: 2px solid var(--border-color); }
@@ -322,7 +322,9 @@
                             <label class="block text-xs text-zinc-400 mb-1">حالة السداد *</label>
                             <select id="cargoPaymentStatus" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-200 outline-none">
                                 <option value="مدفوع">مدفوع</option>
-                                <option value="الدفع عند الباص">الدفع عند الباص</option>
+                                <option value="أجل بالامارات">أجل بالامارات</option>
+                                <option value="الدفع باليمن">الدفع باليمن</option>
+                                <option value="أجل في اليمن">أجل في اليمن</option>
                             </select>
                         </div>
                     </div>
@@ -414,62 +416,16 @@
             </div>
         </section>
 
-        <!-- MODULE 3: TRUSTS & AMANAT -->
+        <!-- MODULE 3: TRUSTS & AMANAT (مرتبط تلقائياً بفواتير الشحن) -->
         <section id="module-trusts" class="tab-content hidden space-y-6">
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl flex justify-between items-center flex-wrap gap-3">
                 <div>
                     <h2 class="text-base font-extrabold text-gold"><i class="fa-solid fa-vault ml-1"></i> كشوفات الأمانات والسامان الشاملة</h2>
-                    <p class="text-xs text-zinc-400 mt-0.5">متابعة المظاريف والطرود الشخصية المسلمة بين الفروع</p>
+                    <p class="text-xs text-zinc-400 mt-0.5">يتم جلب البيانات تلقائياً من فواتير الشحن بالترتيب</p>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="exportExcel('trusts')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow"><i class="fa-solid fa-file-excel ml-1"></i> Excel</button>
-                    <button onclick="toggleTrustForm()" class="gold-gradient-bg text-black px-3 py-1.5 rounded-xl text-xs font-bold shadow"><i class="fa-solid fa-plus ml-1"></i> إضافة أمانة</button>
                 </div>
-            </div>
-
-            <div id="trustFormContainer" class="hidden bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-3">
-                <h3 class="text-xs font-bold text-gold border-b border-zinc-800 pb-2">تسجيل أمانة جديدة</h3>
-                <form id="trustForm" onsubmit="handleSaveTrust(event)" class="space-y-3">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div>
-                            <label class="block text-[11px] text-zinc-400 mb-1">رقم المرجع / الفاتورة</label>
-                            <input type="text" id="trustInvoiceNo" required placeholder="WB-22" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] text-zinc-400 mb-1">الفرع / المحافظة</label>
-                            <select id="trustLocation" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200">
-                                <option value="عدن">عدن</option>
-                                <option value="صنعاء">صنعاء</option>
-                                <option value="المكلا">المكلا</option>
-                                <option value="عجمان">عجمان</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] text-zinc-400 mb-1">اسم المستلم ورقم هاتفه</label>
-                            <input type="text" id="trustReceiver" required placeholder="الاسم والهاتف" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div>
-                            <label class="block text-[11px] text-zinc-400 mb-1">محتوى الأمانة / السامان</label>
-                            <input type="text" id="trustContent" required placeholder="كرتون سامان + مظروف" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] text-zinc-400 mb-1">جهة الدفع والمبلغ</label>
-                            <div class="grid grid-cols-2 gap-1.5">
-                                <select id="trustPayLoc" class="bg-darkbg border border-zinc-800 rounded-xl p-2 text-xs text-zinc-200">
-                                    <option value="باليمن">باليمن</option>
-                                    <option value="بالإمارات">بالإمارات</option>
-                                </select>
-                                <input type="number" id="trustAmount" value="0" class="bg-darkbg border border-zinc-800 rounded-xl p-2 text-xs text-zinc-200">
-                            </div>
-                        </div>
-                        <div class="flex items-end gap-2">
-                            <button type="submit" class="flex-1 gold-gradient-bg text-black font-bold py-2 rounded-xl text-xs">حفظ</button>
-                            <button type="button" onclick="toggleTrustForm()" class="bg-zinc-800 text-zinc-300 px-3 py-2 rounded-xl text-xs">إلغاء</button>
-                        </div>
-                    </div>
-                </form>
             </div>
 
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
@@ -477,13 +433,12 @@
                     <table class="custom-table" id="trustsTable">
                         <thead>
                             <tr>
-                                <th>المرجع</th>
-                                <th>الفرع</th>
+                                <th>المرجع (رقم الفاتورة)</th>
+                                <th>مكان الاستلام</th>
                                 <th>المستلم</th>
-                                <th>المحتوى</th>
+                                <th>المحتوى (أصناف الشحنة)</th>
                                 <th>المبلغ</th>
                                 <th>جهة الدفع</th>
-                                <th>الإجراء</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -562,6 +517,7 @@
                 updateUserBadge();
                 renderPassengersTable();
                 renderCargoTable();
+                renderTrustsTable();
             } else {
                 alert('اسم المستخدم أو كلمة المرور غير صحيحة!');
             }
@@ -587,9 +543,6 @@
             ],
             cargo: [
                 { id: "100", date: "2026-10-28", tripDate: "2026-11-02", sender: "صالح العولقي", senderPhone: "0559876543", origin: "عجمان", receiver: "محمد صالح", receiverPhone: "0770123456", destination: "عدن", paymentStatus: "مدفوع", grandTotal: 300, items: [{ name: "كرتون أمتعة وملابس", qty: 2, price: 150 }], logs: [] }
-            ],
-            trusts: [
-                { invoiceNo: "WB-22", location: "المكلا", receiver: "سالم باوزير", content: "2 كرتون سامان", payLoc: "باليمن", amount: 0 }
             ],
             nextTicketNo: 101,
             nextCargoNo: 101
@@ -632,6 +585,7 @@
                 activeBtn.classList.add('gold-gradient-bg', 'text-black');
             }
 
+            if(tabId === 'trusts') renderTrustsTable();
             if(tabId === 'financials') renderFinancials();
         }
 
@@ -647,7 +601,7 @@
             return tripDate >= today;
         }
 
-        // --- عرض المستندات كصور (Preview as Image) ---
+        // --- عرض المستندات كصور ---
         function previewDocumentAsImage(type, id) {
             const item = (type === 'passengers' ? db.passengers : db.cargo).find(x => x.id === id);
             if(!item) return;
@@ -658,7 +612,7 @@
             const body = document.getElementById('imgDocBody');
             if(type === 'passengers') {
                 const isPaid = item.payMethod === 'مدفوع';
-                const paidText = isPaid ? `<span class="text-emerald-600 font-black mr-2">(تم الدفع)</span>` : `<span class="text-amber-600 font-bold mr-2">(${item.payMethod})</span>`;
+                const paidText = isPaid ? `<span class="text-emerald-600 font-black mr-2">(تم الدفع)</span>` : ``;
 
                 body.innerHTML = `
                     <div class="grid grid-cols-2 gap-2 bg-slate-100 p-3 rounded-lg border border-slate-200">
@@ -668,21 +622,20 @@
                         <div><strong>تاريخ الرحلة:</strong> <span class="text-amber-600 font-bold">${item.tripDate} (${item.reportingTime})</span></div>
                         <div><strong>محطة الصعود:</strong> <span class="text-slate-800 font-bold">${item.origin}</span></div>
                         <div><strong>جهة الوصول:</strong> <span class="text-slate-800 font-bold">${item.destination}</span></div>
-                        <div><strong>حالة السداد:</strong> <span class="text-slate-700 font-bold">${item.payMethod}</span></div>
-                        <div><strong>المبلغ الإجمالي:</strong> <span class="text-indigo-600 font-black">${item.fare} AED</span> ${paidText}</div>
+                        <div class="col-span-2"><strong>المبلغ الإجمالي:</strong> <span class="text-indigo-600 font-black">${item.fare} AED</span> ${paidText}</div>
                     </div>
                 `;
             } else {
                 let itemsHTML = item.items.map((i, idx) => `<tr><td class="border border-slate-300 p-1.5">${idx+1}</td><td class="border border-slate-300 p-1.5">${i.name}</td><td class="border border-slate-300 p-1.5">${i.qty}</td><td class="border border-slate-300 p-1.5">${i.price} AED</td></tr>`).join('');
                 const isPaid = item.paymentStatus === 'مدفوع';
-                const paidText = isPaid ? `<span class="text-emerald-600 font-black mr-2">(تم الدفع)</span>` : `<span class="text-amber-600 font-bold mr-2">(${item.paymentStatus})</span>`;
+                const paidText = isPaid ? `<span class="text-emerald-600 font-black mr-2">(تم الدفع)</span>` : ``;
 
                 body.innerHTML = `
                     <div class="grid grid-cols-2 gap-2 bg-slate-100 p-3 rounded-lg border border-slate-200 mb-3">
                         <div><strong>المرسل:</strong> ${item.sender} (${item.senderPhone})</div>
                         <div><strong>المستلم:</strong> ${item.receiver} (${item.receiverPhone})</div>
                         <div><strong>تاريخ التحريك:</strong> <span class="text-amber-600 font-bold">${item.tripDate}</span></div>
-                        <div><strong>حالة الفاتورة:</strong> <span class="text-slate-700 font-bold">${item.paymentStatus}</span></div>
+                        <div><strong>من ⟵ إلى:</strong> ${item.origin} ⟵ ${item.destination}</div>
                     </div>
                     <table class="w-full border-collapse text-center text-xs">
                         <thead><tr class="bg-slate-200"><th class="border border-slate-300 p-1">م</th><th class="border border-slate-300 p-1">الصنف</th><th class="border border-slate-300 p-1">العدد</th><th class="border border-slate-300 p-1">السعر</th></tr></thead>
@@ -928,6 +881,7 @@
             saveDB();
             resetCargoForm();
             renderCargoTable();
+            renderTrustsTable();
         }
 
         function editCargo(id) {
@@ -1010,7 +964,33 @@
                 db.cargo.splice(idx, 1);
                 saveDB();
                 renderCargoTable();
+                renderTrustsTable();
             }
+        }
+
+        // --- كشوفات الأمانات (مرتبطة تلقائياً بفواتير الشحن) ---
+        function renderTrustsTable() {
+            const tbody = document.querySelector('#trustsTable tbody');
+            tbody.innerHTML = '';
+            
+            if (!db.cargo || db.cargo.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center text-zinc-500 py-6">لا توجد فواتير شحن مسجلة لعرضها في كشف الأمانات</td></tr>`;
+                return;
+            }
+
+            db.cargo.forEach(c => {
+                // تجميع تفاصيل الأصناف والكميات
+                const contentDesc = c.items ? c.items.map(i => `${i.name} (العدد: ${i.qty})`).join('، ') : 'أمتعة وبضائع';
+
+                tbody.insertRow().innerHTML = `
+                    <td><strong class="text-gold">#${c.id}</strong></td>
+                    <td>${c.destination}</td>
+                    <td>${c.receiver} (${c.receiverPhone || ''})</td>
+                    <td>${contentDesc}</td>
+                    <td><strong class="text-emerald-400">${c.grandTotal} AED</strong></td>
+                    <td><span class="font-bold" style="color:${c.paymentStatus === 'مدفوع' ? '#10b981':'#f59e0b'}">${c.paymentStatus}</span></td>
+                `;
+            });
         }
 
         function showLogs(type, id) {
@@ -1036,48 +1016,6 @@
         }
 
         function closeLogsModal() { document.getElementById('logsOverlay').classList.add('hidden'); }
-
-        function toggleTrustForm() { document.getElementById('trustFormContainer').classList.toggle('hidden'); }
-
-        function handleSaveTrust(e) {
-            e.preventDefault();
-            const newTrust = {
-                invoiceNo: document.getElementById('trustInvoiceNo').value,
-                location: document.getElementById('trustLocation').value,
-                receiver: document.getElementById('trustReceiver').value,
-                content: document.getElementById('trustContent').value,
-                payLoc: document.getElementById('trustPayLoc').value,
-                amount: parseFloat(document.getElementById('trustAmount').value) || 0
-            };
-            db.trusts.unshift(newTrust);
-            saveDB();
-            renderTrustsTable();
-            toggleTrustForm();
-        }
-
-        function renderTrustsTable() {
-            const tbody = document.querySelector('#trustsTable tbody');
-            tbody.innerHTML = '';
-            db.trusts.forEach((t, idx) => {
-                tbody.insertRow().innerHTML = `
-                    <td><strong>#${t.invoiceNo}</strong></td>
-                    <td>${t.location}</td>
-                    <td>${t.receiver}</td>
-                    <td>${t.content}</td>
-                    <td>${t.amount} AED</td>
-                    <td>${t.payLoc}</td>
-                    <td><button onclick="deleteTrust(${idx})" class="bg-red-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button></td>
-                `;
-            });
-        }
-
-        function deleteTrust(idx) {
-            if(confirm('حذف السجل؟')) {
-                db.trusts.splice(idx, 1);
-                saveDB();
-                renderTrustsTable();
-            }
-        }
 
         function renderFinancials() {
             const tSum = db.passengers.reduce((s, p) => s + p.fare, 0);
@@ -1114,8 +1052,8 @@
                         <td>فاتورة شحنة طرود</td>
                         <td>#${c.id}</td>
                         <td><strong class="text-gold">${c.grandTotal} AED</strong></td>
-                        <td>عند الاستلام</td>
-                        <td><span class="text-amber-400 font-bold">غير مسدد</span></td>
+                        <td>${c.paymentStatus}</td>
+                        <td><span class="text-amber-400 font-bold">آجل / غير مسدد</span></td>
                     `;
                 }
             });
@@ -1151,7 +1089,16 @@
             let data = [];
             if(type === 'passengers') data = db.passengers;
             else if(type === 'cargo') data = db.cargo;
-            else if(type === 'trusts') data = db.trusts;
+            else if(type === 'trusts') {
+                data = db.cargo.map(c => ({
+                    المرجع: `#${c.id}`,
+                    مكان_الاستلام: c.destination,
+                    المستلم: c.receiver,
+                    المحتوى: c.items ? c.items.map(i => `${i.name} (${i.qty})`).join(', ') : '',
+                    المبلغ: c.grandTotal,
+                    جهة_الدفع: c.paymentStatus
+                }));
+            }
 
             if(data.length === 0) { alert('لا توجد بيانات للتصدير'); return; }
             const ws = XLSX.utils.json_to_sheet(data);
