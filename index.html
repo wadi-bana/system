@@ -299,7 +299,7 @@
                                 <input type="text" id="passAgent" required placeholder="اسم الوكيل أو الحاجز" class="w-full bg-darkbg border border-gold rounded-xl px-3.5 py-2.5 text-xs text-zinc-200 outline-none">
                             </div>
                             <div>
-                                <label class="block text-xs text-gold mb-1 font-bold">تاريخ الرحلة (قابل للتعديل) *</label>
+                                <label class="block text-xs text-gold mb-1 font-bold">تاريخ الرحلة (تلقائي حسب محطة الصعود) *</label>
                                 <input type="date" id="passTripDate" required class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3.5 py-2.5 text-xs outline-none">
                             </div>
                             <div>
@@ -345,10 +345,11 @@
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">محطة الصعود *</label>
-                                <select id="passOrigin" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-200 outline-none">
+                                <select id="passOrigin" onchange="onOriginChanged()" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-200 outline-none">
                                     <option value="عجمان">عجمان</option>
                                     <option value="بني ياس">بني ياس</option>
                                     <option value="العين">العين</option>
+                                    <option value="عمان">عمان (اليوم التالي)</option>
                                     <option value="حفيت">حفيت</option>
                                     <option value="نزوة">نزوة</option>
                                     <option value="عبري">عبري</option>
@@ -379,7 +380,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs text-zinc-400 mb-1">حالة السداد *</label>
-                                <select id="passPayMethod" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-200 outline-none">
+                                <select id="passPayMethod" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-zinc-200 outline-none">
                                     <option value="مدفوع">مدفوع</option>
                                     <option value="الدفع عند الباص">الدفع عند الباص</option>
                                 </select>
@@ -396,9 +397,9 @@
                     <div class="space-y-4">
                         <h3 class="text-gold font-bold text-sm border-b border-zinc-800 pb-2"><i class="fa-solid fa-shield-halved ml-1"></i> ضوابط التعديل والرحلات</h3>
                         <p class="text-xs text-zinc-400 leading-relaxed">
-                            • تاريخ الرحلة أصبح قابلاً للتعديل بالكامل عند إنشاء أو تعديل أي تذكرة.<br>
-                            • يمكنك طباعة كشف الركاب (Manifest) لأي تاريخ رحلة بضغطة زر واحدة.<br>
-                            • يُسمح بتعديل التذاكر <strong class="text-gold">قبل تاريخ الرحلة فقط</strong>.<br>
+                            • محطات (عجمان، بني ياس، العين) تضبط تاريخ الرحلة في نفس اليوم.<br>
+                            • محطة (عمان) تضبط تاريخ الرحلة تلقائياً لليوم التالي.<br>
+                            • جميع التذاكر والفواتير معروضة ومشارِكة بين كافة مستخدمي النظام.<br>
                         </p>
                     </div>
                     <div class="bg-zinc-900/80 p-4 rounded-xl border border-zinc-800 mt-4 space-y-2">
@@ -416,7 +417,7 @@
 
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-zinc-800 flex justify-between items-center flex-wrap gap-2">
-                    <span class="font-bold text-gold text-xs sm:text-sm"><i class="fa-solid fa-list-check ml-1"></i> سجل حجوزات ركاب الرحلة المحددة</span>
+                    <span class="font-bold text-gold text-xs sm:text-sm"><i class="fa-solid fa-list-check ml-1"></i> سجل حجوزات ركاب الرحلة المحددة (لكافة المستخدمين)</span>
                     <button onclick="exportExcel('passengers')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 shadow">
                         <i class="fa-solid fa-file-excel"></i> تصدير Excel
                     </button>
@@ -486,6 +487,7 @@
                                 <option value="عجمان">عنوان/محطة: عجمان</option>
                                 <option value="بني ياس">عنوان/محطة: بني ياس</option>
                                 <option value="العين">عنوان/محطة: العين</option>
+                                <option value="عمان">عنوان/محطة: عمان</option>
                                 <option value="حفيت">عنوان/محطة: حفيت</option>
                                 <option value="نزوة">عنوان/محطة: نزوة</option>
                                 <option value="عبري">عنوان/محطة: عبري</option>
@@ -506,6 +508,7 @@
                                 <option value="عجمان">عنوان/محطة: عجمان</option>
                                 <option value="بني ياس">عنوان/محطة: بني ياس</option>
                                 <option value="العين">عنوان/محطة: العين</option>
+                                <option value="عمان">عنوان/محطة: عمان</option>
                                 <option value="حفيت">عنوان/محطة: حفيت</option>
                                 <option value="نزوة">عنوان/محطة: نزوة</option>
                                 <option value="عبري">عنوان/محطة: عبري</option>
@@ -546,7 +549,7 @@
 
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
-                    <span class="font-bold text-gold text-xs sm:text-sm"><i class="fa-solid fa-clock-rotate-left ml-1"></i> سجل فواتير الشحن والأمتعة</span>
+                    <span class="font-bold text-gold text-xs sm:text-sm"><i class="fa-solid fa-clock-rotate-left ml-1"></i> سجل فواتير الشحن والأمتعة (لكافة المستخدمين)</span>
                     <button onclick="exportExcel('cargo')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 shadow">
                         <i class="fa-solid fa-file-excel"></i> تصدير Excel
                     </button>
@@ -599,7 +602,7 @@
             <!-- VOUCHERS SECTION (سندات القبض والصرف) -->
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3 flex-wrap gap-2">
-                    <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-receipt ml-1"></i> سندات القبض والصرف المالية النثرية والتشغيلية</h3>
+                    <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-receipt ml-1"></i> سندات القبض والصرف المالية النثرية والتشغيلية (متاحة للجميع)</h3>
                 </div>
 
                 <form id="voucherForm" onsubmit="handleSaveVoucher(event)" class="grid grid-cols-1 sm:grid-cols-5 gap-3 bg-darkbg p-4 rounded-xl border border-zinc-800">
@@ -892,6 +895,21 @@
             document.getElementById('passManualTotal').value = count * fare;
         }
 
+        // تحديد تاريخ الرحلة تلقائياً بناءً على محطة الصعود
+        function onOriginChanged() {
+            const origin = document.getElementById('passOrigin').value;
+            const baseDate = activeTripDate || new Date().toISOString().split('T')[0];
+            const d = new Date(baseDate);
+
+            if (origin === 'عمان') {
+                // إذا كانت محطة الصعود عمان، يكون تاريخ الرحلة تلقائياً لليوم التالي
+                d.setDate(d.getDate() + 1);
+            }
+            // عجمان، بني ياس، العين تبقى في نفس تاريخ الفلتر الحالي أو اليوم
+            const formattedDate = d.toISOString().split('T')[0];
+            document.getElementById('passTripDate').value = formattedDate;
+        }
+
         function onPassengerCountChanged(existingExtra = []) {
             calcTicketTotal();
             const count = parseInt(document.getElementById('passCount').value) || 1;
@@ -928,6 +946,7 @@
 
             const passTbody = document.querySelector('#passengersTable tbody');
             passTbody.innerHTML = '';
+            // عرض الحجوزات والفواتير من جميع المستخدمين للجميع
             let filteredPassengers = db.passengers.filter(p => {
                 const matchType = (typeFilter === 'all' || typeFilter === 'ticket');
                 const matchDate = query ? true : (p.tripDate === activeTripDate);
@@ -1259,8 +1278,7 @@
             document.getElementById('passengerForm').reset();
             document.getElementById('passEditId').value = '';
             document.getElementById('passCount').value = '1';
-            document.getElementById('passTripDate').value = activeTripDate;
-            onPassengerCountChanged();
+            onOriginChanged();
             calcTicketTotal();
             document.getElementById('passFormTitle').innerText = `حجز وإصدار تذكرة سفر جديدة`;
             document.getElementById('passSubmitBtn').innerHTML = `<i class="fa-solid fa-ticket ml-1"></i> حفظ وإصدار التذكرة للرحلة المحددة`;
