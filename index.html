@@ -84,7 +84,7 @@
                         </div>
                     </div>
                     <div class="text-left">
-                        <strong id="imgTicketCode" class="text-lg font-black text-amber-600">#100</strong>
+                        <strong id="imgTicketCode" class="text-lg font-black text-amber-600">#118</strong>
                         <p class="text-[11px] text-slate-500 font-bold">Passenger Ticket</p>
                     </div>
                 </div>
@@ -120,7 +120,7 @@
                         </div>
                     </div>
                     <div class="text-left">
-                        <strong id="imgCargoCode" class="text-lg font-black text-indigo-600">#100</strong>
+                        <strong id="imgCargoCode" class="text-lg font-black text-indigo-600">#118</strong>
                         <p class="text-[11px] text-slate-500 font-bold">Cargo Shipping Invoice</p>
                     </div>
                 </div>
@@ -236,7 +236,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex space-x-2 space-x-reverse py-2.5 overflow-x-auto no-scrollbar">
                 <button onclick="switchTab('passengers')" id="tab-passengers" class="tab-btn px-6 py-2.5 rounded-xl text-xs font-bold transition gold-gradient-bg text-black shadow">
-                    <i class="fa-solid fa-ticket ml-1.5"></i> حجوزات وتذاكر الركاب (حسب تاريخ الرحلة)
+                    <i class="fa-solid fa-ticket ml-1.5"></i> حجوزات وتذاكر الركاب
                 </button>
                 <button onclick="switchTab('cargo')" id="tab-cargo" class="tab-btn px-6 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
                     <i class="fa-solid fa-boxes-packing ml-1.5"></i> فواتير الشحن والأمتعة
@@ -272,13 +272,12 @@
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-calendar-day text-gold text-lg"></i>
                     <div>
-                        <h3 class="text-xs font-bold text-gold">إدارة رحلات الركاب بالتاريخ</h3>
-                        <p class="text-[11px] text-zinc-400">اختر أو افتح تاريخ رحلة محدد لعرض حجز وإصدار أو طباعة كشف الرحلة (Manifest)</p>
+                        <h3 class="text-xs font-bold text-gold">إدارة رحلات وتذاكر الركاب</h3>
+                        <p class="text-[11px] text-zinc-400">عرض جميع التذاكر المحجوزة في السيستم مع إمكانية طباعة كشف الرحلة (Manifest)</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 w-full sm:w-auto flex-wrap">
                     <input type="date" id="selectedTripDateFilter" onchange="onTripDateFilterChanged()" class="bg-darkbg border border-gold text-gold font-bold text-xs px-3 py-2 rounded-xl outline-none">
-                    <button onclick="openNewTripDatePrompt()" class="gold-gradient-bg text-black font-bold px-3 py-2 rounded-xl text-xs whitespace-nowrap shadow"><i class="fa-solid fa-plus ml-1"></i> فتح تاريخ رحلة</button>
                     <button onclick="openManifestModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-2 rounded-xl text-xs whitespace-nowrap shadow"><i class="fa-solid fa-file-lines ml-1"></i> طباعة كشف الرحلة (Manifest)</button>
                 </div>
             </div>
@@ -295,11 +294,15 @@
                         
                         <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                             <div>
+                                <label class="block text-xs text-gold mb-1 font-bold">رقم التذكرة / البوليصة *</label>
+                                <input type="text" id="passTicketNo" required class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3.5 py-2.5 text-xs outline-none">
+                            </div>
+                            <div>
                                 <label class="block text-xs text-gold mb-1 font-bold">اسم الوكيل (طالب الحجز) *</label>
                                 <input type="text" id="passAgent" required placeholder="اسم الوكيل أو الحاجز" class="w-full bg-darkbg border border-gold rounded-xl px-3.5 py-2.5 text-xs text-zinc-200 outline-none">
                             </div>
                             <div>
-                                <label class="block text-xs text-gold mb-1 font-bold">تاريخ الرحلة (تلقائي حسب محطة الصعود) *</label>
+                                <label class="block text-xs text-gold mb-1 font-bold">تاريخ الرحلة *</label>
                                 <input type="date" id="passTripDate" required class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3.5 py-2.5 text-xs outline-none">
                             </div>
                             <div>
@@ -313,6 +316,9 @@
                                     <option value="6">6 ركاب</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs text-gold mb-1 font-bold">الإجمالي اليدوي (درهم) *</label>
                                 <input type="number" id="passManualTotal" required class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3.5 py-2.5 text-xs outline-none" placeholder="الإجمالي النهائي">
@@ -388,7 +394,7 @@
                         </div>
 
                         <button type="submit" id="passSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow-lg hover:opacity-95 transition">
-                            <i class="fa-solid fa-ticket ml-1"></i> حفظ وإصدار التذكرة للرحلة المحددة
+                            <i class="fa-solid fa-ticket ml-1"></i> حفظ وإصدار التذكرة
                         </button>
                     </form>
                 </div>
@@ -397,18 +403,18 @@
                     <div class="space-y-4">
                         <h3 class="text-gold font-bold text-sm border-b border-zinc-800 pb-2"><i class="fa-solid fa-shield-halved ml-1"></i> ضوابط التعديل والرحلات</h3>
                         <p class="text-xs text-zinc-400 leading-relaxed">
-                            • محطات (عجمان، بني ياس، العين) تضبط تاريخ الرحلة في نفس اليوم.<br>
-                            • محطة (عمان) تضبط تاريخ الرحلة تلقائياً لليوم التالي.<br>
-                            • جميع التذاكر والفواتير معروضة ومشارِكة بين كافة مستخدمي النظام.<br>
+                            • يتم عرض كافة التذاكر الموجودة في النظام بسجل الركاب أدناه.<br>
+                            • يمكنك تعديل رقم التذكرة أو تاريخ الرحلة بكل مرونة عند التعديل.<br>
+                            • كافة الحجوزات مشتركة ومرئية لكافة مستخدمي النظام.<br>
                         </p>
                     </div>
                     <div class="bg-zinc-900/80 p-4 rounded-xl border border-zinc-800 mt-4 space-y-2">
                         <div class="flex justify-between text-xs">
-                            <span class="text-zinc-400">إجمالي تذاكر الرحلة المحددة:</span>
+                            <span class="text-zinc-400">إجمالي التذاكر المعروضة:</span>
                             <strong id="statTicketCount" class="text-gold font-bold">0</strong>
                         </div>
                         <div class="flex justify-between text-xs">
-                            <span class="text-zinc-400">إجمالي مقبوضات الرحلة:</span>
+                            <span class="text-zinc-400">إجمالي مقبوضات التذاكر:</span>
                             <strong id="statTicketRevenue" class="text-emerald-400 font-bold">0 AED</strong>
                         </div>
                     </div>
@@ -417,7 +423,7 @@
 
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-zinc-800 flex justify-between items-center flex-wrap gap-2">
-                    <span class="font-bold text-gold text-xs sm:text-sm"><i class="fa-solid fa-list-check ml-1"></i> سجل حجوزات ركاب الرحلة المحددة (لكافة المستخدمين)</span>
+                    <span class="font-bold text-gold text-xs sm:text-sm"><i class="fa-solid fa-list-check ml-1"></i> سجل جميع تذاكر ركاب السيستم</span>
                     <button onclick="exportExcel('passengers')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 shadow">
                         <i class="fa-solid fa-file-excel"></i> تصدير Excel
                     </button>
@@ -457,8 +463,8 @@
                     <input type="hidden" id="cargoEditId" value="">
                     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <div>
-                            <label class="block text-xs text-zinc-400 mb-1">رقم الفاتورة</label>
-                            <input type="text" id="cargoInvNo" readonly class="w-full bg-zinc-900 border border-gold font-bold text-gold rounded-xl px-3 py-2.5 text-xs">
+                            <label class="block text-xs text-gold mb-1 font-bold">رقم الفاتورة *</label>
+                            <input type="text" id="cargoInvNo" required class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2.5 text-xs outline-none">
                         </div>
                         <div>
                             <label class="block text-xs text-zinc-400 mb-1">تاريخ الاستلام *</label>
@@ -549,7 +555,7 @@
 
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
-                    <span class="font-bold text-gold text-xs sm:text-sm"><i class="fa-solid fa-clock-rotate-left ml-1"></i> سجل فواتير الشحن والأمتعة (لكافة المستخدمين)</span>
+                    <span class="font-bold text-gold text-xs sm:text-sm"><i class="fa-solid fa-clock-rotate-left ml-1"></i> سجل جميع فواتير الشحن والأمتعة في السيستم</span>
                     <button onclick="exportExcel('cargo')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 shadow">
                         <i class="fa-solid fa-file-excel"></i> تصدير Excel
                     </button>
@@ -772,18 +778,20 @@
 
         const DEFAULT_STORE = {
             passengers: [
-                { id: "100", agent: "مكتب الوكيل العام", passengerCount: 1, name: "عبدالله أحمد علي اليافعي", phone: "0501234567", passport: "A0988712", extraPassengers: [], origin: "عجمان", destination: "عدن", tripDate: "2026-11-05", reportingTime: "07:00 صباحاً", fare: 400, payMethod: "مدفوع", logs: [] }
+                { id: "118", agent: "مكتب الوكيل العام", passengerCount: 1, name: "عبدالله أحمد علي اليافعي", phone: "0501234567", passport: "A0988712", extraPassengers: [], origin: "عجمان", destination: "عدن", tripDate: "2026-11-05", reportingTime: "07:00 صباحاً", fare: 400, payMethod: "مدفوع", logs: [] }
             ],
             cargo: [
-                { id: "100", date: "2026-10-28", tripDate: "2026-11-02", sender: "صالح العولقي", senderOrigin: "عجمان", senderPhone: "0559876543", receiver: "محمد صالح", receiverDestination: "عدن", receiverPhone: "0770123456", paymentStatus: "مدفوع", grandTotal: 300, items: [{ name: "كرتون أمتعة وملابس", qty: 2, price: 150 }], logs: [] }
+                { id: "118", date: "2026-10-28", tripDate: "2026-11-02", sender: "صالح العولقي", senderOrigin: "عجمان", senderPhone: "0559876543", receiver: "محمد صالح", receiverDestination: "عدن", receiverPhone: "0770123456", paymentStatus: "مدفوع", grandTotal: 300, items: [{ name: "كرتون أمتعة وملابس", qty: 2, price: 150 }], logs: [] }
             ],
             vouchers: [],
-            nextTicketNo: 101,
-            nextCargoNo: 101
+            nextTicketNo: 119,
+            nextCargoNo: 119
         };
 
         let db = JSON.parse(localStorage.getItem('WADI_BINA_MASTER_DB')) || DEFAULT_STORE;
         if(!db.vouchers) db.vouchers = [];
+        if(!db.nextTicketNo) db.nextTicketNo = 118;
+        if(!db.nextCargoNo) db.nextCargoNo = 118;
 
         function saveDB() { localStorage.setItem('WADI_BINA_MASTER_DB', JSON.stringify(db)); }
 
@@ -799,7 +807,8 @@
             document.getElementById('cargoTripDate').value = today;
             document.getElementById('passTripDate').value = today;
             document.getElementById('vDate').value = today;
-            document.getElementById('cargoInvNo').value = db.nextCargoNo || 100;
+            document.getElementById('cargoInvNo').value = db.nextCargoNo || 118;
+            document.getElementById('passTicketNo').value = db.nextTicketNo || 118;
 
             renderCargoItemRows();
             onPassengerCountChanged();
@@ -813,24 +822,13 @@
                 dateInput.value = activeTripDate;
             }
             activeTripDate = dateInput.value;
-            document.getElementById('activeTripDateLabel').innerText = activeTripDate;
             handleGlobalSearch();
         }
 
         function onTripDateFilterChanged() {
             const dateInput = document.getElementById('selectedTripDateFilter');
             activeTripDate = dateInput.value;
-            document.getElementById('activeTripDateLabel').innerText = activeTripDate;
             handleGlobalSearch();
-        }
-
-        function openNewTripDatePrompt() {
-            const newDate = prompt("أدخل تاريخ الرحلة الجديد (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
-            if(newDate) {
-                document.getElementById('selectedTripDateFilter').value = newDate;
-                initTripDateFilter();
-                alert(`تم فتح وتحديد رحلة التاريخ: ${newDate}. يمكنك الآن عرض حجز التذاكر الخاصة بها.`);
-            }
         }
 
         function switchTab(tabId) {
@@ -895,17 +893,14 @@
             document.getElementById('passManualTotal').value = count * fare;
         }
 
-        // تحديد تاريخ الرحلة تلقائياً بناءً على محطة الصعود
         function onOriginChanged() {
             const origin = document.getElementById('passOrigin').value;
             const baseDate = activeTripDate || new Date().toISOString().split('T')[0];
             const d = new Date(baseDate);
 
             if (origin === 'عمان') {
-                // إذا كانت محطة الصعود عمان، يكون تاريخ الرحلة تلقائياً لليوم التالي
                 d.setDate(d.getDate() + 1);
             }
-            // عجمان، بني ياس، العين تبقى في نفس تاريخ الفلتر الحالي أو اليوم
             const formattedDate = d.toISOString().split('T')[0];
             document.getElementById('passTripDate').value = formattedDate;
         }
@@ -944,12 +939,11 @@
             const query = document.getElementById('globalSearchInput').value.trim().toLowerCase();
             const typeFilter = document.getElementById('globalSearchType').value;
 
+            // عرض جميع التذاكر المحجوزة في السيستم بالكامل
             const passTbody = document.querySelector('#passengersTable tbody');
             passTbody.innerHTML = '';
-            // عرض الحجوزات والفواتير من جميع المستخدمين للجميع
             let filteredPassengers = db.passengers.filter(p => {
                 const matchType = (typeFilter === 'all' || typeFilter === 'ticket');
-                const matchDate = query ? true : (p.tripDate === activeTripDate);
                 const matchQuery = !query || 
                     p.id.toLowerCase().includes(query) || 
                     (p.agent && p.agent.toLowerCase().includes(query)) ||
@@ -958,7 +952,7 @@
                     p.passport.toLowerCase().includes(query) || 
                     p.tripDate.toLowerCase().includes(query) ||
                     'تذكرة'.includes(query);
-                return matchType && matchDate && matchQuery;
+                return matchType && matchQuery;
             });
 
             let revSum = 0;
@@ -1002,9 +996,10 @@
                     </td>
                 `;
             });
-            document.getElementById('statTicketCount').innerText = filteredPassengers.reduce((s, p) => s + (p.passengerCount || 1), 0);
+            document.getElementById('statTicketCount').innerText = filteredPassengers.length;
             document.getElementById('statTicketRevenue').innerText = `${revSum} AED`;
 
+            // عرض جميع فواتير الشحن الموجودة في السيستم بالكامل
             const cargoTbody = document.querySelector('#cargoTable tbody');
             cargoTbody.innerHTML = '';
             let filteredCargo = db.cargo.filter(c => {
@@ -1175,6 +1170,7 @@
         function handleSavePassenger(e) {
             e.preventDefault();
             const editId = document.getElementById('passEditId').value;
+            const customTicketNo = document.getElementById('passTicketNo').value.trim();
             const now = new Date().toLocaleString('ar-EG');
             const tripDate = document.getElementById('passTripDate').value;
             const agentName = document.getElementById('passAgent').value.trim();
@@ -1203,6 +1199,7 @@
                     if(!db.passengers[pIndex].logs) db.passengers[pIndex].logs = [];
                     db.passengers[pIndex].logs.push({ user: currentUser.username, time: now, action: 'تعديل بيانات التذكرة' });
 
+                    db.passengers[pIndex].id = customTicketNo;
                     db.passengers[pIndex].agent = agentName;
                     db.passengers[pIndex].passengerCount = pCount;
                     db.passengers[pIndex].tripDate = tripDate;
@@ -1215,11 +1212,16 @@
                     db.passengers[pIndex].fare = manualFareTotal;
                     db.passengers[pIndex].payMethod = document.getElementById('passPayMethod').value;
 
-                    alert(`تم تعديل التذكرة #${editId} بنجاح`);
+                    alert(`تم تعديل التذكرة #${customTicketNo} بنجاح`);
                 }
             } else {
+                if(db.passengers.some(p => p.id === customTicketNo)) {
+                    alert('رقم التذكرة هذا موجود مسبقاً! الرجاء استخدام رقم آخر.');
+                    return;
+                }
+
                 const newTicket = {
-                    id: `${db.nextTicketNo || 100}`,
+                    id: customTicketNo,
                     agent: agentName,
                     passengerCount: pCount,
                     name: document.getElementById('passName').value,
@@ -1236,8 +1238,13 @@
                 };
 
                 db.passengers.unshift(newTicket);
-                db.nextTicketNo = (db.nextTicketNo || 100) + 1;
-                alert(`تم حجز التذكرة للرحلة (${tripDate}) برقم البوليصة: #${newTicket.id}`);
+                const numericId = parseInt(customTicketNo);
+                if(!isNaN(numericId) && numericId >= (db.nextTicketNo || 118)) {
+                    db.nextTicketNo = numericId + 1;
+                } else {
+                    db.nextTicketNo = (db.nextTicketNo || 118) + 1;
+                }
+                alert(`تم حجز التذكرة للرحلة برقم البوليصة: #${newTicket.id}`);
             }
 
             saveDB();
@@ -1255,6 +1262,7 @@
             }
 
             document.getElementById('passEditId').value = ticket.id;
+            document.getElementById('passTicketNo').value = ticket.id;
             document.getElementById('passAgent').value = ticket.agent || '';
             document.getElementById('passTripDate').value = ticket.tripDate;
             document.getElementById('passCount').value = ticket.passengerCount || 1;
@@ -1278,10 +1286,11 @@
             document.getElementById('passengerForm').reset();
             document.getElementById('passEditId').value = '';
             document.getElementById('passCount').value = '1';
+            document.getElementById('passTicketNo').value = db.nextTicketNo || 118;
             onOriginChanged();
             calcTicketTotal();
             document.getElementById('passFormTitle').innerText = `حجز وإصدار تذكرة سفر جديدة`;
-            document.getElementById('passSubmitBtn').innerHTML = `<i class="fa-solid fa-ticket ml-1"></i> حفظ وإصدار التذكرة للرحلة المحددة`;
+            document.getElementById('passSubmitBtn').innerHTML = `<i class="fa-solid fa-ticket ml-1"></i> حفظ وإصدار التذكرة`;
             document.getElementById('cancelEditPassBtn').classList.add('hidden');
         }
 
@@ -1340,6 +1349,7 @@
         function handleSaveCargo(e) {
             e.preventDefault();
             const editId = document.getElementById('cargoEditId').value;
+            const customInvNo = document.getElementById('cargoInvNo').value.trim();
             const tot = parseFloat(document.getElementById('cargoManualTotal').value) || 0;
             const status = document.getElementById('cargoPaymentStatus').value;
             const now = new Date().toLocaleString('ar-EG');
@@ -1354,6 +1364,7 @@
                     if(!db.cargo[cIndex].logs) db.cargo[cIndex].logs = [];
                     db.cargo[cIndex].logs.push({ user: currentUser.username, time: now, action: 'تعديل فاتورة الشحن' });
 
+                    db.cargo[cIndex].id = customInvNo;
                     db.cargo[cIndex].date = document.getElementById('cargoDate').value;
                     db.cargo[cIndex].tripDate = document.getElementById('cargoTripDate').value;
                     db.cargo[cIndex].sender = document.getElementById('cargoSenderName').value;
@@ -1366,11 +1377,16 @@
                     db.cargo[cIndex].grandTotal = tot;
                     db.cargo[cIndex].items = [...cargoFormItems];
 
-                    alert(`تم تعديل فاتورة الشحن #${editId} بنجاح`);
+                    alert(`تم تعديل فاتورة الشحن #${customInvNo} بنجاح`);
                 }
             } else {
+                if(db.cargo.some(c => c.id === customInvNo)) {
+                    alert('رقم الفاتورة هذا موجود مسبقاً! الرجاء استخدام رقم آخر.');
+                    return;
+                }
+
                 const newCargo = {
-                    id: `${db.nextCargoNo || 100}`,
+                    id: customInvNo,
                     date: document.getElementById('cargoDate').value,
                     tripDate: document.getElementById('cargoTripDate').value,
                     sender: document.getElementById('cargoSenderName').value,
@@ -1386,7 +1402,12 @@
                 };
 
                 db.cargo.unshift(newCargo);
-                db.nextCargoNo = (db.nextCargoNo || 100) + 1;
+                const numericInv = parseInt(customInvNo);
+                if(!isNaN(numericInv) && numericInv >= (db.nextCargoNo || 118)) {
+                    db.nextCargoNo = numericInv + 1;
+                } else {
+                    db.nextCargoNo = (db.nextCargoNo || 118) + 1;
+                }
                 alert(`تم حفظ فاتورة الشحن برقم: #${newCargo.id}`);
             }
 
@@ -1431,7 +1452,7 @@
         function resetCargoForm() {
             document.getElementById('cargoForm').reset();
             document.getElementById('cargoEditId').value = '';
-            document.getElementById('cargoInvNo').value = db.nextCargoNo || 100;
+            document.getElementById('cargoInvNo').value = db.nextCargoNo || 118;
             document.getElementById('cargoManualTotal').removeAttribute('data-manual-edited');
             document.getElementById('cargoFormTitle').innerText = 'فاتورة استلام أمتعة وبضائع جديدة';
             document.getElementById('cargoSubmitBtn').innerHTML = `<i class="fa-solid fa-file-invoice ml-1"></i> حفظ وإصدار فاتورة الشحن`;
@@ -1453,7 +1474,6 @@
             }
         }
 
-        // VOUCHERS MANAGEMENT (سندات القبض والصرف)
         function handleSaveVoucher(e) {
             e.preventDefault();
             const newVoucher = {
@@ -1641,7 +1661,7 @@
         function exportExcel(type) {
             let data = [];
             if(type === 'passengers') {
-                data = db.passengers.filter(p => p.tripDate === activeTripDate).map(p => ({
+                data = db.passengers.map(p => ({
                     'البوليصة': `#${p.id}`,
                     'اسم الوكيل': p.agent || '',
                     'عدد الركاب': p.passengerCount || 1,
