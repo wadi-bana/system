@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>شركة وادي بناء للنقل البري VIP | النظام الموحد الشامل</title>
+    <title>شركة وادي بناء للنقل البري | النظام الموحد الشامل</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -27,7 +27,7 @@
     <style>
         :root { --bg-dark: #09090b; --bg-card: #121215; --gold-primary: #D4AF37; --border-color: #D4AF3740; }
         body { font-family: 'Cairo', 'Tajawal', sans-serif; background-color: var(--bg-dark); color: #f4f4f5; min-height: 100vh; }
-        .gold-gradient-text { background: linear-gradient(135deg, #FFF 0%, #D4AF37 50%, #AA8C2C 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+        .gold-gradient-text { background: linear-gradient(135deg, #FFF 0%, #D4AF37 50%, #AA8C2C 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .gold-gradient-bg { background: linear-gradient(135deg, #D4AF37 0%, #AA8C2C 100%); }
         .custom-table { width: 100%; border-collapse: collapse; text-align: right; font-size: 0.8rem; }
         .custom-table th { background: rgba(255, 255, 255, 0.03); color: var(--gold-primary); padding: 10px; border-bottom: 2px solid var(--border-color); white-space: nowrap; }
@@ -43,7 +43,7 @@
     <div class="modal-overlay" id="loginOverlay">
         <div class="modal-card" style="max-width: 400px;">
             <div class="text-center mb-4">
-                <img src="logo_2.jpeg" alt="شعار وادي بناء" class="w-20 h-20 object-cover rounded-full mx-auto border-2 border-gold shadow-lg mb-2">
+                <img src="logo_2.jpeg" alt="شعار وادي بناء" class="w-20 h-20 object-cover rounded-full mx-auto border-2 border-gold shadow-lg mb-2" onerror="this.src='https://via.placeholder.com/80?text=Logo'">
                 <h2 class="text-xl font-black text-gold">تسجيل الدخول للنظام</h2>
                 <p class="text-zinc-400 text-xs mt-1">أدخل بيانات الحساب المعتمدة للوصول للوحة التحكم</p>
             </div>
@@ -61,7 +61,7 @@
         </div>
     </div>
 
-    <!-- PREVIEW TICKET IMAGE MODAL -->
+    <!-- PREVIEW TICKET IMAGE MODAL (بدون كلمة VIP في الترويسة وبشعار معتمد) -->
     <div class="modal-overlay hidden" id="ticketPreviewModal">
         <div class="modal-card" style="max-width: 700px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
@@ -72,20 +72,20 @@
             <div id="ticketCaptureArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl font-['Cairo']">
                 <div class="flex justify-between items-center border-b-2 border-slate-300 pb-3 mb-4">
                     <div class="flex items-center gap-3">
-                        <img src="logo_2.jpeg" alt="شعار الشركة" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow">
+                        <img src="logo_2.jpeg" alt="شعار الشركة" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
                         <div>
-                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل البري VIP[cite: 22]</h2>
+                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل البري</h2>
                             <p class="text-[11px] text-slate-500">بوليصة حجز تذكرة سفر ركاب</p>
                         </div>
                     </div>
                     <div class="text-left">
                         <strong id="imgTicketCode" class="text-lg font-black text-amber-600">#100</strong>
-                        <p class="text-[11px] text-slate-500 font-bold">VIP Passenger Ticket</p>
+                        <p class="text-[11px] text-slate-500 font-bold">Passenger Ticket</p>
                     </div>
                 </div>
                 <div id="imgTicketBody" class="space-y-3 text-xs"></div>
                 <div class="mt-6 pt-3 border-t border-dashed border-slate-300 flex justify-between items-center text-[11px] text-slate-500">
-                    <div>* شكراً لاختياركم وادي بناء للنقل البري[cite: 22]. رحلة موفقة وآمنة.</div>
+                    <div>* شكراً لاختياركم وادي بناء للنقل البري. رحلة موفقة وآمنة.</div>
                     <div class="font-bold text-slate-800">الدعم: 0558675501</div>
                 </div>
             </div>
@@ -97,7 +97,7 @@
         </div>
     </div>
 
-    <!-- PREVIEW CARGO IMAGE MODAL -->
+    <!-- PREVIEW CARGO IMAGE MODAL (بدون كلمة VIP في الترويسة وبشعار معتمد) -->
     <div class="modal-overlay hidden" id="cargoPreviewModal">
         <div class="modal-card" style="max-width: 700px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
@@ -108,9 +108,9 @@
             <div id="cargoCaptureArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl font-['Cairo']">
                 <div class="flex justify-between items-center border-b-2 border-slate-300 pb-3 mb-4">
                     <div class="flex items-center gap-3">
-                        <img src="logo_2.jpeg" alt="شعار الشركة" class="w-14 h-14 object-cover rounded-full border border-indigo-600 shadow">
+                        <img src="logo_2.jpeg" alt="شعار الشركة" class="w-14 h-14 object-cover rounded-full border border-indigo-600 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
                         <div>
-                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل البري VIP[cite: 22]</h2>
+                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل البري</h2>
                             <p class="text-[11px] text-slate-500">فاتورة استلام أمتعة وبضائع</p>
                         </div>
                     </div>
@@ -121,7 +121,7 @@
                 </div>
                 <div id="imgCargoBody" class="space-y-3 text-xs"></div>
                 <div class="mt-6 pt-3 border-t border-dashed border-slate-300 flex justify-between items-center text-[11px] text-slate-500">
-                    <div>* شكراً لاختياركم وادي بناء لشحن أمتعتكم[cite: 22]. عناية تامة وآمنة.</div>
+                    <div>* شكراً لاختياركم وادي بناء لشحن أمتعتكم. عناية تامة وآمنة.</div>
                     <div class="font-bold text-slate-800">الدعم: 0558675501</div>
                 </div>
             </div>
@@ -147,9 +147,9 @@
     <!-- HEADER -->
     <header class="bg-cardbg border-b border-bordergold px-4 sm:px-6 py-3.5 flex items-center justify-between sticky top-0 z-50 backdrop-blur-md bg-opacity-95 shadow-lg">
         <div class="flex items-center gap-3">
-            <img src="logo_2.jpeg" alt="شعار وادي بناء" class="w-11 h-11 object-cover rounded-full border border-gold shadow">
+            <img src="logo_2.jpeg" alt="شعار وادي بناء" class="w-11 h-11 object-cover rounded-full border border-gold shadow" onerror="this.src='https://via.placeholder.com/44?text=Logo'">
             <div>
-                <h1 class="text-base sm:text-lg font-black gold-gradient-text leading-tight">شركة وادي بناء للنقل البري VIP[cite: 22]</h1>
+                <h1 class="text-base sm:text-lg font-black gold-gradient-text leading-tight">شركة وادي بناء للنقل البري</h1>
                 <p class="text-[11px] text-zinc-400">النظام الموحد الشامل لإدارة الحجوزات والشحن والمالية</p>
             </div>
         </div>
