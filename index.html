@@ -138,7 +138,43 @@
         </div>
     </div>
 
-    <!-- MANIFEST MODAL (كشف ركاب الرحلة) -->
+    <!-- PREVIEW DEBT INVOICE IMAGE MODAL -->
+    <div class="modal-overlay hidden" id="debtInvPreviewModal">
+        <div class="modal-card" style="max-width: 700px;">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
+                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-invoice-dollar ml-1"></i> معاينة فاتورة حساب آجل</h3>
+                <button onclick="closeModal('debtInvPreviewModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div id="debtInvCaptureArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl font-['Cairo']">
+                <div class="flex justify-between items-center border-b-2 border-slate-300 pb-3 mb-4">
+                    <div class="flex items-center gap-3">
+                        <img src="logo_2.jpeg" alt="شعار الشركة" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
+                        <div>
+                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل البري</h2>
+                            <p class="text-[11px] text-slate-500 font-bold">فاتورة حسابات وآجال مالية (Deferred Account Invoice)</p>
+                        </div>
+                    </div>
+                    <div class="text-left">
+                        <strong id="imgDebtInvCode" class="text-lg font-black text-amber-600">#118</strong>
+                        <p class="text-[11px] text-slate-500 font-bold">Deferred Invoice</p>
+                    </div>
+                </div>
+                <div id="imgDebtInvBody" class="space-y-3 text-xs"></div>
+                <div class="mt-6 pt-3 border-t border-dashed border-slate-300 flex justify-between items-center text-[11px] text-slate-500">
+                    <div>* تعتبر هذه الفاتورة سند مطالبي رسمي للحسابات الآجلة.</div>
+                    <div class="font-bold text-slate-800">الدعم: 0558675501</div>
+                </div>
+            </div>
+
+            <div class="mt-5 flex gap-3">
+                <button onclick="downloadCapturedImage('debtInvCaptureArea', 'WadiBina_DebtInvoice_')" class="flex-1 gold-gradient-bg text-black font-extrabold py-3 rounded-xl text-xs shadow"><i class="fa-solid fa-download ml-1"></i> تحميل الصورة (JPEG)</button>
+                <button onclick="closeModal('debtInvPreviewModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MANIFEST MODAL (تقرير رحلة شامل) -->
     <div class="modal-overlay hidden" id="manifestModal">
         <div class="modal-card" style="max-width: 800px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
@@ -197,11 +233,11 @@
         </div>
     </div>
 
-    <!-- CARGO MANIFEST MODAL (كشف أمانات الرحلة) -->
+    <!-- CARGO MANIFEST MODAL (كشف الأمانات والسامان الشامل) -->
     <div class="modal-overlay hidden" id="cargoManifestModal">
         <div class="modal-card" style="max-width: 850px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> كشف أمانات والسامان الشامل للرحلة (Cargo Manifest)</h3>
+                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> كشف أمانات وسامان الرحلة الشامل (Cargo Manifest)</h3>
                 <div class="flex gap-2">
                     <button onclick="window.print()" class="bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-print ml-1"></i> طباعة كشف الأمانات</button>
                     <button onclick="closeModal('cargoManifestModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -211,7 +247,7 @@
             <div id="cargoManifestPrintArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl font-['Cairo']">
                 <div class="flex justify-between items-center border-b-2 border-slate-800 pb-3 mb-4">
                     <div class="flex items-center gap-3">
-                        <img src="logo_2.jpeg" alt="شعار الشركة" class="w-14 h-14 object-cover rounded-full border border-indigo-600 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
+                        <img src="logo_2.jpeg" alt="شعار الشركة" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
                         <div>
                             <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل البري</h2>
                             <p class="text-[11px] text-slate-600 font-bold">كشف أمانات والسامان والطرود الرسمي (Cargo Manifest)</p>
@@ -225,7 +261,7 @@
 
                 <div class="mb-4 bg-slate-100 p-3 rounded-lg border border-slate-200 flex justify-between text-xs font-bold">
                     <span>إجمالي فواتير الشحن: <span id="cargoManifestTotalInvoices" class="text-indigo-700">0</span></span>
-                    <span>إجمالي قيمة شحنات الرحلة: <span id="cargoManifestTotalAmount" class="text-emerald-700">0 AED</span></span>
+                    <span>إجمالي المبالغ المحصلة/المستحقة: <span id="cargoManifestTotalAmount" class="text-emerald-700">0 AED</span></span>
                 </div>
 
                 <table class="w-full border-collapse text-right text-xs">
@@ -647,7 +683,7 @@
             </div>
         </section>
 
-        <!-- SECTION 3: FINANCIALS & VOUCHERS & TRUSTS -->
+        <!-- SECTION 3: FINANCIALS & VOUCHERS & TRUSTS & DEBT INVOICES -->
         <section id="module-financials" class="tab-content hidden space-y-6">
             <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl">
@@ -671,7 +707,7 @@
             <!-- VOUCHERS SECTION (سندات القبض والصرف) -->
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3 flex-wrap gap-2">
-                    <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-receipt ml-1"></i> سندات القبض والصرف المالية النثرية والتشغيلية (متاحة للجميع)</h3>
+                    <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-receipt ml-1"></i> سندات القبض والصرف المالية النثرية والتشغيلية</h3>
                 </div>
 
                 <form id="voucherForm" onsubmit="handleSaveVoucher(event)" class="grid grid-cols-1 sm:grid-cols-5 gap-3 bg-darkbg p-4 rounded-xl border border-zinc-800">
@@ -720,9 +756,12 @@
             <!-- OTHER FINANCIAL TABS -->
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3 flex-wrap gap-2">
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 flex-wrap">
                         <button onclick="switchFinancialSubTab('debts')" id="subtab-debts" class="px-4 py-2 rounded-xl text-xs font-bold gold-gradient-bg text-black">
                             <i class="fa-solid fa-file-invoice-dollar ml-1"></i> كشف الذمم والمديونيات
+                        </button>
+                        <button onclick="switchFinancialSubTab('create-debt-inv')" id="subtab-create-debt-inv" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-300 hover:text-gold">
+                            <i class="fa-solid fa-plus-circle ml-1"></i> إنشاء فاتورة حسابات آجل
                         </button>
                         <button onclick="switchFinancialSubTab('trusts')" id="subtab-trusts" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-300 hover:text-gold">
                             <i class="fa-solid fa-vault ml-1"></i> بند كشف الأمانات والسامان
@@ -734,6 +773,7 @@
                     </div>
                 </div>
 
+                <!-- SUB TAB 1: DEBTS LIST -->
                 <div id="fin-sub-debts" class="space-y-6">
                     <div>
                         <h4 class="text-xs font-bold text-gold mb-2"><i class="fa-solid fa-boxes-packing ml-1"></i> أولاً: فواتير الشحن غير المدفوعة</h4>
@@ -770,8 +810,96 @@
                             </table>
                         </div>
                     </div>
+
+                    <div class="border-t border-zinc-800 pt-4">
+                        <h4 class="text-xs font-bold text-gold mb-2"><i class="fa-solid fa-file-invoice-dollar ml-1"></i> ثالثاً: سجل فواتير الحسابات الآجلة المسجلة</h4>
+                        <div class="overflow-x-auto">
+                            <table class="custom-table" id="debtInvoicesTable">
+                               <thead>
+                                    <tr>
+                                        <th>رقم الفاتورة</th>
+                                        <th>التاريخ</th>
+                                        <th>الاسم</th>
+                                        <th>رقم التلفون</th>
+                                        <th>العنوان</th>
+                                        <th>مجموع التذاكر/الفواتير</th>
+                                        <th>المبلغ المدفوع</th>
+                                        <th>الإجمالي المتبقي</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
+                <!-- SUB TAB 2: CREATE DEBT INVOICE FORM -->
+                <div id="fin-sub-create-debt-inv" class="hidden space-y-4">
+                    <div class="bg-darkbg p-5 rounded-xl border border-gold space-y-4">
+                        <h3 class="text-gold font-bold text-sm border-b border-zinc-800 pb-2 flex items-center justify-between">
+                            <span><i class="fa-solid fa-file-invoice-dollar ml-1"></i> نموذج إنشاء فاتورة حسابات آجل جديد</span>
+                            <span class="text-xs text-zinc-400">تستخدم للعملاء وأصحاب الحسابات الآجلة</span>
+                        </h3>
+
+                        <form id="debtInvoiceForm" onsubmit="handleSaveDebtInvoice(event)" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-xs text-gold mb-1 font-bold">رقم الفاتورة *</label>
+                                    <input type="text" id="debtInvNo" required class="w-full bg-zinc-900 border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-zinc-400 mb-1">تاريخ الفاتورة *</label>
+                                    <input type="date" id="debtInvDate" required class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-200">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-zinc-400 mb-1">الاسم الكامل *</label>
+                                    <input type="text" id="debtInvCustomerName" required placeholder="اسم العميل / صاحب الحساب" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-200">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-zinc-400 mb-1">رقم التلفون *</label>
+                                    <input type="tel" id="debtInvCustomerPhone" required placeholder="0500000000" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-200">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs text-zinc-400 mb-1">العنوان *</label>
+                                <input type="text" id="debtInvCustomerAddress" required placeholder="المدينة / المنطقة / المحطة" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-200">
+                            </div>
+
+                            <!-- ROWS OF ITEMS (رقم الفاتورة او التذكرة - تفاصيل - المبلغ) -->
+                            <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800 space-y-3">
+                                <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
+                                    <span class="text-xs font-bold text-gold"><i class="fa-solid fa-list-ol ml-1"></i> جدول مديونيات الفاتورة (التذاكر والفواتير الحالية)</span>
+                                    <button type="button" onclick="addDebtInvRow()" class="text-xs text-gold hover:underline font-bold"><i class="fa-solid fa-plus-circle ml-1"></i> إضافة بند جديد</button>
+                                </div>
+                                <div id="debtInvRowsContainer" class="space-y-2"></div>
+                            </div>
+
+                            <!-- TOTALS & PAID CALCULATION -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-zinc-900 p-4 rounded-xl border border-gold">
+                                <div>
+                                    <label class="block text-[11px] text-zinc-400 mb-1 font-bold">مجموع مبالغ البنود (AED)</label>
+                                    <input type="number" id="debtInvSubTotal" readonly class="w-full bg-darkbg border border-zinc-700 font-bold text-zinc-300 rounded-lg p-2 text-xs outline-none" value="0">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] text-emerald-400 mb-1 font-bold">المبلغ المدفوع (درهم)</label>
+                                    <input type="number" id="debtInvPaidAmount" oninput="calcDebtInvoiceNetTotal()" placeholder="0" class="w-full bg-darkbg border border-emerald-500 font-bold text-emerald-400 rounded-lg p-2 text-xs outline-none" value="0">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] text-gold mb-1 font-bold">الإجمالي المتبقي (المجموع - المدفوع)</label>
+                                    <input type="number" id="debtInvNetTotal" readonly class="w-full bg-darkbg border border-gold font-black text-gold rounded-lg p-2 text-xs outline-none" value="0">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow-lg hover:opacity-95 transition">
+                                <i class="fa-solid fa-floppy-disk ml-1"></i> حفظ وإصدار فاتورة الحساب الآجل
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- SUB TAB 3: TRUSTS -->
                 <div id="fin-sub-trusts" class="hidden space-y-4">
                     <div class="flex justify-between items-center flex-wrap gap-2 mb-3">
                         <p class="text-xs text-zinc-400">* يتم جلب كشف أمانات السامان والطرود تلقائياً بناءً على فواتير الشحن المسجلة:</p>
@@ -852,20 +980,25 @@
                 { id: "118", date: "2026-10-28", tripDate: "2026-11-02", sender: "صالح العولقي", senderOrigin: "عجمان", senderPhone: "0559876543", receiver: "محمد صالح", receiverDestination: "عدن", receiverPhone: "0770123456", paymentStatus: "مدفوع", grandTotal: 300, items: [{ name: "كرتون أمتعة وملابس", qty: 2, price: 150 }], logs: [] }
             ],
             vouchers: [],
+            debtInvoices: [],
             nextTicketNo: 119,
-            nextCargoNo: 119
+            nextCargoNo: 119,
+            nextDebtInvNo: 118
         };
 
         let db = JSON.parse(localStorage.getItem('WADI_BINA_MASTER_DB')) || DEFAULT_STORE;
         if(!db.vouchers) db.vouchers = [];
+        if(!db.debtInvoices) db.debtInvoices = [];
         if(!db.nextTicketNo) db.nextTicketNo = 118;
         if(!db.nextCargoNo) db.nextCargoNo = 118;
+        if(!db.nextDebtInvNo) db.nextDebtInvNo = 118;
 
         function saveDB() { localStorage.setItem('WADI_BINA_MASTER_DB', JSON.stringify(db)); }
 
         let currentTab = 'passengers';
         let activeTripDate = new Date().toISOString().split('T')[0];
         let cargoFormItems = [{ name: 'كرتون أمتعة', qty: 1, price: 150 }];
+        let debtInvFormRows = [{ refNo: '', details: 'شحن أمتعة وطرود', amount: 0 }];
 
         window.onload = function() {
             updateUserBadge();
@@ -875,10 +1008,13 @@
             document.getElementById('cargoTripDate').value = today;
             document.getElementById('passTripDate').value = today;
             document.getElementById('vDate').value = today;
+            document.getElementById('debtInvDate').value = today;
             document.getElementById('cargoInvNo').value = db.nextCargoNo || 118;
             document.getElementById('passTicketNo').value = db.nextTicketNo || 118;
+            document.getElementById('debtInvNo').value = db.nextDebtInvNo || 118;
 
             renderCargoItemRows();
+            renderDebtInvRows();
             onPassengerCountChanged();
             calcTicketTotal();
             updateReportingTimeAutomatically();
@@ -920,6 +1056,7 @@
                 renderFinancials();
                 renderVouchersTable();
                 renderTrustsTable();
+                renderDebtInvoicesTable();
             }
             
             handleGlobalSearch();
@@ -927,15 +1064,21 @@
 
         function switchFinancialSubTab(subId) {
             document.getElementById('fin-sub-debts').classList.add('hidden');
+            document.getElementById('fin-sub-create-debt-inv').classList.add('hidden');
             document.getElementById('fin-sub-trusts').classList.add('hidden');
             document.getElementById('finTrustsExportBtn').classList.add('hidden');
 
             document.getElementById('subtab-debts').className = "px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-300 hover:text-gold";
+            document.getElementById('subtab-create-debt-inv').className = "px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-300 hover:text-gold";
             document.getElementById('subtab-trusts').className = "px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-300 hover:text-gold";
 
             if(subId === 'debts') {
                 document.getElementById('fin-sub-debts').classList.remove('hidden');
                 document.getElementById('subtab-debts').className = "px-4 py-2 rounded-xl text-xs font-bold gold-gradient-bg text-black";
+                renderDebtInvoicesTable();
+            } else if(subId === 'create-debt-inv') {
+                document.getElementById('fin-sub-create-debt-inv').classList.remove('hidden');
+                document.getElementById('subtab-create-debt-inv').className = "px-4 py-2 rounded-xl text-xs font-bold gold-gradient-bg text-black";
             } else if(subId === 'trusts') {
                 document.getElementById('fin-sub-trusts').classList.remove('hidden');
                 document.getElementById('finTrustsExportBtn').classList.remove('hidden');
@@ -962,7 +1105,6 @@
             document.getElementById('passManualTotal').value = count * fare;
         }
 
-        // حساب وتحديث وقت وحضور التذكرة تلقائياً بناءً على محطة الصعود وتاريخ الرحلة
         function updateReportingTimeAutomatically() {
             const origin = document.getElementById('passOrigin').value;
             const tripDateVal = document.getElementById('passTripDate').value || new Date().toISOString().split('T')[0];
@@ -982,7 +1124,7 @@
                 targetDateStr = tripDateVal;
             } else if (['حفيت', 'نزوة', 'عبري', 'ثمريت'].includes(origin)) {
                 timeStr = "1:30 صباحاً";
-                d.setDate(d.getDate() + 1); // اليوم التالي
+                d.setDate(d.getDate() + 1);
                 targetDateStr = d.toISOString().split('T')[0];
             } else {
                 timeStr = "4:00 عصراً";
@@ -1283,6 +1425,47 @@
                 <div class="text-left font-black text-sm mt-2 text-indigo-700">الإجمالي النهائي: ${item.grandTotal} AED ${paidText}</div>
             `;
             document.getElementById('cargoPreviewModal').classList.remove('hidden');
+        }
+
+        function previewDebtInvoiceAsImage(id) {
+            const inv = db.debtInvoices.find(x => x.id === id);
+            if(!inv) return;
+
+            document.getElementById('imgDebtInvCode').innerText = `#${inv.id}`;
+            let rowsHTML = inv.items.map((i, idx) => `
+                <tr>
+                    <td class="border border-slate-300 p-1.5 text-center">${idx + 1}</td>
+                    <td class="border border-slate-300 p-1.5 font-bold">${i.refNo || '-'}</td>
+                    <td class="border border-slate-300 p-1.5">${i.details || '-'}</td>
+                    <td class="border border-slate-300 p-1.5 text-left font-bold">${i.amount} AED</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('imgDebtInvBody').innerHTML = `
+                <div class="grid grid-cols-2 gap-2 bg-slate-100 p-3 rounded-lg border border-slate-200 mb-3 text-xs">
+                    <div><strong>تاريخ الفاتورة:</strong> ${inv.date}</div>
+                    <div><strong>الاسم الكامل:</strong> <span class="font-bold text-slate-900">${inv.name}</span></div>
+                    <div><strong>رقم التلفون:</strong> ${inv.phone}</div>
+                    <div><strong>العنوان:</strong> ${inv.address}</div>
+                </div>
+                <table class="w-full border-collapse text-right text-xs mb-3">
+                    <thead>
+                        <tr class="bg-slate-200">
+                            <th class="border border-slate-300 p-1.5">م</th>
+                            <th class="border border-slate-300 p-1.5">رقم الفاتورة/التذكرة</th>
+                            <th class="border border-slate-300 p-1.5">تفاصيل</th>
+                            <th class="border border-slate-300 p-1.5 text-left">المبلغ</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rowsHTML}</tbody>
+                </table>
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1 text-xs">
+                    <div class="flex justify-between"><span>مجموع المبالغ:</span><strong>${inv.subTotal} AED</strong></div>
+                    <div class="flex justify-between text-emerald-700 font-bold"><span>المبلغ المدفوع:</span><strong>${inv.paidAmount} AED</strong></div>
+                    <div class="flex justify-between border-t border-slate-300 pt-1 text-amber-700 font-black text-sm"><span>الإجمالي المتبقي:</span><strong>${inv.netTotal} AED</strong></div>
+                </div>
+            `;
+            document.getElementById('debtInvPreviewModal').classList.remove('hidden');
         }
 
         function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
@@ -1608,6 +1791,138 @@
             }
         }
 
+        // DEBT INVOICES FUNCTIONS (فواتير الحسابات الآجلة)
+        function renderDebtInvRows() {
+            const container = document.getElementById('debtInvRowsContainer');
+            container.innerHTML = '';
+
+            debtInvFormRows.forEach((row, idx) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = "flex gap-2 items-center flex-wrap sm:flex-nowrap";
+                rowDiv.innerHTML = `
+                    <input type="text" placeholder="رقم الفاتورة أو التذكرة" value="${row.refNo}" oninput="updateDebtInvRow(${idx}, 'refNo', this.value)" class="w-full sm:w-48 bg-darkbg border border-zinc-800 rounded-lg p-2 text-xs text-zinc-200 outline-none">
+                    <input type="text" placeholder="التفاصيل / البيان" value="${row.details}" oninput="updateDebtInvRow(${idx}, 'details', this.value)" class="w-full bg-darkbg border border-zinc-800 rounded-lg p-2 text-xs text-zinc-200 outline-none">
+                    <input type="number" placeholder="المبلغ" value="${row.amount}" oninput="updateDebtInvRow(${idx}, 'amount', this.value)" class="w-full sm:w-32 bg-darkbg border border-zinc-800 rounded-lg p-2 text-xs text-gold font-bold text-center outline-none">
+                    ${debtInvFormRows.length > 1 ? `<button type="button" onclick="removeDebtInvRow(${idx})" class="text-red-400 p-1 text-xs"><i class="fa-solid fa-circle-minus text-base"></i></button>` : ''}
+                `;
+                container.appendChild(rowDiv);
+            });
+
+            calcDebtInvoiceNetTotal();
+        }
+
+        function addDebtInvRow() {
+            debtInvFormRows.push({ refNo: '', details: '', amount: 0 });
+            renderDebtInvRows();
+        }
+
+        function removeDebtInvRow(idx) {
+            debtInvFormRows.splice(idx, 1);
+            renderDebtInvRows();
+        }
+
+        function updateDebtInvRow(idx, field, val) {
+            debtInvFormRows[idx][field] = field === 'amount' ? (parseFloat(val) || 0) : val;
+            calcDebtInvoiceNetTotal();
+        }
+
+        function calcDebtInvoiceNetTotal() {
+            const subTotal = debtInvFormRows.reduce((s, r) => s + (r.amount || 0), 0);
+            const paidAmount = parseFloat(document.getElementById('debtInvPaidAmount').value) || 0;
+            const netTotal = subTotal - paidAmount;
+
+            document.getElementById('debtInvSubTotal').value = subTotal;
+            document.getElementById('debtInvNetTotal').value = netTotal;
+        }
+
+        function handleSaveDebtInvoice(e) {
+            e.preventDefault();
+            const invNo = document.getElementById('debtInvNo').value.trim();
+            const date = document.getElementById('debtInvDate').value;
+            const name = document.getElementById('debtInvCustomerName').value.trim();
+            const phone = document.getElementById('debtInvCustomerPhone').value.trim();
+            const address = document.getElementById('debtInvCustomerAddress').value.trim();
+            const subTotal = parseFloat(document.getElementById('debtInvSubTotal').value) || 0;
+            const paidAmount = parseFloat(document.getElementById('debtInvPaidAmount').value) || 0;
+            const netTotal = parseFloat(document.getElementById('debtInvNetTotal').value) || 0;
+
+            if(db.debtInvoices.some(x => x.id === invNo)) {
+                alert('رقم الفاتورة الآجلة هذا مستخدم مسبقاً!');
+                return;
+            }
+
+            const newInv = {
+                id: invNo,
+                date: date,
+                name: name,
+                phone: phone,
+                address: address,
+                items: [...debtInvFormRows],
+                subTotal: subTotal,
+                paidAmount: paidAmount,
+                netTotal: netTotal,
+                user: currentUser ? currentUser.username : 'مسؤول'
+            };
+
+            db.debtInvoices.unshift(newInv);
+            const num = parseInt(invNo);
+            if(!isNaN(num) && num >= (db.nextDebtInvNo || 118)) {
+                db.nextDebtInvNo = num + 1;
+            } else {
+                db.nextDebtInvNo = (db.nextDebtInvNo || 118) + 1;
+            }
+
+            saveDB();
+            alert(`تم حفظ فاتورة الحساب الآجل #${invNo} بنجاح!`);
+            resetDebtInvoiceForm();
+            switchFinancialSubTab('debts');
+        }
+
+        function resetDebtInvoiceForm() {
+            document.getElementById('debtInvoiceForm').reset();
+            document.getElementById('debtInvDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('debtInvNo').value = db.nextDebtInvNo || 118;
+            debtInvFormRows = [{ refNo: '', details: 'شحن أمتعة وطرود', amount: 0 }];
+            renderDebtInvRows();
+        }
+
+        function renderDebtInvoicesTable() {
+            const tbody = document.querySelector('#debtInvoicesTable tbody');
+            tbody.innerHTML = '';
+
+            if (!db.debtInvoices || db.debtInvoices.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center text-zinc-500 py-4">لا توجد فواتير حسابات آجلة مسجلة حتى الآن</td></tr>`;
+                return;
+            }
+
+            db.debtInvoices.forEach(inv => {
+                tbody.insertRow().innerHTML = `
+                    <td><strong class="text-gold">#${inv.id}</strong></td>
+                    <td>${inv.date}</td>
+                    <td><strong>${inv.name}</strong></td>
+                    <td><strong class="text-amber-400">${inv.phone}</strong></td>
+                    <td>${inv.address}</td>
+                    <td>${inv.subTotal} AED</td>
+                    <td><strong class="text-emerald-400">${inv.paidAmount} AED</strong></td>
+                    <td><strong class="text-amber-300 font-black">${inv.netTotal} AED</strong></td>
+                    <td>
+                        <div class="flex items-center gap-1">
+                            <button onclick="previewDebtInvoiceAsImage('${inv.id}')" title="معاينة كصورة" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-image"></i></button>
+                            <button onclick="deleteDebtInvoice('${inv.id}')" title="حذف" class="bg-red-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </td>
+                `;
+            });
+        }
+
+        function deleteDebtInvoice(id) {
+            if(confirm(`تأكيد حذف فاتورة الحساب الآجل #${id}؟`)) {
+                db.debtInvoices = db.debtInvoices.filter(x => x.id !== id);
+                saveDB();
+                renderDebtInvoicesTable();
+            }
+        }
+
         function handleSaveVoucher(e) {
             e.preventDefault();
             const newVoucher = {
@@ -1783,6 +2098,7 @@
                     if(imported && imported.passengers) {
                         db = imported;
                         if(!db.vouchers) db.vouchers = [];
+                        if(!db.debtInvoices) db.debtInvoices = [];
                         saveDB();
                         alert('تم استرجاع النسخة الاحتياطية بنجاح!');
                         location.reload();
@@ -1844,3 +2160,13 @@
     </script>
 </body>
 </html>
+```eofs
+
+تم تحديث كود ملف الواجهة `index.html` بالكامل وتضمين الميزات التالية:
+1. **نموذج إنشاء فواتير الحسابات الآجلة في الإدارة المالية**:
+   - حقول العميل: (الاسم - رقم التلفون - العنوان).
+   - جدول البنود بكافة الأعمدة المطلوبة: (رقم الفاتورة أو التذكرة - تفاصيل - المبلغ).
+   - إضافة خانة **المبلغ المدفوع**.
+   - احتساب الإجمالي تلقائياً: `(مجموع مبالغ البنود - المبلغ المدفوع)`.
+2. **طباعة كشف الأمانات والسامان (Cargo Manifest)** بتصميم مطابق لمانفيستو ركاب الرحلات.
+3. **معاينة فواتير الحسابات الآجلة كصورة وتصديرها كـ JPEG**.
