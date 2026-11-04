@@ -76,7 +76,7 @@
     <div class="modal-overlay hidden" id="ticketPreviewModal">
         <div class="modal-card" style="max-width: 700px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-ticket ml-1"></i> معاينة وتنزيل بوليصة التذكرة</h3>
+                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-ticket ml-1"></i> معاينة وتنزيل بوليصة التذكرة (مع الركاب الإضافيين)</h3>
                 <button onclick="closeModal('ticketPreviewModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div id="ticketCaptureArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl font-['Cairo']">
@@ -120,7 +120,7 @@
                         <img src="logo_2.jpeg" alt="شعار الشركة" class="w-14 h-14 object-cover rounded-full border border-indigo-600 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
                         <div>
                             <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل البري</h2>
-                            <p class="text-[11px] text-slate-500">فاتورة استلام أمتعة وبضائع</p>
+                            <p class="text-[11px] text-slate-500">فاتورة استلام أمتعة وبضائع ومحتوى</p>
                         </div>
                     </div>
                     <div class="text-left">
@@ -179,9 +179,9 @@
 
     <!-- MANIFEST MODAL -->
     <div class="modal-overlay hidden" id="manifestModal">
-        <div class="modal-card" style="max-width: 800px;">
+        <div class="modal-card" style="max-width: 850px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> كشف رحلة ركاب شامل (Manifest)</h3>
+                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> كشف رحلة ركاب شامل (يتضمن الركاب الإضافيين)</h3>
                 <div class="flex gap-2">
                     <button onclick="exportToPDF('manifestPrintArea', 'WadiBina_Manifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> تنزيل PDF</button>
                     <button onclick="window.print()" class="bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-print ml-1"></i> طباعة</button>
@@ -228,76 +228,13 @@
         </div>
     </div>
 
-    <!-- CARGO MANIFEST MODAL -->
-    <div class="modal-overlay hidden" id="cargoManifestModal">
-        <div class="modal-card" style="max-width: 850px;">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> كشف أمانات وسامان الرحلة (Cargo Manifest)</h3>
-                <div class="flex gap-2">
-                    <button onclick="exportToPDF('cargoManifestPrintArea', 'WadiBina_CargoManifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> تنزيل PDF</button>
-                    <button onclick="window.print()" class="bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-print ml-1"></i> طباعة</button>
-                    <button onclick="closeModal('cargoManifestModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-                </div>
-            </div>
-            <div id="cargoManifestPrintArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl font-['Cairo']">
-                <div class="flex justify-between items-center border-b-2 border-slate-800 pb-3 mb-4">
-                    <div class="flex items-center gap-3">
-                        <img src="logo_2.jpeg" alt="شعار الشركة" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
-                        <div>
-                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل البري</h2>
-                            <p class="text-[11px] text-slate-600 font-bold">كشف أمانات والسامان والطرود الرسمي (Cargo Manifest)</p>
-                        </div>
-                    </div>
-                    <div class="text-left text-xs">
-                        <div>تاريخ الرحلة: <strong id="cargoManifestDateText" class="text-amber-700"></strong></div>
-                        <div>تاريخ الإصدار: <span id="cargoManifestIssueDate"></span></div>
-                    </div>
-                </div>
-                <div class="mb-4 bg-slate-100 p-3 rounded-lg border border-slate-200 flex justify-between text-xs font-bold">
-                    <span>إجمالي فواتير الشحن: <span id="cargoManifestTotalInvoices" class="text-indigo-700">0</span></span>
-                    <span>إجمالي المبالغ: <span id="cargoManifestTotalAmount" class="text-emerald-700">0 AED</span></span>
-                </div>
-                <table class="w-full border-collapse text-right text-xs">
-                    <thead>
-                        <tr class="bg-slate-200 text-slate-800">
-                            <th class="border border-slate-300 p-2">م</th>
-                            <th class="border border-slate-300 p-2">الفاتورة</th>
-                            <th class="border border-slate-300 p-2">المرسل</th>
-                            <th class="border border-slate-300 p-2">المستلم والجهة</th>
-                            <th class="border border-slate-300 p-2">هاتف المستلم</th>
-                            <th class="border border-slate-300 p-2">المحتوى</th>
-                            <th class="border border-slate-300 p-2">المبلغ</th>
-                            <th class="border border-slate-300 p-2">الحالة</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cargoManifestTableBody"></tbody>
-                </table>
-            </div>
-            <div class="mt-5 flex gap-3 no-print">
-                <button onclick="exportToPDF('cargoManifestPrintArea', 'WadiBina_CargoManifest_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow"><i class="fa-solid fa-file-pdf ml-1"></i> تحميل PDF فوراً</button>
-                <button onclick="closeModal('cargoManifestModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- LOGS MODAL -->
-    <div class="modal-overlay hidden" id="logsOverlay">
-        <div class="modal-card">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-history ml-1"></i> سجل التعديلات والتغييرات</h3>
-                <button onclick="closeLogsModal()" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div id="logsContent" class="space-y-3 text-xs"></div>
-        </div>
-    </div>
-
     <!-- HEADER -->
     <header class="bg-cardbg border-b border-bordergold px-4 sm:px-6 py-3.5 flex items-center justify-between sticky top-0 z-50 backdrop-blur-md bg-opacity-95 shadow-lg">
         <div class="flex items-center gap-3">
             <img src="logo_2.jpeg" alt="شعار وادي بناء" class="w-11 h-11 object-cover rounded-full border border-gold shadow" onerror="this.src='https://via.placeholder.com/44?text=Logo'">
             <div>
                 <h1 class="text-base sm:text-lg font-black gold-gradient-text leading-tight">شركة وادي بناء للنقل البري</h1>
-                <p class="text-[11px] text-zinc-400">النظام الموحد الشامل (مع طباعة وتنزيل PDF)</p>
+                <p class="text-[11px] text-zinc-400">النظام الموحد الشامل (تعديل الفواتير والركاب الإضافيين)</p>
             </div>
         </div>
         <div class="flex items-center gap-2">
@@ -306,7 +243,7 @@
             </span>
             <span id="userInfoBadge" class="bg-zinc-800 border border-zinc-700 text-gold px-3 py-1.5 rounded-xl text-xs font-bold"></span>
             <button onclick="exportBackupJSON()" class="bg-zinc-800 text-gold border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1">
-                <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">تصدير Backup</span>
+                <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">نسخة احتياطية</span>
             </button>
             <label class="bg-zinc-800 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1">
                 <i class="fa-solid fa-upload"></i> <span class="hidden sm:inline">استرجاع</span>
@@ -340,7 +277,7 @@
         <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl mb-6 flex flex-col sm:flex-row items-center gap-3">
             <div class="relative w-full flex-1">
                 <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-gold"></i>
-                <input type="text" id="globalSearchInput" oninput="handleGlobalSearch()" placeholder="بحث ذكي: اكتب رقم البوليصة، أو اسم العميل، أو الوكيل..." class="w-full bg-darkbg border border-zinc-700 rounded-xl pr-11 pl-4 py-3 text-xs text-zinc-100 outline-none focus:border-gold">
+                <input type="text" id="globalSearchInput" oninput="handleGlobalSearch()" placeholder="بحث ذكي: رقم البوليصة، اسم العميل، اسم الراكب الإضافي، أو المحتوى..." class="w-full bg-darkbg border border-zinc-700 rounded-xl pr-11 pl-4 py-3 text-xs text-zinc-100 outline-none focus:border-gold">
             </div>
             <select id="globalSearchType" onchange="handleGlobalSearch()" class="bg-darkbg border border-zinc-700 text-gold text-xs px-4 py-3 rounded-xl outline-none">
                 <option value="all">جميع السجلات</option>
@@ -356,8 +293,8 @@
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-calendar-day text-gold text-lg"></i>
                     <div>
-                        <h3 class="text-xs font-bold text-gold">إدارة رحلات وتذاكر الركاب</h3>
-                        <p class="text-[11px] text-zinc-400">إصدار التذاكر وطباعتها وتنزيلها بصيغة PDF مباشرة</p>
+                        <h3 class="text-xs font-bold text-gold">إدارة رحلات وتذاكر الركاب والركاب الإضافيين</h3>
+                        <p class="text-[11px] text-zinc-400">إصدار التذاكر وتعديلها وطباعتها وتنزيلها بصيغة PDF</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 w-full sm:w-auto flex-wrap">
@@ -370,7 +307,7 @@
                 <div class="lg:col-span-2 bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                     <h2 class="text-gold font-extrabold text-base border-b border-zinc-800 pb-3 flex items-center justify-between">
                         <span><i class="fa-solid fa-ticket ml-1"></i> <span id="passFormTitle">إصدار تذكرة سفر جديدة</span></span>
-                        <button id="cancelEditPassBtn" onclick="resetPassengerForm()" class="hidden text-xs text-red-400">إلغاء التعديل</button>
+                        <button id="cancelEditPassBtn" onclick="resetPassengerForm()" class="hidden text-xs text-red-400 font-bold bg-red-950/40 border border-red-800 px-2.5 py-1 rounded-lg">إلغاء التعديل</button>
                     </h2>
                     <form id="passengerForm" onsubmit="handleSavePassenger(event)" class="space-y-4">
                         <input type="hidden" id="passEditId" value="">
@@ -391,9 +328,9 @@
                                 <label class="block text-xs text-zinc-400 mb-1">عدد الركاب *</label>
                                 <select id="passCount" onchange="onPassengerCountChanged()" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200">
                                     <option value="1">1 راكب</option>
-                                    <option value="2">2 ركاب</option>
-                                    <option value="3">3 ركاب</option>
-                                    <option value="4">4 ركاب</option>
+                                    <option value="2">2 ركاب (مع 1 إضافي)</option>
+                                    <option value="3">3 ركاب (مع 2 إضافيين)</option>
+                                    <option value="4">4 ركاب (مع 3 إضافيين)</option>
                                 </select>
                             </div>
                         </div>
@@ -419,7 +356,7 @@
                         </div>
 
                         <div id="extraPassengersContainer" class="space-y-3 hidden">
-                            <span class="text-xs font-bold text-amber-400 block">بيانات الركاب الإضافيين</span>
+                            <span class="text-xs font-bold text-amber-400 block"><i class="fa-solid fa-users ml-1"></i> بيانات الركاب الإضافيين</span>
                             <div id="extraPassengersRows" class="space-y-2"></div>
                         </div>
 
@@ -456,7 +393,7 @@
 
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
-                    <span class="font-bold text-gold text-xs">سجل جميع التذاكر</span>
+                    <span class="font-bold text-gold text-xs">سجل جميع التذاكر والركاب الإضافيين</span>
                     <button onclick="exportExcel('passengers')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-file-excel"></i> Excel</button>
                 </div>
                 <div class="overflow-x-auto">
@@ -465,13 +402,14 @@
                             <tr>
                                 <th>البوليصة</th>
                                 <th>الوكيل</th>
-                                <th>الاسم</th>
+                                <th>الاسم الرئيسي</th>
+                                <th>الركاب الإضافيون</th>
                                 <th>الهاتف</th>
                                 <th>المسار</th>
                                 <th>تاريخ الرحلة</th>
                                 <th>المبلغ</th>
                                 <th>السداد</th>
-                                <th>طباعة / إجراءات</th>
+                                <th>إجراءات / طباعة</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -484,8 +422,8 @@
         <section id="module-cargo" class="tab-content hidden space-y-6">
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <h2 class="text-gold font-extrabold text-base border-b border-zinc-800 pb-3 flex justify-between items-center">
-                    <span><i class="fa-solid fa-boxes-packing ml-1"></i> فاتورة أمتعة وبضائع جديدة</span>
-                    <button id="cancelEditCargoBtn" onclick="resetCargoForm()" class="hidden text-xs text-red-400">إلغاء</button>
+                    <span><i class="fa-solid fa-boxes-packing ml-1"></i> <span id="cargoFormTitle">فاتورة أمتعة وبضائع ومحتوى جديدة</span></span>
+                    <button id="cancelEditCargoBtn" onclick="resetCargoForm()" class="hidden text-xs text-red-400 font-bold bg-red-950/40 border border-red-800 px-2.5 py-1 rounded-lg">إلغاء التعديل</button>
                 </h2>
                 <form id="cargoForm" onsubmit="handleSaveCargo(event)" class="space-y-4">
                     <input type="hidden" id="cargoEditId" value="">
@@ -511,6 +449,7 @@
                             </select>
                         </div>
                     </div>
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="bg-darkbg p-3 rounded-xl border border-zinc-800 space-y-2">
                             <span class="text-xs font-bold text-gold">بيانات المرسل</span>
@@ -523,6 +462,12 @@
                             <input type="tel" id="cargoReceiverPhone" required placeholder="هاتف المستلم" class="w-full bg-zinc-900 border border-zinc-800 rounded p-2 text-xs">
                         </div>
                     </div>
+
+                    <div class="bg-darkbg p-3 rounded-xl border border-zinc-800 space-y-2">
+                        <label class="block text-xs text-gold font-bold">محتوى الأمتعة / الطرود والشحنات *</label>
+                        <textarea id="cargoContent" rows="2" required placeholder="اكتب تفاصيل المحتوى والطرود (مثال: 3 كراتين ملابس، حقيبة يدوية، أجهزة إلكترونية...)" class="w-full bg-zinc-900 border border-zinc-700 rounded p-2.5 text-xs text-zinc-200 outline-none focus:border-gold"></textarea>
+                    </div>
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center bg-zinc-900 p-3 rounded-xl border border-gold">
                         <div><span class="text-xs font-bold">المجموع: <span id="cargoAutoTotalDisplay" class="text-gold font-bold">0 AED</span></span></div>
                         <div>
@@ -530,13 +475,13 @@
                             <input type="number" id="cargoManualTotal" required class="w-full bg-darkbg border border-gold font-black text-gold rounded p-2 text-xs" placeholder="0">
                         </div>
                     </div>
-                    <button type="submit" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow">حفظ فاتورة الشحن</button>
+                    <button type="submit" id="cargoSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow">حفظ فاتورة الشحن</button>
                 </form>
             </div>
 
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
-                    <span class="font-bold text-gold text-xs">سجل فواتير الشحن</span>
+                    <span class="font-bold text-gold text-xs">سجل فواتير الشحن والمحتوى</span>
                     <button onclick="exportExcel('cargo')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-file-excel"></i> Excel</button>
                 </div>
                 <div class="overflow-x-auto">
@@ -546,12 +491,11 @@
                                 <th>الفاتورة</th>
                                 <th>تاريخ الرحلة</th>
                                 <th>المرسل</th>
-                                <th>هاتف المرسل</th>
                                 <th>المستلم</th>
-                                <th>هاتف المستلم</th>
+                                <th>محتوى الشحنة</th>
                                 <th>الإجمالي</th>
                                 <th>الحالة</th>
-                                <th>طباعة / إجراءات</th>
+                                <th>إجراءات / طباعة</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -637,7 +581,6 @@
                     </div>
                 </div>
 
-                <!-- CREATE DEBT INVOICE FORM MODAL / SECTION -->
                 <div id="fin-sub-create-debt-inv" class="hidden bg-darkbg p-4 rounded-xl border border-gold space-y-3">
                     <h4 class="text-gold font-bold text-xs">إصدار فاتورة حساب آجل جديدة</h4>
                     <form id="debtInvoiceForm" onsubmit="handleSaveDebtInvoice(event)" class="space-y-3">
@@ -770,6 +713,7 @@
             document.getElementById('cargoInvNo').value = db.nextCargoNo || 121;
             document.getElementById('debtInvNo').value = db.nextDebtInvNo || 120;
             updateReportingTimeAutomatically();
+            onPassengerCountChanged();
             if(currentUser) initSync();
         };
 
@@ -801,7 +745,6 @@
             }
         }
 
-        // --- PDF & IMAGE EXPORT FUNCTION ---
         function exportToPDF(elementId, filePrefix) {
             const element = document.getElementById(elementId);
             html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
@@ -835,38 +778,137 @@
         function onPassengerCountChanged() {
             const count = parseInt(document.getElementById('passCount').value) || 1;
             document.getElementById('passManualTotal').value = count * 400;
+            
+            const container = document.getElementById('extraPassengersContainer');
+            const rowsContainer = document.getElementById('extraPassengersRows');
+            rowsContainer.innerHTML = '';
+
+            if (count > 1) {
+                container.classList.remove('hidden');
+                for (let i = 1; i < count; i++) {
+                    const div = document.createElement('div');
+                    div.className = "grid grid-cols-1 sm:grid-cols-3 gap-2 bg-zinc-900 p-2.5 rounded-xl border border-zinc-800";
+                    div.innerHTML = `
+                        <input type="text" placeholder="الراكب الإضافي ${i} - الاسم" class="extra-name bg-darkbg border border-zinc-700 rounded p-1.5 text-xs text-zinc-200" required>
+                        <input type="tel" placeholder="رقم الهاتف" class="extra-phone bg-darkbg border border-zinc-700 rounded p-1.5 text-xs text-zinc-200" required>
+                        <input type="text" placeholder="رقم الجواز / الهوية" class="extra-passport bg-darkbg border border-zinc-700 rounded p-1.5 text-xs text-zinc-200" required>
+                    `;
+                    rowsContainer.appendChild(div);
+                }
+            } else {
+                container.classList.add('hidden');
+            }
         }
 
         function handleSavePassenger(e) {
             e.preventDefault();
+            const editId = document.getElementById('passEditId').value;
             const ticketNo = document.getElementById('passTicketNo').value.trim();
-            const newTkt = {
+            const count = parseInt(document.getElementById('passCount').value) || 1;
+            
+            let extraList = [];
+            if (count > 1) {
+                const names = document.querySelectorAll('.extra-name');
+                const phones = document.querySelectorAll('.extra-phone');
+                const passports = document.querySelectorAll('.extra-passport');
+                for (let i = 0; i < names.length; i++) {
+                    extraList.push({
+                        name: names[i].value,
+                        phone: phones[i].value,
+                        passport: passports[i].value
+                    });
+                }
+            }
+
+            const tktData = {
                 id: ticketNo,
                 agent: document.getElementById('passAgent').value.trim(),
                 name: document.getElementById('passName').value,
                 phone: document.getElementById('passPhone').value,
                 passport: document.getElementById('passPassport').value,
+                passengerCount: count,
+                extraPassengers: extraList,
                 origin: document.getElementById('passOrigin').value,
                 destination: document.getElementById('passDestination').value,
                 tripDate: document.getElementById('passTripDate').value,
                 reportingTime: document.getElementById('passReportingTime').value,
-                passengerCount: parseInt(document.getElementById('passCount').value) || 1,
-                fare: parseFloat(document.getElementById('passManualTotal').value) || 400,
+                fare: parseFloat(document.getElementById('passManualTotal').value) || (count * 400),
                 payMethod: document.getElementById('passPayMethod').value
             };
-            db.passengers.unshift(newTkt);
-            db.nextTicketNo = parseInt(ticketNo) + 1 || (db.nextTicketNo + 1);
+
+            if (editId) {
+                const idx = db.passengers.findIndex(p => String(p.id) === String(editId));
+                if (idx !== -1) db.passengers[idx] = tktData;
+                alert(`تم تحديث التذكرة #${ticketNo} بنجاح!`);
+                resetPassengerForm();
+            } else {
+                db.passengers.unshift(tktData);
+                db.nextTicketNo = parseInt(ticketNo) + 1 || (db.nextTicketNo + 1);
+                document.getElementById('passengerForm').reset();
+                document.getElementById('passTicketNo').value = db.nextTicketNo;
+                document.getElementById('passTripDate').value = activeTripDate;
+                alert(`تم إصدار التذكرة #${ticketNo} بنجاح!`);
+            }
             saveDB();
+            refreshUI();
+        }
+
+        function editPassenger(id) {
+            const item = db.passengers.find(x => String(x.id) === String(id));
+            if(!item) return;
+            document.getElementById('passEditId').value = item.id;
+            document.getElementById('passTicketNo.value') // skipped
+            document.getElementById('passTicketNo').value = item.id;
+            document.getElementById('passTicketNo').disabled = true;
+            document.getElementById('passAgent').value = item.agent || '';
+            document.getElementById('passTripDate').value = item.tripDate || activeTripDate;
+            document.getElementById('passCount').value = item.passengerCount || 1;
+            onPassengerCountChanged();
+            
+            document.getElementById('passManualTotal').value = item.fare || 400;
+            document.getElementById('passReportingTime').value = item.reportingTime || '';
+            document.getElementById('passName').value = item.name || '';
+            document.getElementById('passPhone').value = item.phone || '';
+            document.getElementById('passPassport').value = item.passport || '';
+            document.getElementById('passOrigin').value = item.origin || 'عجمان';
+            document.getElementById('passDestination').value = item.destination || 'عدن';
+            document.getElementById('passPayMethod').value = item.payMethod || 'مدفوع';
+
+            if (item.extraPassengers && item.extraPassengers.length > 0) {
+                const names = document.querySelectorAll('.extra-name');
+                const phones = document.querySelectorAll('.extra-phone');
+                const passports = document.querySelectorAll('.extra-passport');
+                item.extraPassengers.forEach((ex, i) => {
+                    if (names[i]) names[i].value = ex.name || '';
+                    if (phones[i]) phones[i].value = ex.phone || '';
+                    if (passports[i]) passports[i].value = ex.passport || '';
+                });
+            }
+
+            document.getElementById('passFormTitle').innerText = `تعديل التذكرة #${item.id}`;
+            document.getElementById('passSubmitBtn').innerText = 'حفظ التعديلات';
+            document.getElementById('cancelEditPassBtn').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetPassengerForm() {
             document.getElementById('passengerForm').reset();
+            document.getElementById('passEditId').value = '';
+            document.getElementById('passTicketNo').disabled = false;
             document.getElementById('passTicketNo').value = db.nextTicketNo;
             document.getElementById('passTripDate').value = activeTripDate;
-            alert(`تم إصدار التذكرة #${ticketNo} بنجاح!`);
+            document.getElementById('passFormTitle').innerText = 'إصدار تذكرة سفر جديدة';
+            document.getElementById('passSubmitBtn').innerText = 'حفظ وإصدار التذكرة';
+            document.getElementById('cancelEditPassBtn').classList.add('hidden');
+            onPassengerCountChanged();
+            updateReportingTimeAutomatically();
         }
 
         function handleSaveCargo(e) {
             e.preventDefault();
+            const editId = document.getElementById('cargoEditId').value;
             const invNo = document.getElementById('cargoInvNo').value.trim();
-            const newCargo = {
+            const cargoData = {
                 id: invNo,
                 date: document.getElementById('cargoDate').value,
                 tripDate: document.getElementById('cargoTripDate').value,
@@ -874,17 +916,61 @@
                 senderPhone: document.getElementById('cargoSenderPhone').value,
                 receiver: document.getElementById('cargoReceiverName').value,
                 receiverPhone: document.getElementById('cargoReceiverPhone').value,
+                content: document.getElementById('cargoContent').value,
                 grandTotal: parseFloat(document.getElementById('cargoManualTotal').value) || 0,
                 paymentStatus: document.getElementById('cargoPaymentStatus').value,
                 destination: 'عدن'
             };
-            db.cargo.unshift(newCargo);
-            db.nextCargoNo = parseInt(invNo) + 1 || (db.nextCargoNo + 1);
+
+            if (editId) {
+                const idx = db.cargo.findIndex(c => String(c.id) === String(editId));
+                if (idx !== -1) db.cargo[idx] = cargoData;
+                alert(`تم تحديث فاتورة الشحن #${invNo} بنجاح!`);
+                resetCargoForm();
+            } else {
+                db.cargo.unshift(cargoData);
+                db.nextCargoNo = parseInt(invNo) + 1 || (db.nextCargoNo + 1);
+                document.getElementById('cargoForm').reset();
+                document.getElementById('cargoInvNo').value = db.nextCargoNo;
+                document.getElementById('cargoTripDate').value = activeTripDate;
+                alert(`تم حفظ فاتورة الشحن #${invNo} بنجاح!`);
+            }
             saveDB();
+            refreshUI();
+        }
+
+        function editCargo(id) {
+            const item = db.cargo.find(x => String(x.id) === String(id));
+            if(!item) return;
+            document.getElementById('cargoEditId').value = item.id;
+            document.getElementById('cargoInvNo').value = item.id;
+            document.getElementById('cargoInvNo').disabled = true;
+            document.getElementById('cargoDate').value = item.date || activeTripDate;
+            document.getElementById('cargoTripDate').value = item.tripDate || activeTripDate;
+            document.getElementById('cargoPaymentStatus').value = item.paymentStatus || 'مدفوع';
+            document.getElementById('cargoSenderName').value = item.sender || '';
+            document.getElementById('cargoSenderPhone').value = item.senderPhone || '';
+            document.getElementById('cargoReceiverName').value = item.receiver || '';
+            document.getElementById('cargoReceiverPhone').value = item.receiverPhone || '';
+            document.getElementById('cargoContent').value = item.content || '';
+            document.getElementById('cargoManualTotal').value = item.grandTotal || 0;
+
+            document.getElementById('cargoFormTitle').innerText = `تعديل فاتورة الشحن #${item.id}`;
+            document.getElementById('cargoSubmitBtn').innerText = 'حفظ التعديلات';
+            document.getElementById('cancelEditCargoBtn').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetCargoForm() {
             document.getElementById('cargoForm').reset();
+            document.getElementById('cargoEditId').value = '';
+            document.getElementById('cargoInvNo').disabled = false;
             document.getElementById('cargoInvNo').value = db.nextCargoNo;
             document.getElementById('cargoTripDate').value = activeTripDate;
-            alert(`تم حفظ فاتورة الشحن #${invNo} بنجاح!`);
+            document.getElementById('cargoDate').value = activeTripDate;
+            document.getElementById('cargoFormTitle').innerText = 'فاتورة أمتعة وبضائع ومحتوى جديدة';
+            document.getElementById('cargoSubmitBtn').innerText = 'حفظ فاتورة الشحن';
+            document.getElementById('cancelEditCargoBtn').classList.add('hidden');
         }
 
         function handleSaveDebtInvoice(e) {
@@ -930,22 +1016,36 @@
             const query = document.getElementById('globalSearchInput').value.trim().toLowerCase();
             const passTbody = document.querySelector('#passengersTable tbody');
             passTbody.innerHTML = '';
-            let filteredP = db.passengers.filter(p => !query || p.name.toLowerCase().includes(query) || String(p.id).includes(query) || p.phone.includes(query));
+            
+            let filteredP = db.passengers.filter(p => {
+                if(!query) return true;
+                let matchMain = p.name.toLowerCase().includes(query) || String(p.id).includes(query) || p.phone.includes(query) || p.agent.toLowerCase().includes(query);
+                let matchExtra = p.extraPassengers && p.extraPassengers.some(ex => ex.name.toLowerCase().includes(query) || ex.phone.includes(query));
+                return matchMain || matchExtra;
+            });
+
             let tktRev = 0;
             filteredP.forEach((p, idx) => {
                 tktRev += p.fare || 0;
+                let extraNamesHtml = '-';
+                if(p.extraPassengers && p.extraPassengers.length > 0) {
+                    extraNamesHtml = p.extraPassengers.map(ex => `<span class="bg-amber-950/60 text-amber-300 px-1.5 py-0.5 rounded text-[10px] inline-block m-0.5">${ex.name} (${ex.phone})</span>`).join('');
+                }
+
                 passTbody.insertRow().innerHTML = `
                     <td><strong>#${p.id}</strong></td>
                     <td>${p.agent}</td>
-                    <td><strong>${p.name}</strong></td>
+                    <td><strong>${p.name}</strong><br><span class="text-[10px] text-zinc-400">جواز: ${p.passport}</span></td>
+                    <td>${extraNamesHtml}</td>
                     <td>${p.phone}</td>
                     <td>${p.origin} → ${p.destination}</td>
                     <td><strong class="text-gold">${p.tripDate}</strong></td>
                     <td>${p.fare} AED</td>
                     <td style="color:${p.payMethod==='مدفوع'?'#10b981':'#f59e0b'}">${p.payMethod}</td>
-                    <td>
-                        <button onclick="previewTicket('${p.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold shadow"><i class="fa-solid fa-file-pdf ml-1"></i> PDF / معاينة</button>
-                        <button onclick="deletePassenger(${idx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                    <td class="space-x-1 space-x-reverse">
+                        <button onclick="previewTicket('${p.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold shadow" title="معاينة وتنزيل PDF"><i class="fa-solid fa-file-pdf"></i></button>
+                        <button onclick="editPassenger('${p.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deletePassenger(${idx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs" title="حذف"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 `;
             });
@@ -954,20 +1054,21 @@
 
             const cargoTbody = document.querySelector('#cargoTable tbody');
             cargoTbody.innerHTML = '';
-            let filteredC = db.cargo.filter(c => !query || c.sender.toLowerCase().includes(query) || String(c.id).includes(query));
+            let filteredC = db.cargo.filter(c => !query || c.sender.toLowerCase().includes(query) || String(c.id).includes(query) || (c.content && c.content.toLowerCase().includes(query)));
+            
             filteredC.forEach((c, idx) => {
                 cargoTbody.insertRow().innerHTML = `
                     <td><strong>#${c.id}</strong></td>
                     <td><strong class="text-gold">${c.tripDate}</strong></td>
-                    <td>${c.sender}</td>
-                    <td>${c.senderPhone}</td>
-                    <td><strong>${c.receiver}</strong></td>
-                    <td>${c.receiverPhone}</td>
+                    <td>${c.sender}<br><span class="text-[10px] text-zinc-400">${c.senderPhone}</span></td>
+                    <td><strong>${c.receiver}</strong><br><span class="text-[10px] text-zinc-400">${c.receiverPhone}</span></td>
+                    <td><span class="text-xs text-amber-200 bg-zinc-900 p-1 rounded block max-w-xs truncate" title="${c.content || ''}">${c.content || 'غير محدد'}</span></td>
                     <td>${c.grandTotal} AED</td>
                     <td style="color:${c.paymentStatus==='مدفوع'?'#10b981':'#f59e0b'}">${c.paymentStatus}</td>
-                    <td>
-                        <button onclick="previewCargo('${c.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold shadow"><i class="fa-solid fa-file-pdf ml-1"></i> PDF / معاينة</button>
-                        <button onclick="deleteCargo(${idx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                    <td class="space-x-1 space-x-reverse">
+                        <button onclick="previewCargo('${c.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold shadow" title="معاينة وتنزيل PDF"><i class="fa-solid fa-file-pdf"></i></button>
+                        <button onclick="editCargo('${c.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteCargo(${idx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs" title="حذف"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 `;
             });
@@ -976,13 +1077,24 @@
         function previewTicket(id) {
             const item = db.passengers.find(x => String(x.id) === String(id));
             if(!item) return;
+            
+            let extraHtml = '';
+            if (item.extraPassengers && item.extraPassengers.length > 0) {
+                extraHtml = `<div class="mt-2 border-t border-slate-200 pt-2"><strong class="text-amber-700">الركاب الإضافيون المرافقون:</strong><ul class="list-disc list-inside mt-1 space-y-1">`;
+                item.extraPassengers.forEach((ex, idx) => {
+                    extraHtml += `<li><strong>${idx+1}. ${ex.name}</strong> (هاتف: ${ex.phone} - جواز: ${ex.passport})</li>`;
+                });
+                extraHtml += `</ul></div>`;
+            }
+
             document.getElementById('imgTicketCode').innerText = `#${item.id}`;
             document.getElementById('imgTicketBody').innerHTML = `
-                <div><strong>الراكب:</strong> ${item.name} (هاتف: ${item.phone})</div>
-                <div><strong>الجواز:</strong> ${item.passport}</div>
+                <div><strong>الراكب الرئيسي:</strong> ${item.name} (هاتف: ${item.phone})</div>
+                <div><strong>رقم الجواز:</strong> ${item.passport}</div>
                 <div><strong>المسار:</strong> ${item.origin} إلى ${item.destination}</div>
-                <div><strong>تاريخ الرحلة:</strong> <span class="text-amber-600 font-bold">${item.tripDate}</span></div>
-                <div class="font-black text-indigo-700 mt-2">المبلغ: ${item.fare} AED (${item.payMethod})</div>
+                <div><strong>تاريخ الرحلة:</strong> <span class="text-amber-600 font-bold">${item.tripDate}</span> | <strong>الحضور:</strong> ${item.reportingTime}</div>
+                ${extraHtml}
+                <div class="font-black text-indigo-700 mt-3 pt-2 border-t border-slate-200">إجمالي المبلغ: ${item.fare} AED (${item.payMethod})</div>
             `;
             document.getElementById('ticketPreviewModal').classList.remove('hidden');
         }
@@ -992,10 +1104,19 @@
             if(!item) return;
             document.getElementById('imgCargoCode').innerText = `#${item.id}`;
             document.getElementById('imgCargoBody').innerHTML = `
-                <div><strong>المرسل:</strong> ${item.sender} (هاتف: ${item.senderPhone})</div>
-                <div><strong>المستلم:</strong> ${item.receiver} (هاتف: ${item.receiverPhone})</div>
-                <div><strong>تاريخ التحريك:</strong> <span class="text-amber-600 font-bold">${item.tripDate}</span></div>
-                <div class="font-black text-indigo-700 mt-2">المبلغ: ${item.grandTotal} AED (${item.paymentStatus})</div>
+                <div class="grid grid-cols-2 gap-2 border-b border-slate-200 pb-2">
+                    <div><strong>المرسل:</strong> ${item.sender}<br><span class="text-slate-500">هاتف: ${item.senderPhone}</span></div>
+                    <div><strong>المستلم:</strong> ${item.receiver}<br><span class="text-slate-500">هاتف: ${item.receiverPhone}</span></div>
+                </div>
+                <div class="py-2"><strong>تاريخ الرحلة:</strong> <span class="text-amber-600 font-bold">${item.tripDate}</span></div>
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 my-2">
+                    <strong class="text-slate-700 block mb-1">تفاصيل المحتوى والطرود والشحنات:</strong>
+                    <p class="text-slate-900 font-medium whitespace-pre-wrap">${item.content || 'لا توجد تفاصيل محددة'}</p>
+                </div>
+                <div class="font-black text-indigo-700 mt-2 flex justify-between">
+                    <span>حالة السداد: ${item.paymentStatus}</span>
+                    <span class="text-base">المبلغ الإجمالي: ${item.grandTotal} AED</span>
+                </div>
             `;
             document.getElementById('cargoPreviewModal').classList.remove('hidden');
         }
@@ -1021,15 +1142,24 @@
             document.getElementById('manifestDateText').innerText = activeTripDate;
             document.getElementById('manifestIssueDate').innerText = new Date().toLocaleString('ar-EG');
             document.getElementById('manifestTotalBookings').innerText = tripP.length;
-            let totalPax = tripP.reduce((s, p) => s + (p.passengerCount || 1), 0);
+            
+            let totalPax = 0;
+            tripP.forEach(p => {
+                totalPax += 1 + (p.extraPassengers ? p.extraPassengers.length : 0);
+            });
             document.getElementById('manifestTotalPassengers').innerText = totalPax;
 
             tripP.forEach((p, idx) => {
+                let extraStr = '-';
+                if(p.extraPassengers && p.extraPassengers.length > 0) {
+                    extraStr = p.extraPassengers.map((ex, i) => `${i+1}) ${ex.name} (${ex.phone} - ${ex.passport})`).join('<br>');
+                }
+
                 tbody.insertRow().innerHTML = `
                     <td class="border border-slate-300 p-2">${idx+1}</td>
                     <td class="border border-slate-300 p-2 font-bold">#${p.id}</td>
-                    <td class="border border-slate-300 p-2">${p.name}</td>
-                    <td class="border border-slate-300 p-2">-</td>
+                    <td class="border border-slate-300 p-2"><strong>${p.name}</strong><br><span class="text-[10px] text-slate-500">جواز: ${p.passport}</span></td>
+                    <td class="border border-slate-300 p-2 text-xs">${extraStr}</td>
                     <td class="border border-slate-300 p-2">${p.phone}</td>
                     <td class="border border-slate-300 p-2">${p.passport}</td>
                     <td class="border border-slate-300 p-2">${p.origin} → ${p.destination}</td>
