@@ -24,6 +24,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    
+    <!-- مكتبات Firebase السحابية -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <style>
         :root { --bg-dark: #09090b; --bg-card: #121215; --gold-primary: #D4AF37; --border-color: #D4AF3740; }
         body { font-family: 'Cairo', 'Tajawal', sans-serif; background-color: var(--bg-dark); color: #f4f4f5; min-height: 100vh; }
@@ -138,42 +143,6 @@
         </div>
     </div>
 
-    <!-- PREVIEW DEBT INVOICE IMAGE MODAL -->
-    <div class="modal-overlay hidden" id="debtInvPreviewModal">
-        <div class="modal-card" style="max-width: 700px;">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-invoice-dollar ml-1"></i> معاينة فاتورة حساب آجل</h3>
-                <button onclick="closeModal('debtInvPreviewModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            
-            <div id="debtInvCaptureArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl font-['Cairo']">
-                <div class="flex justify-between items-center border-b-2 border-slate-300 pb-3 mb-4">
-                    <div class="flex items-center gap-3">
-                        <img src="logo_2.jpeg" alt="شعار الشركة" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
-                        <div>
-                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل البري</h2>
-                            <p class="text-[11px] text-slate-500 font-bold">فاتورة حسابات وآجال مالية (Deferred Account Invoice)</p>
-                        </div>
-                    </div>
-                    <div class="text-left">
-                        <strong id="imgDebtInvCode" class="text-lg font-black text-amber-600">#118</strong>
-                        <p class="text-[11px] text-slate-500 font-bold">Deferred Invoice</p>
-                    </div>
-                </div>
-                <div id="imgDebtInvBody" class="space-y-3 text-xs"></div>
-                <div class="mt-6 pt-3 border-t border-dashed border-slate-300 flex justify-between items-center text-[11px] text-slate-500">
-                    <div>* تعتبر هذه الفاتورة سند مطالبي رسمي للحسابات الآجلة.</div>
-                    <div class="font-bold text-slate-800">الدعم: 0558675501</div>
-                </div>
-            </div>
-
-            <div class="mt-5 flex gap-3">
-                <button onclick="downloadCapturedImage('debtInvCaptureArea', 'WadiBina_DebtInvoice_')" class="flex-1 gold-gradient-bg text-black font-extrabold py-3 rounded-xl text-xs shadow"><i class="fa-solid fa-download ml-1"></i> تحميل الصورة (JPEG)</button>
-                <button onclick="closeModal('debtInvPreviewModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
-            </div>
-        </div>
-    </div>
-
     <!-- MANIFEST MODAL -->
     <div class="modal-overlay hidden" id="manifestModal">
         <div class="modal-card" style="max-width: 800px;">
@@ -219,11 +188,6 @@
                     </thead>
                     <tbody id="manifestTableBody"></tbody>
                 </table>
-
-                <div class="mt-8 pt-4 border-t border-slate-300 flex justify-between text-[11px] text-slate-600">
-                    <div>توقيع المشرف / المسؤول: .......................................</div>
-                    <div>ختم الشركة المعتمد</div>
-                </div>
             </div>
 
             <div class="mt-5 flex gap-3 no-print">
@@ -279,11 +243,6 @@
                     </thead>
                     <tbody id="cargoManifestTableBody"></tbody>
                 </table>
-
-                <div class="mt-8 pt-4 border-t border-slate-300 flex justify-between text-[11px] text-slate-600">
-                    <div>توقيع أمين الصندوق / المسؤول: .......................................</div>
-                    <div>ختم الشركة المعتمد</div>
-                </div>
             </div>
 
             <div class="mt-5 flex gap-3 no-print">
@@ -315,14 +274,10 @@
         </div>
 
         <div class="flex items-center gap-2">
+            <span id="cloudSyncIndicator" class="bg-emerald-950 border border-emerald-800 text-emerald-400 px-2.5 py-1 rounded-xl text-[10px] font-bold hidden sm:inline-flex items-center gap-1">
+                <i class="fa-solid fa-cloud-circle-check animate-pulse"></i> متصل بالسحابة (Firebase)
+            </span>
             <span id="userInfoBadge" class="bg-zinc-800 border border-zinc-700 text-gold px-3 py-1.5 rounded-xl text-xs font-bold"></span>
-            <button onclick="exportBackupJSON()" class="bg-zinc-800 hover:bg-zinc-700 text-gold border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
-                <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">تصدير Backup</span>
-            </button>
-            <label class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition flex items-center gap-1.5">
-                <i class="fa-solid fa-upload"></i> <span class="hidden sm:inline">استرجاع</span>
-                <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
-            </label>
             <button onclick="handleLogout()" class="bg-red-600/20 text-red-400 border border-red-600/30 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-red-600/40">خروج</button>
         </div>
     </header>
@@ -331,14 +286,17 @@
     <nav class="bg-zinc-900/90 border-b border-zinc-800 sticky top-[61px] z-40 backdrop-blur">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex space-x-2 space-x-reverse py-2.5 overflow-x-auto no-scrollbar">
-                <button onclick="switchTab('passengers')" id="tab-passengers" class="tab-btn px-6 py-2.5 rounded-xl text-xs font-bold transition gold-gradient-bg text-black shadow">
+                <button onclick="switchTab('passengers')" id="tab-passengers" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition gold-gradient-bg text-black shadow">
                     <i class="fa-solid fa-ticket ml-1.5"></i> حجوزات وتذاكر الركاب
                 </button>
-                <button onclick="switchTab('cargo')" id="tab-cargo" class="tab-btn px-6 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
+                <button onclick="switchTab('cargo')" id="tab-cargo" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
                     <i class="fa-solid fa-boxes-packing ml-1.5"></i> فواتير الشحن والأمتعة
                 </button>
-                <button onclick="switchTab('financials')" id="tab-financials" class="tab-btn px-6 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
+                <button onclick="switchTab('financials')" id="tab-financials" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
                     <i class="fa-solid fa-calculator ml-1.5"></i> الإدارة المالية والحسابات الآجلة
+                </button>
+                <button onclick="switchTab('users')" id="tab-users" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold hidden">
+                    <i class="fa-solid fa-users-gear ml-1.5"></i> إدارة المستخدمين (مدير)
                 </button>
             </div>
         </div>
@@ -523,9 +481,6 @@
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-zinc-800 flex justify-between items-center flex-wrap gap-2">
                     <span class="font-bold text-gold text-xs sm:text-sm"><i class="fa-solid fa-list-check ml-1"></i> سجل جميع تذاكر ركاب السيستم</span>
-                    <button onclick="exportExcel('passengers')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 shadow">
-                        <i class="fa-solid fa-file-excel"></i> تصدير Excel
-                    </button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="custom-table" id="passengersTable">
@@ -654,9 +609,6 @@
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
                     <span class="font-bold text-gold text-xs sm:text-sm"><i class="fa-solid fa-clock-rotate-left ml-1"></i> سجل جميع فواتير الشحن والأمتعة في السيستم</span>
-                    <button onclick="exportExcel('cargo')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 shadow">
-                        <i class="fa-solid fa-file-excel"></i> تصدير Excel
-                    </button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="custom-table" id="cargoTable">
@@ -766,10 +718,6 @@
                             <i class="fa-solid fa-vault ml-1"></i> بند كشف الأمانات والسامان
                         </button>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="exportExcel('trusts')" id="finTrustsExportBtn" class="hidden bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow"><i class="fa-solid fa-file-excel ml-1"></i> Excel الأمانات</button>
-                        <button onclick="window.print()" class="bg-zinc-800 text-gold border border-zinc-700 font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-print ml-1"></i> طباعة المالية</button>
-                    </div>
                 </div>
 
                 <!-- SUB TAB 1: DEBTS REGISTER LIST -->
@@ -795,42 +743,6 @@
                             </table>
                         </div>
                     </div>
-
-                    <div class="border-t border-zinc-800 pt-4">
-                        <h4 class="text-xs font-bold text-gold mb-2"><i class="fa-solid fa-boxes-packing ml-1"></i> ثانياً: فواتير الشحن غير المدفوعة (آجل شحن)</h4>
-                        <div class="overflow-x-auto">
-                            <table class="custom-table" id="debtsCargoTable">
-                               <thead>
-                                    <tr>
-                                        <th>رقم الفاتورة</th>
-                                        <th>اسم المرسل</th>
-                                        <th>رقم الهاتف</th>
-                                        <th>المبلغ</th>
-                                        <th>تاريخ الرحلة</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="border-t border-zinc-800 pt-4">
-                        <h4 class="text-xs font-bold text-gold mb-2"><i class="fa-solid fa-ticket ml-1"></i> ثالثاً: تذاكر الركاب غير المدفوعة (آجل تذاكر)</h4>
-                        <div class="overflow-x-auto">
-                            <table class="custom-table" id="debtsTicketsTable">
-                               <thead>
-                                    <tr>
-                                        <th>رقم التذكرة</th>
-                                        <th>عدد الركاب</th>
-                                        <th>اسم الوكيل</th>
-                                        <th>المبلغ</th>
-                                        <th>تاريخ الرحلة</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- SUB TAB 2: CREATE DEBT INVOICE FORM -->
@@ -838,7 +750,6 @@
                     <div class="bg-darkbg p-5 rounded-xl border border-gold space-y-4">
                         <h3 class="text-gold font-bold text-sm border-b border-zinc-800 pb-2 flex items-center justify-between">
                             <span><i class="fa-solid fa-file-invoice-dollar ml-1"></i> نموذج إنشاء فاتورة حسابات آجل جديد</span>
-                            <span class="text-xs text-zinc-400">تُضاف الفاتورة تلقائياً إلى السجل فور حفظها</span>
                         </h3>
 
                         <form id="debtInvoiceForm" onsubmit="handleSaveDebtInvoice(event)" class="space-y-4">
@@ -866,16 +777,14 @@
                                 <input type="text" id="debtInvCustomerAddress" required placeholder="المدينة / المنطقة / المحطة" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-200">
                             </div>
 
-                            <!-- ROWS OF ITEMS -->
                             <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800 space-y-3">
                                 <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
-                                    <span class="text-xs font-bold text-gold"><i class="fa-solid fa-list-ol ml-1"></i> جدول مديونيات الفاتورة (الأعمدة: رقم الفاتورة أو التذكرة - التفاصيل - المبلغ)</span>
+                                    <span class="text-xs font-bold text-gold"><i class="fa-solid fa-list-ol ml-1"></i> جدول مديونيات الفاتورة</span>
                                     <button type="button" onclick="addDebtInvRow()" class="text-xs text-gold hover:underline font-bold"><i class="fa-solid fa-plus-circle ml-1"></i> إضافة بند جديد</button>
                                 </div>
                                 <div id="debtInvRowsContainer" class="space-y-2"></div>
                             </div>
 
-                            <!-- TOTALS & PAID CALCULATION -->
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-zinc-900 p-4 rounded-xl border border-gold">
                                 <div>
                                     <label class="block text-[11px] text-zinc-400 mb-1 font-bold">مجموع مبالغ البنود (AED)</label>
@@ -886,7 +795,7 @@
                                     <input type="number" id="debtInvPaidAmount" oninput="calcDebtInvoiceNetTotal()" placeholder="0" class="w-full bg-darkbg border border-emerald-500 font-bold text-emerald-400 rounded-lg p-2 text-xs outline-none" value="0">
                                 </div>
                                 <div>
-                                    <label class="block text-[11px] text-gold mb-1 font-bold">الإجمالي المتبقي (المجموع - المدفوع)</label>
+                                    <label class="block text-[11px] text-gold mb-1 font-bold">الإجمالي المتبقي</label>
                                     <input type="number" id="debtInvNetTotal" readonly class="w-full bg-darkbg border border-gold font-black text-gold rounded-lg p-2 text-xs outline-none" value="0">
                                 </div>
                             </div>
@@ -900,12 +809,6 @@
 
                 <!-- SUB TAB 3: TRUSTS -->
                 <div id="fin-sub-trusts" class="hidden space-y-4">
-                    <div class="flex justify-between items-center flex-wrap gap-2 mb-3">
-                        <p class="text-xs text-zinc-400">* يتم جلب كشف أمانات السامان والطرود تلقائياً بناءً على فواتير الشحن المسجلة:</p>
-                        <button onclick="openCargoManifestModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3.5 py-2 rounded-xl text-xs whitespace-nowrap shadow">
-                            <i class="fa-solid fa-file-lines ml-1"></i> طباعة كشف أمانات الرحلة (Cargo Manifest)
-                        </button>
-                    </div>
                     <div class="overflow-x-auto">
                         <table class="custom-table" id="trustsTable">
                             <thead>
@@ -927,13 +830,72 @@
             </div>
         </section>
 
+        <!-- SECTION 4: USERS MANAGEMENT (MANAGER ONLY) -->
+        <section id="module-users" class="tab-content hidden space-y-6">
+            <div class="bg-cardbg border border-bordergold p-5 sm:p-6 rounded-2xl shadow-xl space-y-4">
+                <h3 class="text-gold font-bold text-sm border-b border-zinc-800 pb-3 flex items-center justify-between">
+                    <span><i class="fa-solid fa-user-plus ml-1"></i> إضافة موظف أو مستخدم جديد للنظام</span>
+                    <span class="text-xs text-amber-400 font-bold"><i class="fa-solid fa-shield-halved"></i> صلاحيات المدير فقط</span>
+                </h3>
+
+                <form id="addUserForm" onsubmit="handleAddNewUser(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-4 bg-darkbg p-4 rounded-xl border border-zinc-800">
+                    <div>
+                        <label class="block text-xs text-zinc-400 mb-1">اسم المستخدم *</label>
+                        <input type="text" id="newUsername" required placeholder="اسم المستخدم" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-xs text-zinc-200 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-zinc-400 mb-1">كلمة المرور *</label>
+                        <input type="text" id="newPassword" required placeholder="كلمة المرور" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-xs text-zinc-200 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-zinc-400 mb-1">الصلاحية *</label>
+                        <select id="newUserRole" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-xs text-zinc-200 outline-none">
+                            <option value="موظف">موظف</option>
+                            <option value="مدير">مدير</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-2.5 rounded-lg text-xs shadow hover:opacity-95 transition">
+                            <i class="fa-solid fa-user-check ml-1"></i> حفظ المستخدم
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl p-5">
+                <h3 class="text-gold font-bold text-sm mb-3"><i class="fa-solid fa-users-gear ml-1"></i> قائمة الحسابات والمستخدمين المسجلين في النظام</h3>
+                <div class="overflow-x-auto">
+                    <table class="custom-table" id="usersListTable">
+                        <thead>
+                            <tr>
+                                <th>م</th>
+                                <th>اسم المستخدم</th>
+                                <th>كلمة المرور</th>
+                                <th>الصلاحية</th>
+                                <th>الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <script>
+        // إعدادات الاتصال السحابي بقاعدة بيانات Firebase الخاصة بك
+        const firebaseConfig = {
+            databaseURL: "https://wadi-bana-b585b-default-rtdb.firebaseio.com/"
+        };
+
+        // تهيئة Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         const DEFAULT_USERS = [
             { username: 'وليد السيد', password: '708090', role: 'مدير' },
             { username: 'محمود', password: '102030', role: 'موظف' },
-            { username: 'خالد', password: '124578', role: 'موظف' },
             { username: 'يوسف', password: '405060', role: 'موظف' },
             { username: 'محمد', password: '104070', role: 'موظف' }
         ];
@@ -967,33 +929,66 @@
             if(currentUser) {
                 document.getElementById('userInfoBadge').innerText = `${currentUser.username} (${currentUser.role})`;
                 document.getElementById('loginOverlay').style.display = 'none';
+
+                if(currentUser.role === 'مدير') {
+                    document.getElementById('tab-users').classList.remove('hidden');
+                } else {
+                    document.getElementById('tab-users').classList.add('hidden');
+                }
             } else {
                 document.getElementById('loginOverlay').style.display = 'flex';
             }
         }
 
-        const DEFAULT_STORE = {
-            passengers: [
-                { id: "118", agent: "مكتب الوكيل العام", passengerCount: 1, name: "عبدالله أحمد علي اليافعي", phone: "0501234567", passport: "A0988712", extraPassengers: [], origin: "عجمان", destination: "عدن", tripDate: "2026-11-05", reportingTime: "2026-11-05 4:00 عصراً", fare: 400, payMethod: "مدفوع", logs: [] }
-            ],
-            cargo: [
-                { id: "118", date: "2026-10-28", tripDate: "2026-11-02", sender: "صالح العولقي", senderOrigin: "عجمان", senderPhone: "0559876543", receiver: "محمد صالح", receiverDestination: "عدن", receiverPhone: "0770123456", paymentStatus: "مدفوع", grandTotal: 300, items: [{ name: "كرتون أمتعة وملابس", qty: 2, price: 150 }], logs: [] }
-            ],
+        let db = {
+            passengers: [],
+            cargo: [],
             vouchers: [],
             debtInvoices: [],
-            nextTicketNo: 119,
-            nextCargoNo: 119,
+            nextTicketNo: 118,
+            nextCargoNo: 118,
             nextDebtInvNo: 118
         };
 
-        let db = JSON.parse(localStorage.getItem('WADI_BINA_MASTER_DB')) || DEFAULT_STORE;
-        if(!db.vouchers) db.vouchers = [];
-        if(!db.debtInvoices) db.debtInvoices = [];
-        if(!db.nextTicketNo) db.nextTicketNo = 118;
-        if(!db.nextCargoNo) db.nextCargoNo = 118;
-        if(!db.nextDebtInvNo) db.nextDebtInvNo = 118;
+        // دالة الحفظ السحابي الفوري في Firebase
+        function saveDB() {
+            database.ref('system_master_data').set(db)
+                .then(() => {
+                    const indicator = document.getElementById('cloudSyncIndicator');
+                    if(indicator) {
+                        indicator.innerHTML = '<i class="fa-solid fa-cloud-circle-check text-emerald-400"></i> تم الحفظ بالسحابة بنجاح';
+                        setTimeout(() => {
+                            indicator.innerHTML = '<i class="fa-solid fa-cloud-circle-check animate-pulse"></i> متصل بالسحابة (Firebase)';
+                        }, 2000);
+                    }
+                })
+                .catch(err => {
+                    console.error("خطأ في مزامنة السحابة:", err);
+                });
+        }
 
-        function saveDB() { localStorage.setItem('WADI_BINA_MASTER_DB', JSON.stringify(db)); }
+        // الاستماع للتحديثات اللحظية من قاعدة بيانات Firebase السحابية
+        database.ref('system_master_data').on('value', (snapshot) => {
+            const cloudData = snapshot.val();
+            if (cloudData) {
+                db = cloudData;
+                if(!db.vouchers) db.vouchers = [];
+                if(!db.debtInvoices) db.debtInvoices = [];
+                if(!db.nextTicketNo) db.nextTicketNo = 118;
+                if(!db.nextCargoNo) db.nextCargoNo = 118;
+                if(!db.nextDebtInvNo) db.nextDebtInvNo = 118;
+                
+                handleGlobalSearch();
+                if(currentTab === 'financials') {
+                    renderFinancials();
+                    renderVouchersTable();
+                    renderTrustsTable();
+                    renderDebtInvoicesTable();
+                } else if(currentTab === 'users') {
+                    renderUsersTable();
+                }
+            }
+        });
 
         let currentTab = 'passengers';
         let activeTripDate = new Date().toISOString().split('T')[0];
@@ -1009,16 +1004,12 @@
             document.getElementById('passTripDate').value = today;
             document.getElementById('vDate').value = today;
             document.getElementById('debtInvDate').value = today;
-            document.getElementById('cargoInvNo').value = db.nextCargoNo || 118;
-            document.getElementById('passTicketNo').value = db.nextTicketNo || 118;
-            document.getElementById('debtInvNo').value = db.nextDebtInvNo || 118;
-
+            
             renderCargoItemRows();
             renderDebtInvRows();
             onPassengerCountChanged();
             calcTicketTotal();
             updateReportingTimeAutomatically();
-            handleGlobalSearch();
         };
 
         function initTripDateFilter() {
@@ -1031,12 +1022,16 @@
         }
 
         function onTripDateFilterChanged() {
-            const dateInput = document.getElementById('selectedTripDateFilter');
-            activeTripDate = dateInput.value;
+            activeTripDate = document.getElementById('selectedTripDateFilter').value;
             handleGlobalSearch();
         }
 
         function switchTab(tabId) {
+            if(tabId === 'users' && (!currentUser || currentUser.role !== 'مدير')) {
+                alert('عفواً! هذه الصفحة مخصصة لمدير النظام فقط.');
+                return;
+            }
+
             currentTab = tabId;
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(`module-${tabId}`).classList.remove('hidden');
@@ -1057,6 +1052,8 @@
                 renderVouchersTable();
                 renderTrustsTable();
                 renderDebtInvoicesTable();
+            } else if(tabId === 'users') {
+                renderUsersTable();
             }
             
             handleGlobalSearch();
@@ -1066,7 +1063,6 @@
             document.getElementById('fin-sub-debts').classList.add('hidden');
             document.getElementById('fin-sub-create-debt-inv').classList.add('hidden');
             document.getElementById('fin-sub-trusts').classList.add('hidden');
-            document.getElementById('finTrustsExportBtn').classList.add('hidden');
 
             document.getElementById('subtab-debts').className = "px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-300 hover:text-gold";
             document.getElementById('subtab-create-debt-inv').className = "px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-300 hover:text-gold";
@@ -1081,7 +1077,6 @@
                 document.getElementById('subtab-create-debt-inv').className = "px-4 py-2 rounded-xl text-xs font-bold gold-gradient-bg text-black";
             } else if(subId === 'trusts') {
                 document.getElementById('fin-sub-trusts').classList.remove('hidden');
-                document.getElementById('finTrustsExportBtn').classList.remove('hidden');
                 document.getElementById('subtab-trusts').className = "px-4 py-2 rounded-xl text-xs font-bold gold-gradient-bg text-black";
                 renderTrustsTable();
             }
@@ -1101,8 +1096,7 @@
 
         function calcTicketTotal() {
             const count = parseInt(document.getElementById('passCount').value) || 1;
-            const fare = 400;
-            document.getElementById('passManualTotal').value = count * fare;
+            document.getElementById('passManualTotal').value = count * 400;
         }
 
         function updateReportingTimeAutomatically() {
@@ -1115,22 +1109,15 @@
 
             if (origin === 'عجمان') {
                 timeStr = "4:00 عصراً";
-                targetDateStr = tripDateVal;
             } else if (origin === 'بني ياس') {
                 timeStr = "7:30 مساءً";
-                targetDateStr = tripDateVal;
             } else if (origin === 'العين') {
                 timeStr = "11:00 ليلاً";
-                targetDateStr = tripDateVal;
             } else if (['حفيت', 'نزوة', 'عبري', 'ثمريت'].includes(origin)) {
                 timeStr = "1:30 صباحاً";
                 d.setDate(d.getDate() + 1);
                 targetDateStr = d.toISOString().split('T')[0];
-            } else {
-                timeStr = "4:00 عصراً";
-                targetDateStr = tripDateVal;
             }
-
             document.getElementById('passReportingTime').value = `${targetDateStr} (${timeStr})`;
         }
 
@@ -1174,7 +1161,7 @@
 
             const passTbody = document.querySelector('#passengersTable tbody');
             passTbody.innerHTML = '';
-            let filteredPassengers = db.passengers.filter(p => {
+            let filteredPassengers = (db.passengers || []).filter(p => {
                 const matchType = (typeFilter === 'all' || typeFilter === 'ticket');
                 const matchQuery = !query || 
                     p.id.toLowerCase().includes(query) || 
@@ -1182,15 +1169,13 @@
                     p.name.toLowerCase().includes(query) || 
                     p.phone.toLowerCase().includes(query) || 
                     p.passport.toLowerCase().includes(query) || 
-                    p.tripDate.toLowerCase().includes(query) ||
-                    'تذكرة'.includes(query);
+                    p.tripDate.toLowerCase().includes(query);
                 return matchType && matchQuery;
             });
 
             let revSum = 0;
             filteredPassengers.forEach((p) => {
-                const itemTotal = p.fare || 0;
-                revSum += itemTotal;
+                revSum += (p.fare || 0);
                 const isEditable = canEditOrDelete(p.tripDate);
                 const originalIdx = db.passengers.findIndex(x => x.id === p.id);
 
@@ -1213,11 +1198,10 @@
                     <td>${p.origin} ← ${p.destination}</td>
                     <td><strong class="text-gold">${p.tripDate}</strong></td>
                     <td><strong class="text-amber-300">${p.reportingTime || '-'}</strong></td>
-                    <td>${itemTotal} AED</td>
+                    <td>${p.fare || 0} AED</td>
                     <td><span style="color:${p.payMethod === 'مدفوع' ? '#10b981':'#f59e0b'}; font-weight:bold;">${p.payMethod}</span></td>
                     <td>
                         <div class="flex items-center gap-1">
-                            <button onclick="previewTicketAsImage('${p.id}')" title="معاينة التذكرة كصورة" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-image"></i></button>
                             <button onclick="showLogs('passengers', '${p.id}')" title="سجل التعديلات" class="bg-zinc-800 text-gold px-2 py-1 rounded text-xs"><i class="fa-solid fa-history"></i></button>
                             <button onclick="editPassenger('${p.id}')" ${!isEditable ? 'disabled class="bg-zinc-800 text-zinc-600 px-2 py-1 rounded text-xs cursor-not-allowed"' : 'class="bg-amber-600 text-white px-2 py-1 rounded text-xs"'}>
                                 <i class="fa-solid fa-pen"></i>
@@ -1234,7 +1218,7 @@
 
             const cargoTbody = document.querySelector('#cargoTable tbody');
             cargoTbody.innerHTML = '';
-            let filteredCargo = db.cargo.filter(c => {
+            let filteredCargo = (db.cargo || []).filter(c => {
                 const matchType = (typeFilter === 'all' || typeFilter === 'cargo');
                 const matchQuery = !query || 
                     c.id.toLowerCase().includes(query) || 
@@ -1242,8 +1226,7 @@
                     c.receiver.toLowerCase().includes(query) || 
                     c.senderPhone.toLowerCase().includes(query) || 
                     c.receiverPhone.toLowerCase().includes(query) || 
-                    c.tripDate.toLowerCase().includes(query) ||
-                    'فاتورة'.includes(query) || 'شحن'.includes(query);
+                    c.tripDate.toLowerCase().includes(query);
                 return matchType && matchQuery;
             });
 
@@ -1265,7 +1248,6 @@
                     <td><span style="color:${c.paymentStatus === 'مدفوع' ? '#10b981':'#f59e0b'}; font-weight:bold;">${c.paymentStatus}</span></td>
                     <td>
                         <div class="flex items-center gap-1">
-                            <button onclick="previewCargoAsImage('${c.id}')" title="معاينة الفاتورة كصورة" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-image"></i></button>
                             <button onclick="showLogs('cargo', '${c.id}')" title="سجل التعديلات" class="bg-zinc-800 text-gold px-2 py-1 rounded text-xs"><i class="fa-solid fa-history"></i></button>
                             <button onclick="editCargo('${c.id}')" ${!isEditable ? 'disabled class="bg-zinc-800 text-zinc-600 px-2 py-1 rounded text-xs cursor-not-allowed"' : 'class="bg-amber-600 text-white px-2 py-1 rounded text-xs"'}>
                                 <i class="fa-solid fa-pen"></i>
@@ -1290,7 +1272,7 @@
             document.getElementById('manifestDateText').innerText = tripDate;
             document.getElementById('manifestIssueDate').innerText = new Date().toLocaleString('ar-EG');
 
-            const tripPassengers = db.passengers.filter(p => p.tripDate === tripDate);
+            const tripPassengers = (db.passengers || []).filter(p => p.tripDate === tripDate);
             const tbody = document.getElementById('manifestTableBody');
             tbody.innerHTML = '';
 
@@ -1304,9 +1286,7 @@
 
             let totalPax = 0;
             tripPassengers.forEach((p, idx) => {
-                const count = p.passengerCount || 1;
-                totalPax += count;
-
+                totalPax += (p.passengerCount || 1);
                 let extraNames = '-';
                 if(p.extraPassengers && p.extraPassengers.length > 0) {
                     extraNames = p.extraPassengers.map(ex => `${ex.name} (${ex.passport})`).join('<br>');
@@ -1333,12 +1313,12 @@
             document.getElementById('cargoManifestDateText').innerText = tripDate;
             document.getElementById('cargoManifestIssueDate').innerText = new Date().toLocaleString('ar-EG');
 
-            const tripCargo = db.cargo.filter(c => (c.tripDate || c.date) === tripDate);
+            const tripCargo = (db.cargo || []).filter(c => (c.tripDate || c.date) === tripDate);
             const tbody = document.getElementById('cargoManifestTableBody');
             tbody.innerHTML = '';
 
             if(tripCargo.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center text-slate-500 py-6">لا توجد فواتير شحن أو أمانات مسجلة لتاريخ الرحلة المختار (${tripDate})</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center text-slate-500 py-6">لا توجد فواتير شحن مسجلة لتاريخ الرحلة (${tripDate})</td></tr>`;
                 document.getElementById('cargoManifestTotalInvoices').innerText = '0';
                 document.getElementById('cargoManifestTotalAmount').innerText = '0 AED';
                 document.getElementById('cargoManifestModal').classList.remove('hidden');
@@ -1347,18 +1327,18 @@
 
             let totalAmount = 0;
             tripCargo.forEach((c, idx) => {
-                totalAmount += c.grandTotal || 0;
+                totalAmount += (c.grandTotal || 0);
                 const itemsSummary = c.items ? c.items.map(i => `${i.name} (${i.qty})`).join('، ') : 'أمتعة متنوعة';
 
                 tbody.insertRow().innerHTML = `
                     <td class="border border-slate-300 p-2 text-center font-bold">${idx + 1}</td>
                     <td class="border border-slate-300 p-2 font-bold text-amber-700">#${c.id}</td>
-                    <td class="border border-slate-300 p-2">${c.sender} <span class="text-[10px] text-slate-500">(${c.senderOrigin || 'عجمان'})</span></td>
-                    <td class="border border-slate-300 p-2 font-bold">${c.receiver} <span class="text-[10px] text-slate-500">(${c.destination})</span></td>
+                    <td class="border border-slate-300 p-2">${c.sender}</td>
+                    <td class="border border-slate-300 p-2 font-bold">${c.receiver}</td>
                     <td class="border border-slate-300 p-2">${c.receiverPhone}</td>
-                    <td class="border border-slate-300 p-2 text-slate-700">${itemsSummary}</td>
+                    <td class="border border-slate-300 p-2">${itemsSummary}</td>
                     <td class="border border-slate-300 p-2 font-bold text-indigo-700">${c.grandTotal} AED</td>
-                    <td class="border border-slate-300 p-2 font-bold" style="color:${c.paymentStatus === 'مدفوع' ? '#059669':'#d97706'}">${c.paymentStatus}</td>
+                    <td class="border border-slate-300 p-2 font-bold">${c.paymentStatus}</td>
                 `;
             });
 
@@ -1367,117 +1347,57 @@
             document.getElementById('cargoManifestModal').classList.remove('hidden');
         }
 
-        function previewTicketAsImage(id) {
-            const item = db.passengers.find(x => x.id === id);
-            if(!item) return;
-
-            document.getElementById('imgTicketCode').innerText = `#${item.id}`;
-            const isPaid = item.payMethod === 'مدفوع';
-            const paidText = isPaid ? `<span class="text-emerald-600 font-black mr-2">(تم الدفع)</span>` : ``;
-
-            let passengersListHTML = `<div><strong>الراكب 1:</strong> <span class="text-slate-800 font-bold">${item.name}</span> (جواز: ${item.passport} - هاتف: ${item.phone})</div>`;
-            if(item.extraPassengers && item.extraPassengers.length > 0) {
-                item.extraPassengers.forEach((ex, idx) => {
-                    passengersListHTML += `<div><strong>الراكب ${idx + 2}:</strong> <span class="text-slate-800 font-bold">${ex.name}</span> (جواز: ${ex.passport})</div>`;
-                });
-            }
-
-            const totalFare = item.fare || 400;
-
-            document.getElementById('imgTicketBody').innerHTML = `
-                <div class="space-y-2 bg-slate-100 p-3 rounded-lg border border-slate-200">
-                    <div class="border-b border-slate-200 pb-2 space-y-1">
-                        ${passengersListHTML}
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 pt-1 text-[11px]">
-                        <div><strong>عدد الركاب:</strong> <span class="text-slate-800 font-bold">${item.passengerCount || 1}</span></div>
-                        <div><strong>تاريخ الرحلة:</strong> <span class="text-amber-600 font-bold">${item.tripDate}</span></div>
-                        <div class="col-span-2"><strong>وقت الحضور:</strong> <span class="text-rose-600 font-black">${item.reportingTime || '-'}</span></div>
-                        <div><strong>محطة الصعود:</strong> <span class="text-slate-800 font-bold">${item.origin}</span></div>
-                        <div><strong>جهة الوصول:</strong> <span class="text-slate-800 font-bold">${item.destination}</span></div>
-                        <div class="col-span-2"><strong>المبلغ الإجمالي:</strong> <span class="text-indigo-600 font-black">${totalFare} AED</span> ${paidText}</div>
-                    </div>
-                </div>
-            `;
-            document.getElementById('ticketPreviewModal').classList.remove('hidden');
-        }
-
-        function previewCargoAsImage(id) {
-            const item = db.cargo.find(x => x.id === id);
-            if(!item) return;
-
-            document.getElementById('imgCargoCode').innerText = `#${item.id}`;
-            let itemsHTML = item.items.map((i, idx) => `<tr><td class="border border-slate-300 p-1.5">${idx+1}</td><td class="border border-slate-300 p-1.5">${i.name}</td><td class="border border-slate-300 p-1.5">${i.qty}</td><td class="border border-slate-300 p-1.5">${i.price} AED</td></tr>`).join('');
-            const isPaid = item.paymentStatus === 'مدفوع';
-            const paidText = isPaid ? `<span class="text-emerald-600 font-black mr-2">(تم الدفع)</span>` : ``;
-
-            document.getElementById('imgCargoBody').innerHTML = `
-                <div class="grid grid-cols-2 gap-2 bg-slate-100 p-3 rounded-lg border border-slate-200 mb-3">
-                    <div><strong>المرسل:</strong> ${item.sender} (${item.senderPhone}) [عن: ${item.senderOrigin || 'عجمان'}]</div>
-                    <div><strong>المستلم:</strong> ${item.receiver} (${item.receiverPhone}) [إلى: ${item.destination}]</div>
-                    <div><strong>تاريخ التحريك:</strong> <span class="text-amber-600 font-bold">${item.tripDate}</span></div>
-                    <div><strong>حالة السداد:</strong> <span class="text-slate-800 font-bold">${item.paymentStatus}</span></div>
-                </div>
-                <table class="w-full border-collapse text-center text-xs">
-                    <thead><tr class="bg-slate-200"><th class="border border-slate-300 p-1">م</th><th class="border border-slate-300 p-1">الصنف</th><th class="border border-slate-300 p-1">العدد</th><th class="border border-slate-300 p-1">السعر</th></tr></thead>
-                    <tbody>${itemsHTML}</tbody>
-                </table>
-                <div class="text-left font-black text-sm mt-2 text-indigo-700">الإجمالي النهائي: ${item.grandTotal} AED ${paidText}</div>
-            `;
-            document.getElementById('cargoPreviewModal').classList.remove('hidden');
-        }
-
-        function previewDebtInvoiceAsImage(id) {
-            const inv = db.debtInvoices.find(x => x.id === id);
-            if(!inv) return;
-
-            document.getElementById('imgDebtInvCode').innerText = `#${inv.id}`;
-            let rowsHTML = inv.items.map((i, idx) => `
-                <tr>
-                    <td class="border border-slate-300 p-1.5 text-center">${idx + 1}</td>
-                    <td class="border border-slate-300 p-1.5 font-bold">${i.refNo || '-'}</td>
-                    <td class="border border-slate-300 p-1.5">${i.details || '-'}</td>
-                    <td class="border border-slate-300 p-1.5 text-left font-bold">${i.amount} AED</td>
-                </tr>
-            `).join('');
-
-            document.getElementById('imgDebtInvBody').innerHTML = `
-                <div class="grid grid-cols-2 gap-2 bg-slate-100 p-3 rounded-lg border border-slate-200 mb-3 text-xs">
-                    <div><strong>تاريخ الفاتورة:</strong> ${inv.date}</div>
-                    <div><strong>الاسم الكامل:</strong> <span class="font-bold text-slate-900">${inv.name}</span></div>
-                    <div><strong>رقم التلفون:</strong> ${inv.phone}</div>
-                    <div><strong>العنوان:</strong> ${inv.address}</div>
-                </div>
-                <table class="w-full border-collapse text-right text-xs mb-3">
-                    <thead>
-                        <tr class="bg-slate-200">
-                            <th class="border border-slate-300 p-1.5">م</th>
-                            <th class="border border-slate-300 p-1.5">رقم الفاتورة/التذكرة</th>
-                            <th class="border border-slate-300 p-1.5">تفاصيل</th>
-                            <th class="border border-slate-300 p-1.5 text-left">المبلغ</th>
-                        </tr>
-                    </thead>
-                    <tbody>${rowsHTML}</tbody>
-                </table>
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1 text-xs">
-                    <div class="flex justify-between"><span>مجموع المبالغ:</span><strong>${inv.subTotal} AED</strong></div>
-                    <div class="flex justify-between text-emerald-700 font-bold"><span>المبلغ المدفوع:</span><strong>${inv.paidAmount} AED</strong></div>
-                    <div class="flex justify-between border-t border-slate-300 pt-1 text-amber-700 font-black text-sm"><span>الإجمالي المتبقي:</span><strong>${inv.netTotal} AED</strong></div>
-                </div>
-            `;
-            document.getElementById('debtInvPreviewModal').classList.remove('hidden');
-        }
-
         function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
 
-        function downloadCapturedImage(areaId, prefix) {
-            const area = document.getElementById(areaId);
-            html2canvas(area, { scale: 2, useCORS: true }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `${prefix}${Date.now()}.jpg`;
-                link.href = canvas.toDataURL('image/jpeg', 0.95);
-                link.click();
+        // USERS MANAGEMENT
+        function renderUsersTable() {
+            const tbody = document.querySelector('#usersListTable tbody');
+            tbody.innerHTML = '';
+            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+
+            users.forEach((u, idx) => {
+                tbody.insertRow().innerHTML = `
+                    <td>${idx + 1}</td>
+                    <td><strong>${u.username}</strong></td>
+                    <td><span class="text-amber-400 font-mono">${u.password}</span></td>
+                    <td><span class="px-2.5 py-1 rounded text-xs font-bold ${u.role === 'مدير' ? 'bg-amber-950 text-amber-400 border border-amber-800' : 'bg-zinc-800 text-zinc-300'}">${u.role}</span></td>
+                    <td>
+                        ${u.username !== 'وليد السيد' ? `<button onclick="deleteUser('${u.username}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i> حذف</button>` : '<span class="text-zinc-500 text-xs">حساب رئيسي</span>'}
+                    </td>
+                `;
             });
+        }
+
+        function handleAddNewUser(e) {
+            e.preventDefault();
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value.trim();
+            const role = document.getElementById('newUserRole').value;
+
+            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            if(users.some(u => u.username === username)) {
+                alert('اسم المستخدم موجود مسبقاً!');
+                return;
+            }
+
+            users.push({ username, password, role });
+            localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
+            alert(`تم إضافة المستخدم (${username}) بنجاح!`);
+            document.getElementById('addUserForm').reset();
+            renderUsersTable();
+        }
+
+        function deleteUser(username) {
+            if(username === 'وليد السيد') {
+                alert('لا يمكن حذف المدير الرئيسي!');
+                return;
+            }
+            if(confirm(`تأكيد حذف المستخدم (${username})؟`)) {
+                let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+                users = users.filter(u => u.username !== username);
+                localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
+                renderUsersTable();
+            }
         }
 
         function handleSavePassenger(e) {
@@ -1496,20 +1416,15 @@
                 const nameInputs = document.querySelectorAll('.extra-pass-name');
                 const passportInputs = document.querySelectorAll('.extra-pass-passport');
                 for (let i = 0; i < nameInputs.length; i++) {
-                    extraPassList.push({
-                        name: nameInputs[i].value.trim(),
-                        passport: passportInputs[i].value.trim()
-                    });
+                    extraPassList.push({ name: nameInputs[i].value.trim(), passport: passportInputs[i].value.trim() });
                 }
             }
+
+            if(!db.passengers) db.passengers = [];
 
             if(editId) {
                 const pIndex = db.passengers.findIndex(p => p.id === editId);
                 if(pIndex !== -1) {
-                    if(!canEditOrDelete(db.passengers[pIndex].tripDate)) {
-                        alert('عفواً! انقضى تاريخ هذه الرحلة. التعديل متاح للمدير فقط.');
-                        return;
-                    }
                     if(!db.passengers[pIndex].logs) db.passengers[pIndex].logs = [];
                     db.passengers[pIndex].logs.push({ user: currentUser.username, time: now, action: 'تعديل بيانات التذكرة' });
 
@@ -1526,15 +1441,8 @@
                     db.passengers[pIndex].destination = document.getElementById('passDestination').value;
                     db.passengers[pIndex].fare = manualFareTotal;
                     db.passengers[pIndex].payMethod = document.getElementById('passPayMethod').value;
-
-                    alert(`تم تعديل التذكرة #${customTicketNo} بنجاح`);
                 }
             } else {
-                if(db.passengers.some(p => p.id === customTicketNo)) {
-                    alert('رقم التذكرة هذا موجود مسبقاً! الرجاء استخدام رقم آخر.');
-                    return;
-                }
-
                 const newTicket = {
                     id: customTicketNo,
                     agent: agentName,
@@ -1551,15 +1459,7 @@
                     payMethod: document.getElementById('passPayMethod').value,
                     logs: [{ user: currentUser.username, time: now, action: 'إصدار التذكرة لأول مرة' }]
                 };
-
                 db.passengers.unshift(newTicket);
-                const numericId = parseInt(customTicketNo);
-                if(!isNaN(numericId) && numericId >= (db.nextTicketNo || 118)) {
-                    db.nextTicketNo = numericId + 1;
-                } else {
-                    db.nextTicketNo = (db.nextTicketNo || 118) + 1;
-                }
-                alert(`تم حجز التذكرة للرحلة برقم البوليصة: #${newTicket.id}`);
             }
 
             saveDB();
@@ -1570,11 +1470,6 @@
         function editPassenger(id) {
             const ticket = db.passengers.find(p => p.id === id);
             if(!ticket) return;
-
-            if(!canEditOrDelete(ticket.tripDate) && currentUser.role !== 'مدير') {
-                alert('تنبيه: رحلة هذه التذكرة منتهية التاريخ. التعديل مخصص للمدير فقط!');
-                return;
-            }
 
             document.getElementById('passEditId').value = ticket.id;
             document.getElementById('passTicketNo').value = ticket.id;
@@ -1602,7 +1497,6 @@
             document.getElementById('passengerForm').reset();
             document.getElementById('passEditId').value = '';
             document.getElementById('passCount').value = '1';
-            document.getElementById('passTicketNo').value = db.nextTicketNo || 118;
             document.getElementById('passTripDate').value = new Date().toISOString().split('T')[0];
             updateReportingTimeAutomatically();
             calcTicketTotal();
@@ -1612,12 +1506,7 @@
         }
 
         function deletePassenger(idx) {
-            const ticket = db.passengers[idx];
-            if(!canEditOrDelete(ticket.tripDate)) {
-                alert('عفواً! انقضى تاريخ هذه الرحلة. الحذف متاح للمدير فقط.');
-                return;
-            }
-            if(confirm(`تأكيد حذف التذكرة #${ticket.id}؟`)) {
+            if(confirm('تأكيد حذف التذكرة؟')) {
                 db.passengers.splice(idx, 1);
                 saveDB();
                 handleGlobalSearch();
@@ -1634,15 +1523,13 @@
                     <input type="text" placeholder="اسم الصنف" value="${item.name}" oninput="updateCargoItem(${index}, 'name', this.value)" class="flex-2 bg-zinc-900 border border-zinc-800 rounded-lg p-1.5 text-xs text-zinc-200 w-full">
                     <input type="number" placeholder="العدد" value="${item.qty}" oninput="updateCargoItem(${index}, 'qty', this.value)" class="w-16 bg-zinc-900 border border-zinc-800 rounded-lg p-1.5 text-xs text-zinc-200 text-center">
                     <input type="number" placeholder="السعر" value="${item.price}" oninput="updateCargoItem(${index}, 'price', this.value)" class="w-20 bg-zinc-900 border border-zinc-800 rounded-lg p-1.5 text-xs text-zinc-200 text-center">
-                    ${cargoFormItems.length > 1 ? `<button type="button" onclick="removeCargoItemRow(${index})" class="text-red-400 p-1 text-xs"><i class="fa-solid fa-circle-minus"></i></button>` : ''}
                 `;
                 container.appendChild(row);
             });
             calcCargoTotal();
         }
 
-        function addCargoItemRow() { cargoFormItems.push({ name: '', qty: 1, price: 0 }); renderCargoItemRows(); }
-        function removeCargoItemRow(idx) { cargoFormItems.splice(idx, 1); renderCargoItemRows(); }
+        function addCargoItemRow() { cargoFormItems.push({ name: '', qty: 1, price: 150 }); renderCargoItemRows(); }
         function updateCargoItem(idx, field, val) {
             cargoFormItems[idx][field] = field === 'name' ? val : parseFloat(val) || 0;
             calcCargoTotal();
@@ -1671,13 +1558,11 @@
             const status = document.getElementById('cargoPaymentStatus').value;
             const now = new Date().toLocaleString('ar-EG');
 
+            if(!db.cargo) db.cargo = [];
+
             if(editId) {
                 const cIndex = db.cargo.findIndex(c => c.id === editId);
                 if(cIndex !== -1) {
-                    if(!canEditOrDelete(db.cargo[cIndex].tripDate)) {
-                        alert('عفواً! انقضى تاريخ رحلة تحريك هذه الفاتورة. التعديل متاح للمدير فقط.');
-                        return;
-                    }
                     if(!db.cargo[cIndex].logs) db.cargo[cIndex].logs = [];
                     db.cargo[cIndex].logs.push({ user: currentUser.username, time: now, action: 'تعديل فاتورة الشحن' });
 
@@ -1693,15 +1578,8 @@
                     db.cargo[cIndex].paymentStatus = status;
                     db.cargo[cIndex].grandTotal = tot;
                     db.cargo[cIndex].items = [...cargoFormItems];
-
-                    alert(`تم تعديل فاتورة الشحن #${customInvNo} بنجاح`);
                 }
             } else {
-                if(db.cargo.some(c => c.id === customInvNo)) {
-                    alert('رقم الفاتورة هذا موجود مسبقاً! الرجاء استخدام رقم آخر.');
-                    return;
-                }
-
                 const newCargo = {
                     id: customInvNo,
                     date: document.getElementById('cargoDate').value,
@@ -1715,17 +1593,9 @@
                     paymentStatus: status,
                     grandTotal: tot,
                     items: [...cargoFormItems],
-                    logs: [{ user: currentUser.username, time: now, action: 'إنشاء الفاتورة لأول مرة' }]
+                    logs: [{ user: currentUser.username, time: now, action: 'إنشاء الفاتورة' }]
                 };
-
                 db.cargo.unshift(newCargo);
-                const numericInv = parseInt(customInvNo);
-                if(!isNaN(numericInv) && numericInv >= (db.nextCargoNo || 118)) {
-                    db.nextCargoNo = numericInv + 1;
-                } else {
-                    db.nextCargoNo = (db.nextCargoNo || 118) + 1;
-                }
-                alert(`تم حفظ فاتورة الشحن برقم: #${newCargo.id}`);
             }
 
             saveDB();
@@ -1736,11 +1606,6 @@
         function editCargo(id) {
             const c = db.cargo.find(item => item.id === id);
             if(!c) return;
-
-            if(!canEditOrDelete(c.tripDate) && currentUser.role !== 'مدير') {
-                alert('تنبيه: رحلة هذه الفاتورة منتهية. التعديل مخصص للمدير فقط!');
-                return;
-            }
 
             document.getElementById('cargoEditId').value = c.id;
             document.getElementById('cargoInvNo').value = c.id;
@@ -1758,7 +1623,6 @@
 
             cargoFormItems = c.items ? [...c.items] : [{ name: 'كرتون أمتعة', qty: 1, price: c.grandTotal }];
             renderCargoItemRows();
-            document.getElementById('cargoAutoTotalDisplay').innerText = `${c.grandTotal} AED`;
 
             document.getElementById('cargoFormTitle').innerText = `تعديل فاتورة الشحن #${c.id}`;
             document.getElementById('cargoSubmitBtn').innerHTML = `<i class="fa-solid fa-pen-to-square ml-1"></i> حفظ التعديلات`;
@@ -1769,7 +1633,6 @@
         function resetCargoForm() {
             document.getElementById('cargoForm').reset();
             document.getElementById('cargoEditId').value = '';
-            document.getElementById('cargoInvNo').value = db.nextCargoNo || 118;
             document.getElementById('cargoManualTotal').removeAttribute('data-manual-edited');
             document.getElementById('cargoFormTitle').innerText = 'فاتورة استلام أمتعة وبضائع جديدة';
             document.getElementById('cargoSubmitBtn').innerHTML = `<i class="fa-solid fa-file-invoice ml-1"></i> حفظ وإصدار فاتورة الشحن`;
@@ -1779,23 +1642,16 @@
         }
 
         function deleteCargo(idx) {
-            const cargo = db.cargo[idx];
-            if(!canEditOrDelete(cargo.tripDate)) {
-                alert('عفواً! انقضى تاريخ رحلة هذه الفاتورة. الحذف متاح للمدير فقط.');
-                return;
-            }
-            if(confirm(`تأكيد حذف الفاتورة #${cargo.id}؟`)) {
+            if(confirm('تأكيد حذف الفاتورة؟')) {
                 db.cargo.splice(idx, 1);
                 saveDB();
                 handleGlobalSearch();
             }
         }
 
-        // DEBT INVOICES & REGISTER FUNCTIONS
         function renderDebtInvRows() {
             const container = document.getElementById('debtInvRowsContainer');
             container.innerHTML = '';
-
             debtInvFormRows.forEach((row, idx) => {
                 const rowDiv = document.createElement('div');
                 rowDiv.className = "flex gap-2 items-center flex-wrap sm:flex-nowrap";
@@ -1803,21 +1659,14 @@
                     <input type="text" placeholder="رقم الفاتورة أو التذكرة" value="${row.refNo}" oninput="updateDebtInvRow(${idx}, 'refNo', this.value)" class="w-full sm:w-48 bg-darkbg border border-zinc-800 rounded-lg p-2 text-xs text-zinc-200 outline-none">
                     <input type="text" placeholder="التفاصيل / البيان" value="${row.details}" oninput="updateDebtInvRow(${idx}, 'details', this.value)" class="w-full bg-darkbg border border-zinc-800 rounded-lg p-2 text-xs text-zinc-200 outline-none">
                     <input type="number" placeholder="المبلغ" value="${row.amount}" oninput="updateDebtInvRow(${idx}, 'amount', this.value)" class="w-full sm:w-32 bg-darkbg border border-zinc-800 rounded-lg p-2 text-xs text-gold font-bold text-center outline-none">
-                    ${debtInvFormRows.length > 1 ? `<button type="button" onclick="removeDebtInvRow(${idx})" class="text-red-400 p-1 text-xs"><i class="fa-solid fa-circle-minus text-base"></i></button>` : ''}
                 `;
                 container.appendChild(rowDiv);
             });
-
             calcDebtInvoiceNetTotal();
         }
 
         function addDebtInvRow() {
             debtInvFormRows.push({ refNo: '', details: '', amount: 0 });
-            renderDebtInvRows();
-        }
-
-        function removeDebtInvRow(idx) {
-            debtInvFormRows.splice(idx, 1);
             renderDebtInvRows();
         }
 
@@ -1829,10 +1678,8 @@
         function calcDebtInvoiceNetTotal() {
             const subTotal = debtInvFormRows.reduce((s, r) => s + (r.amount || 0), 0);
             const paidAmount = parseFloat(document.getElementById('debtInvPaidAmount').value) || 0;
-            const netTotal = subTotal - paidAmount;
-
             document.getElementById('debtInvSubTotal').value = subTotal;
-            document.getElementById('debtInvNetTotal').value = netTotal;
+            document.getElementById('debtInvNetTotal').value = subTotal - paidAmount;
         }
 
         function handleSaveDebtInvoice(e) {
@@ -1846,10 +1693,7 @@
             const paidAmount = parseFloat(document.getElementById('debtInvPaidAmount').value) || 0;
             const netTotal = parseFloat(document.getElementById('debtInvNetTotal').value) || 0;
 
-            if(db.debtInvoices.some(x => x.id === invNo)) {
-                alert('رقم الفاتورة الآجلة هذا مستخدم مسبقاً!');
-                return;
-            }
+            if(!db.debtInvoices) db.debtInvoices = [];
 
             const newInv = {
                 id: invNo,
@@ -1865,33 +1709,17 @@
             };
 
             db.debtInvoices.unshift(newInv);
-            const num = parseInt(invNo);
-            if(!isNaN(num) && num >= (db.nextDebtInvNo || 118)) {
-                db.nextDebtInvNo = num + 1;
-            } else {
-                db.nextDebtInvNo = (db.nextDebtInvNo || 118) + 1;
-            }
-
             saveDB();
-            alert(`تم إضافة فاتورة الحساب الآجل #${invNo} بنجاح وتسجيلها في سجل الذمم!`);
-            resetDebtInvoiceForm();
-            switchFinancialSubTab('debts');
-        }
-
-        function resetDebtInvoiceForm() {
+            alert(`تم حفظ فاتورة الحساب الآجل #${invNo} بنجاح!`);
             document.getElementById('debtInvoiceForm').reset();
-            document.getElementById('debtInvDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('debtInvNo').value = db.nextDebtInvNo || 118;
-            debtInvFormRows = [{ refNo: '', details: 'شحن أمتعة وطرود', amount: 0 }];
-            renderDebtInvRows();
+            switchFinancialSubTab('debts');
         }
 
         function renderDebtInvoicesTable() {
             const tbody = document.querySelector('#debtInvoicesTable tbody');
             tbody.innerHTML = '';
-
             if (!db.debtInvoices || db.debtInvoices.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="text-center text-zinc-500 py-4">لا توجد فواتير حسابات آجلة مسجلة في السجل حتى الآن</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center text-zinc-500 py-4">لا توجد فواتير حسابات آجلة مسجلة</td></tr>`;
                 return;
             }
 
@@ -1905,18 +1733,13 @@
                     <td>${inv.subTotal} AED</td>
                     <td><strong class="text-emerald-400">${inv.paidAmount} AED</strong></td>
                     <td><strong class="text-amber-300 font-black">${inv.netTotal} AED</strong></td>
-                    <td>
-                        <div class="flex items-center gap-1">
-                            <button onclick="previewDebtInvoiceAsImage('${inv.id}')" title="معاينة الفاتورة كصورة" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-image"></i></button>
-                            <button onclick="deleteDebtInvoice('${inv.id}')" title="حذف الفاتورة من السجل" class="bg-red-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </td>
+                    <td><button onclick="deleteDebtInvoice('${inv.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button></td>
                 `;
             });
         }
 
         function deleteDebtInvoice(id) {
-            if(confirm(`تأكيد حذف فاتورة الحساب الآجل #${id} من السجل؟`)) {
+            if(confirm('تأكيد حذف الفاتورة الآجلة؟')) {
                 db.debtInvoices = db.debtInvoices.filter(x => x.id !== id);
                 saveDB();
                 renderDebtInvoicesTable();
@@ -1925,6 +1748,7 @@
 
         function handleSaveVoucher(e) {
             e.preventDefault();
+            if(!db.vouchers) db.vouchers = [];
             const newVoucher = {
                 id: Date.now().toString(),
                 type: document.getElementById('vType').value,
@@ -1937,14 +1761,12 @@
             db.vouchers.unshift(newVoucher);
             saveDB();
             document.getElementById('voucherForm').reset();
-            document.getElementById('vDate').value = new Date().toISOString().split('T')[0];
             renderVouchersTable();
             renderFinancials();
-            alert('تم حفظ السند المالي بنجاح!');
         }
 
         function deleteVoucher(id) {
-            if(confirm('تأكيد حذف هذا السند المالي؟')) {
+            if(confirm('تأكيد حذف السند؟')) {
                 db.vouchers = db.vouchers.filter(v => v.id !== id);
                 saveDB();
                 renderVouchersTable();
@@ -1955,9 +1777,8 @@
         function renderVouchersTable() {
             const tbody = document.querySelector('#vouchersTable tbody');
             tbody.innerHTML = '';
-
             if(!db.vouchers || db.vouchers.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-zinc-500 py-4">لا توجد سندات قبض أو صرف مسجلة حتى الآن</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-zinc-500 py-4">لا توجد سندات مسجلة</td></tr>`;
                 return;
             }
 
@@ -1965,7 +1786,7 @@
                 const isReceipt = v.type === 'قبض';
                 tbody.insertRow().innerHTML = `
                     <td>${idx + 1}</td>
-                    <td><span class="px-2 py-0.5 rounded text-xs font-bold ${isReceipt ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-red-950 text-red-400 border border-red-800'}">${v.type}</span></td>
+                    <td><span class="px-2 py-0.5 rounded text-xs font-bold ${isReceipt ? 'bg-emerald-950 text-emerald-400' : 'bg-red-950 text-red-400'}">${v.type}</span></td>
                     <td>${v.date}</td>
                     <td><strong>${v.desc}</strong></td>
                     <td><strong class="${isReceipt ? 'text-emerald-400' : 'text-red-400'}">${v.amount} AED</strong></td>
@@ -1978,15 +1799,13 @@
         function renderTrustsTable() {
             const tbody = document.querySelector('#trustsTable tbody');
             tbody.innerHTML = '';
-            
             if (!db.cargo || db.cargo.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-zinc-500 py-6">لا توجد فواتير شحن مسجلة لعرضها في كشف الأمانات</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-zinc-500 py-6">لا توجد أمانات مسجلة</td></tr>`;
                 return;
             }
 
             db.cargo.forEach(c => {
-                const itemsSummary = c.items ? c.items.map(i => `${i.name} (${i.qty})`).join('، ') : 'أمتعة متنوعة';
-
+                const itemsSummary = c.items ? c.items.map(i => `${i.name} (${i.qty})`).join('، ') : '';
                 tbody.insertRow().innerHTML = `
                     <td><strong class="text-gold">#${c.id}</strong></td>
                     <td>${c.destination}</td>
@@ -2006,7 +1825,7 @@
             const logs = item.logs || [];
             const container = document.getElementById('logsContent');
             if(logs.length === 0) {
-                container.innerHTML = `<p class="text-zinc-500 text-center py-4">لا توجد سجلات تعديل سابقة.</p>`;
+                container.innerHTML = `<p class="text-zinc-500 text-center py-4">لا توجد سجلات تعديل.</p>`;
             } else {
                 container.innerHTML = logs.map(l => `
                     <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-xl space-y-1">
@@ -2024,138 +1843,15 @@
         function closeLogsModal() { document.getElementById('logsOverlay').classList.add('hidden'); }
 
         function renderFinancials() {
-            const tSum = db.passengers.reduce((s, p) => s + (p.fare || 0), 0);
-            const cSum = db.cargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + c.grandTotal, 0);
-            const vReceipts = db.vouchers.filter(v => v.type === 'قبض').reduce((s, v) => s + v.amount, 0);
-            const vExpenses = db.vouchers.filter(v => v.type === 'صرف').reduce((s, v) => s + v.amount, 0);
+            const tSum = (db.passengers || []).reduce((s, p) => s + (p.fare || 0), 0);
+            const cSum = (db.cargo || []).filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + c.grandTotal, 0);
+            const vReceipts = (db.vouchers || []).filter(v => v.type === 'قبض').reduce((s, v) => s + v.amount, 0);
+            const vExpenses = (db.vouchers || []).filter(v => v.type === 'صرف').reduce((s, v) => s + v.amount, 0);
 
             document.getElementById('finTicketsSum').innerText = `${tSum} AED`;
             document.getElementById('finCargoSum').innerText = `${cSum} AED`;
             document.getElementById('finExpensesSum').innerText = `${vExpenses} AED`;
             document.getElementById('finNetBoxSum').innerText = `${(tSum + cSum + vReceipts) - vExpenses} AED`;
-
-            const debtsCargoTbody = document.querySelector('#debtsCargoTable tbody');
-            debtsCargoTbody.innerHTML = '';
-            let cargoDebtSum = 0;
-            let unpaidCargoCount = 0;
-
-            db.cargo.forEach(c => {
-                if(c.paymentStatus !== 'مدفوع') {
-                    cargoDebtSum += c.grandTotal;
-                    unpaidCargoCount++;
-                    debtsCargoTbody.insertRow().innerHTML = `
-                        <td><strong class="text-gold">#${c.id}</strong></td>
-                        <td>${c.sender}</td>
-                        <td><strong class="text-amber-400">${c.senderPhone}</strong></td>
-                        <td><strong>${c.grandTotal} AED</strong></td>
-                        <td>${c.tripDate}</td>
-                    `;
-                }
-            });
-
-            if(unpaidCargoCount === 0) {
-                debtsCargoTbody.innerHTML = `<tr><td colspan="5" class="text-center text-zinc-500 py-3">لا توجد فواتير شحن غير مدفوعة</td></tr>`;
-            }
-
-            const debtsTicketsTbody = document.querySelector('#debtsTicketsTable tbody');
-            debtsTicketsTbody.innerHTML = '';
-            let ticketDebtSum = 0;
-            let unpaidTicketCount = 0;
-
-            db.passengers.forEach(p => {
-                if(p.payMethod !== 'مدفوع') {
-                    const totalTktFare = p.fare || 0;
-                    ticketDebtSum += totalTktFare;
-                    unpaidTicketCount++;
-                    debtsTicketsTbody.insertRow().innerHTML = `
-                        <td><strong class="text-gold">#${p.id}</strong></td>
-                        <td>${p.passengerCount || 1}</td>
-                        <td><strong class="text-emerald-400">${p.agent || '-'}</strong></td>
-                        <td><strong>${totalTktFare} AED</strong></td>
-                        <td>${p.tripDate}</td>
-                    `;
-                }
-            });
-
-            if(unpaidTicketCount === 0) {
-                debtsTicketsTbody.innerHTML = `<tr><td colspan="5" class="text-center text-zinc-500 py-3">لا توجد تذاكر ركاب غير مدفوعة</td></tr>`;
-            }
-        }
-
-        function exportBackupJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
-            const dl = document.createElement('a');
-            dl.setAttribute("href", dataStr);
-            dl.setAttribute("download", `WadiBina_Backup_${new Date().toISOString().split('T')[0]}.json`);
-            dl.click();
-        }
-
-        function importBackupJSON(event) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if(imported && imported.passengers) {
-                        db = imported;
-                        if(!db.vouchers) db.vouchers = [];
-                        if(!db.debtInvoices) db.debtInvoices = [];
-                        saveDB();
-                        alert('تم استرجاع النسخة الاحتياطية بنجاح!');
-                        location.reload();
-                    }
-                } catch(err) { alert('خطأ في ملف النسخة الاحتياطية'); }
-            };
-            reader.readAsText(event.target.files[0]);
-        }
-
-        function exportExcel(type) {
-            let data = [];
-            if(type === 'passengers') {
-                data = db.passengers.map(p => ({
-                    'البوليصة': `#${p.id}`,
-                    'اسم الوكيل': p.agent || '',
-                    'عدد الركاب': p.passengerCount || 1,
-                    'اسم المسافر': p.name,
-                    'رقم الهاتف': p.phone,
-                    'رقم الجواز': p.passport,
-                    'محطة الصعود': p.origin,
-                    'جهة الوصول': p.destination,
-                    'تاريخ الرحلة': p.tripDate,
-                    'وقت الحضور': p.reportingTime || '',
-                    'المبلغ الإجمالي': p.fare || 0,
-                    'حالة السداد': p.payMethod
-                }));
-            } else if(type === 'cargo') {
-                data = db.cargo.map(c => ({
-                    'الفاتورة': `#${c.id}`,
-                    'تاريخ الاستلام': c.date,
-                    'تاريخ الرحلة': c.tripDate,
-                    'اسم المرسل': c.sender,
-                    'عنوان المرسل': c.senderOrigin || 'عجمان',
-                    'هاتف المرسل': c.senderPhone,
-                    'اسم المستلم': c.receiver,
-                    'عنوان المستلم': c.destination,
-                    'هاتف المستلم': c.receiverPhone,
-                    'المبلغ الإجمالي': c.grandTotal,
-                    'حالة السداد': c.paymentStatus
-                }));
-            } else if(type === 'trusts') {
-                data = db.cargo.map(c => ({
-                    'المرجع (رقم الفاتورة)': `#${c.id}`,
-                    'مكان الاستلام': c.destination,
-                    'المستلم': c.receiver,
-                    'رقم المستلم': c.receiverPhone,
-                    'المحتوى': c.items ? c.items.map(i => `${i.name} (${i.qty})`).join(', ') : '',
-                    'المبلغ': `${c.grandTotal} AED`,
-                    'جهة الدفع': c.paymentStatus
-                }));
-            }
-
-            if(data.length === 0) { alert('لا توجد بيانات للتصدير'); return; }
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, type);
-            XLSX.writeFile(wb, `WadiBina_${type}_Report.xlsx`);
         }
     </script>
 </body>
