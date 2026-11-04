@@ -25,7 +25,7 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     
-    <!-- Firebase App & Database (v8) -->
+    <!-- Firebase App (v8 / Modular compatible scripts or v9 CDN) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -1029,12 +1029,14 @@
                         nextDebtInvNo: val.nextDebtInvNo || 118
                     };
                 } else {
+                    // Seed initial data if empty
                     saveDBToFirebase();
                 }
 
                 statusEl.className = "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1.5 rounded-xl text-[10px] font-bold flex items-center gap-1";
                 statusEl.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> متصل بالسحابة`;
 
+                // Update UI views
                 handleGlobalSearch();
                 if(currentTab === 'financials') {
                     renderFinancials();
@@ -1845,6 +1847,7 @@
             }
         }
 
+        // DEBT INVOICES & REGISTER FUNCTIONS
         function renderDebtInvRows() {
             const container = document.getElementById('debtInvRowsContainer');
             container.innerHTML = '';
@@ -2208,4 +2211,3 @@
     </script>
 </body>
 </html>
-```[cite: 4]
