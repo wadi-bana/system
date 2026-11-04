@@ -860,14 +860,361 @@
             }
         }
 
+        // قاعدة البيانات الأولية مدمجة بالبيانات الفعلية من ملف النسخة الاحتياطية
         let db = {
-            passengers: [],
-            cargo: [],
-            vouchers: [],
-            debtInvoices: [],
-            nextTicketNo: 118,
-            nextCargoNo: 118,
-            nextDebtInvNo: 118
+          "passengers": [
+            {
+              "id": "114",
+              "agent": "خالد",
+              "passengerCount": 1,
+              "name": "عيسى محمد عبدالله محمد النهمي",
+              "passport": "17038593",
+              "phone": "05029205559",
+              "extraPassengers": [],
+              "origin": "عجمان",
+              "destination": "عدن",
+              "tripDate": "2026-11-08",
+              "reportingTime": "2026-11-08 (4:00 عصراً)",
+              "fare": 350,
+              "payMethod": "الدفع عند الباص",
+              "logs": [
+                { "user": "محمود", "time": "٤/١١/٢٠٢٦، ٢:٣٨:١٨ م", "action": "إصدار التذكرة لأول مرة" },
+                { "user": "محمود", "time": "٤/١١/٢٠٢٦، ٢:٣٨:٣٠ م", "action": "تعديل بيانات التذكرة" }
+              ]
+            },
+            {
+              "id": "113",
+              "agent": "أبو خالد",
+              "passengerCount": 1,
+              "name": "عارف علي مقبل العامري",
+              "passport": "12903786",
+              "phone": "0559906116",
+              "extraPassengers": [],
+              "origin": "عجمان",
+              "destination": "عدن",
+              "tripDate": "2026-11-08",
+              "reportingTime": "2026-11-08 (4:00 عصراً)",
+              "fare": 350,
+              "payMethod": "الدفع عند الباص",
+              "logs": [{ "user": "محمود", "time": "٤/١١/٢٠٢٦، ١:٠٠:٤٦ م", "action": "إصدار التذكرة لأول مرة" }]
+            },
+            {
+              "id": "112",
+              "agent": "أبو خالد",
+              "passengerCount": 1,
+              "name": "عبدالرحمن البذنوحي",
+              "passport": "17200855",
+              "phone": "0563611229",
+              "extraPassengers": [],
+              "origin": "بني ياس",
+              "destination": "عدن",
+              "tripDate": "2026-11-08",
+              "reportingTime": "2026-11-08 (7:30 مساءً)",
+              "fare": 350,
+              "payMethod": "الدفع عند الباص",
+              "logs": [{ "user": "محمود", "time": "٣/١١/٢٠٢٦، ٥:٥٤:٣١ م", "action": "إصدار التذكرة لأول مرة" }]
+            },
+            {
+              "id": "111",
+              "agent": "أبوشهاب",
+              "passengerCount": 1,
+              "name": "اقبال عبدالله سالم ",
+              "passport": "09896049",
+              "phone": "0559322600",
+              "extraPassengers": [],
+              "origin": "بني ياس",
+              "destination": "المكلا",
+              "tripDate": "2026-11-08",
+              "reportingTime": "2026-11-08 (7:30 مساءً)",
+              "fare": 350,
+              "payMethod": "الدفع عند الباص",
+              "logs": [{ "user": "محمود", "time": "٣/١١/٢٠٢٦، ٢:٢٠:١٨ م", "action": "إصدار التذكرة لأول مرة" }]
+            },
+            {
+              "id": "110",
+              "agent": "أبو خالد",
+              "passengerCount": 1,
+              "name": "فهد عيسى عامرعلي كبرهي",
+              "passport": "15358352",
+              "phone": "0501637817",
+              "extraPassengers": [],
+              "origin": "عجمان",
+              "destination": "عدن",
+              "tripDate": "2026-11-08",
+              "reportingTime": "2026-11-08 (4:00 عصراً)",
+              "fare": 350,
+              "payMethod": "مدفوع",
+              "logs": [
+                { "user": "محمود", "time": "٣/١١/٢٠٢٦، ٢:١٦:١٢ م", "action": "إصدار التذكرة لأول مرة" },
+                { "user": "محمود", "time": "٣/١١/٢٠٢٦، ٢:١٨:٣٤ م", "action": "تعديل بيانات التذكرة" },
+                { "user": "محمود", "time": "٣/١١/٢٠٢٦، ٥:٤٦:٤٠ م", "action": "تعديل بيانات التذكرة" }
+              ]
+            },
+            {
+              "id": "109",
+              "agent": "أبو خالد",
+              "passengerCount": 1,
+              "name": "نعيمة عوض سليمان",
+              "passport": "11186508",
+              "phone": "0556166311",
+              "extraPassengers": [],
+              "origin": "بني ياس",
+              "destination": "عدن",
+              "tripDate": "2026-11-08",
+              "reportingTime": "2026-11-08 (7:30 مساءً)",
+              "fare": 350,
+              "payMethod": "مدفوع",
+              "logs": [{ "user": "محمود", "time": "٣/١١/٢٠٢٦، ٢:١٣:٣٢ م", "action": "إصدار التذكرة لأول مرة" }]
+            },
+            {
+              "id": "108",
+              "agent": "أبو خالد",
+              "passengerCount": 1,
+              "name": "صفاء عبد الله محمد النصيري",
+              "passport": "13546330",
+              "phone": "0544755036",
+              "extraPassengers": [],
+              "origin": "عجمان",
+              "destination": "عدن",
+              "tripDate": "2026-11-08",
+              "reportingTime": "2026-11-08 (4:00 عصراً)",
+              "fare": 400,
+              "payMethod": "مدفوع",
+              "logs": [{ "user": "محمود", "time": "٢/١١/٢٠٢٦، ١١:٠٩:٢٦ م", "action": "إصدار التذكرة لأول مرة" }]
+            },
+            {
+              "id": "107",
+              "agent": "أبو خالد",
+              "passengerCount": 1,
+              "name": "ترنا محمد البيضاني",
+              "passport": "17681575",
+              "phone": "0544755036",
+              "extraPassengers": [],
+              "origin": "عجمان",
+              "destination": "عدن",
+              "tripDate": "2026-11-29",
+              "reportingTime": "2026-11-29 (4:00 عصراً)",
+              "fare": 430,
+              "payMethod": "الدفع عند الباص",
+              "logs": [{ "user": "محمود", "time": "٢/١١/٢٠٢٦، ١١:٠٠:٠٣ م", "action": "إصدار التذكرة لأول مرة" }]
+            },
+            {
+              "id": "106",
+              "agent": "أبوشهاب",
+              "passengerCount": 1,
+              "name": "جميلة محمد احمد عكيش",
+              "passport": "17090616",
+              "phone": "0544755036",
+              "extraPassengers": [],
+              "origin": "عبري",
+              "destination": "عدن",
+              "tripDate": "2026-11-08",
+              "reportingTime": "2026-11-09 (1:30 صباحاً)",
+              "fare": 350,
+              "payMethod": "الدفع عند الباص",
+              "logs": [
+                { "user": "محمود", "time": "٢/١١/٢٠٢٦، ١٠:٥٧:٥٤ م", "action": "إصدار التذكرة لأول مرة" },
+                { "user": "محمود", "time": "٢/١١/٢٠٢٦، ١١:١٦:٣٧ م", "action": "تعديل بيانات التذكرة" }
+              ]
+            },
+            {
+              "id": "105",
+              "agent": "أبوشهاب",
+              "passengerCount": 1,
+              "name": "نور عبدالله على يحي",
+              "passport": "09618725",
+              "phone": "0544755036",
+              "extraPassengers": [],
+              "origin": "عبري",
+              "destination": "عدن",
+              "tripDate": "2026-11-08",
+              "reportingTime": "2026-11-09 (1:30 صباحاً)",
+              "fare": 350,
+              "payMethod": "الدفع عند الباص",
+              "logs": [
+                { "user": "محمود", "time": "٢/١١/٢٠٢٦، ١٠:٥٦:٥٣ م", "action": "إصدار التذكرة لأول مرة" },
+                { "user": "محمود", "time": "٢/١١/٢٠٢٦، ١١:٠٩:٣٨ م", "action": "تعديل بيانات التذكرة" }
+              ]
+            },
+            {
+              "id": "104",
+              "agent": "أبوشهاب",
+              "passengerCount": 1,
+              "name": "حنان حسن سالم محمد البري",
+              "passport": "11374253",
+              "phone": "0544755036",
+              "extraPassengers": [],
+              "origin": "عبري",
+              "destination": "عدن",
+              "tripDate": "2026-11-08",
+              "reportingTime": "2026-11-09 (1:30 صباحاً)",
+              "fare": 400,
+              "payMethod": "الدفع عند الباص",
+              "logs": [{ "user": "محمود", "time": "٢/١١/٢٠٢٦، ١٠:٥٥:٤٣ م", "action": "إصدار التذكرة لأول مرة" }]
+            },
+            {
+              "id": "103",
+              "agent": "أبو خالد",
+              "passengerCount": 6,
+              "name": "عائدة علي شيخ سعيد السنيدي",
+              "passport": "17568571",
+              "phone": "0529008186",
+              "extraPassengers": [
+                { "name": "مها سمير صالح زين احمد", "passport": "17568574" },
+                { "name": "مصطفى سمير صالح زين احمد", "passport": "17568570" },
+                { "name": "احمد سمير صالح زين احمد", "passport": "17568572" },
+                { "name": "أريج سمير صالح زين احمد", "passport": "17568575" },
+                { "name": "يعقوب سمير صالح زين احمد", "passport": "17568573" }
+              ],
+              "origin": "عجمان",
+              "destination": "عدن",
+              "tripDate": "2026-11-08",
+              "reportingTime": "2026-11-08 (4:00 عصراً)",
+              "fare": 1750,
+              "payMethod": "الدفع عند الباص",
+              "logs": [{ "user": "محمود", "time": "٢/١١/٢٠٢٦، ١٠:٥٣:٢٧ م", "action": "إصدار التذكرة لأول مرة" }]
+            },
+            {
+              "id": "102",
+              "agent": "أبوشهاب",
+              "passengerCount": 1,
+              "name": "سونيا محمد يحي",
+              "passport": "10966601",
+              "phone": "0544755036",
+              "extraPassengers": [],
+              "origin": "عبري",
+              "destination": "عدن",
+              "tripDate": "2026-11-08",
+              "reportingTime": "2026-11-09 (1:30 صباحاً)",
+              "fare": 300,
+              "payMethod": "الدفع عند الباص",
+              "logs": [{ "user": "محمود", "time": "٢/١١/٢٠٢٦، ١٠:٤٧:٥٨ م", "action": "إصدار التذكرة لأول مرة" }]
+            },
+            {
+              "id": "101",
+              "agent": "أبوشهاب",
+              "passengerCount": 1,
+              "name": "كاميليا محمد يحي",
+              "passport": "14269384",
+              "phone": "0544755036",
+              "extraPassengers": [],
+              "origin": "عبري",
+              "destination": "عدن",
+              "tripDate": "2026-11-08",
+              "reportingTime": "2026-11-09 (1:30 صباحاً)",
+              "fare": 350,
+              "payMethod": "الدفع عند الباص",
+              "logs": [{ "user": "محمود", "time": "٢/١١/٢٠٢٦، ١٠:٤٦:٥٢ م", "action": "إصدار التذكرة لأول مرة" }]
+            },
+            {
+              "id": "100",
+              "name": "علي حيدره ناصر جرفيل",
+              "passport": "17200685",
+              "phone": "0544755036",
+              "origin": "عبري",
+              "destination": "عدن",
+              "tripDate": "2026-11-08",
+              "reportingTime": "2026-11-09 (1:30 صباحاً)",
+              "fare": 350,
+              "payMethod": "الدفع عند الباص",
+              "logs": [
+                { "user": "محمود", "time": "٣١/١٠/٢٠٢٦، ٩:٣٠:١٤ م", "action": "تعديل بيانات التذكرة" },
+                { "user": "محمود", "time": "٢/١١/٢٠٢٦، ٩:١٨:٤٧ م", "action": "تعديل بيانات التذكرة" },
+                { "user": "محمود", "time": "٢/١١/٢٠٢٦، ٩:٥٠:٢١ م", "action": "تعديل بيانات التذكرة" },
+                { "user": "محمود", "time": "٢/١١/٢٠٢٦، ١٠:٤٣:٢٣ م", "action": "تعديل بيانات التذكرة" },
+                { "user": "محمود", "time": "٢/١١/٢٠٢٦، ١٠:٤٤:٠١ م", "action": "تعديل بيانات التذكرة" }
+              ],
+              "agent": "أبوشهاب",
+              "passengerCount": 1,
+              "extraPassengers": []
+            }
+          ],
+          "cargo": [
+            {
+              "id": "120",
+              "date": "2026-11-03",
+              "tripDate": "2026-11-08",
+              "sender": "احمد ايهاب",
+              "senderOrigin": "عجمان",
+              "senderPhone": "0581238889",
+              "receiver": "عبدالله المقطري",
+              "destination": "عدن",
+              "receiverPhone": "0780547866",
+              "paymentStatus": "الدفع باليمن",
+              "grandTotal": 100,
+              "items": [{ "name": "كيس", "qty": 1, "price": 100 }],
+              "logs": [
+                { "user": "محمود", "time": "٣/١١/٢٠٢٦، ٧:٣٠:٤٥ م", "action": "إنشاء الفاتورة لأول مرة" },
+                { "user": "محمود", "time": "٣/١١/٢٠٢٦، ٧:٣٢:٠٨ م", "action": "تعديل فاتورة الشحن" }
+              ]
+            },
+            {
+              "id": "119",
+              "date": "2026-11-02",
+              "tripDate": "2026-11-08",
+              "sender": "ايمن عامر النهدي",
+              "senderOrigin": "عجمان",
+              "senderPhone": "0543235369",
+              "receiver": "امين صالح حسن حسين المدوري",
+              "destination": "عدن",
+              "receiverPhone": "0776648487",
+              "paymentStatus": "الدفع باليمن",
+              "grandTotal": 100,
+              "items": [{ "name": "كيس فيه قطع غيار", "qty": 1, "price": 100 }],
+              "logs": [{ "user": "محمود", "time": "٢/١١/٢٠٢٦، ١١:٥٩:٥٠ م", "action": "إنشاء الفاتورة لأول مرة" }]
+            },
+            {
+              "id": "118",
+              "date": "2026-11-02",
+              "tripDate": "2026-11-08",
+              "sender": "معتز علي الكندي",
+              "senderPhone": "0529004155",
+              "origin": "عجمان",
+              "receiver": "احمد حسام المنصري",
+              "receiverPhone": "0771420348",
+              "destination": "عدن",
+              "paymentStatus": "مدفوع",
+              "grandTotal": 300,
+              "items": [{ "name": "سله", "qty": 1, "price": 300 }],
+              "logs": [{ "user": "محمود", "time": "٢/١١/٢٠٢٦، ١٠:٤٩:٣٤ م", "action": "تعديل فاتورة الشحن" }],
+              "senderOrigin": "عجمان"
+            }
+          ],
+          "nextTicketNo": 115,
+          "nextCargoNo": 121,
+          "vouchers": [],
+          "debtInvoices": [
+            {
+              "id": "2",
+              "date": "2026-11-04",
+              "name": "محمد توفيق الشيباني",
+              "phone": "0780181514",
+              "address": "عدن",
+              "items": [{ "refNo": "413", "details": "شحن أمتعة وطرود", "amount": 200 }],
+              "subTotal": 200,
+              "paidAmount": 0,
+              "netTotal": 200,
+              "user": "محمود"
+            },
+            {
+              "id": "1",
+              "date": "2026-11-03",
+              "name": "عبدالله الوالي",
+              "phone": "050000000",
+              "address": "عجمان",
+              "items": [
+                { "refNo": "119", "details": "7كراتين", "amount": 1150 },
+                { "refNo": "108", "details": "3كراتين بلاط", "amount": 250 },
+                { "refNo": "290", "details": "2كرتون", "amount": 500 },
+                { "refNo": "0046", "details": "3كرتون+طبليه بلاط", "amount": 1300 }
+              ],
+              "subTotal": 3200,
+              "paidAmount": 0,
+              "netTotal": 3200,
+              "user": "محمود"
+            }
+          ],
+          "nextDebtInvNo": 120
         };
 
         // دالة الحفظ السحابي
@@ -943,7 +1290,7 @@
         });
 
         let currentTab = 'passengers';
-        let activeTripDate = new Date().toISOString().split('T')[0];
+        let activeTripDate = '2026-11-08'; // تم ضبط التاريخ الافتراضي ليطابق رحلة الحجوزات القادمة
         let cargoFormItems = [{ name: 'كرتون أمتعة', qty: 1, price: 150 }];
         let debtInvFormRows = [{ refNo: '', details: 'شحن أمتعة وطرود', amount: 0 }];
 
@@ -952,8 +1299,8 @@
             initTripDateFilter();
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('cargoDate').value = today;
-            document.getElementById('cargoTripDate').value = today;
-            document.getElementById('passTripDate').value = today;
+            document.getElementById('cargoTripDate').value = '2026-11-08';
+            document.getElementById('passTripDate').value = '2026-11-08';
             document.getElementById('vDate').value = today;
             document.getElementById('debtInvDate').value = today;
             
@@ -1410,7 +1757,7 @@
             document.getElementById('passengerForm').reset();
             document.getElementById('passEditId').value = '';
             document.getElementById('passCount').value = '1';
-            document.getElementById('passTripDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('passTripDate').value = '2026-11-08';
             updateReportingTimeAutomatically();
             calcTicketTotal();
             document.getElementById('passFormTitle').innerText = `حجز وإصدار تذكرة سفر جديدة`;
@@ -1769,3 +2116,4 @@
     </script>
 </body>
 </html>
+```[cite: 3]
