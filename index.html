@@ -174,7 +174,7 @@
         </div>
     </div>
 
-    <!-- MANIFEST MODAL (تقرير رحلة شامل) -->
+    <!-- MANIFEST MODAL -->
     <div class="modal-overlay hidden" id="manifestModal">
         <div class="modal-card" style="max-width: 800px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
@@ -233,7 +233,7 @@
         </div>
     </div>
 
-    <!-- CARGO MANIFEST MODAL (كشف الأمانات والسامان الشامل) -->
+    <!-- CARGO MANIFEST MODAL -->
     <div class="modal-overlay hidden" id="cargoManifestModal">
         <div class="modal-card" style="max-width: 850px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
@@ -338,7 +338,7 @@
                     <i class="fa-solid fa-boxes-packing ml-1.5"></i> فواتير الشحن والأمتعة
                 </button>
                 <button onclick="switchTab('financials')" id="tab-financials" class="tab-btn px-6 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
-                    <i class="fa-solid fa-calculator ml-1.5"></i> الإدارة المالية وسندات القبض والصرف
+                    <i class="fa-solid fa-calculator ml-1.5"></i> الإدارة المالية والحسابات الآجلة
                 </button>
             </div>
         </div>
@@ -363,7 +363,6 @@
 
         <!-- SECTION 1: PASSENGERS -->
         <section id="module-passengers" class="tab-content space-y-6">
-            
             <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl flex flex-col sm:flex-row justify-between items-center gap-3">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-calendar-day text-gold text-lg"></i>
@@ -683,7 +682,7 @@
             </div>
         </section>
 
-        <!-- SECTION 3: FINANCIALS & VOUCHERS & TRUSTS & DEBT INVOICES -->
+        <!-- SECTION 3: FINANCIALS & DEBT REGISTER -->
         <section id="module-financials" class="tab-content hidden space-y-6">
             <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl">
@@ -704,7 +703,7 @@
                 </div>
             </div>
 
-            <!-- VOUCHERS SECTION (سندات القبض والصرف) -->
+            <!-- VOUCHERS SECTION -->
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3 flex-wrap gap-2">
                     <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-receipt ml-1"></i> سندات القبض والصرف المالية النثرية والتشغيلية</h3>
@@ -727,7 +726,7 @@
                         <input type="number" id="vAmount" required placeholder="0.00" class="w-full bg-zinc-900 border border-gold rounded-lg p-2 text-xs text-gold font-bold">
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="block text-[11px] text-zinc-400 mb-1">البيان / الوصف (مثال: رسوم طريق، ديزل، غسيل باص) *</label>
+                        <label class="block text-[11px] text-zinc-400 mb-1">البيان / الوصف (سبب السند) *</label>
                         <div class="flex gap-2">
                             <input type="text" id="vDesc" required placeholder="سبب السند بالتفصيل..." class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2 text-xs text-zinc-200">
                             <button type="submit" class="gold-gradient-bg text-black font-extrabold px-4 py-2 rounded-lg text-xs whitespace-nowrap shadow">حفظ السند</button>
@@ -753,15 +752,15 @@
                 </div>
             </div>
 
-            <!-- OTHER FINANCIAL TABS -->
+            <!-- OTHER FINANCIAL SUB-TABS -->
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3 flex-wrap gap-2">
                     <div class="flex gap-2 flex-wrap">
                         <button onclick="switchFinancialSubTab('debts')" id="subtab-debts" class="px-4 py-2 rounded-xl text-xs font-bold gold-gradient-bg text-black">
-                            <i class="fa-solid fa-file-invoice-dollar ml-1"></i> كشف الذمم والمديونيات
+                            <i class="fa-solid fa-file-invoice-dollar ml-1"></i> كشف وسجل الذمم والحسابات الآجلة
                         </button>
                         <button onclick="switchFinancialSubTab('create-debt-inv')" id="subtab-create-debt-inv" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-300 hover:text-gold">
-                            <i class="fa-solid fa-plus-circle ml-1"></i> إنشاء فاتورة حسابات آجل
+                            <i class="fa-solid fa-plus-circle ml-1"></i> إنشاء فاتورة حسابات آجل جديدة
                         </button>
                         <button onclick="switchFinancialSubTab('trusts')" id="subtab-trusts" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-300 hover:text-gold">
                             <i class="fa-solid fa-vault ml-1"></i> بند كشف الأمانات والسامان
@@ -773,10 +772,32 @@
                     </div>
                 </div>
 
-                <!-- SUB TAB 1: DEBTS LIST -->
+                <!-- SUB TAB 1: DEBTS REGISTER LIST -->
                 <div id="fin-sub-debts" class="space-y-6">
                     <div>
-                        <h4 class="text-xs font-bold text-gold mb-2"><i class="fa-solid fa-boxes-packing ml-1"></i> أولاً: فواتير الشحن غير المدفوعة</h4>
+                        <h4 class="text-xs font-bold text-gold mb-2"><i class="fa-solid fa-file-invoice-dollar ml-1"></i> أولاً: سجل فواتير الحسابات الآجلة المسجلة (Debt Invoices Register)</h4>
+                        <div class="overflow-x-auto">
+                            <table class="custom-table" id="debtInvoicesTable">
+                               <thead>
+                                    <tr>
+                                        <th>رقم الفاتورة</th>
+                                        <th>التاريخ</th>
+                                        <th>الاسم</th>
+                                        <th>رقم التلفون</th>
+                                        <th>العنوان</th>
+                                        <th>مجموع المبالغ</th>
+                                        <th>المبلغ المدفوع</th>
+                                        <th>الإجمالي المتبقي</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-zinc-800 pt-4">
+                        <h4 class="text-xs font-bold text-gold mb-2"><i class="fa-solid fa-boxes-packing ml-1"></i> ثانياً: فواتير الشحن غير المدفوعة (آجل شحن)</h4>
                         <div class="overflow-x-auto">
                             <table class="custom-table" id="debtsCargoTable">
                                <thead>
@@ -794,7 +815,7 @@
                     </div>
 
                     <div class="border-t border-zinc-800 pt-4">
-                        <h4 class="text-xs font-bold text-gold mb-2"><i class="fa-solid fa-ticket ml-1"></i> ثانياً: تذاكر الركاب غير المدفوعة</h4>
+                        <h4 class="text-xs font-bold text-gold mb-2"><i class="fa-solid fa-ticket ml-1"></i> ثالثاً: تذاكر الركاب غير المدفوعة (آجل تذاكر)</h4>
                         <div class="overflow-x-auto">
                             <table class="custom-table" id="debtsTicketsTable">
                                <thead>
@@ -810,28 +831,6 @@
                             </table>
                         </div>
                     </div>
-
-                    <div class="border-t border-zinc-800 pt-4">
-                        <h4 class="text-xs font-bold text-gold mb-2"><i class="fa-solid fa-file-invoice-dollar ml-1"></i> ثالثاً: سجل فواتير الحسابات الآجلة المسجلة</h4>
-                        <div class="overflow-x-auto">
-                            <table class="custom-table" id="debtInvoicesTable">
-                               <thead>
-                                    <tr>
-                                        <th>رقم الفاتورة</th>
-                                        <th>التاريخ</th>
-                                        <th>الاسم</th>
-                                        <th>رقم التلفون</th>
-                                        <th>العنوان</th>
-                                        <th>مجموع التذاكر/الفواتير</th>
-                                        <th>المبلغ المدفوع</th>
-                                        <th>الإجمالي المتبقي</th>
-                                        <th>الإجراءات</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- SUB TAB 2: CREATE DEBT INVOICE FORM -->
@@ -839,7 +838,7 @@
                     <div class="bg-darkbg p-5 rounded-xl border border-gold space-y-4">
                         <h3 class="text-gold font-bold text-sm border-b border-zinc-800 pb-2 flex items-center justify-between">
                             <span><i class="fa-solid fa-file-invoice-dollar ml-1"></i> نموذج إنشاء فاتورة حسابات آجل جديد</span>
-                            <span class="text-xs text-zinc-400">تستخدم للعملاء وأصحاب الحسابات الآجلة</span>
+                            <span class="text-xs text-zinc-400">تُضاف الفاتورة تلقائياً إلى السجل فور حفظها</span>
                         </h3>
 
                         <form id="debtInvoiceForm" onsubmit="handleSaveDebtInvoice(event)" class="space-y-4">
@@ -867,10 +866,10 @@
                                 <input type="text" id="debtInvCustomerAddress" required placeholder="المدينة / المنطقة / المحطة" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-200">
                             </div>
 
-                            <!-- ROWS OF ITEMS (رقم الفاتورة او التذكرة - تفاصيل - المبلغ) -->
+                            <!-- ROWS OF ITEMS -->
                             <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800 space-y-3">
                                 <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
-                                    <span class="text-xs font-bold text-gold"><i class="fa-solid fa-list-ol ml-1"></i> جدول مديونيات الفاتورة (التذاكر والفواتير الحالية)</span>
+                                    <span class="text-xs font-bold text-gold"><i class="fa-solid fa-list-ol ml-1"></i> جدول مديونيات الفاتورة (الأعمدة: رقم الفاتورة أو التذكرة - التفاصيل - المبلغ)</span>
                                     <button type="button" onclick="addDebtInvRow()" class="text-xs text-gold hover:underline font-bold"><i class="fa-solid fa-plus-circle ml-1"></i> إضافة بند جديد</button>
                                 </div>
                                 <div id="debtInvRowsContainer" class="space-y-2"></div>
@@ -1791,7 +1790,7 @@
             }
         }
 
-        // DEBT INVOICES FUNCTIONS (فواتير الحسابات الآجلة)
+        // DEBT INVOICES & REGISTER FUNCTIONS
         function renderDebtInvRows() {
             const container = document.getElementById('debtInvRowsContainer');
             container.innerHTML = '';
@@ -1873,7 +1872,7 @@
             }
 
             saveDB();
-            alert(`تم حفظ فاتورة الحساب الآجل #${invNo} بنجاح!`);
+            alert(`تم إضافة فاتورة الحساب الآجل #${invNo} بنجاح وتسجيلها في سجل الذمم!`);
             resetDebtInvoiceForm();
             switchFinancialSubTab('debts');
         }
@@ -1891,7 +1890,7 @@
             tbody.innerHTML = '';
 
             if (!db.debtInvoices || db.debtInvoices.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="text-center text-zinc-500 py-4">لا توجد فواتير حسابات آجلة مسجلة حتى الآن</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center text-zinc-500 py-4">لا توجد فواتير حسابات آجلة مسجلة في السجل حتى الآن</td></tr>`;
                 return;
             }
 
@@ -1907,8 +1906,8 @@
                     <td><strong class="text-amber-300 font-black">${inv.netTotal} AED</strong></td>
                     <td>
                         <div class="flex items-center gap-1">
-                            <button onclick="previewDebtInvoiceAsImage('${inv.id}')" title="معاينة كصورة" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-image"></i></button>
-                            <button onclick="deleteDebtInvoice('${inv.id}')" title="حذف" class="bg-red-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="previewDebtInvoiceAsImage('${inv.id}')" title="معاينة الفاتورة كصورة" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-image"></i></button>
+                            <button onclick="deleteDebtInvoice('${inv.id}')" title="حذف الفاتورة من السجل" class="bg-red-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </td>
                 `;
@@ -1916,7 +1915,7 @@
         }
 
         function deleteDebtInvoice(id) {
-            if(confirm(`تأكيد حذف فاتورة الحساب الآجل #${id}؟`)) {
+            if(confirm(`تأكيد حذف فاتورة الحساب الآجل #${id} من السجل؟`)) {
                 db.debtInvoices = db.debtInvoices.filter(x => x.id !== id);
                 saveDB();
                 renderDebtInvoicesTable();
