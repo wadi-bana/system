@@ -39,7 +39,7 @@
         .custom-table th { background: rgba(255, 255, 255, 0.03); color: var(--gold-primary); padding: 10px; border-bottom: 2px solid var(--border-color); white-space: nowrap; }
         .custom-table td { padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(9, 9, 11, 0.92); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-card { background: var(--bg-card); border: 2px solid var(--gold-primary); border-radius: 16px; padding: 25px; width: 100%; max-width: 650px; box-shadow: 0 15px 35px rgba(212, 175, 55, 0.2); position: relative; max-height: 90vh; overflow-y: auto; }
+        .modal-card { background: var(--bg-card); border: 2px solid var(--gold-primary); border-radius: 16px; padding: 25px; width: 100%; max-width: 750px; box-shadow: 0 15px 35px rgba(212, 175, 55, 0.2); position: relative; max-height: 90vh; overflow-y: auto; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         @media print {
             body { background: white !important; color: black !important; }
@@ -76,7 +76,7 @@
     <div class="modal-overlay hidden" id="ticketPreviewModal">
         <div class="modal-card" style="max-width: 700px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-ticket ml-1"></i> معاينة وتنزيل بوليصة التذكرة (مع الركاب الإضافيين)</h3>
+                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-ticket ml-1"></i> معاينة وتنزيل بوليصة التذكرة</h3>
                 <button onclick="closeModal('ticketPreviewModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div id="ticketCaptureArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl font-['Cairo']">
@@ -107,34 +107,68 @@
         </div>
     </div>
 
-    <!-- PREVIEW CARGO MODAL -->
+    <!-- PREVIEW CARGO MODAL (Matched to exact requested format) -->
     <div class="modal-overlay hidden" id="cargoPreviewModal">
-        <div class="modal-card" style="max-width: 700px;">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-boxes-packing ml-1"></i> معاينة وتنزيل فاتورة الشحن</h3>
+        <div class="modal-card" style="max-width: 750px;">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
+                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-boxes-packing ml-1"></i> معاينة وتنزيل فاتورة الشحن والأصناف</h3>
                 <button onclick="closeModal('cargoPreviewModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div id="cargoCaptureArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl font-['Cairo']">
-                <div class="flex justify-between items-center border-b-2 border-slate-300 pb-3 mb-4">
-                    <div class="flex items-center gap-3">
-                        <img src="logo_2.jpeg" alt="شعار الشركة" class="w-14 h-14 object-cover rounded-full border border-indigo-600 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
-                        <div>
-                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل البري</h2>
-                            <p class="text-[11px] text-slate-500">فاتورة استلام أمتعة وبضائع ومحتوى</p>
-                        </div>
-                    </div>
-                    <div class="text-left">
-                        <strong id="imgCargoCode" class="text-lg font-black text-indigo-600">#118</strong>
+                <!-- Top Header -->
+                <div class="flex justify-between items-start border-b-2 border-slate-300 pb-3 mb-4">
+                    <div>
+                        <strong id="imgCargoCode" class="text-xl font-black text-indigo-700">#119</strong>
                         <p class="text-[11px] text-slate-500 font-bold">Cargo Shipping Invoice</p>
                     </div>
+                    <div class="text-left flex items-center gap-3">
+                        <div>
+                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل البري</h2>
+                            <p class="text-[11px] text-slate-500">فاتورة استلام أمتعة وبضائع</p>
+                        </div>
+                        <img src="logo_2.jpeg" alt="شعار الشركة" class="w-12 h-12 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/50?text=Logo'">
+                    </div>
                 </div>
-                <div id="imgCargoBody" class="space-y-3 text-xs"></div>
-                <div class="mt-6 pt-3 border-t border-dashed border-slate-300 flex justify-between items-center text-[11px] text-slate-500">
+
+                <!-- Sender/Receiver Info Box -->
+                <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 text-xs space-y-1 mb-4">
+                    <div class="flex justify-between flex-wrap gap-2">
+                        <div><strong class="text-slate-700">المرسل:</strong> <span id="imgCargoSender" class="font-bold text-slate-900"></span></div>
+                        <div><strong class="text-slate-700">المستلم:</strong> <span id="imgCargoReceiver" class="font-bold text-slate-900"></span></div>
+                    </div>
+                    <div class="flex justify-between flex-wrap gap-2 pt-1 border-t border-slate-200">
+                        <div><strong class="text-slate-700">تاريخ التحريك:</strong> <span id="imgCargoTripDate" class="font-bold text-amber-700"></span></div>
+                        <div><strong class="text-slate-700">حالة السداد:</strong> <span id="imgCargoPayStatus" class="font-bold text-indigo-700"></span></div>
+                    </div>
+                </div>
+
+                <!-- Items Table -->
+                <table class="w-full border-collapse text-right text-xs mb-4">
+                    <thead>
+                        <tr class="bg-slate-200 text-slate-800">
+                            <th class="border border-slate-300 p-2 w-12 text-center">م</th>
+                            <th class="border border-slate-300 p-2">الصنف</th>
+                            <th class="border border-slate-300 p-2 w-20 text-center">العدد</th>
+                            <th class="border border-slate-300 p-2 w-28 text-left">السعر</th>
+                        </tr>
+                    </thead>
+                    <tbody id="imgCargoItemsTableBody"></tbody>
+                </table>
+
+                <!-- Grand Total -->
+                <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm font-black mb-6">
+                    <span class="text-indigo-900">الإجمالي النهائي:</span>
+                    <span id="imgCargoGrandTotal" class="text-amber-600 text-base">0 AED</span>
+                </div>
+
+                <!-- Footer -->
+                <div class="pt-3 border-t border-dashed border-slate-300 flex justify-between items-center text-[11px] text-slate-500">
                     <div>* شكراً لاختياركم وادي بناء لشحن أمتعتكم. عناية تامة وآمنة.</div>
                     <div class="font-bold text-slate-800">الدعم: 0558675501</div>
                 </div>
             </div>
-            <div class="mt-5 flex gap-2 flex-wrap">
+
+            <div class="mt-5 flex gap-2 flex-wrap no-print">
                 <button onclick="exportToPDF('cargoCaptureArea', 'WadiBina_Cargo_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow hover:bg-red-500"><i class="fa-solid fa-file-pdf ml-1"></i> تحميل PDF فوراً</button>
                 <button onclick="downloadCapturedImage('cargoCaptureArea', 'WadiBina_CargoInvoice_')" class="flex-1 gold-gradient-bg text-black font-extrabold py-3 rounded-xl text-xs shadow"><i class="fa-solid fa-download ml-1"></i> تحميل صورة (JPEG)</button>
                 <button onclick="closeModal('cargoPreviewModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
@@ -181,7 +215,7 @@
     <div class="modal-overlay hidden" id="manifestModal">
         <div class="modal-card" style="max-width: 850px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> كشف رحلة ركاب شامل (يتضمن الركاب الإضافيين)</h3>
+                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> كشف رحلة ركاب شامل</h3>
                 <div class="flex gap-2">
                     <button onclick="exportToPDF('manifestPrintArea', 'WadiBina_Manifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> تنزيل PDF</button>
                     <button onclick="window.print()" class="bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-print ml-1"></i> طباعة</button>
@@ -234,7 +268,7 @@
             <img src="logo_2.jpeg" alt="شعار وادي بناء" class="w-11 h-11 object-cover rounded-full border border-gold shadow" onerror="this.src='https://via.placeholder.com/44?text=Logo'">
             <div>
                 <h1 class="text-base sm:text-lg font-black gold-gradient-text leading-tight">شركة وادي بناء للنقل البري</h1>
-                <p class="text-[11px] text-zinc-400">النظام الموحد الشامل (تعديل الفواتير والركاب الإضافيين)</p>
+                <p class="text-[11px] text-zinc-400">النظام الموحد الشامل (فواتير الشحن بنظام الأصناف)</p>
             </div>
         </div>
         <div class="flex items-center gap-2">
@@ -261,7 +295,7 @@
                     <i class="fa-solid fa-ticket ml-1.5"></i> حجوزات وتذاكر الركاب
                 </button>
                 <button onclick="switchTab('cargo')" id="tab-cargo" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
-                    <i class="fa-solid fa-boxes-packing ml-1.5"></i> فواتير الشحن والأمتعة
+                    <i class="fa-solid fa-boxes-packing ml-1.5"></i> فواتير الشحن والأصناف
                 </button>
                 <button onclick="switchTab('financials')" id="tab-financials" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
                     <i class="fa-solid fa-calculator ml-1.5"></i> الحسابات والإدارة المالية والذمم
@@ -277,7 +311,7 @@
         <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl mb-6 flex flex-col sm:flex-row items-center gap-3">
             <div class="relative w-full flex-1">
                 <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-gold"></i>
-                <input type="text" id="globalSearchInput" oninput="handleGlobalSearch()" placeholder="بحث ذكي: رقم البوليصة، اسم العميل، اسم الراكب الإضافي، أو المحتوى..." class="w-full bg-darkbg border border-zinc-700 rounded-xl pr-11 pl-4 py-3 text-xs text-zinc-100 outline-none focus:border-gold">
+                <input type="text" id="globalSearchInput" oninput="handleGlobalSearch()" placeholder="بحث ذكي: رقم البوليصة، اسم العميل، اسم الراكب، أو الصنف..." class="w-full bg-darkbg border border-zinc-700 rounded-xl pr-11 pl-4 py-3 text-xs text-zinc-100 outline-none focus:border-gold">
             </div>
             <select id="globalSearchType" onchange="handleGlobalSearch()" class="bg-darkbg border border-zinc-700 text-gold text-xs px-4 py-3 rounded-xl outline-none">
                 <option value="all">جميع السجلات</option>
@@ -418,11 +452,11 @@
             </div>
         </section>
 
-        <!-- TAB 2: CARGO -->
+        <!-- TAB 2: CARGO (WITH MULTI-ITEM DYNAMIC TABLE) -->
         <section id="module-cargo" class="tab-content hidden space-y-6">
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <h2 class="text-gold font-extrabold text-base border-b border-zinc-800 pb-3 flex justify-between items-center">
-                    <span><i class="fa-solid fa-boxes-packing ml-1"></i> <span id="cargoFormTitle">فاتورة أمتعة وبضائع ومحتوى جديدة</span></span>
+                    <span><i class="fa-solid fa-boxes-packing ml-1"></i> <span id="cargoFormTitle">فاتورة أمتعة وبضائع (بنظام الأصناف المتعددة)</span></span>
                     <button id="cancelEditCargoBtn" onclick="resetCargoForm()" class="hidden text-xs text-red-400 font-bold bg-red-950/40 border border-red-800 px-2.5 py-1 rounded-lg">إلغاء التعديل</button>
                 </h2>
                 <form id="cargoForm" onsubmit="handleSaveCargo(event)" class="space-y-4">
@@ -463,25 +497,40 @@
                         </div>
                     </div>
 
-                    <div class="bg-darkbg p-3 rounded-xl border border-zinc-800 space-y-2">
-                        <label class="block text-xs text-gold font-bold">محتوى الأمتعة / الطرود والشحنات *</label>
-                        <textarea id="cargoContent" rows="2" required placeholder="اكتب تفاصيل المحتوى والطرود (مثال: 3 كراتين ملابس، حقيبة يدوية، أجهزة إلكترونية...)" class="w-full bg-zinc-900 border border-zinc-700 rounded p-2.5 text-xs text-zinc-200 outline-none focus:border-gold"></textarea>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center bg-zinc-900 p-3 rounded-xl border border-gold">
-                        <div><span class="text-xs font-bold">المجموع: <span id="cargoAutoTotalDisplay" class="text-gold font-bold">0 AED</span></span></div>
-                        <div>
-                            <label class="block text-[11px] text-gold font-bold mb-1">المبلغ النهائي *</label>
-                            <input type="number" id="cargoManualTotal" required class="w-full bg-darkbg border border-gold font-black text-gold rounded p-2 text-xs" placeholder="0">
+                    <!-- CARGO ITEMS BUILDER SECTION -->
+                    <div class="bg-darkbg p-4 rounded-xl border border-zinc-800 space-y-3">
+                        <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
+                            <span class="text-xs font-bold text-gold"><i class="fa-solid fa-list-check ml-1"></i> أصناف الأمتعة والطرود والشحنات</span>
+                            <button type="button" onclick="addCargoItemRow()" class="bg-gold text-black font-extrabold px-3 py-1 rounded text-xs hover:bg-gold-400"><i class="fa-solid fa-plus ml-1"></i> إضافة صنف جديد</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-xs" id="cargoItemsBuilderTable">
+                                <thead>
+                                    <tr class="text-zinc-400 border-b border-zinc-800">
+                                        <th class="p-2">الصنف والوصف</th>
+                                        <th class="p-2 w-24">العدد</th>
+                                        <th class="p-2 w-32">السعر (AED)</th>
+                                        <th class="p-2 w-12 text-center">حذف</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cargoItemsRowsContainer"></tbody>
+                            </table>
                         </div>
                     </div>
-                    <button type="submit" id="cargoSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow">حفظ فاتورة الشحن</button>
+
+                    <div class="flex justify-between items-center bg-zinc-900 p-4 rounded-xl border border-gold">
+                        <span class="text-xs font-bold text-zinc-300">الإجمالي النهائي المحسوب للأصناف:</span>
+                        <span id="cargoCalculatedTotal" class="text-lg font-black text-gold">0 AED</span>
+                        <input type="hidden" id="cargoManualTotal" value="0">
+                    </div>
+
+                    <button type="submit" id="cargoSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow">حفظ فاتورة الشحن والأصناف</button>
                 </form>
             </div>
 
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
-                    <span class="font-bold text-gold text-xs">سجل فواتير الشحن والمحتوى</span>
+                    <span class="font-bold text-gold text-xs">سجل فواتير الشحن والأصناف</span>
                     <button onclick="exportExcel('cargo')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-file-excel"></i> Excel</button>
                 </div>
                 <div class="overflow-x-auto">
@@ -492,7 +541,7 @@
                                 <th>تاريخ الرحلة</th>
                                 <th>المرسل</th>
                                 <th>المستلم</th>
-                                <th>محتوى الشحنة</th>
+                                <th>عدد الأصناف</th>
                                 <th>الإجمالي</th>
                                 <th>الحالة</th>
                                 <th>إجراءات / طباعة</th>
@@ -714,6 +763,7 @@
             document.getElementById('debtInvNo').value = db.nextDebtInvNo || 120;
             updateReportingTimeAutomatically();
             onPassengerCountChanged();
+            addCargoItemRow(); // Add default initial item row
             if(currentUser) initSync();
         };
 
@@ -800,6 +850,33 @@
             }
         }
 
+        // --- CARGO ITEMS BUILDER FUNCTIONS ---
+        function addCargoItemRow(desc = '', qty = 1, price = 100) {
+            const tbody = document.getElementById('cargoItemsRowsContainer');
+            const tr = document.createElement('tr');
+            tr.className = "border-b border-zinc-800/60";
+            tr.innerHTML = `
+                <td class="p-2"><input type="text" value="${desc}" placeholder="وصف الصنف..." class="cargo-item-desc w-full bg-darkbg border border-zinc-700 rounded p-1.5 text-xs text-zinc-200" required></td>
+                <td class="p-2"><input type="number" value="${qty}" min="1" oninput="calculateCargoTotal()" class="cargo-item-qty w-full bg-darkbg border border-zinc-700 rounded p-1.5 text-xs text-zinc-200 text-center" required></td>
+                <td class="p-2"><input type="number" value="${price}" min="0" oninput="calculateCargoTotal()" class="cargo-item-price w-full bg-darkbg border border-gold rounded p-1.5 text-xs text-gold font-bold text-left" required></td>
+                <td class="p-2 text-center"><button type="button" onclick="this.closest('tr').remove(); calculateCargoTotal();" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+            calculateCargoTotal();
+        }
+
+        function calculateCargoTotal() {
+            let total = 0;
+            const rows = document.querySelectorAll('#cargoItemsRowsContainer tr');
+            rows.forEach(tr => {
+                const qty = parseFloat(tr.querySelector('.cargo-item-qty').value) || 0;
+                const price = parseFloat(tr.querySelector('.cargo-item-price').value) || 0;
+                total += (qty * price);
+            });
+            document.getElementById('cargoCalculatedTotal').innerText = `${total} AED`;
+            document.getElementById('cargoManualTotal').value = total;
+        }
+
         function handleSavePassenger(e) {
             e.preventDefault();
             const editId = document.getElementById('passEditId').value;
@@ -812,11 +889,7 @@
                 const phones = document.querySelectorAll('.extra-phone');
                 const passports = document.querySelectorAll('.extra-passport');
                 for (let i = 0; i < names.length; i++) {
-                    extraList.push({
-                        name: names[i].value,
-                        phone: phones[i].value,
-                        passport: passports[i].value
-                    });
+                    extraList.push({ name: names[i].value, phone: phones[i].value, passport: passports[i].value });
                 }
             }
 
@@ -857,7 +930,6 @@
             const item = db.passengers.find(x => String(x.id) === String(id));
             if(!item) return;
             document.getElementById('passEditId').value = item.id;
-            document.getElementById('passTicketNo.value') // skipped
             document.getElementById('passTicketNo').value = item.id;
             document.getElementById('passTicketNo').disabled = true;
             document.getElementById('passAgent').value = item.agent || '';
@@ -908,6 +980,17 @@
             e.preventDefault();
             const editId = document.getElementById('cargoEditId').value;
             const invNo = document.getElementById('cargoInvNo').value.trim();
+
+            let itemsList = [];
+            const rows = document.querySelectorAll('#cargoItemsRowsContainer tr');
+            rows.forEach(tr => {
+                itemsList.push({
+                    desc: tr.querySelector('.cargo-item-desc').value,
+                    qty: parseFloat(tr.querySelector('.cargo-item-qty').value) || 1,
+                    price: parseFloat(tr.querySelector('.cargo-item-price').value) || 0
+                });
+            });
+
             const cargoData = {
                 id: invNo,
                 date: document.getElementById('cargoDate').value,
@@ -916,7 +999,7 @@
                 senderPhone: document.getElementById('cargoSenderPhone').value,
                 receiver: document.getElementById('cargoReceiverName').value,
                 receiverPhone: document.getElementById('cargoReceiverPhone').value,
-                content: document.getElementById('cargoContent').value,
+                items: itemsList,
                 grandTotal: parseFloat(document.getElementById('cargoManualTotal').value) || 0,
                 paymentStatus: document.getElementById('cargoPaymentStatus').value,
                 destination: 'عدن'
@@ -933,6 +1016,9 @@
                 document.getElementById('cargoForm').reset();
                 document.getElementById('cargoInvNo').value = db.nextCargoNo;
                 document.getElementById('cargoTripDate').value = activeTripDate;
+                document.getElementById('cargoDate').value = activeTripDate;
+                document.getElementById('cargoItemsRowsContainer').innerHTML = '';
+                addCargoItemRow();
                 alert(`تم حفظ فاتورة الشحن #${invNo} بنجاح!`);
             }
             saveDB();
@@ -952,8 +1038,16 @@
             document.getElementById('cargoSenderPhone').value = item.senderPhone || '';
             document.getElementById('cargoReceiverName').value = item.receiver || '';
             document.getElementById('cargoReceiverPhone').value = item.receiverPhone || '';
-            document.getElementById('cargoContent').value = item.content || '';
-            document.getElementById('cargoManualTotal').value = item.grandTotal || 0;
+
+            const tbody = document.getElementById('cargoItemsRowsContainer');
+            tbody.innerHTML = '';
+            if (item.items && item.items.length > 0) {
+                item.items.forEach(it => {
+                    addCargoItemRow(it.desc, it.qty, it.price);
+                });
+            } else {
+                addCargoItemRow(item.content || 'أمتعة متنوعة', 1, item.grandTotal || 100);
+            }
 
             document.getElementById('cargoFormTitle').innerText = `تعديل فاتورة الشحن #${item.id}`;
             document.getElementById('cargoSubmitBtn').innerText = 'حفظ التعديلات';
@@ -968,8 +1062,10 @@
             document.getElementById('cargoInvNo').value = db.nextCargoNo;
             document.getElementById('cargoTripDate').value = activeTripDate;
             document.getElementById('cargoDate').value = activeTripDate;
-            document.getElementById('cargoFormTitle').innerText = 'فاتورة أمتعة وبضائع ومحتوى جديدة';
-            document.getElementById('cargoSubmitBtn').innerText = 'حفظ فاتورة الشحن';
+            document.getElementById('cargoItemsRowsContainer').innerHTML = '';
+            addCargoItemRow();
+            document.getElementById('cargoFormTitle').innerText = 'فاتورة أمتعة وبضائع (بنظام الأصناف المتعددة)';
+            document.getElementById('cargoSubmitBtn').innerText = 'حفظ فاتورة الشحن والأصناف';
             document.getElementById('cancelEditCargoBtn').classList.add('hidden');
         }
 
@@ -1054,15 +1150,21 @@
 
             const cargoTbody = document.querySelector('#cargoTable tbody');
             cargoTbody.innerHTML = '';
-            let filteredC = db.cargo.filter(c => !query || c.sender.toLowerCase().includes(query) || String(c.id).includes(query) || (c.content && c.content.toLowerCase().includes(query)));
+            let filteredC = db.cargo.filter(c => {
+                if(!query) return true;
+                let matchBase = c.sender.toLowerCase().includes(query) || String(c.id).includes(query) || c.receiver.toLowerCase().includes(query);
+                let matchItems = c.items && c.items.some(it => it.desc.toLowerCase().includes(query));
+                return matchBase || matchItems;
+            });
             
             filteredC.forEach((c, idx) => {
+                let itemCount = c.items ? c.items.length : 1;
                 cargoTbody.insertRow().innerHTML = `
                     <td><strong>#${c.id}</strong></td>
                     <td><strong class="text-gold">${c.tripDate}</strong></td>
                     <td>${c.sender}<br><span class="text-[10px] text-zinc-400">${c.senderPhone}</span></td>
                     <td><strong>${c.receiver}</strong><br><span class="text-[10px] text-zinc-400">${c.receiverPhone}</span></td>
-                    <td><span class="text-xs text-amber-200 bg-zinc-900 p-1 rounded block max-w-xs truncate" title="${c.content || ''}">${c.content || 'غير محدد'}</span></td>
+                    <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs">${itemCount} صنف</span></td>
                     <td>${c.grandTotal} AED</td>
                     <td style="color:${c.paymentStatus==='مدفوع'?'#10b981':'#f59e0b'}">${c.paymentStatus}</td>
                     <td class="space-x-1 space-x-reverse">
@@ -1099,25 +1201,32 @@
             document.getElementById('ticketPreviewModal').classList.remove('hidden');
         }
 
+        // --- CARGO PREVIEW MATCHED TO EXACT REQUESTED FORMAT ---
         function previewCargo(id) {
             const item = db.cargo.find(x => String(x.id) === String(id));
             if(!item) return;
+            
             document.getElementById('imgCargoCode').innerText = `#${item.id}`;
-            document.getElementById('imgCargoBody').innerHTML = `
-                <div class="grid grid-cols-2 gap-2 border-b border-slate-200 pb-2">
-                    <div><strong>المرسل:</strong> ${item.sender}<br><span class="text-slate-500">هاتف: ${item.senderPhone}</span></div>
-                    <div><strong>المستلم:</strong> ${item.receiver}<br><span class="text-slate-500">هاتف: ${item.receiverPhone}</span></div>
-                </div>
-                <div class="py-2"><strong>تاريخ الرحلة:</strong> <span class="text-amber-600 font-bold">${item.tripDate}</span></div>
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 my-2">
-                    <strong class="text-slate-700 block mb-1">تفاصيل المحتوى والطرود والشحنات:</strong>
-                    <p class="text-slate-900 font-medium whitespace-pre-wrap">${item.content || 'لا توجد تفاصيل محددة'}</p>
-                </div>
-                <div class="font-black text-indigo-700 mt-2 flex justify-between">
-                    <span>حالة السداد: ${item.paymentStatus}</span>
-                    <span class="text-base">المبلغ الإجمالي: ${item.grandTotal} AED</span>
-                </div>
-            `;
+            document.getElementById('imgCargoSender').innerText = `${item.sender} (${item.senderPhone}) [عن: ${item.origin || 'عجمان'}]`;
+            document.getElementById('imgCargoReceiver').innerText = `${item.receiver} (${item.receiverPhone}) [إلى: ${item.destination || 'عدن'}]`;
+            document.getElementById('imgCargoTripDate').innerText = item.tripDate;
+            document.getElementById('imgCargoPayStatus').innerText = item.paymentStatus;
+
+            let tbody = document.getElementById('imgCargoItemsTableBody');
+            tbody.innerHTML = '';
+
+            let itemsArr = item.items && item.items.length > 0 ? item.items : [{ desc: item.content || 'أمتعة متنوعة', qty: 1, price: item.grandTotal || 100 }];
+            
+            itemsArr.forEach((it, idx) => {
+                tbody.insertRow().innerHTML = `
+                    <td class="border border-slate-300 p-2 text-center">${idx+1}</td>
+                    <td class="border border-slate-300 p-2 font-medium">${it.desc}</td>
+                    <td class="border border-slate-300 p-2 text-center font-bold">${it.qty}</td>
+                    <td class="border border-slate-300 p-2 text-left font-bold text-amber-600">AED ${it.price * it.qty}</td>
+                `;
+            });
+
+            document.getElementById('imgCargoGrandTotal').innerText = `AED ${item.grandTotal}`;
             document.getElementById('cargoPreviewModal').classList.remove('hidden');
         }
 
