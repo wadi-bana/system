@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>شركة وادي بناء للنقل البري | النظام الموحد الشامل المطور</title>
     <!-- Tailwind CSS -->
-    <script src="https://cdn.jsdelivr.net/npm/tailwindcss-cdn@3.4.1"></script> <!-- fallback or standard CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -94,9 +93,33 @@
                         <p class="text-[11px] text-slate-500 font-bold">Passenger Ticket</p>
                     </div>
                 </div>
-                <div id="imgTicketBody" class="space-y-3 text-xs"></div>
-                <!-- Updated Footer -->
-                <div class="mt-6 pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
+
+                <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 text-xs space-y-2 mb-4">
+                    <div><strong>الراكب الرئيسي:</strong> <span id="imgTktName" class="font-bold"></span></div>
+                    <div><strong>رقم الهاتف:</strong> <span id="imgTktPhone"></span></div>
+                    <div><strong>رقم الجواز / الهوية:</strong> <span id="imgTktPassport"></span></div>
+                    <div class="pt-1 border-t border-slate-200 flex justify-between flex-wrap gap-2">
+                        <div><strong>المسار:</strong> <span id="imgTktRoute"></span></div>
+                        <div><strong>تاريخ الرحلة:</strong> <span id="imgTktDate" class="text-amber-700 font-bold"></span></div>
+                        <div><strong>الحضور:</strong> <span id="imgTktTime"></span></div>
+                    </div>
+                </div>
+
+                <div id="imgTicketExtraBox"></div>
+
+                <!-- Grand Total with Payment Status beside it -->
+                <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm font-black mb-6">
+                    <div class="flex items-center gap-2">
+                        <span class="text-indigo-900">إجمالي المبلغ:</span>
+                        <span id="imgTktFare" class="text-amber-600 text-base">0 AED</span>
+                    </div>
+                    <div class="text-xs">
+                        <span class="text-slate-500 font-normal ml-1">حالة السداد:</span>
+                        <span id="imgTktPayStatus" class="px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-bold">مدفوع</span>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
                     <div>* رحلة موفقة وآمنة مع وادي بناء للنقل البري. أرقام التواصل بالمكاتب:</div>
                     <div class="grid grid-cols-1 gap-0.5 font-bold text-slate-800">
                         <div>• مكتب عجمان (الجرف 2): 0508200749 - 0558675501 - 0502920559</div>
@@ -135,15 +158,24 @@
                     </div>
                 </div>
 
-                <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 text-xs space-y-1 mb-4">
-                    <div class="flex justify-between flex-wrap gap-2">
-                        <div><strong class="text-slate-700">المرسل:</strong> <span id="imgCargoSender" class="font-bold text-slate-900"></span></div>
-                        <div><strong class="text-slate-700">المستلم:</strong> <span id="imgCargoReceiver" class="font-bold text-slate-900"></span></div>
+                <!-- Sender/Receiver Detailed Lines (Name, Phone, Address on separate lines) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 text-xs">
+                    <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 space-y-1">
+                        <span class="text-indigo-800 font-bold block mb-1">بيانات المرسل:</span>
+                        <div><strong>الاسم:</strong> <span id="imgCargoSenderName" class="font-bold text-slate-900"></span></div>
+                        <div><strong>رقم الهاتف:</strong> <span id="imgCargoSenderPhone"></span></div>
+                        <div><strong>العنوان / المحطة:</strong> <span id="imgCargoSenderAddress"></span></div>
                     </div>
-                    <div class="flex justify-between flex-wrap gap-2 pt-1 border-t border-slate-200">
-                        <div><strong class="text-slate-700">تاريخ التحريك:</strong> <span id="imgCargoTripDate" class="font-bold text-amber-700"></span></div>
-                        <div><strong class="text-slate-700">حالة السداد:</strong> <span id="imgCargoPayStatus" class="font-bold text-indigo-700"></span></div>
+                    <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 space-y-1">
+                        <span class="text-indigo-800 font-bold block mb-1">بيانات المستلم:</span>
+                        <div><strong>الاسم:</strong> <span id="imgCargoReceiverName" class="font-bold text-slate-900"></span></div>
+                        <div><strong>رقم الهاتف:</strong> <span id="imgCargoReceiverPhone"></span></div>
+                        <div><strong>العنوان / المحطة:</strong> <span id="imgCargoReceiverAddress"></span></div>
                     </div>
+                </div>
+
+                <div class="mb-3 text-xs">
+                    <strong>تاريخ التحريك:</strong> <span id="imgCargoTripDate" class="font-bold text-amber-700"></span>
                 </div>
 
                 <table class="w-full border-collapse text-right text-xs mb-4">
@@ -158,12 +190,18 @@
                     <tbody id="imgCargoItemsTableBody"></tbody>
                 </table>
 
+                <!-- Grand Total with Payment Status directly beside it -->
                 <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm font-black mb-6">
-                    <span class="text-indigo-900">الإجمالي النهائي:</span>
-                    <span id="imgCargoGrandTotal" class="text-amber-600 text-base">0 AED</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-indigo-900">الإجمالي النهائي:</span>
+                        <span id="imgCargoGrandTotal" class="text-amber-600 text-base">0 AED</span>
+                    </div>
+                    <div class="text-xs">
+                        <span class="text-slate-500 font-normal ml-1">حالة السداد:</span>
+                        <span id="imgCargoPayStatus" class="px-2.5 py-1 rounded-md bg-indigo-100 text-indigo-800 font-bold">مدفوع</span>
+                    </div>
                 </div>
 
-                <!-- Updated Footer -->
                 <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
                     <div>* شكراً لاختياركم وادي بناء لشحن أمتعتكم. عناية تامة وآمنة. أرقام التواصل بالمكاتب:</div>
                     <div class="grid grid-cols-1 gap-0.5 font-bold text-slate-800">
@@ -202,9 +240,32 @@
                         <p class="text-[11px] text-slate-500 font-bold">Deferred Invoice</p>
                     </div>
                 </div>
-                <div id="imgDebtInvBody" class="space-y-3 text-xs"></div>
-                <!-- Updated Footer -->
-                <div class="mt-6 pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
+
+                <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 text-xs space-y-1 mb-4">
+                    <div><strong>اسم العميل:</strong> <span id="imgDebtName" class="font-bold text-slate-900"></span></div>
+                    <div><strong>رقم الهاتف:</strong> <span id="imgDebtPhone"></span></div>
+                    <div><strong>العنوان / المحطة:</strong> <span id="imgDebtAddress"></span></div>
+                    <div><strong>تاريخ الفاتورة:</strong> <span id="imgDebtDate"></span></div>
+                </div>
+
+                <div class="space-y-1 text-xs mb-4">
+                    <div><strong>المجموع الكلي:</strong> <span id="imgDebtSubTotal"></span> AED</div>
+                    <div><strong>المبلغ المدفوع:</strong> <span id="imgDebtPaid" class="text-emerald-700 font-bold"></span> AED</div>
+                </div>
+
+                <!-- Net Total with payment status beside it -->
+                <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm font-black mb-6">
+                    <div class="flex items-center gap-2">
+                        <span class="text-indigo-900">المبلغ المتبقي:</span>
+                        <span id="imgDebtNetTotal" class="text-amber-600 text-base">0 AED</span>
+                    </div>
+                    <div class="text-xs">
+                        <span class="text-slate-500 font-normal ml-1">الحالة:</span>
+                        <span class="px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-bold">حساب آجل</span>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
                     <div>* تعتبر هذه الفاتورة سند مطالبي رسمي للحسابات الآجلة. أرقام التواصل بالمكاتب:</div>
                     <div class="grid grid-cols-1 gap-0.5 font-bold text-slate-800">
                         <div>• مكتب عجمان (الجرف 2): 0508200749 - 0558675501 - 0502920559</div>
@@ -498,12 +559,14 @@
                         <div class="bg-darkbg p-3 rounded-xl border border-zinc-800 space-y-2">
                             <span class="text-xs font-bold text-gold">بيانات المرسل</span>
                             <input type="text" id="cargoSenderName" required placeholder="اسم المرسل" class="w-full bg-zinc-900 border border-zinc-800 rounded p-2 text-xs">
-                            <input type="tel" id="cargoSenderPhone" required placeholder="هاتف المرسل" class="w-full bg-zinc-900 border border-zinc-800 rounded p-2 text-xs">
+                            <input type="tel" id="cargoSenderPhone" required placeholder="رقم الهاتف" class="w-full bg-zinc-900 border border-zinc-800 rounded p-2 text-xs">
+                            <input type="text" id="cargoSenderAddress" required placeholder="العنوان / المحطة (مثال: عجمان)" class="w-full bg-zinc-900 border border-zinc-800 rounded p-2 text-xs" value="عجمان">
                         </div>
                         <div class="bg-darkbg p-3 rounded-xl border border-zinc-800 space-y-2">
                             <span class="text-xs font-bold text-emerald-400">بيانات المستلم</span>
                             <input type="text" id="cargoReceiverName" required placeholder="اسم المستلم" class="w-full bg-zinc-900 border border-zinc-800 rounded p-2 text-xs">
-                            <input type="tel" id="cargoReceiverPhone" required placeholder="هاتف المستلم" class="w-full bg-zinc-900 border border-zinc-800 rounded p-2 text-xs">
+                            <input type="tel" id="cargoReceiverPhone" required placeholder="رقم الهاتف" class="w-full bg-zinc-900 border border-zinc-800 rounded p-2 text-xs">
+                            <input type="text" id="cargoReceiverAddress" required placeholder="العنوان / المحطة (مثال: عدن)" class="w-full bg-zinc-900 border border-zinc-800 rounded p-2 text-xs" value="عدن">
                         </div>
                     </div>
 
@@ -1005,12 +1068,13 @@
                 tripDate: document.getElementById('cargoTripDate').value,
                 sender: document.getElementById('cargoSenderName').value,
                 senderPhone: document.getElementById('cargoSenderPhone').value,
+                senderAddress: document.getElementById('cargoSenderAddress').value || 'عجمان',
                 receiver: document.getElementById('cargoReceiverName').value,
                 receiverPhone: document.getElementById('cargoReceiverPhone').value,
+                receiverAddress: document.getElementById('cargoReceiverAddress').value || 'عدن',
                 items: itemsList,
                 grandTotal: parseFloat(document.getElementById('cargoManualTotal').value) || 0,
-                paymentStatus: document.getElementById('cargoPaymentStatus').value,
-                destination: 'عدن'
+                paymentStatus: document.getElementById('cargoPaymentStatus').value
             };
 
             if (editId) {
@@ -1025,6 +1089,8 @@
                 document.getElementById('cargoInvNo').value = db.nextCargoNo;
                 document.getElementById('cargoTripDate').value = activeTripDate;
                 document.getElementById('cargoDate').value = activeTripDate;
+                document.getElementById('cargoSenderAddress').value = 'عجمان';
+                document.getElementById('cargoReceiverAddress').value = 'عدن';
                 document.getElementById('cargoItemsRowsContainer').innerHTML = '';
                 addCargoItemRow();
                 alert(`تم حفظ فاتورة الشحن #${invNo} بنجاح!`);
@@ -1044,8 +1110,10 @@
             document.getElementById('cargoPaymentStatus').value = item.paymentStatus || 'مدفوع';
             document.getElementById('cargoSenderName').value = item.sender || '';
             document.getElementById('cargoSenderPhone').value = item.senderPhone || '';
+            document.getElementById('cargoSenderAddress').value = item.senderAddress || item.origin || 'عجمان';
             document.getElementById('cargoReceiverName').value = item.receiver || '';
             document.getElementById('cargoReceiverPhone').value = item.receiverPhone || '';
+            document.getElementById('cargoReceiverAddress').value = item.receiverAddress || item.destination || 'عدن';
 
             const tbody = document.getElementById('cargoItemsRowsContainer');
             tbody.innerHTML = '';
@@ -1070,6 +1138,8 @@
             document.getElementById('cargoInvNo').value = db.nextCargoNo;
             document.getElementById('cargoTripDate').value = activeTripDate;
             document.getElementById('cargoDate').value = activeTripDate;
+            document.getElementById('cargoSenderAddress').value = 'عجمان';
+            document.getElementById('cargoReceiverAddress').value = 'عدن';
             document.getElementById('cargoItemsRowsContainer').innerHTML = '';
             addCargoItemRow();
             document.getElementById('cargoFormTitle').innerText = 'فاتورة أمتعة وبضائع (بنظام الأصناف المتعددة)';
@@ -1188,24 +1258,27 @@
             const item = db.passengers.find(x => String(x.id) === String(id));
             if(!item) return;
             
-            let extraHtml = '';
+            document.getElementById('imgTicketCode').innerText = `#${item.id}`;
+            document.getElementById('imgTktName').innerText = item.name;
+            document.getElementById('imgTktPhone').innerText = item.phone;
+            document.getElementById('imgTktPassport').innerText = item.passport;
+            document.getElementById('imgTktRoute').innerText = `${item.origin} إلى ${item.destination}`;
+            document.getElementById('imgTktDate').innerText = item.tripDate;
+            document.getElementById('imgTktTime').innerText = item.reportingTime;
+            document.getElementById('imgTktFare').innerText = `${item.fare} AED`;
+            document.getElementById('imgTktPayStatus').innerText = item.payMethod;
+
+            let extraBox = document.getElementById('imgTicketExtraBox');
+            extraBox.innerHTML = '';
             if (item.extraPassengers && item.extraPassengers.length > 0) {
-                extraHtml = `<div class="mt-2 border-t border-slate-200 pt-2"><strong class="text-amber-700">الركاب الإضافيون المرافقون:</strong><ul class="list-disc list-inside mt-1 space-y-1">`;
+                let html = `<div class="bg-slate-100 p-3 rounded-lg border border-slate-200 text-xs mb-4 space-y-2"><strong class="text-amber-700 block">الركاب الإضافيون المرافقون:</strong>`;
                 item.extraPassengers.forEach((ex, idx) => {
-                    extraHtml += `<li><strong>${idx+1}. ${ex.name}</strong> (هاتف: ${ex.phone} - جواز: ${ex.passport})</li>`;
+                    html += `<div class="border-t border-slate-200 pt-1"><div><strong>الاسم:</strong> ${ex.name}</div><div><strong>الهاتف:</strong> ${ex.phone}</div><div><strong>رقم الجواز:</strong> ${ex.passport}</div></div>`;
                 });
-                extraHtml += `</ul></div>`;
+                html += `</div>`;
+                extraBox.innerHTML = html;
             }
 
-            document.getElementById('imgTicketCode').innerText = `#${item.id}`;
-            document.getElementById('imgTicketBody').innerHTML = `
-                <div><strong>الراكب الرئيسي:</strong> ${item.name} (هاتف: ${item.phone})</div>
-                <div><strong>رقم الجواز:</strong> ${item.passport}</div>
-                <div><strong>المسار:</strong> ${item.origin} إلى ${item.destination}</div>
-                <div><strong>تاريخ الرحلة:</strong> <span class="text-amber-600 font-bold">${item.tripDate}</span> | <strong>الحضور:</strong> ${item.reportingTime}</div>
-                ${extraHtml}
-                <div class="font-black text-indigo-700 mt-3 pt-2 border-t border-slate-200">إجمالي المبلغ: ${item.fare} AED (${item.payMethod})</div>
-            `;
             document.getElementById('ticketPreviewModal').classList.remove('hidden');
         }
 
@@ -1214,8 +1287,14 @@
             if(!item) return;
             
             document.getElementById('imgCargoCode').innerText = `#${item.id}`;
-            document.getElementById('imgCargoSender').innerText = `${item.sender} (${item.senderPhone}) [عن: ${item.origin || 'عجمان'}]`;
-            document.getElementById('imgCargoReceiver').innerText = `${item.receiver} (${item.receiverPhone}) [إلى: ${item.destination || 'عدن'}]`;
+            document.getElementById('imgCargoSenderName').innerText = item.sender;
+            document.getElementById('imgCargoSenderPhone').innerText = item.senderPhone;
+            document.getElementById('imgCargoSenderAddress').innerText = item.senderAddress || 'عجمان';
+
+            document.getElementById('imgCargoReceiverName').innerText = item.receiver;
+            document.getElementById('imgCargoReceiverPhone').innerText = item.receiverPhone;
+            document.getElementById('imgCargoReceiverAddress').innerText = item.receiverAddress || 'عدن';
+
             document.getElementById('imgCargoTripDate').innerText = item.tripDate;
             document.getElementById('imgCargoPayStatus').innerText = item.paymentStatus;
 
@@ -1241,13 +1320,13 @@
             const inv = db.debtInvoices.find(x => String(x.id) === String(id));
             if(!inv) return;
             document.getElementById('imgDebtInvCode').innerText = `#${inv.id}`;
-            document.getElementById('imgDebtInvBody').innerHTML = `
-                <div><strong>العميل:</strong> ${inv.name} (هاتف: ${inv.phone})</div>
-                <div><strong>العنوان:</strong> ${inv.address}</div>
-                <div><strong>تاريخ الفاتورة:</strong> ${inv.date}</div>
-                <div><strong>المجموع:</strong> ${inv.subTotal} AED | <strong>المدفوع:</strong> ${inv.paidAmount} AED</div>
-                <div class="font-black text-amber-600 mt-2">المتبقي: ${inv.netTotal} AED</div>
-            `;
+            document.getElementById('imgDebtName').innerText = inv.name;
+            document.getElementById('imgDebtPhone').innerText = inv.phone;
+            document.getElementById('imgDebtAddress').innerText = inv.address;
+            document.getElementById('imgDebtDate').innerText = inv.date;
+            document.getElementById('imgDebtSubTotal').innerText = inv.subTotal;
+            document.getElementById('imgDebtPaid').innerText = inv.paidAmount;
+            document.getElementById('imgDebtNetTotal').innerText = `${inv.netTotal} AED`;
             document.getElementById('debtInvPreviewModal').classList.remove('hidden');
         }
 
