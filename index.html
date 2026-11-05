@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>شركة وادي بناء للنقل البري | النظام الموحد الشامل المطور</title>
     <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/tailwindcss-cdn@3.4.1"></script> <!-- fallback or standard CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -75,7 +76,7 @@
     <!-- PREVIEW TICKET MODAL -->
     <div class="modal-overlay hidden" id="ticketPreviewModal">
         <div class="modal-card" style="max-width: 700px;">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
                 <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-ticket ml-1"></i> معاينة وتنزيل بوليصة التذكرة</h3>
                 <button onclick="closeModal('ticketPreviewModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
@@ -94,12 +95,17 @@
                     </div>
                 </div>
                 <div id="imgTicketBody" class="space-y-3 text-xs"></div>
-                <div class="mt-6 pt-3 border-t border-dashed border-slate-300 flex justify-between items-center text-[11px] text-slate-500">
-                    <div>* شكراً لاختياركم وادي بناء للنقل البري. رحلة موفقة وآمنة.</div>
-                    <div class="font-bold text-slate-800">الدعم: 0558675501</div>
+                <!-- Updated Footer -->
+                <div class="mt-6 pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
+                    <div>* رحلة موفقة وآمنة مع وادي بناء للنقل البري. أرقام التواصل بالمكاتب:</div>
+                    <div class="grid grid-cols-1 gap-0.5 font-bold text-slate-800">
+                        <div>• مكتب عجمان (الجرف 2): 0508200749 - 0558675501 - 0502920559</div>
+                        <div>• ابوظبي بني ياس الكبرات: 0508200754 - 0558675501 - 0502920559</div>
+                        <div>• مكتب عدن (شارع عدن تعز تحت فندق الابداع - جولة السفينه): 0783424999 - 0776363101</div>
+                    </div>
                 </div>
             </div>
-            <div class="mt-5 flex gap-2 flex-wrap">
+            <div class="mt-5 flex gap-2 flex-wrap no-print">
                 <button onclick="exportToPDF('ticketCaptureArea', 'WadiBina_Ticket_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow hover:bg-red-500"><i class="fa-solid fa-file-pdf ml-1"></i> تحميل PDF فوراً</button>
                 <button onclick="downloadCapturedImage('ticketCaptureArea', 'WadiBina_Ticket_')" class="flex-1 gold-gradient-bg text-black font-extrabold py-3 rounded-xl text-xs shadow"><i class="fa-solid fa-download ml-1"></i> تحميل صورة (JPEG)</button>
                 <button onclick="closeModal('ticketPreviewModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
@@ -107,7 +113,7 @@
         </div>
     </div>
 
-    <!-- PREVIEW CARGO MODAL (Matched to exact requested format) -->
+    <!-- PREVIEW CARGO MODAL -->
     <div class="modal-overlay hidden" id="cargoPreviewModal">
         <div class="modal-card" style="max-width: 750px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
@@ -115,7 +121,6 @@
                 <button onclick="closeModal('cargoPreviewModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div id="cargoCaptureArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl font-['Cairo']">
-                <!-- Top Header -->
                 <div class="flex justify-between items-start border-b-2 border-slate-300 pb-3 mb-4">
                     <div>
                         <strong id="imgCargoCode" class="text-xl font-black text-indigo-700">#119</strong>
@@ -130,7 +135,6 @@
                     </div>
                 </div>
 
-                <!-- Sender/Receiver Info Box -->
                 <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 text-xs space-y-1 mb-4">
                     <div class="flex justify-between flex-wrap gap-2">
                         <div><strong class="text-slate-700">المرسل:</strong> <span id="imgCargoSender" class="font-bold text-slate-900"></span></div>
@@ -142,7 +146,6 @@
                     </div>
                 </div>
 
-                <!-- Items Table -->
                 <table class="w-full border-collapse text-right text-xs mb-4">
                     <thead>
                         <tr class="bg-slate-200 text-slate-800">
@@ -155,19 +158,21 @@
                     <tbody id="imgCargoItemsTableBody"></tbody>
                 </table>
 
-                <!-- Grand Total -->
                 <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm font-black mb-6">
                     <span class="text-indigo-900">الإجمالي النهائي:</span>
                     <span id="imgCargoGrandTotal" class="text-amber-600 text-base">0 AED</span>
                 </div>
 
-                <!-- Footer -->
-                <div class="pt-3 border-t border-dashed border-slate-300 flex justify-between items-center text-[11px] text-slate-500">
-                    <div>* شكراً لاختياركم وادي بناء لشحن أمتعتكم. عناية تامة وآمنة.</div>
-                    <div class="font-bold text-slate-800">الدعم: 0558675501</div>
+                <!-- Updated Footer -->
+                <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
+                    <div>* شكراً لاختياركم وادي بناء لشحن أمتعتكم. عناية تامة وآمنة. أرقام التواصل بالمكاتب:</div>
+                    <div class="grid grid-cols-1 gap-0.5 font-bold text-slate-800">
+                        <div>• مكتب عجمان (الجرف 2): 0508200749 - 0558675501 - 0502920559</div>
+                        <div>• ابوظبي بني ياس الكبرات: 0508200754 - 0558675501 - 0502920559</div>
+                        <div>• مكتب عدن (شارع عدن تعز تحت فندق الابداع - جولة السفينه): 0783424999 - 0776363101</div>
+                    </div>
                 </div>
             </div>
-
             <div class="mt-5 flex gap-2 flex-wrap no-print">
                 <button onclick="exportToPDF('cargoCaptureArea', 'WadiBina_Cargo_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow hover:bg-red-500"><i class="fa-solid fa-file-pdf ml-1"></i> تحميل PDF فوراً</button>
                 <button onclick="downloadCapturedImage('cargoCaptureArea', 'WadiBina_CargoInvoice_')" class="flex-1 gold-gradient-bg text-black font-extrabold py-3 rounded-xl text-xs shadow"><i class="fa-solid fa-download ml-1"></i> تحميل صورة (JPEG)</button>
@@ -179,7 +184,7 @@
     <!-- PREVIEW DEBT INVOICE MODAL -->
     <div class="modal-overlay hidden" id="debtInvPreviewModal">
         <div class="modal-card" style="max-width: 700px;">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
                 <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-invoice-dollar ml-1"></i> معاينة وتنزيل فاتورة الحساب الآجل</h3>
                 <button onclick="closeModal('debtInvPreviewModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
@@ -198,12 +203,17 @@
                     </div>
                 </div>
                 <div id="imgDebtInvBody" class="space-y-3 text-xs"></div>
-                <div class="mt-6 pt-3 border-t border-dashed border-slate-300 flex justify-between items-center text-[11px] text-slate-500">
-                    <div>* تعتبر هذه الفاتورة سند مطالبي رسمي للحسابات الآجلة.</div>
-                    <div class="font-bold text-slate-800">الدعم: 0558675501</div>
+                <!-- Updated Footer -->
+                <div class="mt-6 pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
+                    <div>* تعتبر هذه الفاتورة سند مطالبي رسمي للحسابات الآجلة. أرقام التواصل بالمكاتب:</div>
+                    <div class="grid grid-cols-1 gap-0.5 font-bold text-slate-800">
+                        <div>• مكتب عجمان (الجرف 2): 0508200749 - 0558675501 - 0502920559</div>
+                        <div>• ابوظبي بني ياس الكبرات: 0508200754 - 0558675501 - 0502920559</div>
+                        <div>• مكتب عدن (شارع عدن تعز تحت فندق الابداع - جولة السفينه): 0783424999 - 0776363101</div>
+                    </div>
                 </div>
             </div>
-            <div class="mt-5 flex gap-2 flex-wrap">
+            <div class="mt-5 flex gap-2 flex-wrap no-print">
                 <button onclick="exportToPDF('debtInvCaptureArea', 'WadiBina_DebtInv_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow hover:bg-red-500"><i class="fa-solid fa-file-pdf ml-1"></i> تحميل PDF فوراً</button>
                 <button onclick="downloadCapturedImage('debtInvCaptureArea', 'WadiBina_DebtInvoice_')" class="flex-1 gold-gradient-bg text-black font-extrabold py-3 rounded-xl text-xs shadow"><i class="fa-solid fa-download ml-1"></i> تحميل صورة (JPEG)</button>
                 <button onclick="closeModal('debtInvPreviewModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
@@ -268,7 +278,7 @@
             <img src="logo_2.jpeg" alt="شعار وادي بناء" class="w-11 h-11 object-cover rounded-full border border-gold shadow" onerror="this.src='https://via.placeholder.com/44?text=Logo'">
             <div>
                 <h1 class="text-base sm:text-lg font-black gold-gradient-text leading-tight">شركة وادي بناء للنقل البري</h1>
-                <p class="text-[11px] text-zinc-400">النظام الموحد الشامل (فواتير الشحن بنظام الأصناف)</p>
+                <p class="text-[11px] text-zinc-400">النظام الموحد الشامل</p>
             </div>
         </div>
         <div class="flex items-center gap-2">
@@ -452,7 +462,7 @@
             </div>
         </section>
 
-        <!-- TAB 2: CARGO (WITH MULTI-ITEM DYNAMIC TABLE) -->
+        <!-- TAB 2: CARGO -->
         <section id="module-cargo" class="tab-content hidden space-y-6">
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <h2 class="text-gold font-extrabold text-base border-b border-zinc-800 pb-3 flex justify-between items-center">
@@ -497,7 +507,6 @@
                         </div>
                     </div>
 
-                    <!-- CARGO ITEMS BUILDER SECTION -->
                     <div class="bg-darkbg p-4 rounded-xl border border-zinc-800 space-y-3">
                         <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
                             <span class="text-xs font-bold text-gold"><i class="fa-solid fa-list-check ml-1"></i> أصناف الأمتعة والطرود والشحنات</span>
@@ -763,7 +772,7 @@
             document.getElementById('debtInvNo').value = db.nextDebtInvNo || 120;
             updateReportingTimeAutomatically();
             onPassengerCountChanged();
-            addCargoItemRow(); // Add default initial item row
+            addCargoItemRow();
             if(currentUser) initSync();
         };
 
@@ -850,7 +859,6 @@
             }
         }
 
-        // --- CARGO ITEMS BUILDER FUNCTIONS ---
         function addCargoItemRow(desc = '', qty = 1, price = 100) {
             const tbody = document.getElementById('cargoItemsRowsContainer');
             const tr = document.createElement('tr');
@@ -1201,7 +1209,6 @@
             document.getElementById('ticketPreviewModal').classList.remove('hidden');
         }
 
-        // --- CARGO PREVIEW MATCHED TO EXACT REQUESTED FORMAT ---
         function previewCargo(id) {
             const item = db.cargo.find(x => String(x.id) === String(id));
             if(!item) return;
