@@ -73,7 +73,7 @@
         </div>
     </div>
 
-    <!-- CHANGE PASSWORD MODAL (للمستخدم العادي أو المدير) -->
+    <!-- CHANGE PASSWORD MODAL -->
     <div class="modal-overlay hidden" id="changePassModal">
         <div class="modal-card" style="max-width: 400px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
@@ -153,7 +153,7 @@
         </div>
     </div>
 
-    <!-- PREVIEW CARGO MODAL -->
+    <!-- PREVIEW CARGO MODAL (بدون سعر فردي، إجمالي نهائي فقط) -->
     <div class="modal-overlay hidden" id="cargoPreviewModal">
         <div class="modal-card" style="max-width: 750px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
@@ -438,6 +438,18 @@
 
     <!-- MAIN CONTAINER -->
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 flex-grow w-full pb-24">
+
+        <!-- فلتر الأفرع الخاص بالمدير (يظهر للمدير فقط لاختيار فرع محدد أو كل الأفرع) -->
+        <div id="managerBranchFilterContainer" class="hidden bg-cardbg border border-bordergold p-3.5 rounded-2xl shadow-xl mb-6 flex flex-col sm:flex-row items-center justify-between gap-3 no-print">
+            <span class="text-xs font-bold text-gold flex items-center gap-1.5"><i class="fa-solid fa-filter"></i> تصفية الأفرع (لوحة تحكم المدير):</span>
+            <select id="selectedManagerBranch" onchange="refreshUI()" class="bg-darkbg border border-gold text-gold text-xs px-4 py-2.5 rounded-xl outline-none font-bold w-full sm:w-auto">
+                <option value="ALL">🌐 جميع الأفرع مجتمعة (عجمان، ابوظبي، عمان، اليمن)</option>
+                <option value="فرع عجمان">فرع عجمان</option>
+                <option value="فرع ابوظبي">فرع ابوظبي</option>
+                <option value="فرع عمان">فرع عمان</option>
+                <option value="فرع اليمن">فرع اليمن</option>
+            </select>
+        </div>
 
         <!-- GLOBAL SEARCH -->
         <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl mb-6 flex flex-col sm:flex-row items-center gap-3">
@@ -1032,11 +1044,13 @@
                 document.getElementById('userInfoBadge').innerText = `${currentUser.username} (${currentUser.role} - ${currentUser.branch || 'فرع عجمان'})`;
                 document.getElementById('loginOverlay').style.display = 'none';
                 
-                // إظهار تبويب إدارة المستخدمين فقط إذا كان المستخدم مديراً
+                // إظهار تبويب إدارة المستخدمين وفلتر الأفرع للمدير فقط
                 if(currentUser.role === 'مدير') {
                     document.getElementById('tab-users').classList.remove('hidden');
+                    document.getElementById('managerBranchFilterContainer').classList.remove('hidden');
                 } else {
                     document.getElementById('tab-users').classList.add('hidden');
+                    document.getElementById('managerBranchFilterContainer').classList.add('hidden');
                 }
             } else { 
                 document.getElementById('loginOverlay').style.display = 'flex'; 
@@ -1083,7 +1097,6 @@
                 return;
             }
             
-            // مزامنة المستخدمين من Firebase أيضاً
             rtdb.ref('systemUsers').on('value', (snapshot) => {
                 const val = snapshot.val();
                 if(val) {
@@ -1179,12 +1192,22 @@
         let finBarChartInstance = null;
         let payPieChartInstance = null;
 
-        // فلترة البيانات حسب فرع المستخدم (إذا لم يكن مديراً، أو المدير يرى الكل؟ حسب الرغبة، هنا الموظف يرى بيانات فرعه)
+        // دالة تصفية البيانات حسب الفرع (الموظف يرى فرعه حصراً، والمدير يمكنه التبديل بين كل الأفرع أو فرع محدد)
         function getFilteredData(list) {
             if(!currentUser) return list;
-            // إذا أراد المدير رؤية بيانات كل الأفرع، أو فرعه فقط؟ عادة الموظف يرى فرعه، والمدير يرى الكل أو حسب الحاجة. سنسمح للمدير برؤية كل الفروع والموظف بفرعه.
-            if(currentUser.role === 'مدير') return list;
-            return list.filter(item => item.branch === (currentUser.branch || 'فرع عجمان'));
+            
+            if(currentUser.role !== 'مدير') {
+                return list.filter(item => item.branch === (currentUser.branch || 'فرع عجمان'));
+            }
+            
+            const branchSelect = document.getElementById('selectedManagerBranch');
+            const selectedBranch = branchSelect ? branchSelect.value : 'ALL';
+            
+            if(selectedBranch === 'ALL') {
+                return list; // جميع الأفرع مجتمعة
+            } else {
+                return list.filter(item => item.branch === selectedBranch); // فرع محدد
+            }
         }
 
         function renderDashboardData() {
@@ -1543,7 +1566,6 @@
             alert('تم حفظ السند المالي بنجاح!');
         }
 
-        // إدارة المستخدمين (للمدير)
         function renderUsersTable() {
             const tbody = document.querySelector('#usersTable tbody');
             if(!tbody) return;
@@ -1644,7 +1666,7 @@
                 });
 
                 let tktRev = 0;
-                searchP.forEach((p, idx) => {
+                searchP.forEach((p) => {
                     tktRev += p.fare || 0;
                     let extraNamesHtml = '-';
                     if(p.extraPassengers && p.extraPassengers.length > 0) {
@@ -1683,7 +1705,7 @@
                     return c.sender.toLowerCase().includes(query) || String(c.id).includes(query) || c.receiver.toLowerCase().includes(query);
                 });
                 
-                searchC.forEach((c, idx) => {
+                searchC.forEach((c) => {
                     let itemCount = c.items ? c.items.length : 1;
                     const realIdx = db.cargo.findIndex(x => x.id === c.id);
 
