@@ -62,13 +62,30 @@
             <form onsubmit="handleLogin(event)">
                 <div class="mb-4">
                     <label id="lgUserLbl" class="block text-xs font-bold text-zinc-300 mb-2">اسم المستخدم</label>
-                    <input type="text" id="loginUser" class="w-full bg-darkbg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required placeholder="Username">
+                    <input type="text" id="loginUser" class="w-full bg-darkbg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required placeholder="اسم المستخدم">
                 </div>
                 <div class="mb-6">
                     <label id="lgPassLbl" class="block text-xs font-bold text-zinc-300 mb-2">كلمة المرور</label>
                     <input type="password" id="loginPass" class="w-full bg-darkbg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required placeholder="••••••••">
                 </div>
                 <button type="submit" id="lgBtn" class="w-full gold-gradient-bg text-black font-extrabold py-3 rounded-xl shadow-lg transition">دخول النظام</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- CHANGE PASSWORD MODAL (للمستخدم العادي أو المدير) -->
+    <div class="modal-overlay hidden" id="changePassModal">
+        <div class="modal-card" style="max-width: 400px;">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
+                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-key ml-1"></i> تغيير كلمة المرور الخاصة بي</h3>
+                <button onclick="closeModal('changePassModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="handleUserChangePassword(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-zinc-300 mb-1">كلمة المرور الجديدة</label>
+                    <input type="password" id="newPassInput" required class="w-full bg-darkbg border border-gold rounded-xl px-3 py-2 text-xs text-zinc-100 outline-none" placeholder="أدخل كلمة المرور الجديدة">
+                </div>
+                <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-2.5 rounded-xl text-xs shadow">حفظ كلمة المرور</button>
             </form>
         </div>
     </div>
@@ -122,9 +139,9 @@
                 <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
                     <div id="tktFootNote">* رحلة موفقة وآمنة مع وادي بناء للنقل البري. أرقام التواصل بالمكاتب:</div>
                     <div class="grid grid-cols-1 gap-0.5 font-bold text-slate-800">
-                        <div>• عجمان (الجرف 2): 0508200749 - 0558675501 - 0502920559</div>
-                        <div>• ابوظبي بني ياس: 0508200754 - 0558675501 - 0502920559</div>
-                        <div>• مكتب عدن: 0783424999 - 0776363101</div>
+                        <div>• عجمان (الجرف 2): 0508200749 - 0558675501</div>
+                        <div>• ابوظبي بني ياس: 0508200754 - 0558675501</div>
+                        <div>• عدن: 0783424999 - 0776363101</div>
                     </div>
                 </div>
             </div>
@@ -136,7 +153,7 @@
         </div>
     </div>
 
-    <!-- PREVIEW CARGO MODAL (مع إخفاء سعر الصنف الفردي وإظهار الإجمالي النهائي فقط) -->
+    <!-- PREVIEW CARGO MODAL -->
     <div class="modal-overlay hidden" id="cargoPreviewModal">
         <div class="modal-card" style="max-width: 750px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
@@ -173,7 +190,6 @@
                     </div>
                 </div>
 
-                <!-- جدول أصناف الشحن بدون سعر فردي، مع إظهار الكمية وإجمالي الصنف النهائي -->
                 <table class="w-full border-collapse text-right text-xs mb-4" style="direction: inherit;">
                     <thead>
                         <tr class="bg-slate-200 text-slate-800">
@@ -198,12 +214,7 @@
                 </div>
 
                 <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
-                    <div id="cargoFootNote">* شكراً لاختياركم وادي بناء لشحن أمتعتكم. عناية تامة وآمنة. أرقام التواصل:</div>
-                    <div class="grid grid-cols-1 gap-0.5 font-bold text-slate-800">
-                        <div>• عجمان (الجرف 2): 0508200749 - 0558675501</div>
-                        <div>• ابوظبي بني ياس: 0508200754 - 0558675501</div>
-                        <div>• عدن: 0783424999 - 0776363101</div>
-                    </div>
+                    <div id="cargoFootNote">* شكراً لاختياركم وادي بناء لشحن أمتعتكم. أرقام التواصل بالمكاتب:</div>
                 </div>
             </div>
             <div class="mt-5 flex gap-2 flex-wrap no-print">
@@ -321,7 +332,7 @@
         </div>
     </div>
 
-    <!-- CARGO MANIFEST MODAL (مع حالة السداد) -->
+    <!-- CARGO MANIFEST MODAL -->
     <div class="modal-overlay hidden" id="cargoManifestModal">
         <div class="modal-card" style="max-width: 850px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
@@ -354,8 +365,8 @@
                         <tr class="bg-slate-200 text-slate-800">
                             <th class="border border-slate-300 p-2">م</th>
                             <th class="border border-slate-300 p-2">الفاتورة</th>
-                            <th class="border border-slate-300 p-2">المرسل (الاسم وهاتف)</th>
-                            <th class="border border-slate-300 p-2">المستلم (الاسم وهاتف)</th>
+                            <th class="border border-slate-300 p-2">المرسل</th>
+                            <th class="border border-slate-300 p-2">المستلم</th>
                             <th class="border border-slate-300 p-2">وصف الأصناف والعدد</th>
                             <th class="border border-slate-300 p-2">الإجمالي</th>
                             <th class="border border-slate-300 p-2">حالة السداد</th>
@@ -381,7 +392,9 @@
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <!-- زر تغيير اللغة -->
+            <button onclick="openChangePasswordModal()" class="bg-zinc-800 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-bold">
+                <i class="fa-solid fa-key"></i> <span id="btnChangePass">كلمة المرور</span>
+            </button>
             <button onclick="toggleLanguage()" id="langToggleBtn" class="bg-gold/20 text-gold border border-gold/40 px-3 py-1.5 rounded-xl text-xs font-extrabold hover:bg-gold/30">
                 <i class="fa-solid fa-globe"></i> English
             </button>
@@ -414,7 +427,10 @@
                     <i class="fa-solid fa-boxes-packing ml-1.5"></i> فواتير الشحن
                 </button>
                 <button onclick="switchTab('financials')" id="tab-financials" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
-                    <i class="fa-solid fa-calculator ml-1.5"></i> الحسابات والإدارة المالية
+                    <i class="fa-solid fa-calculator ml-1.5"></i> الإدارة المالية
+                </button>
+                <button onclick="switchTab('users')" id="tab-users" class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold hidden">
+                    <i class="fa-solid fa-users-gear ml-1.5"></i> إدارة المستخدمين (للمدير)
                 </button>
             </div>
         </div>
@@ -597,7 +613,8 @@
                                 <th id="thP7">تاريخ الإصدار</th>
                                 <th id="thP8">المبلغ</th>
                                 <th id="thP9">السداد</th>
-                                <th id="thP10">إجراءات / طباعة</th>
+                                <th id="thP10">الفرع</th>
+                                <th id="thP11">إجراءات / طباعة</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -662,7 +679,7 @@
 
                     <div class="bg-darkbg p-4 rounded-xl border border-zinc-800 space-y-3">
                         <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
-                            <span id="lblItemsList" class="text-xs font-bold text-gold"><i class="fa-solid fa-list-check ml-1"></i> أصناف الأمتعة (يدعم الأرقام الكسرية الدقيقة مثل 122.2222)</span>
+                            <span id="lblItemsList" class="text-xs font-bold text-gold"><i class="fa-solid fa-list-check ml-1"></i> أصناف الأمتعة (يدعم الأرقام الكسرية الدقيقة)</span>
                             <button type="button" onclick="addCargoItemRow()" id="btnAddItem" class="bg-gold text-black font-extrabold px-3 py-1 rounded text-xs hover:bg-gold-400"><i class="fa-solid fa-plus ml-1"></i> إضافة صنف</button>
                         </div>
                         <div class="overflow-x-auto">
@@ -706,7 +723,8 @@
                                 <th id="thC5">عدد الأصناف</th>
                                 <th id="thC6">الإجمالي</th>
                                 <th id="thC7">الحالة</th>
-                                <th id="thC8">إجراءات / طباعة</th>
+                                <th id="thC8">الفرع</th>
+                                <th id="thC9">إجراءات / طباعة</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -758,7 +776,8 @@
                                 <th id="thV3">البيان</th>
                                 <th id="thV4">المبلغ</th>
                                 <th id="thV5">المسؤول</th>
-                                <th id="thV6">إجراء</th>
+                                <th id="thV6">الفرع</th>
+                                <th id="thV7">إجراء</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -784,7 +803,8 @@
                                     <th id="thD5">المجموع</th>
                                     <th id="thD6">المدفوع</th>
                                     <th id="thD7">المتبقي</th>
-                                    <th id="thD8">إجراءات / PDF</th>
+                                    <th id="thD8">الفرع</th>
+                                    <th id="thD9">إجراءات / PDF</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -818,6 +838,64 @@
             </div>
         </section>
 
+        <!-- TAB 4: USERS MANAGEMENT (خاص بالمدير فقط) -->
+        <section id="module-users" class="tab-content hidden space-y-6">
+            <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
+                <h3 class="text-gold font-bold text-sm border-b border-zinc-800 pb-3 flex items-center justify-between">
+                    <span><i class="fa-solid fa-users-gear ml-1"></i> لوحة إدارة المستخدمين وصلاحيات الأفرع (صلاحية المدير)</span>
+                </h3>
+                
+                <form id="userForm" onsubmit="handleSaveUser(event)" class="bg-darkbg p-4 rounded-xl border border-zinc-800 space-y-3">
+                    <input type="hidden" id="userEditOriginalName" value="">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">اسم المستخدم</label>
+                            <input type="text" id="manageUsername" required class="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-100" placeholder="اسم المستخدم">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">كلمة المرور</label>
+                            <input type="text" id="managePassword" required class="w-full bg-zinc-900 border border-gold rounded p-2 text-xs text-gold font-bold" placeholder="كلمة المرور">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">الدور والصلاحية</label>
+                            <select id="manageRole" class="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200">
+                                <option value="موظف">موظف</option>
+                                <option value="مدير">مدير</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 mb-1">فرع الشركة</label>
+                            <select id="manageBranch" class="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200">
+                                <option value="فرع عجمان">فرع عجمان</option>
+                                <option value="فرع ابوظبي">فرع ابوظبي</option>
+                                <option value="فرع عمان">فرع عمان</option>
+                                <option value="فرع اليمن">فرع اليمن</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 pt-2">
+                        <button type="submit" id="userSubmitBtn" class="gold-gradient-bg text-black font-bold px-4 py-2 rounded text-xs">إضافة مستخدم جديد</button>
+                        <button type="button" onclick="resetUserForm()" class="bg-zinc-800 text-zinc-300 px-4 py-2 rounded text-xs">إلغاء</button>
+                    </div>
+                </form>
+
+                <div class="overflow-x-auto">
+                    <table class="custom-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>اسم المستخدم</th>
+                                <th>كلمة المرور</th>
+                                <th>الصلاحية</th>
+                                <th>الفرع التابع له</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <script>
@@ -838,10 +916,11 @@
 
         let currentUser = JSON.parse(localStorage.getItem('WADI_BINA_USER')) || null;
         let currentLang = localStorage.getItem('WADI_BINA_LANG') || 'ar';
+        
         const DEFAULT_USERS = [
-            { username: 'وليد السيد', password: '708090', role: 'مدير' },
-            { username: 'محمود', password: '102030', role: 'موظف' },
-            { username: 'يوسف', password: '405060', role: 'موظف' }
+            { username: 'وليد السيد', password: '708090', role: 'مدير', branch: 'فرع عجمان' },
+            { username: 'محمود', password: '102030', role: 'موظف', branch: 'فرع عجمان' },
+            { username: 'يوسف', password: '405060', role: 'موظف', branch: 'فرع اليمن' }
         ];
 
         const translations = {
@@ -860,13 +939,13 @@
                 lblPassHeader: 'إدارة رحلات وتذاكر الركاب والركاب الإضافيين', lblPassSub: 'إصدار التذاكر وتعديلها وطباعتها بصيغة PDF', btnManifestP: 'كشف الرحلة (Manifest)',
                 passFormTitle: 'إصدار تذكرة سفر جديدة', cancelEditPassBtn: 'إلغاء التعديل', lblTktNo: 'رقم البوليصة *', lblAgent: 'اسم الوكيل *', lblCount: 'عدد الركاب *', lblFare: 'الإجمالي (درهم) *', lblTime: 'وقت الحضور *', lblMainPax: 'بيانات الراكب الرئيسي', lblExtraPax: 'بيانات الركاب الإضافيين', passSubmitBtn: 'حفظ وإصدار التذكرة',
                 lblPassStats: 'إحصائيات التذاكر', lblTktCount: 'التذاكر المحجوزة:', lblTktRev: 'إجمالي الإيرادات:', lblPassLog: 'سجل جميع التذاكر والركاب الإضافيين',
-                thP1: 'البوليصة', thP2: 'الوكيل', thP3: 'الاسم الرئيسي', thP4: 'الركاب الإضافيون', thP5: 'الهاتف', thP6: 'المسار', thP7: 'تاريخ الإصدار', thP8: 'المبلغ', thP9: 'السداد', thP10: 'إجراءات / طباعة',
+                thP1: 'البوليصة', thP2: 'الوكيل', thP3: 'الاسم الرئيسي', thP4: 'الركاب الإضافيون', thP5: 'الهاتف', thP6: 'المسار', thP7: 'تاريخ الإصدار', thP8: 'المبلغ', thP9: 'السداد', thP10: 'الفرع', thP11: 'إجراءات / طباعة',
                 lblCargoHeader: 'إدارة فواتير الشحن والأصناف', lblCargoSub: 'إصدار الفواتير وطباعة مانفيستو الشحن الشامل', btnManifestC: 'كشف مانفيستو الشحن',
-                cargoFormTitle: 'فاتورة أمتعة وبضائع (بأرقام كسرية دقيقة للأسعار)', cancelEditCargoBtn: 'إلغاء التعديل', lblInvNo: 'رقم الفاتورة *', lblInvDate: 'تاريخ الفاتورة *', lblInvStatus: 'حالة السداد *', lblSenderBox: 'بيانات المرسل', lblReceiverBox: 'بيانات المستلم', lblItemsList: 'أصناف الأمتعة (يدعم الأرقام الكسرية الدقيقة مثل 122.2222)', btnAddItem: 'إضافة صنف', thBDesc: 'الوصف', thBQty: 'العدد', thBPrice: 'السعر الإجمالي للصنف (كسري)', thBDel: 'حذف', lblTotalCalc: 'الإجمالي النهائي المحسوب للأصناف:', cargoSubmitBtn: 'حفظ فاتورة الشحن والأصناف', lblCargoLog: 'سجل فواتير الشحن والأصناف',
-                thC1: 'الفاتورة', thC2: 'التاريخ', thC3: 'المرسل', thC4: 'المستلم', thC5: 'عدد الأصناف', thC6: 'الإجمالي', thC7: 'الحالة', thC8: 'إجراءات / طباعة',
+                cargoFormTitle: 'فاتورة أمتعة وبضائع (بأرقام كسرية دقيقة للأسعار)', cancelEditCargoBtn: 'إلغاء التعديل', lblInvNo: 'رقم الفاتورة *', lblInvDate: 'تاريخ الفاتورة *', lblInvStatus: 'حالة السداد *', lblSenderBox: 'بيانات المرسل', lblReceiverBox: 'بيانات المستلم', lblItemsList: 'أصناف الأمتعة (يدعم الأرقام الكسرية الدقيقة)', btnAddItem: 'إضافة صنف', thBDesc: 'الوصف', thBQty: 'العدد', thBPrice: 'السعر الإجمالي للصنف (كسري)', thBDel: 'حذف', lblTotalCalc: 'الإجمالي النهائي المحسوب للأصناف:', cargoSubmitBtn: 'حفظ فاتورة الشحن والأصناف', lblCargoLog: 'سجل فواتير الشحن والأصناف',
+                thC1: 'الفاتورة', thC2: 'التاريخ', thC3: 'المرسل', thC4: 'المستلم', thC5: 'عدد الأصناف', thC6: 'الإجمالي', thC7: 'الحالة', thC8: 'الفرع', thC9: 'إجراءات / طباعة',
                 lblFin1: 'إجمالي التذاكر', lblFin2: 'إجمالي الشحن', lblFin3: 'المصروفات', lblFin4: 'صافي الصندوق',
-                lblVoucherHead: 'سندات القبض والصرف والنثريات', btnSaveV: 'حفظ السند المالي', thV1: 'النوع', thV2: 'التاريخ', thV3: 'البيان', thV4: 'المبلغ', thV5: 'المسؤول', thV6: 'إجراء',
-                lblDebtHead: 'فواتير وحسابات الذمم الآجلة', btnNewDebt: 'إنشاء فاتورة آجل', thD1: 'الفاتورة', thD2: 'التاريخ', thD3: 'الاسم', thD4: 'الهاتف', thD5: 'المجموع', thD6: 'المدفوع', thD7: 'المتبقي', thD8: 'إجراءات / PDF',
+                lblVoucherHead: 'سندات القبض والصرف والنثريات', btnSaveV: 'حفظ السند المالي', thV1: 'النوع', thV2: 'التاريخ', thV3: 'البيان', thV4: 'المبلغ', thV5: 'المسؤول', thV6: 'الفرع', thV7: 'إجراء',
+                lblDebtHead: 'فواتير وحسابات الذمم الآجلة', btnNewDebt: 'إنشاء فاتورة آجل', thD1: 'الفاتورة', thD2: 'التاريخ', thD3: 'الاسم', thD4: 'الهاتف', thD5: 'المجموع', thD6: 'المدفوع', thD7: 'المتبقي', thD8: 'الفرع', thD9: 'إجراءات / PDF',
                 lblDebtFormTitle: 'إصدار فاتورة حساب آجل جديدة', btnSaveDebt: 'حفظ وإصدار', btnCancelDebt: 'إلغاء',
                 tktPreviewHead: 'معاينة وتنزيل بوليصة التذكرة', cargoPreviewHead: 'معاينة وتنزيل فاتورة الشحن والأصناف', debtPreviewHead: 'معاينة وتنزيل فاتورة الحساب الآجل',
                 manPTitle: 'كشف رحلة ركاب شامل', manCTitle: 'كشف مانفيستو فواتير الشحن والأصناف',
@@ -889,13 +968,13 @@
                 lblPassHeader: 'Passenger Trips & Extra Passengers Management', lblPassSub: 'Issue, edit, and print tickets as PDF', btnManifestP: 'Passenger Manifest',
                 passFormTitle: 'Issue New Travel Ticket', cancelEditPassBtn: 'Cancel Edit', lblTktNo: 'Policy No *', lblAgent: 'Agent Name *', lblCount: 'Passenger Count *', lblFare: 'Total Fare (AED) *', lblTime: 'Reporting Time *', lblMainPax: 'Main Passenger Info', lblExtraPax: 'Extra Passengers Info', passSubmitBtn: 'Save & Issue Ticket',
                 lblPassStats: 'Ticket Statistics', lblTktCount: 'Booked Tickets:', lblTktRev: 'Total Revenue:', lblPassLog: 'All Tickets & Extra Passengers Record',
-                thP1: 'Policy', thP2: 'Agent', thP3: 'Main Name', thP4: 'Extra Passengers', thP5: 'Phone', thP6: 'Route', thP7: 'Issue Date', thP8: 'Amount', thP9: 'Status', thP10: 'Actions / Print',
+                thP1: 'Policy', thP2: 'Agent', thP3: 'Main Name', thP4: 'Extra Passengers', thP5: 'Phone', thP6: 'Route', thP7: 'Issue Date', thP8: 'Amount', thP9: 'Status', thP10: 'Branch', thP11: 'Actions / Print',
                 lblCargoHeader: 'Cargo Invoices & Items Management', lblCargoSub: 'Issue invoices and print comprehensive cargo manifest', btnManifestC: 'Cargo Manifest',
-                cargoFormTitle: 'Luggage & Cargo Invoice (Supports Precise Decimal Prices)', cancelEditCargoBtn: 'Cancel Edit', lblInvNo: 'Invoice No *', lblInvDate: 'Invoice Date *', lblInvStatus: 'Payment Status *', lblSenderBox: 'Sender Information', lblReceiverBox: 'Receiver Information', lblItemsList: 'Luggage Items (Supports exact decimals like 122.2222)', btnAddItem: 'Add Item', thBDesc: 'Description', thBQty: 'Qty', thBPrice: 'Total Item Price (Decimal)', thBDel: 'Delete', lblTotalCalc: 'Calculated Final Grand Total:', cargoSubmitBtn: 'Save Cargo Invoice & Items', lblCargoLog: 'Cargo Invoices Record',
-                thC1: 'Invoice', thC2: 'Date', thC3: 'Sender', thC4: 'Receiver', thC5: 'Items Count', thC6: 'Total', thC7: 'Status', thC8: 'Actions / Print',
+                cargoFormTitle: 'Luggage & Cargo Invoice (Supports Precise Decimal Prices)', cancelEditCargoBtn: 'Cancel Edit', lblInvNo: 'Invoice No *', lblInvDate: 'Invoice Date *', lblInvStatus: 'Payment Status *', lblSenderBox: 'Sender Information', lblReceiverBox: 'Receiver Information', lblItemsList: 'Luggage Items (Supports exact decimals)', btnAddItem: 'Add Item', thBDesc: 'Description', thBQty: 'Qty', thBPrice: 'Total Item Price (Decimal)', thBDel: 'Delete', lblTotalCalc: 'Calculated Final Grand Total:', cargoSubmitBtn: 'Save Cargo Invoice & Items', lblCargoLog: 'Cargo Invoices Record',
+                thC1: 'Invoice', thC2: 'Date', thC3: 'Sender', thC4: 'Receiver', thC5: 'Items Count', thC6: 'Total', thC7: 'Status', thC8: 'Branch', thC9: 'Actions / Print',
                 lblFin1: 'Total Tickets', lblFin2: 'Total Cargo', lblFin3: 'Expenses', lblFin4: 'Net Cash Box',
-                lblVoucherHead: 'Receipts, Payments & Vouchers', btnSaveV: 'Save Financial Voucher', thV1: 'Type', thV2: 'Date', thV3: 'Description', thV4: 'Amount', thV5: 'User', thV6: 'Action',
-                lblDebtHead: 'Deferred Accounts & Debts Invoices', btnNewDebt: 'Create Debt Invoice', thD1: 'Invoice', thD2: 'Date', thD3: 'Name', thD4: 'Phone', thD5: 'Total', thD6: 'Paid', thD7: 'Remaining', thD8: 'Actions / PDF',
+                lblVoucherHead: 'Receipts, Payments & Vouchers', btnSaveV: 'Save Financial Voucher', thV1: 'Type', thV2: 'Date', thV3: 'Description', thV4: 'Amount', thV5: 'User', thV6: 'Branch', thV7: 'Action',
+                lblDebtHead: 'Deferred Accounts & Debts Invoices', btnNewDebt: 'Create Debt Invoice', thD1: 'Invoice', thD2: 'Date', thD3: 'Name', thD4: 'Phone', thD5: 'Total', thD6: 'Paid', thD7: 'Remaining', thD8: 'Branch', thD9: 'Actions / PDF',
                 lblDebtFormTitle: 'Issue New Deferred Account Invoice', btnSaveDebt: 'Save & Issue', btnCancelDebt: 'Cancel',
                 tktPreviewHead: 'Preview & Download Ticket Policy', cargoPreviewHead: 'Preview & Download Cargo Invoice', debtPreviewHead: 'Preview & Download Deferred Invoice',
                 manPTitle: 'Comprehensive Passenger Manifest', manCTitle: 'Cargo Manifest & Items',
@@ -917,7 +996,6 @@
             document.getElementById('htmlRoot').setAttribute('lang', t.htmlLang);
             document.getElementById('pageTitle').innerText = t.pageTitle;
             
-            // تحديث نصوص الأزرار والترويسات في القالب
             for (let key in t) {
                 const el = document.getElementById(key);
                 if (el) {
@@ -936,7 +1014,7 @@
             e.preventDefault();
             const uInput = document.getElementById('loginUser').value.trim();
             const pInput = document.getElementById('loginPass').value.trim();
-            const users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
             const found = users.find(u => u.username === uInput && u.password === pInput);
             if(found) {
                 currentUser = found;
@@ -948,11 +1026,50 @@
         }
 
         function handleLogout() { localStorage.removeItem('WADI_BINA_USER'); location.reload(); }
+        
         function updateUserBadge() {
             if(currentUser) {
-                document.getElementById('userInfoBadge').innerText = `${currentUser.username} (${currentUser.role})`;
+                document.getElementById('userInfoBadge').innerText = `${currentUser.username} (${currentUser.role} - ${currentUser.branch || 'فرع عجمان'})`;
                 document.getElementById('loginOverlay').style.display = 'none';
-            } else { document.getElementById('loginOverlay').style.display = 'flex'; }
+                
+                // إظهار تبويب إدارة المستخدمين فقط إذا كان المستخدم مديراً
+                if(currentUser.role === 'مدير') {
+                    document.getElementById('tab-users').classList.remove('hidden');
+                } else {
+                    document.getElementById('tab-users').classList.add('hidden');
+                }
+            } else { 
+                document.getElementById('loginOverlay').style.display = 'flex'; 
+            }
+        }
+
+        function openChangePasswordModal() {
+            document.getElementById('newPassInput').value = '';
+            document.getElementById('changePassModal').classList.remove('hidden');
+        }
+
+        function handleUserChangePassword(e) {
+            e.preventDefault();
+            const newPass = document.getElementById('newPassInput').value.trim();
+            if(!newPass) return;
+
+            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            const userObj = users.find(u => u.username === currentUser.username);
+            if(userObj) {
+                userObj.password = newPass;
+            } else {
+                currentUser.password = newPass;
+                users.push(currentUser);
+            }
+            localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
+            currentUser.password = newPass;
+            localStorage.setItem('WADI_BINA_USER', JSON.stringify(currentUser));
+            
+            if(useFirebase && rtdb) {
+                rtdb.ref('systemUsers').set(users);
+            }
+            alert('تم تغيير كلمة المرور بنجاح!');
+            closeModal('changePassModal');
         }
 
         let db = { passengers: [], cargo: [], vouchers: [], debtInvoices: [], nextTicketNo: 115, nextCargoNo: 121, nextDebtInvNo: 120 };
@@ -965,6 +1082,17 @@
                 loadFromLocal();
                 return;
             }
+            
+            // مزامنة المستخدمين من Firebase أيضاً
+            rtdb.ref('systemUsers').on('value', (snapshot) => {
+                const val = snapshot.val();
+                if(val) {
+                    localStorage.setItem('WADI_BINA_USERS', JSON.stringify(Object.values(val)));
+                } else {
+                    rtdb.ref('systemUsers').set(DEFAULT_USERS);
+                }
+            });
+
             rtdb.ref('systemUnifiedData').on('value', (snapshot) => {
                 const val = snapshot.val();
                 if(val) {
@@ -1043,17 +1171,32 @@
                 renderVouchersTable();
                 renderDebtInvoicesTable();
             }
+            if(currentTab === 'users' && currentUser && currentUser.role === 'مدير') {
+                renderUsersTable();
+            }
         }
 
         let finBarChartInstance = null;
         let payPieChartInstance = null;
 
+        // فلترة البيانات حسب فرع المستخدم (إذا لم يكن مديراً، أو المدير يرى الكل؟ حسب الرغبة، هنا الموظف يرى بيانات فرعه)
+        function getFilteredData(list) {
+            if(!currentUser) return list;
+            // إذا أراد المدير رؤية بيانات كل الأفرع، أو فرعه فقط؟ عادة الموظف يرى فرعه، والمدير يرى الكل أو حسب الحاجة. سنسمح للمدير برؤية كل الفروع والموظف بفرعه.
+            if(currentUser.role === 'مدير') return list;
+            return list.filter(item => item.branch === (currentUser.branch || 'فرع عجمان'));
+        }
+
         function renderDashboardData() {
-            const totalPassengersCount = db.passengers.length;
-            const totalCargoRev = db.cargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + c.grandTotal, 0);
-            const totalTicketRev = db.passengers.reduce((s, p) => s + (p.fare || 0), 0);
-            const totalExpenses = db.vouchers.filter(v => v.type === 'صرف').reduce((s, v) => s + v.amount, 0);
-            const totalVoucherRec = db.vouchers.filter(v => v.type === 'قبض').reduce((s, v) => s + v.amount, 0);
+            const filteredPass = getFilteredData(db.passengers);
+            const filteredCargo = getFilteredData(db.cargo);
+            const filteredVouchers = getFilteredData(db.vouchers);
+
+            const totalPassengersCount = filteredPass.length;
+            const totalCargoRev = filteredCargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + c.grandTotal, 0);
+            const totalTicketRev = filteredPass.reduce((s, p) => s + (p.fare || 0), 0);
+            const totalExpenses = filteredVouchers.filter(v => v.type === 'صرف').reduce((s, v) => s + v.amount, 0);
+            const totalVoucherRec = filteredVouchers.filter(v => v.type === 'قبض').reduce((s, v) => s + v.amount, 0);
             const netBox = (totalTicketRev + totalCargoRev + totalVoucherRec) - totalExpenses;
 
             document.getElementById('dashTotalPassengers').innerText = totalPassengersCount;
@@ -1079,8 +1222,8 @@
                 });
             }
 
-            const paidCount = db.passengers.filter(p => p.payMethod === 'مدفوع').length + db.cargo.filter(c => c.paymentStatus === 'مدفوع').length;
-            const unpaidCount = (db.passengers.length + db.cargo.length) - paidCount;
+            const paidCount = filteredPass.filter(p => p.payMethod === 'مدفوع').length + filteredCargo.filter(c => c.paymentStatus === 'مدفوع').length;
+            const unpaidCount = (filteredPass.length + filteredCargo.length) - paidCount;
 
             const ctxPie = document.getElementById('paymentStatusPieChart');
             if (ctxPie) {
@@ -1096,7 +1239,6 @@
             }
         }
 
-        // دالة التصدير لـ PDF مع ضمان اتجاه وترتيب النصوص العربية والإنجليزية
         function exportToPDF(elementId, filePrefix) {
             const element = document.getElementById(elementId);
             html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
@@ -1150,7 +1292,6 @@
             }
         }
 
-        // دعم الأرقام الكسرية الدقيقة لأصناف فواتير الشحن
         function addCargoItemRow(desc = '', qty = 1, price = 100) {
             const tbody = document.getElementById('cargoItemsRowsContainer');
             const tr = document.createElement('tr');
@@ -1206,7 +1347,8 @@
                 date: currentDate,
                 reportingTime: document.getElementById('passReportingTime').value,
                 fare: parseFloat(document.getElementById('passManualTotal').value) || (count * 400),
-                payMethod: document.getElementById('passPayMethod').value
+                payMethod: document.getElementById('passPayMethod').value,
+                branch: currentUser.branch || 'فرع عجمان'
             };
 
             if (editId) {
@@ -1295,7 +1437,8 @@
                 receiverAddress: document.getElementById('cargoReceiverAddress').value || 'عدن',
                 items: itemsList,
                 grandTotal: parseFloat(document.getElementById('cargoManualTotal').value) || 0,
-                paymentStatus: document.getElementById('cargoPaymentStatus').value
+                paymentStatus: document.getElementById('cargoPaymentStatus').value,
+                branch: currentUser.branch || 'فرع عجمان'
             };
 
             if (editId) {
@@ -1370,7 +1513,8 @@
                 address: document.getElementById('debtInvCustomerAddress').value,
                 subTotal: parseFloat(document.getElementById('debtInvSubTotal').value) || 0,
                 paidAmount: parseFloat(document.getElementById('debtInvPaidAmount').value) || 0,
-                netTotal: parseFloat(document.getElementById('debtInvNetTotal').value) || 0
+                netTotal: parseFloat(document.getElementById('debtInvNetTotal').value) || 0,
+                branch: currentUser.branch || 'فرع عجمان'
             };
             db.debtInvoices.unshift(newInv);
             db.nextDebtInvNo = parseInt(invNo) + 1 || (db.nextDebtInvNo + 1);
@@ -1389,7 +1533,8 @@
                 date: document.getElementById('vDate').value,
                 amount: parseFloat(document.getElementById('vAmount').value) || 0,
                 desc: document.getElementById('vDesc').value,
-                user: currentUser.username
+                user: currentUser.username,
+                branch: currentUser.branch || 'فرع عجمان'
             };
             db.vouchers.unshift(v);
             saveDB();
@@ -1398,23 +1543,115 @@
             alert('تم حفظ السند المالي بنجاح!');
         }
 
+        // إدارة المستخدمين (للمدير)
+        function renderUsersTable() {
+            const tbody = document.querySelector('#usersTable tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            
+            users.forEach((u, idx) => {
+                tbody.insertRow().innerHTML = `
+                    <td><strong>${u.username}</strong></td>
+                    <td><span class="text-gold font-bold">${u.password}</span></td>
+                    <td><span class="px-2 py-0.5 rounded text-xs ${u.role==='مدير'?'bg-amber-950 text-amber-300':'bg-zinc-800 text-zinc-300'}">${u.role}</span></td>
+                    <td><span class="text-indigo-300 font-bold">${u.branch || 'فرع عجمان'}</span></td>
+                    <td class="space-x-1 space-x-reverse">
+                        <button onclick="editUser('${u.username}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i> تعديل</button>
+                        <button onclick="deleteUser(${idx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i> حذف</button>
+                    </td>
+                `;
+            });
+        }
+
+        function handleSaveUser(e) {
+            e.preventDefault();
+            const origName = document.getElementById('userEditOriginalName').value;
+            const uname = document.getElementById('manageUsername').value.trim();
+            const upass = document.getElementById('managePassword').value.trim();
+            const urole = document.getElementById('manageRole').value;
+            const ubranch = document.getElementById('manageBranch').value;
+
+            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+
+            if(origName) {
+                const idx = users.findIndex(u => u.username === origName);
+                if(idx !== -1) {
+                    users[idx] = { username: uname, password: upass, role: urole, branch: ubranch };
+                }
+                alert('تم تحديث بيانات المستخدم بنجاح!');
+            } else {
+                if(users.some(u => u.username === uname)) {
+                    alert('اسم المستخدم موجود مسبقاً!');
+                    return;
+                }
+                users.push({ username: uname, password: upass, role: urole, branch: ubranch });
+                alert('تم إضافة المستخدم الجديد بنجاح!');
+            }
+
+            localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
+            if(useFirebase && rtdb) {
+                rtdb.ref('systemUsers').set(users);
+            }
+            resetUserForm();
+            renderUsersTable();
+        }
+
+        function editUser(username) {
+            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            const u = users.find(x => x.username === username);
+            if(!u) return;
+
+            document.getElementById('userEditOriginalName').value = u.username;
+            document.getElementById('manageUsername').value = u.username;
+            document.getElementById('managePassword').value = u.password;
+            document.getElementById('manageRole').value = u.role;
+            document.getElementById('manageBranch').value = u.branch || 'فرع عجمان';
+            document.getElementById('userSubmitBtn').innerText = 'حفظ تعديلات المستخدم';
+        }
+
+        function resetUserForm() {
+            document.getElementById('userForm').reset();
+            document.getElementById('userEditOriginalName').value = '';
+            document.getElementById('userSubmitBtn').innerText = 'إضافة مستخدم جديد';
+        }
+
+        function deleteUser(idx) {
+            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            if(users.length <= 1) {
+                alert('لا يمكن حذف جميع المستخدمين!');
+                return;
+            }
+            users.splice(idx, 1);
+            localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
+            if(useFirebase && rtdb) {
+                rtdb.ref('systemUsers').set(users);
+            }
+            renderUsersTable();
+        }
+
         function handleGlobalSearch() {
             const query = document.getElementById('globalSearchInput').value.trim().toLowerCase();
+            const filteredPass = getFilteredData(db.passengers);
+            const filteredCargo = getFilteredData(db.cargo);
+
             const passTbody = document.querySelector('#passengersTable tbody');
             if (passTbody) {
                 passTbody.innerHTML = '';
-                let filteredP = db.passengers.filter(p => {
+                let searchP = filteredPass.filter(p => {
                     if(!query) return true;
                     return p.name.toLowerCase().includes(query) || String(p.id).includes(query) || p.phone.includes(query) || p.agent.toLowerCase().includes(query);
                 });
 
                 let tktRev = 0;
-                filteredP.forEach((p, idx) => {
+                searchP.forEach((p, idx) => {
                     tktRev += p.fare || 0;
                     let extraNamesHtml = '-';
                     if(p.extraPassengers && p.extraPassengers.length > 0) {
                         extraNamesHtml = p.extraPassengers.map(ex => `<span class="bg-amber-950/60 text-amber-300 px-1.5 py-0.5 rounded text-[10px] inline-block m-0.5">${ex.name}</span>`).join('');
                     }
+
+                    const realIdx = db.passengers.findIndex(x => x.id === p.id);
 
                     passTbody.insertRow().innerHTML = `
                         <td><strong>#${p.id}</strong></td>
@@ -1426,27 +1663,30 @@
                         <td><strong class="text-gold">${p.date || '-'}</strong></td>
                         <td>${p.fare} AED</td>
                         <td style="color:${p.payMethod==='مدفوع'?'#10b981':'#f59e0b'}">${p.payMethod}</td>
+                        <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${p.branch || 'فرع عجمان'}</span></td>
                         <td class="space-x-1 space-x-reverse">
                             <button onclick="previewTicket('${p.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-file-pdf"></i></button>
                             <button onclick="editPassenger('${p.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deletePassenger(${idx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="deletePassenger(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     `;
                 });
-                document.getElementById('statTicketCount').innerText = filteredP.length;
+                document.getElementById('statTicketCount').innerText = searchP.length;
                 document.getElementById('statTicketRevenue').innerText = `${tktRev} AED`;
             }
 
             const cargoTbody = document.querySelector('#cargoTable tbody');
             if (cargoTbody) {
                 cargoTbody.innerHTML = '';
-                let filteredC = db.cargo.filter(c => {
+                let searchC = filteredCargo.filter(c => {
                     if(!query) return true;
                     return c.sender.toLowerCase().includes(query) || String(c.id).includes(query) || c.receiver.toLowerCase().includes(query);
                 });
                 
-                filteredC.forEach((c, idx) => {
+                searchC.forEach((c, idx) => {
                     let itemCount = c.items ? c.items.length : 1;
+                    const realIdx = db.cargo.findIndex(x => x.id === c.id);
+
                     cargoTbody.insertRow().innerHTML = `
                         <td><strong>#${c.id}</strong></td>
                         <td><strong class="text-gold">${c.date}</strong></td>
@@ -1455,10 +1695,11 @@
                         <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs">${itemCount}</span></td>
                         <td>${c.grandTotal} AED</td>
                         <td style="color:${c.paymentStatus==='مدفوع'?'#10b981':'#f59e0b'}">${c.paymentStatus}</td>
+                        <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${c.branch || 'فرع عجمان'}</span></td>
                         <td class="space-x-1 space-x-reverse">
                             <button onclick="previewCargo('${c.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-file-pdf"></i></button>
                             <button onclick="editCargo('${c.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deleteCargo(${idx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="deleteCargo(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     `;
                 });
@@ -1491,7 +1732,6 @@
             document.getElementById('ticketPreviewModal').classList.remove('hidden');
         }
 
-        // معاينة فاتورة الشحن (مع إخفاء السعر الفردي وإظهار الإجمالي النهائي فقط للصنف)
         function previewCargo(id) {
             const item = db.cargo.find(x => String(x.id) === String(id));
             if(!item) return;
@@ -1540,14 +1780,15 @@
         function openManifestModal() {
             const tbody = document.getElementById('manifestTableBody');
             tbody.innerHTML = '';
+            const filteredPass = getFilteredData(db.passengers);
             document.getElementById('manifestIssueDate').innerText = new Date().toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US');
-            document.getElementById('manifestTotalBookings').innerText = db.passengers.length;
+            document.getElementById('manifestTotalBookings').innerText = filteredPass.length;
             
             let totalPax = 0;
-            db.passengers.forEach(p => { totalPax += 1 + (p.extraPassengers ? p.extraPassengers.length : 0); });
+            filteredPass.forEach(p => { totalPax += 1 + (p.extraPassengers ? p.extraPassengers.length : 0); });
             document.getElementById('manifestTotalPassengers').innerText = totalPax;
 
-            db.passengers.forEach((p, idx) => {
+            filteredPass.forEach((p, idx) => {
                 let extraStr = '-';
                 if(p.extraPassengers && p.extraPassengers.length > 0) {
                     extraStr = p.extraPassengers.map((ex, i) => `${i+1}) ${ex.name} (${ex.phone})`).join('<br>');
@@ -1568,14 +1809,15 @@
         function openCargoManifestModal() {
             const tbody = document.getElementById('cargoManifestTableBody');
             tbody.innerHTML = '';
+            const filteredCargo = getFilteredData(db.cargo);
             document.getElementById('cargoManifestIssueDate').innerText = new Date().toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US');
-            document.getElementById('cargoManifestTotalInvoices').innerText = db.cargo.length;
+            document.getElementById('cargoManifestTotalInvoices').innerText = filteredCargo.length;
             
             let totalRev = 0;
-            db.cargo.forEach(c => { totalRev += c.grandTotal || 0; });
+            filteredCargo.forEach(c => { totalRev += c.grandTotal || 0; });
             document.getElementById('cargoManifestTotalRevenue').innerText = `${totalRev} AED`;
 
-            db.cargo.forEach((c, idx) => {
+            filteredCargo.forEach((c, idx) => {
                 let itemsStr = '';
                 let itemsArr = c.items && c.items.length > 0 ? c.items : [{ desc: 'أمتعة متنوعة', qty: 1, price: c.grandTotal || 100 }];
                 itemsArr.forEach((it, i) => {
@@ -1585,8 +1827,8 @@
                 tbody.insertRow().innerHTML = `
                     <td class="border border-slate-300 p-2 text-center">${idx+1}</td>
                     <td class="border border-slate-300 p-2 font-bold">#${c.id}</td>
-                    <td class="border border-slate-300 p-2"><strong>${c.sender}</strong><br><span class="text-[10px] text-zinc-500">${c.senderPhone}</span></td>
-                    <td class="border border-slate-300 p-2"><strong>${c.receiver}</strong><br><span class="text-[10px] text-zinc-500">${c.receiverPhone}</span></td>
+                    <td class="border border-slate-300 p-2"><strong>${c.sender}</strong><br><span class="text-[10px] text-slate-500">${c.senderPhone}</span></td>
+                    <td class="border border-slate-300 p-2"><strong>${c.receiver}</strong><br><span class="text-[10px] text-slate-500">${c.receiverPhone}</span></td>
                     <td class="border border-slate-300 p-2 text-xs">${itemsStr}</td>
                     <td class="border border-slate-300 p-2 font-bold text-amber-600">${c.grandTotal} AED</td>
                     <td class="border border-slate-300 p-2 font-bold" style="color:${c.paymentStatus==='مدفوع'?'#10b981':'#f59e0b'}">${c.paymentStatus}</td>
@@ -1596,10 +1838,14 @@
         }
 
         function renderFinancials() {
-            const tSum = db.passengers.reduce((s, p) => s + (p.fare || 0), 0);
-            const cSum = db.cargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + c.grandTotal, 0);
-            const vExp = db.vouchers.filter(v => v.type === 'صرف').reduce((s, v) => s + v.amount, 0);
-            const vRec = db.vouchers.filter(v => v.type === 'قبض').reduce((s, v) => s + v.amount, 0);
+            const filteredPass = getFilteredData(db.passengers);
+            const filteredCargo = getFilteredData(db.cargo);
+            const filteredVouchers = getFilteredData(db.vouchers);
+
+            const tSum = filteredPass.reduce((s, p) => s + (p.fare || 0), 0);
+            const cSum = filteredCargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + c.grandTotal, 0);
+            const vExp = filteredVouchers.filter(v => v.type === 'صرف').reduce((s, v) => s + v.amount, 0);
+            const vRec = filteredVouchers.filter(v => v.type === 'قبض').reduce((s, v) => s + v.amount, 0);
 
             document.getElementById('finTicketsSum').innerText = `${tSum} AED`;
             document.getElementById('finCargoSum').innerText = `${cSum} AED`;
@@ -1609,16 +1855,19 @@
 
         function renderVouchersTable() {
             const tbody = document.querySelector('#vouchersTable tbody');
+            const filteredVouchers = getFilteredData(db.vouchers);
             if (tbody) {
                 tbody.innerHTML = '';
-                db.vouchers.forEach((v, idx) => {
+                filteredVouchers.forEach((v) => {
+                    const realIdx = db.vouchers.findIndex(x => x.id === v.id);
                     tbody.insertRow().innerHTML = `
                         <td><span class="px-2 py-0.5 rounded text-xs font-bold ${v.type==='قبض'?'bg-emerald-950 text-emerald-400':'bg-red-950 text-red-400'}">${v.type}</span></td>
                         <td>${v.date}</td>
                         <td>${v.desc}</td>
                         <td><strong>${v.amount} AED</strong></td>
                         <td>${v.user}</td>
-                        <td><button onclick="deleteVoucher(${idx})" class="bg-red-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button></td>
+                        <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${v.branch || 'فرع عجمان'}</span></td>
+                        <td><button onclick="deleteVoucher(${realIdx})" class="bg-red-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button></td>
                     `;
                 });
             }
@@ -1626,9 +1875,11 @@
 
         function renderDebtInvoicesTable() {
             const tbody = document.querySelector('#debtInvoicesTable tbody');
+            const filteredDebts = getFilteredData(db.debtInvoices);
             if (tbody) {
                 tbody.innerHTML = '';
-                db.debtInvoices.forEach((inv, idx) => {
+                filteredDebts.forEach((inv) => {
+                    const realIdx = db.debtInvoices.findIndex(x => x.id === inv.id);
                     tbody.insertRow().innerHTML = `
                         <td><strong>#${inv.id}</strong></td>
                         <td>${inv.date}</td>
@@ -1637,9 +1888,10 @@
                         <td>${inv.subTotal} AED</td>
                         <td class="text-emerald-400">${inv.paidAmount} AED</td>
                         <td class="text-amber-400 font-bold">${inv.netTotal} AED</td>
+                        <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${inv.branch || 'فرع عجمان'}</span></td>
                         <td>
                             <button onclick="previewDebtInvoice('${inv.id}')" class="bg-red-600 text-white px-2.5 py-1 rounded text-xs font-bold shadow"><i class="fa-solid fa-file-pdf"></i> PDF</button>
-                            <button onclick="deleteDebtInvoice(${idx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="deleteDebtInvoice(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     `;
                 });
@@ -1672,7 +1924,7 @@
         }
 
         function exportExcel(type) {
-            const data = type === 'passengers' ? db.passengers : db.cargo;
+            const data = type === 'passengers' ? getFilteredData(db.passengers) : getFilteredData(db.cargo);
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, type);
