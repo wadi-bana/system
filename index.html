@@ -40,7 +40,7 @@
         .custom-table th { background: rgba(255, 255, 255, 0.03); color: var(--gold-primary); padding: 10px; border-bottom: 2px solid var(--border-color); white-space: nowrap; }
         .custom-table td { padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(9, 9, 11, 0.92); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-card { background: var(--bg-card); border: 2px solid var(--gold-primary); border-radius: 16px; padding: 25px; width: 100%; max-width: 750px; box-shadow: 0 15px 35px rgba(212, 175, 55, 0.2); position: relative; max-height: 90vh; overflow-y: auto; }
+        .modal-card { background: var(--bg-card); border: 2px solid var(--gold-primary); border-radius: 16px; padding: 25px; width: 100%; max-width: 800px; box-shadow: 0 15px 35px rgba(212, 175, 55, 0.2); position: relative; max-height: 90vh; overflow-y: auto; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         @media print {
             body { background: white !important; color: black !important; }
@@ -118,7 +118,7 @@
                     <div><strong id="lblPrPass">رقم الجواز / الهوية:</strong> <span id="imgTktPassport"></span></div>
                     <div class="pt-1 border-t border-slate-200 flex justify-between flex-wrap gap-2">
                         <div><strong id="lblPrRoute">المسار:</strong> <span id="imgTktRoute"></span></div>
-                        <div><strong id="lblPrDate">تاريخ الإصدار:</strong> <span id="imgTktDate" class="text-amber-700 font-bold"></span></div>
+                        <div><strong id="lblPrDate">تاريخ الإصدار / الرحلة:</strong> <span id="imgTktDate" class="text-amber-700 font-bold"></span></div>
                         <div><strong id="lblPrTime">وقت الحضور:</strong> <span id="imgTktTime"></span></div>
                     </div>
                 </div>
@@ -153,7 +153,7 @@
         </div>
     </div>
 
-    <!-- PREVIEW CARGO MODAL (بدون سعر فردي، إجمالي نهائي فقط) -->
+    <!-- PREVIEW CARGO MODAL -->
     <div class="modal-overlay hidden" id="cargoPreviewModal">
         <div class="modal-card" style="max-width: 750px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
@@ -282,17 +282,26 @@
         </div>
     </div>
 
-    <!-- MANIFEST MODAL (PASSENGERS) -->
+    <!-- MANIFEST MODAL (PASSENGERS) WITH DATE FILTER -->
     <div class="modal-overlay hidden" id="manifestModal">
-        <div class="modal-card" style="max-width: 850px;">
+        <div class="modal-card" style="max-width: 900px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> <span id="manPTitle">كشف رحلة ركاب شامل</span></h3>
-                <div class="flex gap-2">
+                <div class="flex items-center gap-3">
+                    <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> <span id="manPTitle">كشف رحلة ركاب حسب تاريخ الرحلة</span></h3>
+                </div>
+                <div class="flex gap-2 items-center">
                     <button onclick="exportToPDF('manifestPrintArea', 'WadiBina_Manifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> PDF</button>
                     <button onclick="window.print()" class="bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-print ml-1"></i> Print</button>
                     <button onclick="closeModal('manifestModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
             </div>
+
+            <!-- حقل اختيار تاريخ الرحلة لفلترة المانفيستو -->
+            <div class="bg-darkbg p-3 rounded-xl border border-gold mb-4 flex items-center justify-between gap-3 no-print">
+                <label class="text-xs font-bold text-gold flex items-center gap-2"><i class="fa-solid fa-calendar-days"></i> حدد تاريخ الرحلة المطلوب للمانفيستو:</label>
+                <input type="date" id="manifestFilterDate" onchange="renderPassengerManifestTable()" class="bg-zinc-900 border border-gold text-gold text-xs px-3 py-2 rounded-xl outline-none font-bold">
+            </div>
+
             <div id="manifestPrintArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl" style="direction: inherit; text-align: inherit;">
                 <div class="flex justify-between items-center border-b-2 border-slate-800 pb-3 mb-4">
                     <div class="flex items-center gap-3">
@@ -302,7 +311,8 @@
                             <p class="text-[11px] text-slate-600 font-bold">كشف ركاب الرحلة الرسمي (Passenger Manifest)</p>
                         </div>
                     </div>
-                    <div class="text-left text-xs">
+                    <div class="text-left text-xs space-y-0.5">
+                        <div>تاريخ الرحلة: <strong id="manifestActiveDateBadge" class="text-amber-700"></strong></div>
                         <div>تاريخ الإصدار: <span id="manifestIssueDate"></span></div>
                     </div>
                 </div>
@@ -332,17 +342,24 @@
         </div>
     </div>
 
-    <!-- CARGO MANIFEST MODAL -->
+    <!-- CARGO MANIFEST MODAL WITH DATE FILTER -->
     <div class="modal-overlay hidden" id="cargoManifestModal">
-        <div class="modal-card" style="max-width: 850px;">
+        <div class="modal-card" style="max-width: 900px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> <span id="manCTitle">كشف مانفيستو فواتير الشحن والأصناف</span></h3>
-                <div class="flex gap-2">
+                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> <span id="manCTitle">كشف مانفيستو فواتير الشحن حسب تاريخ الرحلة</span></h3>
+                <div class="flex gap-2 items-center">
                     <button onclick="exportToPDF('cargoManifestPrintArea', 'WadiBina_CargoManifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> PDF</button>
                     <button onclick="window.print()" class="bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-print ml-1"></i> Print</button>
                     <button onclick="closeModal('cargoManifestModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
             </div>
+
+            <!-- حقل اختيار تاريخ الشحن للمانفيستو -->
+            <div class="bg-darkbg p-3 rounded-xl border border-gold mb-4 flex items-center justify-between gap-3 no-print">
+                <label class="text-xs font-bold text-gold flex items-center gap-2"><i class="fa-solid fa-calendar-days"></i> حدد تاريخ فواتير الشحن المطلوب:</label>
+                <input type="date" id="cargoManifestFilterDate" onchange="renderCargoManifestTable()" class="bg-zinc-900 border border-gold text-gold text-xs px-3 py-2 rounded-xl outline-none font-bold">
+            </div>
+
             <div id="cargoManifestPrintArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl" style="direction: inherit; text-align: inherit;">
                 <div class="flex justify-between items-center border-b-2 border-slate-800 pb-3 mb-4">
                     <div class="flex items-center gap-3">
@@ -352,7 +369,8 @@
                             <p class="text-[11px] text-slate-600 font-bold">كشف مانفيستو الشحن الرسمي (Cargo Manifest)</p>
                         </div>
                     </div>
-                    <div class="text-left text-xs">
+                    <div class="text-left text-xs space-y-0.5">
+                        <div>تاريخ الشحن: <strong id="cargoManifestActiveDateBadge" class="text-amber-700"></strong></div>
                         <div>تاريخ الإصدار: <span id="cargoManifestIssueDate"></span></div>
                     </div>
                 </div>
@@ -439,7 +457,7 @@
     <!-- MAIN CONTAINER -->
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 flex-grow w-full pb-24">
 
-        <!-- فلتر الأفرع الخاص بالمدير (يظهر للمدير فقط لاختيار فرع محدد أو كل الأفرع) -->
+        <!-- فلتر الأفرع الخاص بالمدير -->
         <div id="managerBranchFilterContainer" class="hidden bg-cardbg border border-bordergold p-3.5 rounded-2xl shadow-xl mb-6 flex flex-col sm:flex-row items-center justify-between gap-3 no-print">
             <span class="text-xs font-bold text-gold flex items-center gap-1.5"><i class="fa-solid fa-filter"></i> تصفية الأفرع (لوحة تحكم المدير):</span>
             <select id="selectedManagerBranch" onchange="refreshUI()" class="bg-darkbg border border-gold text-gold text-xs px-4 py-2.5 rounded-xl outline-none font-bold w-full sm:w-auto">
@@ -520,7 +538,7 @@
                         <p id="lblPassSub" class="text-[11px] text-zinc-400">إصدار التذاكر وتعديلها وطباعتها بصيغة PDF</p>
                     </div>
                 </div>
-                <button onclick="openManifestModal()" id="btnManifestP" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-2 rounded-xl text-xs shadow"><i class="fa-solid fa-file-lines ml-1"></i> كشف الرحلة (Manifest)</button>
+                <button onclick="openManifestModal()" id="btnManifestP" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-2 rounded-xl text-xs shadow"><i class="fa-solid fa-file-lines ml-1"></i> كشف الرحلة حسب التاريخ (Manifest)</button>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -551,7 +569,11 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs text-gold mb-1 font-bold">تاريخ الرحلة *</label>
+                                <input type="date" id="passDate" required class="w-full bg-darkbg border border-gold rounded-xl px-3 py-2 text-xs text-zinc-100 outline-none">
+                            </div>
                             <div>
                                 <label id="lblFare" class="block text-xs text-gold mb-1 font-bold">الإجمالي (درهم) *</label>
                                 <input type="number" id="passManualTotal" required class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs outline-none" value="400">
@@ -622,7 +644,7 @@
                                 <th id="thP4">الركاب الإضافيون</th>
                                 <th id="thP5">الهاتف</th>
                                 <th id="thP6">المسار</th>
-                                <th id="thP7">تاريخ الإصدار</th>
+                                <th id="thP7">تاريخ الرحلة</th>
                                 <th id="thP8">المبلغ</th>
                                 <th id="thP9">السداد</th>
                                 <th id="thP10">الفرع</th>
@@ -645,7 +667,7 @@
                         <p id="lblCargoSub" class="text-[11px] text-zinc-400">إصدار الفواتير وطباعة مانفيستو الشحن الشامل</p>
                     </div>
                 </div>
-                <button onclick="openCargoManifestModal()" id="btnManifestC" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-2 rounded-xl text-xs shadow"><i class="fa-solid fa-file-lines ml-1"></i> كشف مانفيستو الشحن</button>
+                <button onclick="openCargoManifestModal()" id="btnManifestC" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-2 rounded-xl text-xs shadow"><i class="fa-solid fa-file-lines ml-1"></i> كشف مانفيستو الشحن حسب التاريخ</button>
             </div>
 
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
@@ -661,7 +683,7 @@
                             <input type="text" id="cargoInvNo" required class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs">
                         </div>
                         <div>
-                            <label id="lblInvDate" class="block text-xs text-zinc-400 mb-1">تاريخ الفاتورة *</label>
+                            <label id="lblInvDate" class="block text-xs text-zinc-400 mb-1">تاريخ الشحن *</label>
                             <input type="date" id="cargoDate" required class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200">
                         </div>
                         <div>
@@ -951,7 +973,7 @@
                 lblPassHeader: 'إدارة رحلات وتذاكر الركاب والركاب الإضافيين', lblPassSub: 'إصدار التذاكر وتعديلها وطباعتها بصيغة PDF', btnManifestP: 'كشف الرحلة (Manifest)',
                 passFormTitle: 'إصدار تذكرة سفر جديدة', cancelEditPassBtn: 'إلغاء التعديل', lblTktNo: 'رقم البوليصة *', lblAgent: 'اسم الوكيل *', lblCount: 'عدد الركاب *', lblFare: 'الإجمالي (درهم) *', lblTime: 'وقت الحضور *', lblMainPax: 'بيانات الراكب الرئيسي', lblExtraPax: 'بيانات الركاب الإضافيين', passSubmitBtn: 'حفظ وإصدار التذكرة',
                 lblPassStats: 'إحصائيات التذاكر', lblTktCount: 'التذاكر المحجوزة:', lblTktRev: 'إجمالي الإيرادات:', lblPassLog: 'سجل جميع التذاكر والركاب الإضافيين',
-                thP1: 'البوليصة', thP2: 'الوكيل', thP3: 'الاسم الرئيسي', thP4: 'الركاب الإضافيون', thP5: 'الهاتف', thP6: 'المسار', thP7: 'تاريخ الإصدار', thP8: 'المبلغ', thP9: 'السداد', thP10: 'الفرع', thP11: 'إجراءات / طباعة',
+                thP1: 'البوليصة', thP2: 'الوكيل', thP3: 'الاسم الرئيسي', thP4: 'الركاب الإضافيون', thP5: 'الهاتف', thP6: 'المسار', thP7: 'تاريخ الرحلة', thP8: 'المبلغ', thP9: 'السداد', thP10: 'الفرع', thP11: 'إجراءات / طباعة',
                 lblCargoHeader: 'إدارة فواتير الشحن والأصناف', lblCargoSub: 'إصدار الفواتير وطباعة مانفيستو الشحن الشامل', btnManifestC: 'كشف مانفيستو الشحن',
                 cargoFormTitle: 'فاتورة أمتعة وبضائع (بأرقام كسرية دقيقة للأسعار)', cancelEditCargoBtn: 'إلغاء التعديل', lblInvNo: 'رقم الفاتورة *', lblInvDate: 'تاريخ الفاتورة *', lblInvStatus: 'حالة السداد *', lblSenderBox: 'بيانات المرسل', lblReceiverBox: 'بيانات المستلم', lblItemsList: 'أصناف الأمتعة (يدعم الأرقام الكسرية الدقيقة)', btnAddItem: 'إضافة صنف', thBDesc: 'الوصف', thBQty: 'العدد', thBPrice: 'السعر الإجمالي للصنف (كسري)', thBDel: 'حذف', lblTotalCalc: 'الإجمالي النهائي المحسوب للأصناف:', cargoSubmitBtn: 'حفظ فاتورة الشحن والأصناف', lblCargoLog: 'سجل فواتير الشحن والأصناف',
                 thC1: 'الفاتورة', thC2: 'التاريخ', thC3: 'المرسل', thC4: 'المستلم', thC5: 'عدد الأصناف', thC6: 'الإجمالي', thC7: 'الحالة', thC8: 'الفرع', thC9: 'إجراءات / طباعة',
@@ -960,8 +982,8 @@
                 lblDebtHead: 'فواتير وحسابات الذمم الآجلة', btnNewDebt: 'إنشاء فاتورة آجل', thD1: 'الفاتورة', thD2: 'التاريخ', thD3: 'الاسم', thD4: 'الهاتف', thD5: 'المجموع', thD6: 'المدفوع', thD7: 'المتبقي', thD8: 'الفرع', thD9: 'إجراءات / PDF',
                 lblDebtFormTitle: 'إصدار فاتورة حساب آجل جديدة', btnSaveDebt: 'حفظ وإصدار', btnCancelDebt: 'إلغاء',
                 tktPreviewHead: 'معاينة وتنزيل بوليصة التذكرة', cargoPreviewHead: 'معاينة وتنزيل فاتورة الشحن والأصناف', debtPreviewHead: 'معاينة وتنزيل فاتورة الحساب الآجل',
-                manPTitle: 'كشف رحلة ركاب شامل', manCTitle: 'كشف مانفيستو فواتير الشحن والأصناف',
-                lblPrName: 'الراكب الرئيسي:', lblPrPhone: 'رقم الهاتف:', lblPrPass: 'رقم الجواز / الهوية:', lblPrRoute: 'المسار:', lblPrDate: 'تاريخ الإصدار:', lblPrTime: 'وقت الحضور:', lblPrTotal: 'إجمالي المبلغ:', lblPrPayStatus: 'حالة السداد:',
+                manPTitle: 'كشف رحلة ركاب حسب تاريخ الرحلة', manCTitle: 'كشف مانفيستو فواتير الشحن حسب تاريخ الرحلة',
+                lblPrName: 'الراكب الرئيسي:', lblPrPhone: 'رقم الهاتف:', lblPrPass: 'رقم الجواز / الهوية:', lblPrRoute: 'المسار:', lblPrDate: 'تاريخ الرحلة:', lblPrTime: 'وقت الحضور:', lblPrTotal: 'إجمالي المبلغ:', lblPrPayStatus: 'حالة السداد:',
                 lblSenderInfo: 'بيانات المرسل:', lblReceiverInfo: 'بيانات المستلم:', lblSndName: 'الاسم:', lblSndPhone: 'رقم الهاتف:', lblSndAddr: 'العنوان:', lblRcvName: 'الاسم:', lblRcvPhone: 'رقم الهاتف:', lblRcvAddr: 'العنوان:', thNum: 'م', thItem: 'الصنف', thQty: 'العدد', thTotalItem: 'الإجمالي النهائي للصنف', lblGrandTotal: 'الإجمالي النهائي:', lblPayStatusInv: 'حالة السداد:',
                 lblDebtCust: 'اسم العميل:', lblDebtPhone: 'رقم الهاتف:', lblDebtAddr: 'العنوان:', lblDebtDate: 'تاريخ الفاتورة:', lblDebtSub: 'المجموع الكلي:', lblDebtPaid: 'المبلغ المدفوع:', lblDebtRem: 'المبلغ المتبقي:'
             },
@@ -977,11 +999,11 @@
                 searchPh: 'Smart search: Policy No, Client name, Item...', btnResetSearch: 'Reset',
                 lblStat1: 'Total Passenger Bookings', lblStat2: 'Cargo & Parcel Revenue', lblStat3: 'Total Expenses & Misc', lblStat4: 'Net Cash Box Balance',
                 lblChart1: 'Revenue vs Expenses Comparison', lblChart2: 'Invoices & Tickets Payment Status Ratio',
-                lblPassHeader: 'Passenger Trips & Extra Passengers Management', lblPassSub: 'Issue, edit, and print tickets as PDF', btnManifestP: 'Passenger Manifest',
+                lblPassHeader: 'Passenger Trips & Extra Passengers Management', lblPassSub: 'Issue, edit, and print tickets as PDF', btnManifestP: 'Passenger Manifest by Date',
                 passFormTitle: 'Issue New Travel Ticket', cancelEditPassBtn: 'Cancel Edit', lblTktNo: 'Policy No *', lblAgent: 'Agent Name *', lblCount: 'Passenger Count *', lblFare: 'Total Fare (AED) *', lblTime: 'Reporting Time *', lblMainPax: 'Main Passenger Info', lblExtraPax: 'Extra Passengers Info', passSubmitBtn: 'Save & Issue Ticket',
                 lblPassStats: 'Ticket Statistics', lblTktCount: 'Booked Tickets:', lblTktRev: 'Total Revenue:', lblPassLog: 'All Tickets & Extra Passengers Record',
-                thP1: 'Policy', thP2: 'Agent', thP3: 'Main Name', thP4: 'Extra Passengers', thP5: 'Phone', thP6: 'Route', thP7: 'Issue Date', thP8: 'Amount', thP9: 'Status', thP10: 'Branch', thP11: 'Actions / Print',
-                lblCargoHeader: 'Cargo Invoices & Items Management', lblCargoSub: 'Issue invoices and print comprehensive cargo manifest', btnManifestC: 'Cargo Manifest',
+                thP1: 'Policy', thP2: 'Agent', thP3: 'Main Name', thP4: 'Extra Passengers', thP5: 'Phone', thP6: 'Route', thP7: 'Trip Date', thP8: 'Amount', thP9: 'Status', thP10: 'Branch', thP11: 'Actions / Print',
+                lblCargoHeader: 'Cargo Invoices & Items Management', lblCargoSub: 'Issue invoices and print comprehensive cargo manifest', btnManifestC: 'Cargo Manifest by Date',
                 cargoFormTitle: 'Luggage & Cargo Invoice (Supports Precise Decimal Prices)', cancelEditCargoBtn: 'Cancel Edit', lblInvNo: 'Invoice No *', lblInvDate: 'Invoice Date *', lblInvStatus: 'Payment Status *', lblSenderBox: 'Sender Information', lblReceiverBox: 'Receiver Information', lblItemsList: 'Luggage Items (Supports exact decimals)', btnAddItem: 'Add Item', thBDesc: 'Description', thBQty: 'Qty', thBPrice: 'Total Item Price (Decimal)', thBDel: 'Delete', lblTotalCalc: 'Calculated Final Grand Total:', cargoSubmitBtn: 'Save Cargo Invoice & Items', lblCargoLog: 'Cargo Invoices Record',
                 thC1: 'Invoice', thC2: 'Date', thC3: 'Sender', thC4: 'Receiver', thC5: 'Items Count', thC6: 'Total', thC7: 'Status', thC8: 'Branch', thC9: 'Actions / Print',
                 lblFin1: 'Total Tickets', lblFin2: 'Total Cargo', lblFin3: 'Expenses', lblFin4: 'Net Cash Box',
@@ -989,8 +1011,8 @@
                 lblDebtHead: 'Deferred Accounts & Debts Invoices', btnNewDebt: 'Create Debt Invoice', thD1: 'Invoice', thD2: 'Date', thD3: 'Name', thD4: 'Phone', thD5: 'Total', thD6: 'Paid', thD7: 'Remaining', thD8: 'Branch', thD9: 'Actions / PDF',
                 lblDebtFormTitle: 'Issue New Deferred Account Invoice', btnSaveDebt: 'Save & Issue', btnCancelDebt: 'Cancel',
                 tktPreviewHead: 'Preview & Download Ticket Policy', cargoPreviewHead: 'Preview & Download Cargo Invoice', debtPreviewHead: 'Preview & Download Deferred Invoice',
-                manPTitle: 'Comprehensive Passenger Manifest', manCTitle: 'Cargo Manifest & Items',
-                lblPrName: 'Main Passenger:', lblPrPhone: 'Phone:', lblPrPass: 'Passport / ID:', lblPrRoute: 'Route:', lblPrDate: 'Issue Date:', lblPrTime: 'Reporting Time:', lblPrTotal: 'Grand Total:', lblPrPayStatus: 'Payment Status:',
+                manPTitle: 'Comprehensive Passenger Manifest by Trip Date', manCTitle: 'Cargo Manifest by Trip Date',
+                lblPrName: 'Main Passenger:', lblPrPhone: 'Phone:', lblPrPass: 'Passport / ID:', lblPrRoute: 'Route:', lblPrDate: 'Trip Date:', lblPrTime: 'Reporting Time:', lblPrTotal: 'Grand Total:', lblPrPayStatus: 'Payment Status:',
                 lblSenderInfo: 'Sender Info:', lblReceiverInfo: 'Receiver Info:', lblSndName: 'Name:', lblSndPhone: 'Phone:', lblSndAddr: 'Address:', lblRcvName: 'Name:', lblRcvPhone: 'Phone:', lblRcvAddr: 'Address:', thNum: '#', thItem: 'Item', thQty: 'Qty', thTotalItem: 'Total Item Price', lblGrandTotal: 'Grand Total:', lblPayStatusInv: 'Payment Status:',
                 lblDebtCust: 'Customer Name:', lblDebtPhone: 'Phone:', lblDebtAddr: 'Address:', lblDebtDate: 'Invoice Date:', lblDebtSub: 'Subtotal:', lblDebtPaid: 'Paid Amount:', lblDebtRem: 'Remaining Balance:'
             }
@@ -1044,7 +1066,6 @@
                 document.getElementById('userInfoBadge').innerText = `${currentUser.username} (${currentUser.role} - ${currentUser.branch || 'فرع عجمان'})`;
                 document.getElementById('loginOverlay').style.display = 'none';
                 
-                // إظهار تبويب إدارة المستخدمين وفلتر الأفرع للمدير فقط
                 if(currentUser.role === 'مدير') {
                     document.getElementById('tab-users').classList.remove('hidden');
                     document.getElementById('managerBranchFilterContainer').classList.remove('hidden');
@@ -1146,6 +1167,9 @@
             updateUserBadge();
             applyLanguage();
             document.getElementById('cargoDate').value = currentDate;
+            document.getElementById('passDate').value = currentDate;
+            document.getElementById('manifestFilterDate').value = currentDate;
+            document.getElementById('cargoManifestFilterDate').value = currentDate;
             document.getElementById('vDate').value = currentDate;
             document.getElementById('debtInvDate').value = currentDate;
             document.getElementById('passTicketNo').value = db.nextTicketNo || 115;
@@ -1192,7 +1216,6 @@
         let finBarChartInstance = null;
         let payPieChartInstance = null;
 
-        // دالة تصفية البيانات حسب الفرع (الموظف يرى فرعه حصراً، والمدير يمكنه التبديل بين كل الأفرع أو فرع محدد)
         function getFilteredData(list) {
             if(!currentUser) return list;
             
@@ -1204,9 +1227,9 @@
             const selectedBranch = branchSelect ? branchSelect.value : 'ALL';
             
             if(selectedBranch === 'ALL') {
-                return list; // جميع الأفرع مجتمعة
+                return list;
             } else {
-                return list.filter(item => item.branch === selectedBranch); // فرع محدد
+                return list.filter(item => item.branch === selectedBranch);
             }
         }
 
@@ -1367,7 +1390,7 @@
                 extraPassengers: extraList,
                 origin: document.getElementById('passOrigin').value,
                 destination: document.getElementById('passDestination').value,
-                date: currentDate,
+                date: document.getElementById('passDate').value || currentDate,
                 reportingTime: document.getElementById('passReportingTime').value,
                 fare: parseFloat(document.getElementById('passManualTotal').value) || (count * 400),
                 payMethod: document.getElementById('passPayMethod').value,
@@ -1384,6 +1407,7 @@
                 db.nextTicketNo = parseInt(ticketNo) + 1 || (db.nextTicketNo + 1);
                 document.getElementById('passengerForm').reset();
                 document.getElementById('passTicketNo').value = db.nextTicketNo;
+                document.getElementById('passDate').value = currentDate;
                 alert('تم إصدار التذكرة بنجاح!');
             }
             saveDB();
@@ -1398,6 +1422,7 @@
             document.getElementById('passAgent').value = item.agent || '';
             document.getElementById('passCount').value = item.passengerCount || 1;
             onPassengerCountChanged();
+            document.getElementById('passDate').value = item.date || currentDate;
             document.getElementById('passManualTotal').value = item.fare || 400;
             document.getElementById('passReportingTime').value = item.reportingTime || '';
             document.getElementById('passName').value = item.name || '';
@@ -1427,6 +1452,7 @@
             document.getElementById('passengerForm').reset();
             document.getElementById('passEditId').value = '';
             document.getElementById('passTicketNo').value = db.nextTicketNo;
+            document.getElementById('passDate').value = currentDate;
             document.getElementById('passFormTitle').innerText = 'إصدار تذكرة سفر جديدة';
             document.getElementById('passSubmitBtn').innerText = 'حفظ وإصدار التذكرة';
             document.getElementById('cancelEditPassBtn').classList.add('hidden');
@@ -1800,10 +1826,20 @@
         }
 
         function openManifestModal() {
+            document.getElementById('manifestFilterDate').value = currentDate;
+            renderPassengerManifestTable();
+            document.getElementById('manifestModal').classList.remove('hidden');
+        }
+
+        function renderPassengerManifestTable() {
+            const filterDate = document.getElementById('manifestFilterDate').value;
+            document.getElementById('manifestActiveDateBadge').innerText = filterDate;
+            document.getElementById('manifestIssueDate').innerText = new Date().toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US');
+
             const tbody = document.getElementById('manifestTableBody');
             tbody.innerHTML = '';
-            const filteredPass = getFilteredData(db.passengers);
-            document.getElementById('manifestIssueDate').innerText = new Date().toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US');
+            
+            const filteredPass = getFilteredData(db.passengers).filter(p => (p.date || currentDate) === filterDate);
             document.getElementById('manifestTotalBookings').innerText = filteredPass.length;
             
             let totalPax = 0;
@@ -1825,14 +1861,23 @@
                     <td class="border border-slate-300 p-2">${p.origin} → ${p.destination}</td>
                 `;
             });
-            document.getElementById('manifestModal').classList.remove('hidden');
         }
 
         function openCargoManifestModal() {
+            document.getElementById('cargoManifestFilterDate').value = currentDate;
+            renderCargoManifestTable();
+            document.getElementById('cargoManifestModal').classList.remove('hidden');
+        }
+
+        function renderCargoManifestTable() {
+            const filterDate = document.getElementById('cargoManifestFilterDate').value;
+            document.getElementById('cargoManifestActiveDateBadge').innerText = filterDate;
+            document.getElementById('cargoManifestIssueDate').innerText = new Date().toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US');
+
             const tbody = document.getElementById('cargoManifestTableBody');
             tbody.innerHTML = '';
-            const filteredCargo = getFilteredData(db.cargo);
-            document.getElementById('cargoManifestIssueDate').innerText = new Date().toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US');
+
+            const filteredCargo = getFilteredData(db.cargo).filter(c => (c.date || currentDate) === filterDate);
             document.getElementById('cargoManifestTotalInvoices').innerText = filteredCargo.length;
             
             let totalRev = 0;
@@ -1856,7 +1901,6 @@
                     <td class="border border-slate-300 p-2 font-bold" style="color:${c.paymentStatus==='مدفوع'?'#10b981':'#f59e0b'}">${c.paymentStatus}</td>
                 `;
             });
-            document.getElementById('cargoManifestModal').classList.remove('hidden');
         }
 
         function renderFinancials() {
