@@ -48,6 +48,7 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(9, 9, 11, 0.92); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .modal-card { background: var(--bg-card); border: 2px solid var(--gold-primary); border-radius: 16px; padding: 25px; width: 100%; max-width: 800px; box-shadow: 0 15px 35px rgba(212, 175, 55, 0.2); position: relative; max-height: 90vh; overflow-y: auto; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(0.8) sepia(1) saturate(5) hue-rotate(5deg); }
         @media print {
             body { background: white !important; color: black !important; }
             header, nav, .no-print, button { display: none !important; }
@@ -56,12 +57,6 @@
     </style>
 </head>
 <body class="bg-darkbg text-zinc-100 min-h-screen flex flex-col justify-between selection:bg-gold selection:text-black">
-
-    <!-- Offline Banner Notification -->
-    <div id="offlineBanner" class="hidden bg-red-600 text-white text-center text-xs py-2 font-bold px-4 sticky top-0 z-50 flex items-center justify-center gap-2 shadow-lg">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-        <span>انقطع اتصال الإنترنت! يتم حفظ البيانات محلياً على المتصفح وسيتم مزامنتها تلقائياً عند عودة الاتصال.</span>
-    </div>
 
     <!-- LOGIN MODAL -->
     <div class="modal-overlay" id="loginOverlay">
@@ -426,9 +421,6 @@
             <button onclick="toggleLanguage()" id="langToggleBtn" class="bg-gold/20 text-gold border border-gold/40 px-3 py-1.5 rounded-xl text-xs font-extrabold hover:bg-gold/30">
                 <i class="fa-solid fa-globe"></i> English
             </button>
-            <span id="firebaseStatusIndicator" class="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2.5 py-1.5 rounded-xl text-[10px] font-bold flex items-center gap-1">
-                <i class="fa-solid fa-circle-notch fa-spin"></i> جاري الاتصال...
-            </span>
             <span id="userInfoBadge" class="bg-zinc-800 border border-zinc-700 text-gold px-3 py-1.5 rounded-xl text-xs font-bold"></span>
             
             <button onclick="exportBackupJSON()" class="bg-zinc-800 text-gold border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1">
@@ -601,13 +593,13 @@
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
                     <h3 class="text-gold font-extrabold text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-bus text-gold"></i> إنشاء رحلة جديدة (أيام الأحد والأربعاء)
+                        <i class="fa-solid fa-bus text-gold"></i> إنشاء رحلة جديدة (التاريخ اختياري مع تقويم منسدل)
                     </h3>
                 </div>
                 <form id="tripForm" onsubmit="handleSaveTrip(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                     <div>
-                        <label class="block text-xs text-gold mb-1 font-bold">تاريخ الرحلة (أحد/أربعاء) *</label>
-                        <input type="date" id="tripDate" required onchange="validateTripDay(this)" class="w-full bg-darkbg border border-gold rounded-xl p-2.5 text-xs text-zinc-100 outline-none font-bold" value="2026-11-08">
+                        <label class="block text-xs text-gold mb-1 font-bold">تاريخ الرحلة (اختياري)</label>
+                        <input type="date" id="tripDate" class="w-full bg-darkbg border border-gold rounded-xl p-2.5 text-xs text-zinc-100 outline-none font-bold">
                     </div>
                     <div>
                         <label class="block text-xs text-zinc-400 mb-1">خط سير الرحلة *</label>
@@ -687,8 +679,8 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
-                                <label class="block text-xs text-zinc-400 mb-1">تاريخ الرحلة *</label>
-                                <input type="date" id="passDate" required readonly class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-300 outline-none">
+                                <label class="block text-xs text-gold mb-1 font-bold">تاريخ الرحلة (تقويم منسدل)</label>
+                                <input type="date" id="passDate" class="w-full bg-darkbg border border-gold rounded-xl px-3 py-2 text-xs text-zinc-100 outline-none font-bold">
                             </div>
                             <div>
                                 <label id="lblFare" class="block text-xs text-gold mb-1 font-bold">الإجمالي (درهم) *</label>
@@ -721,7 +713,7 @@
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <select id="passOrigin" onchange="updateReportingTimeAutomatically()" class="bg-darkbg border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200">
+                            <select id="passOrigin" class="bg-darkbg border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200">
                                 <option value="عجمان">عجمان</option>
                                 <option value="بني ياس">بني ياس</option>
                                 <option value="العين">العين</option>
@@ -739,7 +731,7 @@
                         </div>
                         <div>
                             <label class="block text-xs text-amber-400 mb-1 font-bold">وقت الحضور *</label>
-                            <input type="text" id="passReportingTime" required class="w-full bg-darkbg border border-amber-500/80 font-bold text-amber-300 rounded-xl px-3 py-2 text-xs outline-none" value="2026-11-08 (4:00 عصراً)">
+                            <input type="text" id="passReportingTime" required class="w-full bg-darkbg border border-amber-500/80 font-bold text-amber-300 rounded-xl px-3 py-2 text-xs outline-none" value="4:00 عصراً">
                         </div>
                         <button type="submit" id="passSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow-lg">حفظ وإصدار التذكرة</button>
                     </form>
@@ -810,8 +802,8 @@
                             <input type="text" id="cargoInvNo" required class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs" value="126">
                         </div>
                         <div>
-                            <label id="lblInvDate" class="block text-xs text-zinc-400 mb-1">تاريخ الشحن (أحد / أربعاء) *</label>
-                            <input type="date" id="cargoDate" required onchange="validateTripDay(this)" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200" value="2026-11-08">
+                            <label id="lblInvDate" class="block text-xs text-gold mb-1 font-bold">تاريخ الفاتورة (تقويم منسدل)</label>
+                            <input type="date" id="cargoDate" class="w-full bg-darkbg border border-gold rounded-xl px-3 py-2 text-xs text-zinc-100 font-bold">
                         </div>
                         <div>
                             <label id="lblInvStatus" class="block text-xs text-zinc-400 mb-1">حالة السداد *</label>
@@ -923,7 +915,7 @@
                         <option value="قبض">سند قبض</option>
                         <option value="صرف">سند صرف</option>
                     </select>
-                    <input type="date" id="vDate" required class="bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200" value="2026-11-08">
+                    <input type="date" id="vDate" class="bg-zinc-900 border border-gold rounded p-2 text-xs text-gold font-bold">
                     <input type="number" step="any" id="vAmount" required placeholder="المبلغ" class="bg-zinc-900 border border-gold rounded p-2 text-xs text-gold font-bold">
                     <input type="text" id="vDesc" required placeholder="البيان والتفاصيل..." class="bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200 sm:col-span-2">
                     <button type="submit" id="btnSaveV" class="gold-gradient-bg text-black font-extrabold py-2 rounded text-xs sm:col-span-5 shadow">حفظ السند المالي</button>
@@ -978,7 +970,7 @@
                     <form id="debtInvoiceForm" onsubmit="handleSaveDebtInvoice(event)" class="space-y-3">
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <input type="text" id="debtInvNo" required placeholder="رقم الفاتورة" class="bg-zinc-900 border border-gold p-2 text-xs text-gold font-bold rounded" value="1">
-                            <input type="date" id="debtInvDate" required class="bg-zinc-900 border border-zinc-700 p-2 text-xs rounded" value="2026-11-08">
+                            <input type="date" id="debtInvDate" class="bg-zinc-900 border border-gold p-2 text-xs font-bold rounded">
                             <input type="text" id="debtInvCustomerName" required placeholder="اسم العميل" class="bg-zinc-900 border border-zinc-700 p-2 text-xs rounded">
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1090,28 +1082,28 @@
                 { id: "trip_1", date: "2026-11-08", route: "الإمارات ➔ عدن", busInfo: "باص الرحلة الأساسي (الأحد)" }
             ],
             passengers: [
-                { id: "140", tripId: "trip_1", agent: "النظام", name: "محسن فيصل احمد", phone: "05", passport: "12605475", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
-                { id: "139", tripId: "trip_1", agent: "النظام", name: "نضرة محمد عبود عبد الله", phone: "05", passport: "16719704", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (7:30 مساءً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
-                { id: "138", tripId: "trip_1", agent: "النظام", name: "مروان محمد يحي", phone: "05", passport: "14033923", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (7:30 مساءً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
-                { id: "137", tripId: "trip_1", agent: "النظام", name: "جمال ناصر محمد ابراهيم", phone: "05", passport: "17104141", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (7:30 مساءً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
-                { id: "136", tripId: "trip_1", agent: "النظام", name: "حسين عيدروس صالح عبد الله", phone: "05", passport: "16188210", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (7:30 مساءً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
-                { id: "135", tripId: "trip_1", agent: "النظام", name: "مراد محمد علي ابوبكر", phone: "0557751876", passport: "12776245", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
-                { id: "133", tripId: "trip_1", agent: "النظام", name: "احمد صالح ناجي", phone: "0503733445", passport: "16671163", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
-                { id: "132", tripId: "trip_1", agent: "النظام", name: "مجاهد محسن غالب", phone: "05", passport: "14935024", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (7:30 مساءً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
-                { id: "131", tripId: "trip_1", agent: "النظام", name: "هشام محمد عبد الرحيم العمودي", phone: "05", passport: "16130448", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "المكلا", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
-                { id: "116", tripId: "trip_1", agent: "خالد", name: "عيسى محمد عبدالله محمد النهمي", phone: "05029205559", passport: "17038593", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
-                { id: "119", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "اقبال عبدالله سالم", passport: "09896049", phone: "0559322600", extraPassengers: [], origin: "بني ياس", destination: "المكلا", date: "2026-11-08", reportingTime: "2026-11-08 (7:30 مساءً)", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
-                { id: "120", tripId: "trip_1", agent: "أبو خالد", passengerCount: 1, name: "فهد عيسى عامرعلي كبرهي", passport: "15358352", phone: "0501637817", extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
-                { id: "121", tripId: "trip_1", agent: "أبو خالد", passengerCount: 1, name: "نعيمة عوض سليمان", passport: "11186508", phone: "0556166311", extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (7:30 مساءً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
-                { id: "122", tripId: "trip_1", agent: "أبو خالد", passengerCount: 1, name: "صفاء عبد الله محمد النصيري", passport: "13546330", phone: "0544755036", extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 400, payMethod: "مدفوع", branch: "فرع عجمان" },
-                { id: "123", tripId: "trip_1", agent: "أبو خالد", name: "ترنا محمد البيضاني", phone: "0544755036", passport: "17681575", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 430, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
-                { id: "124", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "جميلة محمد احمد عكيش", passport: "17090616", phone: "0544755036", extraPassengers: [], origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-09 (1:30 صباحاً)", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
-                { id: "125", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "نور عبدالله على يحي", passport: "09618725", phone: "0544755036", extraPassengers: [], origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-09 (1:30 صباحاً)", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
-                { id: "126", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 2, name: "حنان حسن سالم محمد البري", passport: "11374253", phone: "0544755036", extraPassengers: [{name: "مها سمير صالح زين احمد", passport: ""}, {name: "مصطفى سمير صالح زين احمد", passport: ""}], origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-09 (1:30 صباحاً)", fare: 400, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
-                { id: "127", tripId: "trip_1", agent: "أبو خالد", passengerCount: 5, name: "عائدة علي شيخ سعيد السنيدي", passport: "17568571", phone: "0529008186", extraPassengers: [{name: "احمد سمير صالح زين احمد", passport: ""}, {name: "أريج سمير صالح زين احمد", passport: ""}, {name: "يعقوب سمير صالح زين احمد", passport: ""}], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 1750, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
-                { id: "128", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "سونيا محمد يحي", passport: "10966601", phone: "0544755036", extraPassengers: [], origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-09 (1:30 صباحاً)", fare: 300, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
-                { id: "129", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "كاميليا محمد يحي", passport: "14269384", phone: "0544755036", extraPassengers: [], origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-09 (1:30 صباحاً)", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
-                { id: "130", tripId: "trip_1", name: "علي حيدره ناصر جرفيل", passport: "17200685", phone: "0544755036", origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-09 (1:30 صباحاً)", fare: 350, payMethod: "الدفع عند الباص", agent: "أبوشهاب", passengerCount: 1, extraPassengers: [], branch: "فرع عجمان" }
+                { id: "140", tripId: "trip_1", agent: "النظام", name: "محسن فيصل احمد", phone: "05", passport: "12605475", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "4:00 عصراً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "139", tripId: "trip_1", agent: "النظام", name: "نضرة محمد عبود عبد الله", phone: "05", passport: "16719704", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "7:30 مساءً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "138", tripId: "trip_1", agent: "النظام", name: "مروان محمد يحي", phone: "05", passport: "14033923", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "7:30 مساءً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "137", tripId: "trip_1", agent: "النظام", name: "جمال ناصر محمد ابراهيم", phone: "05", passport: "17104141", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "7:30 مساءً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "136", tripId: "trip_1", agent: "النظام", name: "حسين عيدروس صالح عبد الله", phone: "05", passport: "16188210", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "7:30 مساءً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "135", tripId: "trip_1", agent: "النظام", name: "مراد محمد علي ابوبكر", phone: "0557751876", passport: "12776245", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "4:00 عصراً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "133", tripId: "trip_1", agent: "النظام", name: "احمد صالح ناجي", phone: "0503733445", passport: "16671163", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "4:00 عصراً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "132", tripId: "trip_1", agent: "النظام", name: "مجاهد محسن غالب", phone: "05", passport: "14935024", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "7:30 مساءً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "131", tripId: "trip_1", agent: "النظام", name: "هشام محمد عبد الرحيم العمودي", phone: "05", passport: "16130448", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "المكلا", date: "2026-11-08", reportingTime: "4:00 عصراً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "116", tripId: "trip_1", agent: "خالد", name: "عيسى محمد عبدالله محمد النهمي", phone: "05029205559", passport: "17038593", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "4:00 عصراً", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
+                { id: "119", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "اقبال عبدالله سالم", passport: "09896049", phone: "0559322600", extraPassengers: [], origin: "بني ياس", destination: "المكلا", date: "2026-11-08", reportingTime: "7:30 مساءً", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
+                { id: "120", tripId: "trip_1", agent: "أبو خالد", passengerCount: 1, name: "فهد عيسى عامرعلي كبرهي", passport: "15358352", phone: "0501637817", extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "4:00 عصراً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "121", tripId: "trip_1", agent: "أبو خالد", passengerCount: 1, name: "نعيمة عوض سليمان", passport: "11186508", phone: "0556166311", extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "7:30 مساءً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "122", tripId: "trip_1", agent: "أبو خالد", passengerCount: 1, name: "صفاء عبد الله محمد النصيري", passport: "13546330", phone: "0544755036", extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "4:00 عصراً", fare: 400, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "123", tripId: "trip_1", agent: "أبو خالد", name: "ترنا محمد البيضاني", phone: "0544755036", passport: "17681575", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "4:00 عصراً", fare: 430, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
+                { id: "124", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "جميلة محمد احمد عكيش", passport: "17090616", phone: "0544755036", extraPassengers: [], origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "1:30 صباحاً", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
+                { id: "125", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "نور عبدالله على يحي", passport: "09618725", phone: "0544755036", extraPassengers: [], origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "1:30 صباحاً", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
+                { id: "126", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 2, name: "حنان حسن سالم محمد البري", passport: "11374253", phone: "0544755036", extraPassengers: [{name: "مها سمير صالح زين احمد", passport: ""}, {name: "مصطفى سمير صالح زين احمد", passport: ""}], origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "1:30 صباحاً", fare: 400, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
+                { id: "127", tripId: "trip_1", agent: "أبو خالد", passengerCount: 5, name: "عائدة علي شيخ سعيد السنيدي", passport: "17568571", phone: "0529008186", extraPassengers: [{name: "احمد سمير صالح زين احمد", passport: ""}, {name: "أريج سمير صالح زين احمد", passport: ""}, {name: "يعقوب سمير صالح زين احمد", passport: ""}], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "4:00 عصراً", fare: 1750, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
+                { id: "128", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "سونيا محمد يحي", passport: "10966601", phone: "0544755036", extraPassengers: [], origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "1:30 صباحاً", fare: 300, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
+                { id: "129", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "كاميليا محمد يحي", passport: "14269384", phone: "0544755036", extraPassengers: [], origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "1:30 صباحاً", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
+                { id: "130", tripId: "trip_1", name: "علي حيدره ناصر جرفيل", passport: "17200685", phone: "0544755036", origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "1:30 صباحاً", fare: 350, payMethod: "الدفع عند الباص", agent: "أبوشهاب", passengerCount: 1, extraPassengers: [], branch: "فرع عجمان" }
             ],
             cargo: [
                 { id: "130", date: "2026-11-08", sender: "عبد الكريم عبد الله بندر عدن", senderPhone: "0567777133", senderAddress: "عجمان", receiver: "النادي الدولي للسيارات", receiverPhone: "0778826198", receiverAddress: "عدن", items: [{desc: "كرتون صغير به فواتير", qty: 1, price: 50}], grandTotal: 50, paymentStatus: "مدفوع", branch: "فرع عجمان" },
@@ -1287,37 +1279,12 @@
             closeModal('changePassModal');
         }
 
-        function getNextTripDate(targetDateStr = null) {
-            let d = targetDateStr ? new Date(targetDateStr) : new Date('2026-11-08');
-            if (isNaN(d.getTime())) d = new Date('2026-11-08');
-            let day = d.getDay();
-            if (day !== 0 && day !== 3) {
-                let addDaysSun = (7 - day) % 7;
-                let addDaysWed = (3 - day + 7) % 7;
-                if (addDaysWed === 0) addDaysWed = 7;
-                if (addDaysSun === 0) addDaysSun = 7;
-                d.setDate(d.getDate() + (addDaysSun <= addDaysWed ? addDaysSun : addDaysWed));
-            }
-            return d.toISOString().split('T')[0];
-        }
-
-        function validateTripDay(inputElement) {
-            if(!inputElement.value) return;
-            let d = new Date(inputElement.value);
-            let day = d.getDay();
-            if (day !== 0 && day !== 3) {
-                alert('تنبيه: الرحلات مخصصة حصرياً أيام الأحد والأربعاء!');
-                inputElement.value = getNextTripDate(inputElement.value);
-            }
-        }
-
         window.addEventListener('online', () => {
-            document.getElementById('offlineBanner').classList.add('hidden');
             if(useFirebase && rtdb) { saveDB(); }
         });
 
         window.addEventListener('offline', () => {
-            document.getElementById('offlineBanner').classList.remove('hidden');
+            // العمل دون اتصال بصمت تام
         });
 
         function validateAndRepairDB() {
@@ -1346,9 +1313,6 @@
         }
 
         function initSync() {
-            const statusEl = document.getElementById('firebaseStatusIndicator');
-            if(!navigator.onLine) { document.getElementById('offlineBanner').classList.remove('hidden'); }
-
             if(!useFirebase || !rtdb) { loadFromLocal(); return; }
             
             rtdb.ref('systemUsers').on('value', (snapshot) => {
@@ -1373,12 +1337,8 @@
                     validateAndRepairDB();
                     localStorage.setItem('WADI_BINA_UNIFIED_DB', JSON.stringify(db));
                 } else { saveDB(); }
-                statusEl.className = "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1.5 rounded-xl text-[10px] font-bold flex items-center gap-1";
-                statusEl.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> متصل سحابياً`;
                 refreshUI();
             }, (error) => {
-                statusEl.className = "bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2.5 py-1.5 rounded-xl text-[10px] font-bold flex items-center gap-1";
-                statusEl.innerHTML = `<i class="fa-solid fa-database"></i> وضع التخزين المحلي`;
                 loadFromLocal();
             });
         }
@@ -1518,7 +1478,7 @@
 
             const newTrip = {
                 id: 'trip_' + Date.now(),
-                date: tripDate,
+                date: tripDate || '-',
                 route: tripRoute,
                 busInfo: tripBusInfo,
                 branch: currentUser.branch || 'فرع عجمان'
@@ -1527,6 +1487,7 @@
             db.trips.unshift(newTrip);
             saveDB();
             alert('تم إنشاء الرحلة بنجاح!');
+            document.getElementById('tripForm').reset();
             renderTripsTable();
             populateTripsDropdown();
         }
@@ -1559,7 +1520,7 @@
             db.trips.forEach(trip => {
                 const opt = document.createElement('option');
                 opt.value = trip.id;
-                opt.textContent = `${trip.date} (${trip.route}) - ${trip.busInfo}`;
+                opt.textContent = `${trip.date !== '-' ? trip.date : 'بدون تاريخ'} (${trip.route}) - ${trip.busInfo}`;
                 sel.appendChild(opt);
             });
             if(currentVal) sel.value = currentVal;
@@ -1568,14 +1529,13 @@
         function onTripSelectedForTicket() {
             const tripId = document.getElementById('passTripSelect').value;
             const trip = db.trips.find(t => t.id === tripId);
-            if(trip) {
+            if(trip && trip.date && trip.date !== '-') {
                 document.getElementById('passDate').value = trip.date;
-                updateReportingTimeAutomatically();
             }
         }
 
         function openManifestForTrip(tripDate) {
-            document.getElementById('manifestFilterDate').value = tripDate;
+            document.getElementById('manifestFilterDate').value = tripDate !== '-' ? tripDate : new Date().toISOString().split('T')[0];
             renderPassengerManifestTable();
             document.getElementById('manifestModal').classList.remove('hidden');
         }
@@ -1645,15 +1605,6 @@
                 link.href = canvas.toDataURL('image/jpeg', 0.95);
                 link.click();
             });
-        }
-
-        function updateReportingTimeAutomatically() {
-            const origin = document.getElementById('passOrigin').value;
-            let timeStr = "4:00 PM";
-            if (origin === 'بني ياس') timeStr = "7:30 PM";
-            else if (origin === 'العين' || origin === 'عبري') timeStr = "11:00 PM";
-            let currentTripDate = document.getElementById('passDate').value || '2026-11-08';
-            document.getElementById('passReportingTime').value = `${currentTripDate} (${timeStr})`;
         }
 
         function onPassengerCountChanged() {
@@ -1735,7 +1686,7 @@
                 extraPassengers: extraList,
                 origin: document.getElementById('passOrigin').value,
                 destination: document.getElementById('passDestination').value,
-                date: document.getElementById('passDate').value,
+                date: document.getElementById('passDate').value || '-',
                 reportingTime: document.getElementById('passReportingTime').value,
                 fare: parseFloat(document.getElementById('passManualTotal').value) || (count * 350),
                 payMethod: document.getElementById('passPayMethod').value,
@@ -1767,7 +1718,7 @@
             document.getElementById('passAgent').value = item.agent || '';
             document.getElementById('passCount').value = item.passengerCount || 1;
             onPassengerCountChanged();
-            document.getElementById('passDate').value = item.date || '2026-11-08';
+            document.getElementById('passDate').value = item.date !== '-' ? item.date : '';
             document.getElementById('passManualTotal').value = item.fare || 350;
             document.getElementById('passReportingTime').value = item.reportingTime || '';
             document.getElementById('passName').value = item.name || '';
@@ -1820,7 +1771,7 @@
 
             const cargoData = {
                 id: invNo,
-                date: document.getElementById('cargoDate').value,
+                date: document.getElementById('cargoDate').value || '-',
                 sender: document.getElementById('cargoSenderName').value,
                 senderPhone: document.getElementById('cargoSenderPhone').value,
                 senderAddress: document.getElementById('cargoSenderAddress').value || 'عجمان',
@@ -1843,7 +1794,6 @@
                 db.nextCargoNo = parseInt(invNo) + 1 || (db.nextCargoNo + 1);
                 document.getElementById('cargoForm').reset();
                 document.getElementById('cargoInvNo').value = db.nextCargoNo;
-                document.getElementById('cargoDate').value = '2026-11-08';
                 document.getElementById('cargoItemsRowsContainer').innerHTML = '';
                 addCargoItemRow();
                 alert('تم حفظ فاتورة الشحن بنجاح!');
@@ -1857,7 +1807,7 @@
             if(!item) return;
             document.getElementById('cargoEditId').value = item.id;
             document.getElementById('cargoInvNo').value = item.id;
-            document.getElementById('cargoDate').value = item.date || '2026-11-08';
+            document.getElementById('cargoDate').value = item.date !== '-' ? item.date : '';
             document.getElementById('cargoPaymentStatus').value = item.paymentStatus || 'مدفوع';
             document.getElementById('cargoSenderName').value = item.sender || '';
             document.getElementById('cargoSenderPhone').value = item.senderPhone || '';
@@ -1884,7 +1834,6 @@
             document.getElementById('cargoForm').reset();
             document.getElementById('cargoEditId').value = '';
             document.getElementById('cargoInvNo').value = db.nextCargoNo;
-            document.getElementById('cargoDate').value = '2026-11-08';
             document.getElementById('cargoItemsRowsContainer').innerHTML = '';
             addCargoItemRow();
             document.getElementById('cargoFormTitle').innerText = 'فاتورة أمتعة وبضائع (بأرقام كسرية دقيقة للأسعار)';
@@ -1897,7 +1846,7 @@
             const invNo = document.getElementById('debtInvNo').value.trim();
             const newInv = {
                 id: invNo,
-                date: document.getElementById('debtInvDate').value,
+                date: document.getElementById('debtInvDate').value || '-',
                 name: document.getElementById('debtInvCustomerName').value,
                 phone: document.getElementById('debtInvCustomerPhone').value,
                 address: document.getElementById('debtInvCustomerAddress').value,
@@ -1920,7 +1869,7 @@
             const v = {
                 id: Date.now().toString(),
                 type: document.getElementById('vType').value,
-                date: document.getElementById('vDate').value,
+                date: document.getElementById('vDate').value || '-',
                 amount: parseFloat(document.getElementById('vAmount').value) || 0,
                 desc: document.getElementById('vDesc').value,
                 user: currentUser.username,
@@ -2037,7 +1986,7 @@
                         <td>${extraNamesHtml}</td>
                         <td>${p.phone}</td>
                         <td>${p.origin} → ${p.destination}</td>
-                        <td><strong class="text-gold">${p.date || '2026-11-08'}</strong></td>
+                        <td><strong class="text-gold">${p.date || '-'}</strong></td>
                         <td>${p.fare} AED</td>
                         <td style="color:${p.payMethod==='مدفوع'?'#10b981':'#f59e0b'}">${p.payMethod}</td>
                         <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${p.branch || 'فرع عجمان'}</span></td>
@@ -2066,7 +2015,7 @@
 
                     cargoTbody.insertRow().innerHTML = `
                         <td><strong>#${c.id}</strong></td>
-                        <td><strong class="text-gold">${c.date}</strong></td>
+                        <td><strong class="text-gold">${c.date || '-'}</strong></td>
                         <td>${c.sender}<br><span class="text-[10px] text-zinc-400">${c.senderPhone}</span></td>
                         <td><strong>${c.receiver}</strong><br><span class="text-[10px] text-zinc-400">${c.receiverPhone}</span></td>
                         <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs">${itemCount}</span></td>
@@ -2091,7 +2040,7 @@
             document.getElementById('imgTktPhone').innerText = item.phone;
             document.getElementById('imgTktPassport').innerText = item.passport;
             document.getElementById('imgTktRoute').innerText = `${item.origin} → ${item.destination}`;
-            document.getElementById('imgTktDate').innerText = item.date || '2026-11-08';
+            document.getElementById('imgTktDate').innerText = item.date || '-';
             document.getElementById('imgTktTime').innerText = item.reportingTime;
             document.getElementById('imgTktFare').innerText = `${item.fare} AED`;
             document.getElementById('imgTktPayStatus').innerText = item.payMethod;
@@ -2147,7 +2096,7 @@
             document.getElementById('imgDebtName').innerText = inv.name;
             document.getElementById('imgDebtPhone').innerText = inv.phone;
             document.getElementById('imgDebtAddress').innerText = inv.address;
-            document.getElementById('imgDebtDate').innerText = inv.date;
+            document.getElementById('imgDebtDate').innerText = inv.date || '-';
             document.getElementById('imgDebtSubTotal').innerText = inv.subTotal;
             document.getElementById('imgDebtPaid').innerText = inv.paidAmount;
             document.getElementById('imgDebtNetTotal').innerText = `${inv.netTotal} AED`;
@@ -2155,7 +2104,7 @@
         }
 
         function openManifestModal() {
-            document.getElementById('manifestFilterDate').value = '2026-11-08';
+            document.getElementById('manifestFilterDate').value = new Date().toISOString().split('T')[0];
             renderPassengerManifestTable();
             document.getElementById('manifestModal').classList.remove('hidden');
         }
@@ -2168,7 +2117,7 @@
             const tbody = document.getElementById('manifestTableBody');
             tbody.innerHTML = '';
             
-            const filteredPass = getFilteredData(db.passengers).filter(p => (p.date || '2026-11-08') === filterDate);
+            const filteredPass = getFilteredData(db.passengers).filter(p => (p.date || '-') === filterDate);
             document.getElementById('manifestTotalBookings').innerText = filteredPass.length;
             
             let totalPax = 0;
@@ -2193,7 +2142,7 @@
         }
 
         function openCargoManifestModal() {
-            document.getElementById('cargoManifestFilterDate').value = '2026-11-08';
+            document.getElementById('cargoManifestFilterDate').value = new Date().toISOString().split('T')[0];
             renderCargoManifestTable();
             document.getElementById('cargoManifestModal').classList.remove('hidden');
         }
@@ -2206,7 +2155,7 @@
             const tbody = document.getElementById('cargoManifestTableBody');
             tbody.innerHTML = '';
 
-            const filteredCargo = getFilteredData(db.cargo).filter(c => (c.date || '2026-11-08') === filterDate);
+            const filteredCargo = getFilteredData(db.cargo).filter(c => (c.date || '-') === filterDate);
             document.getElementById('cargoManifestTotalInvoices').innerText = filteredCargo.length;
             
             let totalRev = 0;
@@ -2372,8 +2321,8 @@
                         extraPassengers: [],
                         origin: "عجمان",
                         destination: "عدن",
-                        date: "2026-11-08",
-                        reportingTime: "2026-11-08 (4:00 عصراً)",
+                        date: "-",
+                        reportingTime: "4:00 عصراً",
                         fare: 350,
                         payMethod: "مدفوع",
                         branch: currentUser ? currentUser.branch : "فرع عجمان"
@@ -2388,7 +2337,7 @@
                 if(cId && !db.cargo.some(c => String(c.id) === String(cId))) {
                     db.cargo.unshift({
                         id: cId,
-                        date: "2026-11-08",
+                        date: "-",
                         sender: "مرسل مستعاد #" + cId,
                         senderPhone: "0500000000",
                         senderAddress: "عجمان",
@@ -2425,4 +2374,3 @@
     </script>
 </body>
 </html>
-```[cite: 3, 4]
