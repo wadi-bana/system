@@ -431,9 +431,14 @@
             </span>
             <span id="userInfoBadge" class="bg-zinc-800 border border-zinc-700 text-gold px-3 py-1.5 rounded-xl text-xs font-bold"></span>
             
-            <!-- أزرار النسخ الاحتياطي والاستعادة -->
+            <!-- أزرار النسخ الاحتياطي بصيغة JSON و PDF -->
             <button onclick="exportBackupJSON()" class="bg-zinc-800 text-gold border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1">
-                <i class="fa-solid fa-download"></i> <span class="hidden sm:inline" id="btnBackup">نسخة احتياطية</span>
+                <i class="fa-solid fa-download"></i> <span class="hidden sm:inline" id="btnBackup">نسخة JSON</span>
+            </button>
+
+            <!-- زر تصدير نسخة احتياطية PDF شاملة -->
+            <button onclick="exportSystemBackupPDF()" class="bg-red-600 text-white border border-red-500 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 hover:bg-red-500">
+                <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline" id="btnBackupPDF">نسخة احتياطية PDF</span>
             </button>
             
             <label class="bg-zinc-800 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1 hover:border-gold">
@@ -441,7 +446,6 @@
                 <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
             </label>
 
-            <!-- زر الاستعادة من ملفات PDF المضاف حديثاً -->
             <label class="bg-red-950/60 text-red-400 border border-red-700 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1 hover:bg-red-900 hover:text-white">
                 <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline" id="btnRestorePDF">استعادة من PDF</span>
                 <input type="file" accept=".pdf" onchange="importBackupPDF(event)" class="hidden">
@@ -479,6 +483,49 @@
 
     <!-- MAIN CONTAINER -->
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 flex-grow w-full pb-24">
+
+        <!-- عنصر مخفي لتوليد تقرير النسخة الاحتياطية بصيغة PDF -->
+        <div id="systemReportPrintArea" class="hidden bg-white text-slate-900 p-8 rounded-xl shadow-2xl" style="direction: rtl; text-align: right; width: 210mm;">
+            <div class="flex justify-between items-center border-b-2 border-amber-600 pb-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <img src="logo_2.jpeg" alt="Logo" class="w-16 h-16 object-cover rounded-full border-2 border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
+                    <div>
+                        <h2 class="text-lg font-black text-slate-900 leading-tight">شركة وادي بناء للنقل البري</h2>
+                        <p class="text-xs text-slate-600">تقرير النسخة الاحتياطية الشاملة للنظام الموحد</p>
+                    </div>
+                </div>
+                <div class="text-left text-xs space-y-1">
+                    <div>تاريخ التقرير: <strong id="reportDateBadge" class="text-amber-700"></strong></div>
+                    <div>المسؤول: <span id="reportUserBadge" class="font-bold"></span></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 mb-6 text-xs bg-slate-100 p-4 rounded-xl border border-slate-200">
+                <div>إجمالي التذاكر: <strong id="repTotalTkt" class="text-indigo-700 font-black text-sm">0</strong></div>
+                <div>إجمالي فواتير الشحن: <strong id="repTotalCargo" class="text-emerald-700 font-black text-sm">0</strong></div>
+                <div>إجمالي الذمم والآجال: <strong id="repTotalDebt" class="text-amber-700 font-black text-sm">0</strong></div>
+            </div>
+
+            <h3 class="font-bold text-sm text-slate-800 mb-2 border-b border-slate-300 pb-1">أحدث التذاكر المسجلة في النظام:</h3>
+            <table class="w-full border-collapse text-xs mb-6">
+                <thead>
+                    <tr class="bg-slate-200 text-slate-800">
+                        <th class="border border-slate-300 p-2">البوليصة</th>
+                        <th class="border border-slate-300 p-2">الاسم</th>
+                        <th class="border border-slate-300 p-2">الهاتف</th>
+                        <th class="border border-slate-300 p-2">المسار</th>
+                        <th class="border border-slate-300 p-2">المبلغ</th>
+                        <th class="border border-slate-300 p-2">السداد</th>
+                    </tr>
+                </thead>
+                <tbody id="repTicketsTbody"></tbody>
+            </table>
+
+            <div class="pt-4 border-t border-dashed border-slate-400 text-[10px] text-slate-600 flex justify-between">
+                <span>شركة وادي بناء للنقل الدولي - النظام الموحد للعمليات اللوجستية</span>
+                <span>صفحة التقرير الرسمي</span>
+            </div>
+        </div>
 
         <!-- فلتر الأفرع الخاص بالمدير -->
         <div id="managerBranchFilterContainer" class="hidden bg-cardbg border border-bordergold p-3.5 rounded-2xl shadow-xl mb-6 flex flex-col sm:flex-row items-center justify-between gap-3 no-print">
@@ -1082,7 +1129,7 @@
                 lgSub: 'أدخل بيانات الحساب المعتمدة للوصول للوحة التحكم',
                 lgUserLbl: 'اسم المستخدم', lgPassLbl: 'كلمة المرور', lgBtn: 'دخول النظام',
                 headTitle: 'شركة وادي بناء للنقل البري', headSub: 'النظام الموحد الشامل',
-                btnBackup: 'نسخة احتياطية', btnRestore: 'استرجاع JSON', btnRestorePDF: 'استعادة من PDF', btnLogout: 'خروج',
+                btnBackup: 'نسخة JSON', btnBackupPDF: 'نسخة احتياطية PDF', btnRestore: 'استرجاع JSON', btnRestorePDF: 'استعادة من PDF', btnLogout: 'خروج',
                 tDashboard: 'لوحة التحكم', tPassengers: 'التذاكر والركاب', tCargo: 'فواتير الشحن', tFin: 'الإدارة المالية',
                 searchPh: 'بحث ذكي: رقم البوليصة، اسم العميل، أو الصنف...', btnResetSearch: 'إلغاء',
                 lblStat1: 'إجمالي حجوزات الركاب', lblStat2: 'إيرادات الشحن والبارسيل', lblStat3: 'إجمالي المصروفات والنثريات', lblStat4: 'صافي رصيد الصندوق',
@@ -1111,7 +1158,7 @@
                 lgSub: 'Enter approved credentials to access the control panel',
                 lgUserLbl: 'Username', lgPassLbl: 'Password', lgBtn: 'Login',
                 headTitle: 'Wadi Bina Overland Transport', headSub: 'Comprehensive Unified System',
-                btnBackup: 'Backup', btnRestore: 'Restore JSON', btnRestorePDF: 'Restore PDF', btnLogout: 'Logout',
+                btnBackup: 'JSON Backup', btnBackupPDF: 'PDF Backup', btnRestore: 'Restore JSON', btnRestorePDF: 'Restore PDF', btnLogout: 'Logout',
                 tDashboard: 'Dashboard', tPassengers: 'Tickets & Passengers', tCargo: 'Cargo Invoices', tFin: 'Financial Management',
                 searchPh: 'Smart search: Policy No, Client name, Item...', btnResetSearch: 'Reset',
                 lblStat1: 'Total Passenger Bookings', lblStat2: 'Cargo & Parcel Revenue', lblStat3: 'Total Expenses & Misc', lblStat4: 'Net Cash Box Balance',
@@ -1533,6 +1580,46 @@
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
                 pdf.addImage(imgData, 'PNG', 0, 10, imgWidth, imgHeight);
                 pdf.save(`${filePrefix}${Date.now()}.pdf`);
+            });
+        }
+
+        // --- ميزة تصدير النسخة الاحتياطية الشاملة بصيغة PDF ---
+        function exportSystemBackupPDF() {
+            document.getElementById('reportDateBadge').innerText = new Date().toLocaleDateString('ar-EG');
+            document.getElementById('reportUserBadge').innerText = currentUser ? currentUser.username : 'النظام';
+            
+            const filteredPass = getFilteredData(db.passengers);
+            const filteredCargo = getFilteredData(db.cargo);
+            const filteredDebts = getFilteredData(db.debtInvoices);
+
+            document.getElementById('repTotalTkt').innerText = filteredPass.length;
+            document.getElementById('repTotalCargo').innerText = filteredCargo.length;
+            document.getElementById('repTotalDebt').innerText = filteredDebts.length;
+
+            const tBody = document.getElementById('repTicketsTbody');
+            tBody.innerHTML = '';
+            filteredPass.slice(0, 15).forEach(p => {
+                tBody.insertRow().innerHTML = `
+                    <td class="border border-slate-300 p-1.5 font-bold">#${p.id}</td>
+                    <td class="border border-slate-300 p-1.5">${p.name}</td>
+                    <td class="border border-slate-300 p-1.5">${p.phone}</td>
+                    <td class="border border-slate-300 p-1.5">${p.origin} → ${p.destination}</td>
+                    <td class="border border-slate-300 p-1.5 font-bold">${p.fare} AED</td>
+                    <td class="border border-slate-300 p-1.5">${p.payMethod}</td>
+                `;
+            });
+
+            const printArea = document.getElementById('systemReportPrintArea');
+            printArea.classList.remove('hidden');
+
+            html2canvas(printArea, { scale: 2, useCORS: true }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                const imgWidth = 210;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                pdf.addImage(imgData, 'PNG', 0, 10, imgWidth, imgHeight);
+                pdf.save(`WadiBina_System_Backup_Report_${Date.now()}.pdf`);
+                printArea.classList.add('hidden');
             });
         }
 
@@ -2222,7 +2309,6 @@
             reader.readAsText(file);
         }
 
-        // --- ميزة الاستعادة وقراءة البيانات من ملف PDF ---
         async function importBackupPDF(e) {
             const file = e.target.files[0];
             if(!file) return;
@@ -2253,12 +2339,10 @@
         function parseAndImportPdfText(text) {
             let recoveredCount = 0;
 
-            // 1. استخراج التذاكر (Passenger Ticket Parsing)
             const ticketMatches = text.matchAll(/(?:#|بوليصة|Ticket)\s*(\d+)/gi);
             for(const match of ticketMatches) {
                 const tId = match[1];
                 if(tId && !db.passengers.some(p => String(p.id) === String(tId))) {
-                    // استخراج الاسم ورقم الهاتف والجواز إن وجد
                     const phoneMatch = text.match(/(?:05\d{8}|07\d{8})/);
                     const passportMatch = text.match(/\b\d{7,9}\b/);
                     
@@ -2283,7 +2367,6 @@
                 }
             }
 
-            // 2. استخراج فواتير الشحن (Cargo Invoice Parsing)
             const cargoMatches = text.matchAll(/(?:فاتورة شحن|Cargo|شحن)\s*#?\s*(\d+)/gi);
             for(const match of cargoMatches) {
                 const cId = match[1];
