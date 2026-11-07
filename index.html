@@ -431,12 +431,10 @@
             </span>
             <span id="userInfoBadge" class="bg-zinc-800 border border-zinc-700 text-gold px-3 py-1.5 rounded-xl text-xs font-bold"></span>
             
-            <!-- أزرار النسخ الاحتياطي بصيغة JSON و PDF -->
             <button onclick="exportBackupJSON()" class="bg-zinc-800 text-gold border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1">
                 <i class="fa-solid fa-download"></i> <span class="hidden sm:inline" id="btnBackup">نسخة JSON</span>
             </button>
 
-            <!-- زر تصدير نسخة احتياطية PDF شاملة -->
             <button onclick="exportSystemBackupPDF()" class="bg-red-600 text-white border border-red-500 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 hover:bg-red-500">
                 <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline" id="btnBackupPDF">نسخة احتياطية PDF</span>
             </button>
@@ -1092,32 +1090,50 @@
                 { id: "trip_1", date: "2026-11-08", route: "الإمارات ➔ عدن", busInfo: "باص الرحلة الأساسي (الأحد)" }
             ],
             passengers: [
-                { id: "115", tripId: "trip_1", agent: "أبو خالد", name: "صفية محمد مبارك باوحدة", phone: "0544830131", passport: "10384842", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08(7:30 PM)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "140", tripId: "trip_1", agent: "النظام", name: "محسن فيصل احمد", phone: "05", passport: "12605475", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "139", tripId: "trip_1", agent: "النظام", name: "نضرة محمد عبود عبد الله", phone: "05", passport: "16719704", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (7:30 مساءً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "138", tripId: "trip_1", agent: "النظام", name: "مروان محمد يحي", phone: "05", passport: "14033923", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (7:30 مساءً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "137", tripId: "trip_1", agent: "النظام", name: "جمال ناصر محمد ابراهيم", phone: "05", passport: "17104141", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (7:30 مساءً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "136", tripId: "trip_1", agent: "النظام", name: "حسين عيدروس صالح عبد الله", phone: "05", passport: "16188210", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (7:30 مساءً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "135", tripId: "trip_1", agent: "النظام", name: "مراد محمد علي ابوبكر", phone: "0557751876", passport: "12776245", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "133", tripId: "trip_1", agent: "النظام", name: "احمد صالح ناجي", phone: "0503733445", passport: "16671163", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "132", tripId: "trip_1", agent: "النظام", name: "مجاهد محسن غالب", phone: "05", passport: "14935024", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (7:30 مساءً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
+                { id: "131", tripId: "trip_1", agent: "النظام", name: "هشام محمد عبد الرحيم العمودي", phone: "05", passport: "16130448", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "المكلا", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
                 { id: "116", tripId: "trip_1", agent: "خالد", name: "عيسى محمد عبدالله محمد النهمي", phone: "05029205559", passport: "17038593", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
-                { id: "117", tripId: "trip_1", agent: "أبو خالد", name: "عارف علي مقبل العامري", phone: "0559906116", passport: "12903786", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08(4:00 عصراً)", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
-                { id: "118", tripId: "trip_1", agent: "أبو خالد", name: "عبدالرحمن البذنوحي", phone: "0563611229", passport: "17200855", passengerCount: 1, extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (7:30 مساءً)", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
-                { id: "119", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "اقبال عبدالله سالم ", passport: "09896049", phone: "0559322600", extraPassengers: [], origin: "بني ياس", destination: "المكلا", date: "2026-11-08", reportingTime: "2026-11-08 (7:30 مساءً)", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
+                { id: "119", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "اقبال عبدالله سالم", passport: "09896049", phone: "0559322600", extraPassengers: [], origin: "بني ياس", destination: "المكلا", date: "2026-11-08", reportingTime: "2026-11-08 (7:30 مساءً)", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
                 { id: "120", tripId: "trip_1", agent: "أبو خالد", passengerCount: 1, name: "فهد عيسى عامرعلي كبرهي", passport: "15358352", phone: "0501637817", extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
                 { id: "121", tripId: "trip_1", agent: "أبو خالد", passengerCount: 1, name: "نعيمة عوض سليمان", passport: "11186508", phone: "0556166311", extraPassengers: [], origin: "بني ياس", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (7:30 مساءً)", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان" },
                 { id: "122", tripId: "trip_1", agent: "أبو خالد", passengerCount: 1, name: "صفاء عبد الله محمد النصيري", passport: "13546330", phone: "0544755036", extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 400, payMethod: "مدفوع", branch: "فرع عجمان" },
                 { id: "123", tripId: "trip_1", agent: "أبو خالد", name: "ترنا محمد البيضاني", phone: "0544755036", passport: "17681575", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 430, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
                 { id: "124", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "جميلة محمد احمد عكيش", passport: "17090616", phone: "0544755036", extraPassengers: [], origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-09 (1:30 صباحاً)", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
                 { id: "125", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "نور عبدالله على يحي", passport: "09618725", phone: "0544755036", extraPassengers: [], origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-09 (1:30 صباحاً)", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
-                { id: "126", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "حنان حسن سالم محمد البري", passport: "11374253", phone: "0544755036", extraPassengers: [], origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-09 (1:30 صباحاً)", fare: 400, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
-                { id: "127", tripId: "trip_1", agent: "أبو خالد", passengerCount: 6, name: "عائدة علي شيخ سعيد السنيدي", passport: "17568571", phone: "0529008186", extraPassengers: [{name: "مها سمير صالح زين احمد", passport: "17568574"}, {name: "مصطفى سمير صالح زين احمد", passport: "17568570"}, {name: "احمد سمير صالح زين احمد", passport: "17568572"}, {name: "أريج سمير صالح زين احمد", passport: "17568575"}, {name: "يعقوب سمير صالح زين احمد", passport: "17568573"}], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 1750, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
+                { id: "126", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 2, name: "حنان حسن سالم محمد البري", passport: "11374253", phone: "0544755036", extraPassengers: [{name: "مها سمير صالح زين احمد", passport: ""}, {name: "مصطفى سمير صالح زين احمد", passport: ""}], origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-09 (1:30 صباحاً)", fare: 400, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
+                { id: "127", tripId: "trip_1", agent: "أبو خالد", passengerCount: 5, name: "عائدة علي شيخ سعيد السنيدي", passport: "17568571", phone: "0529008186", extraPassengers: [{name: "احمد سمير صالح زين احمد", passport: ""}, {name: "أريج سمير صالح زين احمد", passport: ""}, {name: "يعقوب سمير صالح زين احمد", passport: ""}], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-08 (4:00 عصراً)", fare: 1750, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
                 { id: "128", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "سونيا محمد يحي", passport: "10966601", phone: "0544755036", extraPassengers: [], origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-09 (1:30 صباحاً)", fare: 300, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
                 { id: "129", tripId: "trip_1", agent: "أبوشهاب", passengerCount: 1, name: "كاميليا محمد يحي", passport: "14269384", phone: "0544755036", extraPassengers: [], origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-09 (1:30 صباحاً)", fare: 350, payMethod: "الدفع عند الباص", branch: "فرع عجمان" },
                 { id: "130", tripId: "trip_1", name: "علي حيدره ناصر جرفيل", passport: "17200685", phone: "0544755036", origin: "عبري", destination: "عدن", date: "2026-11-08", reportingTime: "2026-11-09 (1:30 صباحاً)", fare: 350, payMethod: "الدفع عند الباص", agent: "أبوشهاب", passengerCount: 1, extraPassengers: [], branch: "فرع عجمان" }
             ],
             cargo: [
-                { id: "126", date: "2026-11-08", sender: "بيت السقاف", senderPhone: "0557764244", senderAddress: "عجمان الحميدية", receiver: "خالد علوي السقاف", receiverPhone: "0783536886", receiverAddress: "عدن", items: [{desc: "كيس رز 10كيلو", qty: 2, price: 35}, {desc: "كيس دقيق 10كيلو", qty: 2, price: 25}, {desc: "تنكة زيت", qty: 1, price: 40}, {desc: "كرتون حليب", qty: 1, price: 20}, {desc: "كيس به اغراض", qty: 1, price: 20}], grandTotal: 200, paymentStatus: "مدفوع", branch: "فرع عجمان" }
+                { id: "130", date: "2026-11-08", sender: "عبد الكريم عبد الله بندر عدن", senderPhone: "0567777133", senderAddress: "عجمان", receiver: "النادي الدولي للسيارات", receiverPhone: "0778826198", receiverAddress: "عدن", items: [{desc: "كرتون صغير به فواتير", qty: 1, price: 50}], grandTotal: 50, paymentStatus: "مدفوع", branch: "فرع عجمان" },
+                { id: "129", date: "2026-11-08", sender: "ابوبكر علي باوزير", senderPhone: "0505985852", senderAddress: "عجمان", receiver: "أكرم السعدي", receiverPhone: "0778274998", receiverAddress: "عدن", items: [{desc: "كيس فيه ملابس", qty: 1, price: 100}], grandTotal: 100, paymentStatus: "مدفوع", branch: "فرع عجمان" },
+                { id: "128", date: "2026-11-08", sender: "محمد قايد", senderPhone: "0501410084", senderAddress: "عجمان", receiver: "حسام رشيد مجاهد", receiverPhone: "077827676", receiverAddress: "عدن", items: [{desc: "كرتون صغير", qty: 1, price: 100}], grandTotal: 100, paymentStatus: "مدفوع", branch: "فرع عجمان" },
+                { id: "127", date: "2026-11-08", sender: "صلاح سالم", senderPhone: "0503385848", senderAddress: "عجمان", receiver: "سالم عوض", receiverPhone: "0774706770", receiverAddress: "عدن", items: [{desc: "كرتون", qty: 2, price: 400}, {desc: "كرتون", qty: 1, price: 200}, {desc: "شاشه", qty: 1, price: 200}], grandTotal: 800, paymentStatus: "أجل بالامارات", branch: "فرع عجمان" },
+                { id: "126", date: "2026-11-08", sender: "بيت السقاف", senderPhone: "0557764244", senderAddress: "عجمان الحميدية", receiver: "خالد علوي السقاف", receiverPhone: "0783536886", receiverAddress: "عدن", items: [{desc: "كيس رز 10كيلو", qty: 2, price: 35}, {desc: "كيس دقيق 10كيلو", qty: 2, price: 25}, {desc: "تنكة زيت", qty: 1, price: 40}, {desc: "كرتون حليب", qty: 1, price: 20}, {desc: "كيس به اغراض", qty: 1, price: 20}], grandTotal: 200, paymentStatus: "مدفوع", branch: "فرع عجمان" },
+                { id: "125", date: "2026-11-08", sender: "أحمد السعدي", senderPhone: "0568067476", senderAddress: "عجمان", receiver: "جمال عبد الناصر", receiverPhone: "0777944721", receiverAddress: "عدن", items: [{desc: "ظرف", qty: 1, price: 0}], grandTotal: 0, paymentStatus: "مدفوع", branch: "فرع عجمان" },
+                { id: "124", date: "2026-11-08", sender: "ليث كتر بلر", senderPhone: "0506564373", senderAddress: "عجمان", receiver: "محمود حريز مطهر", receiverPhone: "0771034094", receiverAddress: "عدن", items: [{desc: "كيس صغير", qty: 1, price: 150}], grandTotal: 150, paymentStatus: "مدفوع", branch: "فرع عجمان" },
+                { id: "123", date: "2026-11-08", sender: "أحمد السعدي", senderPhone: "0568067476", senderAddress: "عجمان", receiver: "عبد المجيد السعدي", receiverPhone: "0774020974", receiverAddress: "عدن", items: [{desc: "كراتين", qty: 45, price: 5500}], grandTotal: 5500, paymentStatus: "أجل بالامارات", branch: "فرع عجمان" },
+                { id: "122", date: "2026-11-08", sender: "ياسر محضار", senderPhone: "0505722612", senderAddress: "عجمان", receiver: "عبد الرحمن محمد سقاف", receiverPhone: "0735581244", receiverAddress: "عدن", items: [{desc: "جونية", qty: 1, price: 150}], grandTotal: 150, paymentStatus: "الدفع باليمن", branch: "فرع عجمان" },
+                { id: "121", date: "2026-11-08", sender: "علي ناصر", senderPhone: "0529004155", senderAddress: "عجمان", receiver: "محمد طه", receiverPhone: "0770581111", receiverAddress: "عدن", items: [{desc: "شنطة طريال", qty: 1, price: 250}], grandTotal: 250, paymentStatus: "الدفع باليمن", branch: "فرع عجمان" },
+                { id: "120", date: "2026-11-08", sender: "احمد إيهاب", senderPhone: "0581238889", senderAddress: "عجمان", receiver: "عبد الله المقطري", receiverPhone: "0780547866", receiverAddress: "عدن", items: [{desc: "كيس في اغراض شخصية", qty: 1, price: 100}], grandTotal: 100, paymentStatus: "الدفع باليمن", branch: "فرع عجمان" },
+                { id: "119", date: "2026-11-08", sender: "ايمن عامر النهدي", senderPhone: "0543235369", senderAddress: "عجمان", receiver: "امين صالح حسن حسين المدوري", receiverPhone: "0776648487", receiverAddress: "عدن", items: [{desc: "كيس به قطع غيار", qty: 1, price: 100}], grandTotal: 100, paymentStatus: "الدفع باليمن", branch: "فرع عجمان" },
+                { id: "118", date: "2026-11-08", sender: "معتز علي الكندي", senderPhone: "0529004155", senderAddress: "عجمان", receiver: "احمد حسام المنصري", receiverPhone: "0771420348", receiverAddress: "عدن", items: [{desc: "سله", qty: 1, price: 300}], grandTotal: 300, paymentStatus: "مدفوع", branch: "فرع عجمان" }
             ],
             vouchers: [],
             debtInvoices: [
                 { id: "1", date: "2026-11-08", name: "عبدالله الوالي", phone: "050000000", address: "عجمان", subTotal: 3200, paidAmount: 0, netTotal: 3200, user: "محمود", branch: "فرع عجمان" }
             ],
-            nextTicketNo: 131,
-            nextCargoNo: 127,
+            nextTicketNo: 141,
+            nextCargoNo: 131,
             nextDebtInvNo: 2
         };
 
@@ -1350,8 +1366,8 @@
                         cargo: val.cargo ? Object.values(val.cargo) : db.cargo,
                         vouchers: val.vouchers ? Object.values(val.vouchers) : [],
                         debtInvoices: val.debtInvoices ? Object.values(val.debtInvoices) : db.debtInvoices,
-                        nextTicketNo: val.nextTicketNo || 131,
-                        nextCargoNo: val.nextCargoNo || 127,
+                        nextTicketNo: val.nextTicketNo || 141,
+                        nextCargoNo: val.nextCargoNo || 131,
                         nextDebtInvNo: val.nextDebtInvNo || 2
                     };
                     validateAndRepairDB();
@@ -1388,7 +1404,7 @@
             loadFromLocal();
             updateUserBadge();
             applyLanguage();
-            document.getElementById('passTicketNo').value = db.nextTicketNo || 115;
+            document.getElementById('passTicketNo').value = db.nextTicketNo || 141;
             onPassengerCountChanged();
             addCargoItemRow();
             if(currentUser) initSync();
@@ -1583,7 +1599,6 @@
             });
         }
 
-        // --- ميزة تصدير النسخة الاحتياطية الشاملة بصيغة PDF ---
         function exportSystemBackupPDF() {
             document.getElementById('reportDateBadge').innerText = new Date().toLocaleDateString('ar-EG');
             document.getElementById('reportUserBadge').innerText = currentUser ? currentUser.username : 'النظام';
@@ -2086,7 +2101,7 @@
             if (item.extraPassengers && item.extraPassengers.length > 0) {
                 let html = `<div class="bg-slate-100 p-3 rounded-lg border border-slate-200 text-xs mb-4 space-y-2"><strong class="text-amber-700 block">الركاب الإضافيون:</strong>`;
                 item.extraPassengers.forEach(ex => {
-                    html += `<div>• ${ex.name} (${ex.phone} - ${ex.passport})</div>`;
+                    html += `<div>• ${ex.name} (${ex.phone || ''} - ${ex.passport || ''})</div>`;
                 });
                 html += `</div>`;
                 extraBox.innerHTML = html;
@@ -2163,7 +2178,7 @@
             filteredPass.forEach((p, idx) => {
                 let extraStr = '-';
                 if(p.extraPassengers && p.extraPassengers.length > 0) {
-                    extraStr = p.extraPassengers.map((ex, i) => `${i+1}) ${ex.name} (${ex.phone})`).join('<br>');
+                    extraStr = p.extraPassengers.map((ex, i) => `${i+1}) ${ex.name} (${ex.phone || ''})`).join('<br>');
                 }
                 tbody.insertRow().innerHTML = `
                     <td class="border border-slate-300 p-2">${idx+1}</td>
@@ -2410,3 +2425,4 @@
     </script>
 </body>
 </html>
+```[cite: 3, 4]
