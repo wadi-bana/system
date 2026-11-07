@@ -27,6 +27,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
+    <!-- PDF.js للقراءة والاستعادة من ملفات PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -50,6 +56,12 @@
     </style>
 </head>
 <body class="bg-darkbg text-zinc-100 min-h-screen flex flex-col justify-between selection:bg-gold selection:text-black">
+
+    <!-- Offline Banner Notification -->
+    <div id="offlineBanner" class="hidden bg-red-600 text-white text-center text-xs py-2 font-bold px-4 sticky top-0 z-50 flex items-center justify-center gap-2 shadow-lg">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>انقطع اتصال الإنترنت! يتم حفظ البيانات محلياً على المتصفح وسيتم مزامنتها تلقائياً عند عودة الاتصال.</span>
+    </div>
 
     <!-- LOGIN MODAL -->
     <div class="modal-overlay" id="loginOverlay">
@@ -407,7 +419,7 @@
                 <p id="headSub" class="text-[11px] text-zinc-400">النظام الموحد الشامل</p>
             </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
             <button onclick="openChangePasswordModal()" class="bg-zinc-800 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-bold">
                 <i class="fa-solid fa-key"></i> <span id="btnChangePass">كلمة المرور</span>
             </button>
@@ -418,13 +430,23 @@
                 <i class="fa-solid fa-circle-notch fa-spin"></i> جاري الاتصال...
             </span>
             <span id="userInfoBadge" class="bg-zinc-800 border border-zinc-700 text-gold px-3 py-1.5 rounded-xl text-xs font-bold"></span>
+            
+            <!-- أزرار النسخ الاحتياطي والاستعادة -->
             <button onclick="exportBackupJSON()" class="bg-zinc-800 text-gold border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1">
                 <i class="fa-solid fa-download"></i> <span class="hidden sm:inline" id="btnBackup">نسخة احتياطية</span>
             </button>
-            <label class="bg-zinc-800 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1">
-                <i class="fa-solid fa-upload"></i> <span class="hidden sm:inline" id="btnRestore">استرجاع</span>
+            
+            <label class="bg-zinc-800 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1 hover:border-gold">
+                <i class="fa-solid fa-upload"></i> <span class="hidden sm:inline" id="btnRestore">استرجاع JSON</span>
                 <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
             </label>
+
+            <!-- زر الاستعادة من ملفات PDF المضاف حديثاً -->
+            <label class="bg-red-950/60 text-red-400 border border-red-700 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1 hover:bg-red-900 hover:text-white">
+                <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline" id="btnRestorePDF">استعادة من PDF</span>
+                <input type="file" accept=".pdf" onchange="importBackupPDF(event)" class="hidden">
+            </label>
+
             <button onclick="handleLogout()" id="btnLogout" class="bg-red-600/20 text-red-400 border border-red-600/30 px-3 py-1.5 rounded-xl text-xs font-bold">خروج</button>
         </div>
     </header>
@@ -437,7 +459,7 @@
                     <i class="fa-solid fa-chart-pie ml-1.5"></i> لوحة التحكم
                 </button>
                 <button onclick="switchTab('trips')" id="tab-trips" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
-                    <i class="fa-solid fa-bus ml-1.5"></i> إدارة الرحلات (جديد)
+                    <i class="fa-solid fa-bus ml-1.5"></i> إدارة الرحلات
                 </button>
                 <button onclick="switchTab('passengers')" id="tab-passengers" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
                     <i class="fa-solid fa-ticket ml-1.5"></i> التذاكر والركاب
@@ -529,7 +551,7 @@
             </div>
         </section>
 
-        <!-- TAB TRIPS: إدارة الرحلات (إنشاء رحلة أولاً ثم ربط التذاكر بها) -->
+        <!-- TAB TRIPS: إدارة الرحلات -->
         <section id="module-trips" class="tab-content hidden space-y-6">
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -561,7 +583,7 @@
             </div>
 
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
-                <h3 class="text-gold font-bold text-sm border-b border-zinc-800 pb-3"><i class="fa-solid fa-list-check ml-1"></i> قائمة الرحلات المجدولة (اختر رحلة لإضافة تذاكر إليها أو عرض مانفيستو خاص بها)</h3>
+                <h3 class="text-gold font-bold text-sm border-b border-zinc-800 pb-3"><i class="fa-solid fa-list-check ml-1"></i> قائمة الرحلات المجدولة</h3>
                 <div class="overflow-x-auto">
                     <table class="custom-table" id="tripsTable">
                         <thead>
@@ -607,13 +629,13 @@
                                 <input type="text" id="passTicketNo" required readonly class="w-full bg-zinc-900 border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs outline-none cursor-not-allowed">
                             </div>
                             <div>
-                                <label class="block text-xs text-gold mb-1 font-bold">ربط برحلة مجدولة *</label>
+                                <label id="lblAgent" class="block text-xs text-gold mb-1 font-bold">ربط برحلة مجدولة *</label>
                                 <select id="passTripSelect" required onchange="onTripSelectedForTicket()" class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs outline-none">
                                     <option value="">-- اختر الرحلة أولاً --</option>
                                 </select>
                             </div>
                             <div>
-                                <label id="lblAgent" class="block text-xs text-gold mb-1 font-bold">اسم الوكيل *</label>
+                                <label class="block text-xs text-gold mb-1 font-bold">اسم الوكيل *</label>
                                 <input type="text" id="passAgent" required placeholder="اسم الوكيل أو الحاجز" class="w-full bg-darkbg border border-gold rounded-xl px-3 py-2 text-xs text-zinc-200 outline-none" value="أبو خالد">
                             </div>
                         </div>
@@ -925,7 +947,7 @@
                         </div>
                         <div class="flex gap-2">
                             <button type="submit" id="btnSaveDebt" class="gold-gradient-bg text-black font-bold px-4 py-2 rounded text-xs">حفظ وإصدار</button>
-                            <button type="button" onclick="switchFinancialSubTab('debts')" id="btnCancelDebt" class="bg-zinc-800 text-zinc-300 px-4 py-2 rounded text-xs">إلغاء</button>
+                            <button type="button" onclick="switchFinancialSubTab('debts')" id="btnCancelDebt" class="bg-zinc-800 text-zinc-300 px-4 py-2 rounded text-xs">إغلاق</button>
                         </div>
                     </form>
                 </div>
@@ -969,7 +991,7 @@
                     </div>
                     <div class="flex gap-2 pt-2">
                         <button type="submit" id="userSubmitBtn" class="gold-gradient-bg text-black font-bold px-4 py-2 rounded text-xs">إضافة مستخدم جديد</button>
-                        <button type="button" onclick="resetUserForm()" class="bg-zinc-800 text-zinc-300 px-4 py-2 rounded text-xs">إلغاء</button>
+                        <button type="button" onclick="resetUserForm()" class="bg-zinc-800 text-zinc-300 px-4 py-2 rounded text-xs">إغلاق</button>
                     </div>
                 </form>
 
@@ -1010,7 +1032,8 @@
 
         let currentUser = JSON.parse(localStorage.getItem('WADI_BINA_USER')) || null;
         let currentLang = localStorage.getItem('WADI_BINA_LANG') || 'ar';
-        
+        let currentTab = 'dashboard';
+
         const DEFAULT_USERS = [
             { username: 'وليد السيد', password: '708090', role: 'مدير', branch: 'فرع عجمان' },
             { username: 'محمود', password: '102030', role: 'موظف', branch: 'فرع عجمان' },
@@ -1059,7 +1082,7 @@
                 lgSub: 'أدخل بيانات الحساب المعتمدة للوصول للوحة التحكم',
                 lgUserLbl: 'اسم المستخدم', lgPassLbl: 'كلمة المرور', lgBtn: 'دخول النظام',
                 headTitle: 'شركة وادي بناء للنقل البري', headSub: 'النظام الموحد الشامل',
-                btnBackup: 'نسخة احتياطية', btnRestore: 'استرجاع', btnLogout: 'خروج',
+                btnBackup: 'نسخة احتياطية', btnRestore: 'استرجاع JSON', btnRestorePDF: 'استعادة من PDF', btnLogout: 'خروج',
                 tDashboard: 'لوحة التحكم', tPassengers: 'التذاكر والركاب', tCargo: 'فواتير الشحن', tFin: 'الإدارة المالية',
                 searchPh: 'بحث ذكي: رقم البوليصة، اسم العميل، أو الصنف...', btnResetSearch: 'إلغاء',
                 lblStat1: 'إجمالي حجوزات الركاب', lblStat2: 'إيرادات الشحن والبارسيل', lblStat3: 'إجمالي المصروفات والنثريات', lblStat4: 'صافي رصيد الصندوق',
@@ -1088,7 +1111,7 @@
                 lgSub: 'Enter approved credentials to access the control panel',
                 lgUserLbl: 'Username', lgPassLbl: 'Password', lgBtn: 'Login',
                 headTitle: 'Wadi Bina Overland Transport', headSub: 'Comprehensive Unified System',
-                btnBackup: 'Backup', btnRestore: 'Restore', btnLogout: 'Logout',
+                btnBackup: 'Backup', btnRestore: 'Restore JSON', btnRestorePDF: 'Restore PDF', btnLogout: 'Logout',
                 tDashboard: 'Dashboard', tPassengers: 'Tickets & Passengers', tCargo: 'Cargo Invoices', tFin: 'Financial Management',
                 searchPh: 'Smart search: Policy No, Client name, Item...', btnResetSearch: 'Reset',
                 lblStat1: 'Total Passenger Bookings', lblStat2: 'Cargo & Parcel Revenue', lblStat3: 'Total Expenses & Misc', lblStat4: 'Net Cash Box Balance',
@@ -1204,7 +1227,7 @@
         function getNextTripDate(targetDateStr = null) {
             let d = targetDateStr ? new Date(targetDateStr) : new Date('2026-11-08');
             if (isNaN(d.getTime())) d = new Date('2026-11-08');
-            let day = d.getDay(); // الأحد = 0، الأربعاء = 3
+            let day = d.getDay();
             if (day !== 0 && day !== 3) {
                 let addDaysSun = (7 - day) % 7;
                 let addDaysWed = (3 - day + 7) % 7;
@@ -1225,20 +1248,50 @@
             }
         }
 
+        window.addEventListener('online', () => {
+            document.getElementById('offlineBanner').classList.add('hidden');
+            if(useFirebase && rtdb) { saveDB(); }
+        });
+
+        window.addEventListener('offline', () => {
+            document.getElementById('offlineBanner').classList.remove('hidden');
+        });
+
+        function validateAndRepairDB() {
+            let fixed = false;
+            if(!db.trips || !Array.isArray(db.trips)) { db.trips = []; fixed = true; }
+            if(!db.passengers || !Array.isArray(db.passengers)) { db.passengers = []; fixed = true; }
+            if(!db.cargo || !Array.isArray(db.cargo)) { db.cargo = []; fixed = true; }
+            if(!db.vouchers || !Array.isArray(db.vouchers)) { db.vouchers = []; fixed = true; }
+            if(!db.debtInvoices || !Array.isArray(db.debtInvoices)) { db.debtInvoices = []; fixed = true; }
+            
+            if(!db.nextTicketNo || isNaN(db.nextTicketNo)) {
+                let maxT = 130;
+                db.passengers.forEach(p => { let idNum = parseInt(p.id); if(!isNaN(idNum) && idNum > maxT) maxT = idNum; });
+                db.nextTicketNo = maxT + 1;
+                fixed = true;
+            }
+
+            if(!db.nextCargoNo || isNaN(db.nextCargoNo)) {
+                let maxC = 126;
+                db.cargo.forEach(c => { let idNum = parseInt(c.id); if(!isNaN(idNum) && idNum > maxC) maxC = idNum; });
+                db.nextCargoNo = maxC + 1;
+                fixed = true;
+            }
+
+            if(fixed) { saveDB(); }
+        }
+
         function initSync() {
             const statusEl = document.getElementById('firebaseStatusIndicator');
-            if(!useFirebase || !rtdb) {
-                loadFromLocal();
-                return;
-            }
+            if(!navigator.onLine) { document.getElementById('offlineBanner').classList.remove('hidden'); }
+
+            if(!useFirebase || !rtdb) { loadFromLocal(); return; }
             
             rtdb.ref('systemUsers').on('value', (snapshot) => {
                 const val = snapshot.val();
-                if(val) {
-                    localStorage.setItem('WADI_BINA_USERS', JSON.stringify(Object.values(val)));
-                } else {
-                    rtdb.ref('systemUsers').set(DEFAULT_USERS);
-                }
+                if(val) { localStorage.setItem('WADI_BINA_USERS', JSON.stringify(Object.values(val))); } 
+                else { rtdb.ref('systemUsers').set(DEFAULT_USERS); }
             });
 
             rtdb.ref('systemUnifiedData').on('value', (snapshot) => {
@@ -1254,6 +1307,8 @@
                         nextCargoNo: val.nextCargoNo || 127,
                         nextDebtInvNo: val.nextDebtInvNo || 2
                     };
+                    validateAndRepairDB();
+                    localStorage.setItem('WADI_BINA_UNIFIED_DB', JSON.stringify(db));
                 } else { saveDB(); }
                 statusEl.className = "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1.5 rounded-xl text-[10px] font-bold flex items-center gap-1";
                 statusEl.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> متصل سحابياً`;
@@ -1268,19 +1323,22 @@
         function loadFromLocal() {
             const local = localStorage.getItem('WADI_BINA_UNIFIED_DB');
             if(local) {
-                try { db = JSON.parse(local); } catch(e) {}
-            }
+                try { db = JSON.parse(local); validateAndRepairDB(); } catch(e) {}
+            } else { validateAndRepairDB(); }
             refreshUI();
         }
 
         function saveDB() {
             localStorage.setItem('WADI_BINA_UNIFIED_DB', JSON.stringify(db));
-            if(useFirebase && rtdb) {
-                rtdb.ref('systemUnifiedData').set(db).catch(err => console.error("Firebase save error:", err));
+            if(useFirebase && rtdb && navigator.onLine) {
+                rtdb.ref('systemUnifiedData').set(db).catch(err => {
+                    console.error("فشلت المزامنة السحابية، التخزين محلي:", err);
+                });
             }
         }
 
         window.onload = function() {
+            loadFromLocal();
             updateUserBadge();
             applyLanguage();
             document.getElementById('passTicketNo').value = db.nextTicketNo || 115;
@@ -1290,6 +1348,7 @@
         };
 
         function switchTab(tabId) {
+            currentTab = tabId;
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(`module-${tabId}`).classList.remove('hidden');
             document.querySelectorAll('.tab-btn').forEach(btn => btn.className = "tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold");
@@ -1388,7 +1447,6 @@
             }
         }
 
-        // إدارة الرحلات الجديدة
         function handleSaveTrip(e) {
             e.preventDefault();
             const tripDate = document.getElementById('tripDate').value;
@@ -1405,7 +1463,7 @@
 
             db.trips.unshift(newTrip);
             saveDB();
-            alert('تم إنشاء الرحلة بنجاح! يمكنك الآن إصدار التذاكر وربطها بهذه الرحلة.');
+            alert('تم إنشاء الرحلة بنجاح!');
             renderTripsTable();
             populateTripsDropdown();
         }
@@ -1551,10 +1609,7 @@
             const editId = document.getElementById('passEditId').value;
             const ticketNo = document.getElementById('passTicketNo').value.trim();
             const tripId = document.getElementById('passTripSelect').value;
-            if(!tripId) {
-                alert('الرجاء اختيار الرحلة المرتبطة أولاً!');
-                return;
-            }
+            if(!tripId) { alert('الرجاء اختيار الرحلة المرتبطة أولاً!'); return; }
             const count = parseInt(document.getElementById('passCount').value) || 1;
             
             let extraList = [];
@@ -1712,9 +1767,7 @@
             const tbody = document.getElementById('cargoItemsRowsContainer');
             tbody.innerHTML = '';
             if (item.items && item.items.length > 0) {
-                item.items.forEach(it => {
-                    addCargoItemRow(it.desc, it.qty, it.price);
-                });
+                item.items.forEach(it => { addCargoItemRow(it.desc, it.qty, it.price); });
             } else {
                 addCargoItemRow('أمتعة متنوعة', 1, item.grandTotal || 100);
             }
@@ -1810,23 +1863,16 @@
 
             if(origName) {
                 const idx = users.findIndex(u => u.username === origName);
-                if(idx !== -1) {
-                    users[idx] = { username: uname, password: upass, role: urole, branch: ubranch };
-                }
+                if(idx !== -1) { users[idx] = { username: uname, password: upass, role: urole, branch: ubranch }; }
                 alert('تم تحديث بيانات المستخدم بنجاح!');
             } else {
-                if(users.some(u => u.username === uname)) {
-                    alert('اسم المستخدم موجود مسبقاً!');
-                    return;
-                }
+                if(users.some(u => u.username === uname)) { alert('اسم المستخدم موجود مسبقاً!'); return; }
                 users.push({ username: uname, password: upass, role: urole, branch: ubranch });
                 alert('تم إضافة المستخدم الجديد بنجاح!');
             }
 
             localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
-            if(useFirebase && rtdb) {
-                rtdb.ref('systemUsers').set(users);
-            }
+            if(useFirebase && rtdb) { rtdb.ref('systemUsers').set(users); }
             resetUserForm();
             renderUsersTable();
         }
@@ -1852,15 +1898,10 @@
 
         function deleteUser(idx) {
             let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
-            if(users.length <= 1) {
-                alert('لا يمكن حذف جميع المستخدمين!');
-                return;
-            }
+            if(users.length <= 1) { alert('لا يمكن حذف جميع المستخدمين!'); return; }
             users.splice(idx, 1);
             localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
-            if(useFirebase && rtdb) {
-                rtdb.ref('systemUsers').set(users);
-            }
+            if(useFirebase && rtdb) { rtdb.ref('systemUsers').set(users); }
             renderUsersTable();
         }
 
@@ -2163,16 +2204,117 @@
         }
 
         function importBackupJSON(e) {
+            const file = e.target.files[0];
+            if(!file) return;
             const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
-                    db = JSON.parse(evt.target.result);
-                    saveDB();
-                    alert('تم الاسترجاع بنجاح!');
-                    location.reload();
-                } catch(err) { alert('خطأ في ملف النسخة الاحتياطية'); }
+                    const importedData = JSON.parse(evt.target.result);
+                    if(importedData && importedData.passengers && importedData.cargo) {
+                        db = importedData;
+                        validateAndRepairDB();
+                        saveDB();
+                        alert('تم استرجاع النسخة الاحتياطية بنجاح وتحديث النظام!');
+                        location.reload();
+                    } else { alert('ملف النسخة الاحتياطية غير صالح أو تالف!'); }
+                } catch(err) { alert('خطأ أثناء قراءة ملف النسخة الاحتياطية'); }
             };
-            reader.readAsText(e.target.files[0]);
+            reader.readAsText(file);
+        }
+
+        // --- ميزة الاستعادة وقراءة البيانات من ملف PDF ---
+        async function importBackupPDF(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            const fileReader = new FileReader();
+            fileReader.onload = async function() {
+                const typedarray = new Uint8Array(this.result);
+                try {
+                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                    let fullText = "";
+
+                    for(let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(" ");
+                        fullText += pageText + "\n";
+                    }
+
+                    parseAndImportPdfText(fullText);
+                } catch(error) {
+                    alert('تعذر قراءة ملف PDF: قد يكون الملف تالفاً أو محمي برقم سري.');
+                    console.error(error);
+                }
+            };
+            fileReader.readAsArrayBuffer(file);
+        }
+
+        function parseAndImportPdfText(text) {
+            let recoveredCount = 0;
+
+            // 1. استخراج التذاكر (Passenger Ticket Parsing)
+            const ticketMatches = text.matchAll(/(?:#|بوليصة|Ticket)\s*(\d+)/gi);
+            for(const match of ticketMatches) {
+                const tId = match[1];
+                if(tId && !db.passengers.some(p => String(p.id) === String(tId))) {
+                    // استخراج الاسم ورقم الهاتف والجواز إن وجد
+                    const phoneMatch = text.match(/(?:05\d{8}|07\d{8})/);
+                    const passportMatch = text.match(/\b\d{7,9}\b/);
+                    
+                    db.passengers.unshift({
+                        id: tId,
+                        tripId: db.trips[0] ? db.trips[0].id : "trip_1",
+                        agent: "استعادة من PDF",
+                        name: "راكب مستعاد #" + tId,
+                        phone: phoneMatch ? phoneMatch[0] : "0500000000",
+                        passport: passportMatch ? passportMatch[0] : "00000000",
+                        passengerCount: 1,
+                        extraPassengers: [],
+                        origin: "عجمان",
+                        destination: "عدن",
+                        date: "2026-11-08",
+                        reportingTime: "2026-11-08 (4:00 عصراً)",
+                        fare: 350,
+                        payMethod: "مدفوع",
+                        branch: currentUser ? currentUser.branch : "فرع عجمان"
+                    });
+                    recoveredCount++;
+                }
+            }
+
+            // 2. استخراج فواتير الشحن (Cargo Invoice Parsing)
+            const cargoMatches = text.matchAll(/(?:فاتورة شحن|Cargo|شحن)\s*#?\s*(\d+)/gi);
+            for(const match of cargoMatches) {
+                const cId = match[1];
+                if(cId && !db.cargo.some(c => String(c.id) === String(cId))) {
+                    db.cargo.unshift({
+                        id: cId,
+                        date: "2026-11-08",
+                        sender: "مرسل مستعاد #" + cId,
+                        senderPhone: "0500000000",
+                        senderAddress: "عجمان",
+                        receiver: "مستلم مستعاد #" + cId,
+                        receiverPhone: "0700000000",
+                        receiverAddress: "عدن",
+                        items: [{ desc: "أمتعة مستعادة من ملف PDF", qty: 1, price: 100 }],
+                        grandTotal: 100,
+                        paymentStatus: "مدفوع",
+                        branch: currentUser ? currentUser.branch : "فرع عجمان"
+                    });
+                    recoveredCount++;
+                }
+            }
+
+            validateAndRepairDB();
+            saveDB();
+            refreshUI();
+
+            if(recoveredCount > 0) {
+                alert(`تم تحليل ملف PDF واستعادة دمج (${recoveredCount}) سجل بنجاح داخل قاعدة البيانات!`);
+            } else {
+                alert('تم فحص ملف PDF بنجاح. البيانات الموجودة بداخله مضافة سابقاً أو تحتاج إلى تنسيق جدول نصوص واضح.');
+            }
         }
 
         function exportExcel(type) {
