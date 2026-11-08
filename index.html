@@ -1102,7 +1102,7 @@
         <section id="module-financials" class="tab-content hidden space-y-6">
             <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow">
-                    <span id="lblFin1" class="text-[11px] text-zinc-400 block">إجمالي التذاكر والشحن</span>
+                    <span id="lblFin1" class="text-[11px] text-zinc-400 block">إجمالي التذاكر والشحن المدفوع</span>
                     <strong id="finRevSum" class="text-lg font-black text-emerald-400">0 AED</strong>
                 </div>
                 <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow">
@@ -1114,7 +1114,7 @@
                     <strong id="finExpensesSum" class="text-lg font-black text-red-400">0 AED</strong>
                 </div>
                 <div class="bg-cardbg border border-gold p-4 rounded-2xl shadow">
-                    <span id="lblFin4" class="text-[11px] text-gold block">صافي الصندوق العام</span>
+                    <span id="lblFin4" class="text-[11px] text-gold block">صافي رصيد الصندوق العام (تذاكر+شحن مدفوع+سندات قبض)</span>
                     <strong id="finNetBoxSum" class="text-lg font-black text-amber-400">0 AED</strong>
                 </div>
             </div>
@@ -1122,15 +1122,16 @@
             <!-- VOUCHERS -->
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <h3 id="lblVoucherHead" class="text-gold font-bold text-sm border-b border-zinc-800 pb-3">سندات القبض والصرف والنثريات</h3>
-                <form id="voucherForm" onsubmit="handleSaveVoucher(event)" class="grid grid-cols-1 sm:grid-cols-5 gap-3 bg-darkbg p-4 rounded-xl border border-zinc-800">
+                <form id="voucherForm" onsubmit="handleSaveVoucher(event)" class="grid grid-cols-1 sm:grid-cols-6 gap-3 bg-darkbg p-4 rounded-xl border border-zinc-800">
                     <select id="vType" class="bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200">
                         <option value="قبض">سند قبض</option>
                         <option value="صرف">سند صرف</option>
                     </select>
                     <input type="date" id="vDate" class="bg-zinc-900 border border-gold rounded p-2 text-xs text-gold font-bold">
                     <input type="number" step="any" id="vAmount" required placeholder="المبلغ" class="bg-zinc-900 border border-gold rounded p-2 text-xs text-gold font-bold">
+                    <input type="text" id="vReceiver" required placeholder="اسم المستلم (المستلم/المسلم إليه)..." class="bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200">
                     <input type="text" id="vDesc" required placeholder="البيان والتفاصيل..." class="bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200 sm:col-span-2">
-                    <button type="submit" id="btnSaveV" class="gold-gradient-bg text-black font-extrabold py-2 rounded text-xs sm:col-span-5 shadow">حفظ السند المالي</button>
+                    <button type="submit" id="btnSaveV" class="gold-gradient-bg text-black font-extrabold py-2 rounded text-xs sm:col-span-6 shadow">حفظ السند المالي</button>
                 </form>
                 <div class="overflow-x-auto">
                     <table class="custom-table" id="vouchersTable">
@@ -1138,11 +1139,12 @@
                             <tr>
                                 <th id="thV1">النوع</th>
                                 <th id="thV2">التاريخ</th>
-                                <th id="thV3">البيان</th>
-                                <th id="thV4">المبلغ</th>
-                                <th id="thV5">المسؤول</th>
-                                <th id="thV6">الفرع</th>
-                                <th id="thV7">إجراء</th>
+                                <th id="thV3">اسم المستلم</th>
+                                <th id="thV4">البيان</th>
+                                <th id="thV5">المبلغ</th>
+                                <th id="thV6">المسؤول</th>
+                                <th id="thV7">الفرع</th>
+                                <th id="thV8">إجراء</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -1554,6 +1556,7 @@
             document.getElementById('passTicketNo').value = db.nextTicketNo || 141;
             document.getElementById('passDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('drvDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('vDate').value = new Date().toISOString().split('T')[0];
             onPassengerCountChanged();
             updateReportingTimeAutomatically();
             addCargoItemRow();
@@ -1619,7 +1622,7 @@
 
             const totalPassengersCount = filteredPass.length;
             const totalCargoRev = filteredCargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + c.grandTotal, 0);
-            const totalTicketRev = filteredPass.reduce((s, p) => s + (p.fare || 0), 0);
+            const totalTicketRev = filteredPass.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (p.fare || 0), 0);
             
             const totalDriversExp = filteredDrivers.reduce((s, d) => s + (d.totalExpenses || 0), 0);
             const totalVoucherExp = filteredVouchers.filter(v => v.type === 'صرف').reduce((s, v) => s + v.amount, 0);
@@ -1639,7 +1642,7 @@
                 finBarChartInstance = new Chart(ctxBar.getContext('2d'), {
                     type: 'bar',
                     data: {
-                        labels: ['التذاكر', 'الشحن', 'المصروفات', 'الصندوق'],
+                        labels: ['تذاكر مدفوعة', 'شحن مدفوع', 'المصروفات', 'الصندوق'],
                         datasets: [{
                             label: 'المبلغ (درهم)',
                             data: [totalTicketRev, totalCargoRev, totalExpenses, netBox],
@@ -1742,11 +1745,11 @@
             if(editId) {
                 const idx = db.drivers.findIndex(d => d.id === editId);
                 if(idx !== -1) db.drivers[idx] = record;
-                alert('تم تحديث حساب السائق وترحيل المصروفات للصندوق بنجاح!   ');
+                alert('تم تحديث حساب السائق وترحيل المصروفات للصندوق بنجاح!');
                 resetDriverForm();
             } else {
                 db.drivers.unshift(record);
-                alert('تم حفظ وتسجيل حساب السائق وترحيل مصروفات الرحلة تلقائياً إلى الصندوق المالي!]');
+                alert('تم حفظ وتسجيل حساب السائق وترحيل مصروفات الرحلة تلقائياً إلى الصندوق المالي!');
                 document.getElementById('driverForm').reset();
                 document.getElementById('drvDate').value = new Date().toISOString().split('T')[0];
                 buildDriverItemsRows();
@@ -1847,7 +1850,7 @@
             document.getElementById('driverEditId').value = '';
             document.getElementById('drvDate').value = new Date().toISOString().split('T')[0];
             buildDriverItemsRows();
-            document.getElementById('drvSubmitBtn').innerText = 'حفظ وتصديق حساب السائق وترحيل المصروفات للصندوق   ';
+            document.getElementById('drvSubmitBtn').innerText = 'حفظ وتصديق حساب السائق وترحيل المصروفات للصندوق';
             document.getElementById('cancelEditDriverBtn').classList.add('hidden');
         }
 
@@ -2312,6 +2315,7 @@
                 type: document.getElementById('vType').value,
                 date: document.getElementById('vDate').value || '-',
                 amount: parseFloat(document.getElementById('vAmount').value) || 0,
+                receiver: document.getElementById('vReceiver').value.trim(),
                 desc: document.getElementById('vDesc').value,
                 user: currentUser.username,
                 branch: currentUser.branch || 'فرع عجمان'
@@ -2319,6 +2323,7 @@
             db.vouchers.unshift(v);
             saveDB();
             document.getElementById('voucherForm').reset();
+            document.getElementById('vDate').value = new Date().toISOString().split('T')[0];
             refreshUI();
             alert('تم حفظ السند المالي بنجاح!');
         }
@@ -2691,7 +2696,7 @@
             const filteredVouchers = getFilteredData(db.vouchers);
             const filteredDrivers = getFilteredData(db.drivers);
 
-            const tSum = filteredPass.reduce((s, p) => s + (p.fare || 0), 0);
+            const tSum = filteredPass.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (p.fare || 0), 0);
             const cSum = filteredCargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + c.grandTotal, 0);
             const totalRev = tSum + cSum;
             
@@ -2717,6 +2722,7 @@
                     tbody.insertRow().innerHTML = `
                         <td><span class="px-2 py-0.5 rounded text-xs font-bold ${v.type==='قبض'?'bg-emerald-950 text-emerald-400':'bg-red-950 text-red-400'}">${v.type}</span></td>
                         <td>${v.date}</td>
+                        <td><strong>${v.receiver || '-'}</strong></td>
                         <td>${v.desc}</td>
                         <td><strong>${v.amount} AED</strong></td>
                         <td>${v.user}</td>
