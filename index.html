@@ -50,8 +50,9 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(0.8) sepia(1) saturate(5) hue-rotate(5deg); }
         
-        /* تعديلات الطباعة لضمان ظهور كامل الجداول ومنع تكرار النسخ */
+        /* تعديلات احترافية للطباعة والـ PDF متعدد الصفحات لمنع القص */
         @media print {
+            @page { size: A4; margin: 10mm; }
             body { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             header, nav, .no-print, button, .modal-overlay { display: none !important; }
             .print-only { display: block !important; }
@@ -84,17 +85,17 @@
             #manifestPrintArea, #cargoManifestPrintArea {
                 display: block !important;
                 width: 100% !important;
-                padding: 10mm !important;
+                padding: 5mm !important;
                 margin: 0 !important;
                 background: white !important;
                 box-shadow: none !important;
                 color: black !important;
                 page-break-inside: auto;
             }
-            table { page-break-inside: auto; width: 100% !important; }
-            tr { page-break-inside: avoid; page-break-after: auto; }
-            thead { display: table-header-group; }
-            tfoot { display: table-footer-group; }
+            table { page-break-inside: auto; width: 100% !important; border-collapse: collapse !important; }
+            tr { page-break-inside: avoid !important; page-break-after: auto !important; break-inside: avoid !important; }
+            thead { display: table-header-group !important; }
+            tfoot { display: table-footer-group !important; }
         }
     </style>
 </head>
@@ -1615,7 +1616,7 @@
             });
         }
 
-        /* دالة لضمان تصدير كامل محتوى جداول المانفيستو الطويلة في صفحات متعددة داخل ملف الـ PDF بدون قص أو اختفاء */
+        /* دالة لتقسيم محتوى الجداول الطويلة في صفحات متعددة داخل ملف الـ PDF احترافياً */
         function exportMultiPagePDF(elementId, filePrefix) {
             const element = document.getElementById(elementId);
             html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
@@ -1633,7 +1634,7 @@
                 pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                 heightLeft -= pageHeight;
 
-                while (heightLeft >= 0) {
+                while (heightLeft > 0) {
                     position = heightLeft - imgHeight;
                     pdf.addPage();
                     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
