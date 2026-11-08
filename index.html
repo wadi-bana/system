@@ -50,9 +50,9 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(0.8) sepia(1) saturate(5) hue-rotate(5deg); }
         
-        /* قواعد التنسيق والطباعة للمانفيستو متعدد الصفحات لمنع القص وضبط الـ 2 صفحة */
+        /* تعديلات احترافية للطباعة والـ PDF متعدد الصفحات لمنع القص */
         @media print {
-            @page { size: A4 portrait; margin: 8mm; }
+            @page { size: A4; margin: 10mm; }
             body { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             header, nav, .no-print, button, .modal-overlay { display: none !important; }
             .print-only { display: block !important; }
@@ -85,14 +85,15 @@
             #manifestPrintArea, #cargoManifestPrintArea {
                 display: block !important;
                 width: 100% !important;
-                padding: 2mm !important;
+                padding: 5mm !important;
                 margin: 0 !important;
                 background: white !important;
                 box-shadow: none !important;
                 color: black !important;
+                page-break-inside: auto;
             }
-            table { width: 100% !important; border-collapse: collapse !important; font-size: 11px !important; }
-            tr { page-break-inside: avoid !important; break-inside: avoid !important; }
+            table { page-break-inside: auto; width: 100% !important; border-collapse: collapse !important; }
+            tr { page-break-inside: avoid !important; page-break-after: auto !important; break-inside: avoid !important; }
             thead { display: table-header-group !important; }
             tfoot { display: table-footer-group !important; }
         }
@@ -331,7 +332,7 @@
         </div>
     </div>
 
-    <!-- MANIFEST MODAL (PASSENGERS) WITH DATE FILTER & PAGE BREAK CONTROL -->
+    <!-- MANIFEST MODAL (PASSENGERS) WITH DATE FILTER & ROLE-BASED PRINT OPTIONS -->
     <div class="modal-overlay hidden" id="manifestModal">
         <div class="modal-card" style="max-width: 950px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
@@ -341,7 +342,7 @@
                 <div class="flex gap-2 items-center flex-wrap">
                     <button onclick="printManifestPassenger('driver')" class="bg-amber-600 text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow"><i class="fa-solid fa-id-card ml-1"></i> طباعة للسائق (بدون أسعار)</button>
                     <button onclick="printManifestPassenger('management')" class="bg-gold text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow"><i class="fa-solid fa-chart-line ml-1"></i> طباعة للإدارة (بالأسعار)</button>
-                    <button onclick="exportMultiPagePDF('manifestPrintArea', 'WadiBina_Manifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> تصدير PDF (صفحتين)</button>
+                    <button onclick="exportMultiPagePDF('manifestPrintArea', 'WadiBina_Manifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> PDF (تصدير كامل)</button>
                     <button onclick="closeModal('manifestModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
             </div>
@@ -387,13 +388,13 @@
                 </table>
             </div>
             <div class="mt-5 flex gap-3 no-print">
-                <button onclick="exportMultiPagePDF('manifestPrintArea', 'WadiBina_Manifest_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow">PDF صفحتين ممتدة</button>
+                <button onclick="exportMultiPagePDF('manifestPrintArea', 'WadiBina_Manifest_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow">PDF (تصدير كامل)</button>
                 <button onclick="closeModal('manifestModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
             </div>
         </div>
     </div>
 
-    <!-- CARGO MANIFEST MODAL WITH DATE FILTER -->
+    <!-- CARGO MANIFEST MODAL WITH DATE FILTER & ROLE-BASED PRINT OPTIONS -->
     <div class="modal-overlay hidden" id="cargoManifestModal">
         <div class="modal-card" style="max-width: 1000px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
@@ -401,7 +402,7 @@
                 <div class="flex gap-2 items-center flex-wrap">
                     <button onclick="printManifestCargo('driver')" class="bg-amber-600 text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow"><i class="fa-solid fa-id-card ml-1"></i> طباعة للسائق (بدون أسعار)</button>
                     <button onclick="printManifestCargo('management')" class="bg-gold text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow"><i class="fa-solid fa-chart-line ml-1"></i> طباعة للإدارة (بالأسعار)</button>
-                    <button onclick="exportMultiPagePDF('cargoManifestPrintArea', 'WadiBina_CargoManifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> تصدير PDF (صفحتين)</button>
+                    <button onclick="exportMultiPagePDF('cargoManifestPrintArea', 'WadiBina_CargoManifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> PDF (تصدير كامل)</button>
                     <button onclick="closeModal('cargoManifestModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
             </div>
@@ -445,7 +446,7 @@
                 </table>
             </div>
             <div class="mt-5 flex gap-3 no-print">
-                <button onclick="exportMultiPagePDF('cargoManifestPrintArea', 'WadiBina_CargoManifest_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow">PDF صفحتين ممتدة</button>
+                <button onclick="exportMultiPagePDF('cargoManifestPrintArea', 'WadiBina_CargoManifest_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow">PDF (تصدير كامل)</button>
                 <button onclick="closeModal('cargoManifestModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
             </div>
         </div>
@@ -575,7 +576,7 @@
             </select>
         </div>
 
-        <!-- GLOBAL SEARCH & ADVANCED FILTERS MODULE -->
+        <!-- GLOBAL SEARCH & ADVANCED FILTERS -->
         <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl mb-6 space-y-3">
             <div class="flex flex-col sm:flex-row items-center gap-3">
                 <div class="relative w-full flex-1">
@@ -737,7 +738,7 @@
                 <div class="lg:col-span-2 bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                     <h2 class="text-gold font-extrabold text-base border-b border-zinc-800 pb-3 flex items-center justify-between">
                         <span><i class="fa-solid fa-ticket ml-1"></i> <span id="passFormTitle">إصدار تذكرة سفر جديدة</span></span>
-                        <button id="cancelEditPassBtn" onclick="resetPassengerForm()" class="hidden text-xs text-red-400 font-bold bg-red-950/40 border border-red-808 px-2.5 py-1 rounded-lg">إغلاق التعديل</button>
+                        <button id="cancelEditPassBtn" onclick="resetPassengerForm()" class="hidden text-xs text-red-400 font-bold bg-red-950/40 border border-red-800 px-2.5 py-1 rounded-lg">إغلاق التعديل</button>
                     </h2>
                     <form id="passengerForm" onsubmit="handleSavePassenger(event)" class="space-y-4">
                         <input type="hidden" id="passEditId" value="">
@@ -1028,25 +1029,25 @@
                 </div>
             </div>
 
-            <!-- DEBT INVOICES REGISTER & UNPAID ITEMS -->
+            <!-- DEBT INVOICES REGISTER -->
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
-                    <h3 id="lblDebtHead" class="text-gold font-bold text-sm"><i class="fa-solid fa-file-invoice-dollar ml-1"></i> فواتير وحسابات الذمم الآجلة (التذاكر والشحنات المعلقة)</h3>
-                    <button onclick="switchFinancialSubTab('create-debt-inv')" id="btnNewDebt" class="gold-gradient-bg text-black px-3 py-1.5 rounded-xl text-xs font-bold">إنشاء فاتورة آجل جديدة</button>
+                    <h3 id="lblDebtHead" class="text-gold font-bold text-sm"><i class="fa-solid fa-file-invoice-dollar ml-1"></i> فواتير وحسابات الذمم الآجلة</h3>
+                    <button onclick="switchFinancialSubTab('create-debt-inv')" id="btnNewDebt" class="gold-gradient-bg text-black px-3 py-1.5 rounded-xl text-xs font-bold">إنشاء فاتورة آجل</button>
                 </div>
                 <div id="fin-sub-debts">
                     <div class="overflow-x-auto">
                         <table class="custom-table" id="debtInvoicesTable">
                             <thead>
                                 <tr>
-                                    <th id="thD1">الفاتورة / المرجع</th>
+                                    <th id="thD1">الفاتورة</th>
                                     <th id="thD2">التاريخ</th>
-                                    <th id="thD3">الاسم / العميل</th>
+                                    <th id="thD3">الاسم</th>
                                     <th id="thD4">الهاتف</th>
                                     <th id="thD5">المجموع</th>
                                     <th id="thD6">المدفوع</th>
                                     <th id="thD7">المتبقي</th>
-                                    <th id="thD8">الفرع / الحالة</th>
+                                    <th id="thD8">الفرع</th>
                                     <th id="thD9">إجراءات / PDF</th>
                                 </tr>
                             </thead>
@@ -1369,6 +1370,12 @@
             closeModal('changePassModal');
         }
 
+        window.addEventListener('online', () => {
+            if(useFirebase && rtdb) { saveDB(); }
+        });
+
+        window.addEventListener('offline', () => {});
+
         function validateAndRepairDB() {
             let fixed = false;
             if(!db.trips || !Array.isArray(db.trips)) { db.trips = []; fixed = true; }
@@ -1377,6 +1384,48 @@
             if(!db.vouchers || !Array.isArray(db.vouchers)) { db.vouchers = []; fixed = true; }
             if(!db.debtInvoices || !Array.isArray(db.debtInvoices)) { db.debtInvoices = []; fixed = true; }
             
+            // مزامنة تلقائية للتذاكر وفواتير الشحن غير المدفوعة إلى فواتير الذمم والآجال المالية
+            db.passengers.forEach(p => {
+                if(p.payMethod !== 'مدفوع') {
+                    const exists = db.debtInvoices.some(d => String(d.id) === String('T-' + p.id));
+                    if(!exists) {
+                        db.debtInvoices.push({
+                            id: 'T-' + p.id,
+                            date: p.date || '-',
+                            name: p.name,
+                            phone: p.phone,
+                            address: p.origin + ' ➔ ' + p.destination,
+                            subTotal: p.fare || 350,
+                            paidAmount: 0,
+                            netTotal: p.fare || 350,
+                            branch: p.branch || 'فرع عجمان'
+                        });
+                        fixed = true;
+                    }
+                }
+            });
+
+            db.cargo.forEach(c => {
+                if(c.paymentStatus !== 'مدفوع') {
+                    const exists = db.debtInvoices.some(d => String(d.id) === String('C-' + c.id));
+                    if(!exists) {
+                        db.debtInvoices.push({
+                            id: 'C-' + c.id,
+                            date: c.date || '-',
+                            name: c.sender,
+                            senderPhone: c.senderPhone,
+                            phone: c.senderPhone,
+                            address: c.senderAddress + ' ➔ ' + c.receiverAddress,
+                            subTotal: c.grandTotal || 0,
+                            paidAmount: 0,
+                            netTotal: c.grandTotal || 0,
+                            branch: c.branch || 'فرع عجمان'
+                        });
+                        fixed = true;
+                    }
+                }
+            });
+
             if(!db.nextTicketNo || isNaN(db.nextTicketNo)) {
                 let maxT = 130;
                 db.passengers.forEach(p => { let idNum = parseInt(p.id); if(!isNaN(idNum) && idNum > maxT) maxT = idNum; });
@@ -1644,7 +1693,6 @@
             });
         }
 
-        /* دالة التصدير إلى PDF متعدد الصفحات (مقسم بالضبط على ورقتين منسقتين عند الحاجة) */
         function exportMultiPagePDF(elementId, filePrefix) {
             const element = document.getElementById(elementId);
             html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
@@ -1854,6 +1902,7 @@
                 updateReportingTimeAutomatically();
                 alert('تم إصدار التذكرة بنجاح برقم تلقائي #' + ticketNo);
             }
+            validateAndRepairDB();
             saveDB();
             refreshUI();
         }
@@ -1949,6 +1998,7 @@
                 addCargoItemRow();
                 alert('تم حفظ فاتورة الشحن بنجاح!');
             }
+            validateAndRepairDB();
             saveDB();
             refreshUI();
         }
@@ -2107,7 +2157,6 @@
             renderUsersTable();
         }
 
-        /* دالة البحث والفلترة المتطورة الشاملة */
         function handleGlobalSearch() {
             const query = document.getElementById('globalSearchInput').value.trim().toLowerCase();
             const searchType = document.getElementById('globalSearchType').value;
@@ -2434,21 +2483,15 @@
             }
         }
 
-        /* نقل وتجميع التذاكر والفواتير التي ليست "مدفوع" لعرضها ضمن الذمم الآجلة بالإدارة المالية */
         function renderDebtInvoicesTable() {
             const tbody = document.querySelector('#debtInvoicesTable tbody');
             const filteredDebts = getFilteredData(db.debtInvoices);
-            const filteredUnpaidPass = getFilteredData(db.passengers).filter(p => p.payMethod !== 'مدفوع');
-            const filteredUnpaidCargo = getFilteredData(db.cargo).filter(c => c.paymentStatus !== 'مدفوع');
-
             if (tbody) {
                 tbody.innerHTML = '';
-                
-                // 1. عرض فواتير الذمم المسجلة يدوياً
                 filteredDebts.forEach((inv) => {
                     const realIdx = db.debtInvoices.findIndex(x => x.id === inv.id);
                     tbody.insertRow().innerHTML = `
-                        <td><strong>#${inv.id} (آجل)</strong></td>
+                        <td><strong>#${inv.id}</strong></td>
                         <td>${inv.date}</td>
                         <td><strong>${inv.name}</strong></td>
                         <td>${inv.phone}</td>
@@ -2462,54 +2505,19 @@
                         </td>
                     `;
                 });
-
-                // 2. تذاكر الركاب التي حالة سدادها "الدفع عند الباص"
-                filteredUnpaidPass.forEach((p) => {
-                    tbody.insertRow().innerHTML = `
-                        <td><strong>#${p.id} (تذكرة)</strong></td>
-                        <td>${p.date || '-'}</td>
-                        <td><strong>${p.name}</strong></td>
-                        <td>${p.phone}</td>
-                        <td>${p.fare} AED</td>
-                        <td class="text-red-400 font-bold">0 AED</td>
-                        <td class="text-amber-400 font-bold">${p.fare} AED</td>
-                        <td><span class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded text-xs font-bold">${p.payMethod}</span></td>
-                        <td>
-                            <button onclick="previewTicket('${p.id}')" class="bg-red-600 text-white px-2.5 py-1 rounded text-xs font-bold shadow"><i class="fa-solid fa-file-pdf"></i> معاينة التذكرة</button>
-                        </td>
-                    `;
-                });
-
-                // 3. فواتير الشحن غير المدفوعة ("أجل بالامارات" / "الدفع باليمن")
-                filteredUnpaidCargo.forEach((c) => {
-                    tbody.insertRow().innerHTML = `
-                        <td><strong>#${c.id} (شحن)</strong></td>
-                        <td>${c.date || '-'}</td>
-                        <td><strong>المرسل: ${c.sender}</strong><br><span class="text-[10px]">المستلم: ${c.receiver}</span></td>
-                        <td>${c.senderPhone}</td>
-                        <td>${c.grandTotal} AED</td>
-                        <td class="text-red-400 font-bold">0 AED</td>
-                        <td class="text-amber-400 font-bold">${c.grandTotal} AED</td>
-                        <td><span class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded text-xs font-bold">${c.paymentStatus}</span></td>
-                        <td>
-                            <button onclick="previewCargo('${c.id}')" class="bg-red-600 text-white px-2.5 py-1 rounded text-xs font-bold shadow"><i class="fa-solid fa-file-pdf"></i> معاينة الشحنة</button>
-                        </td>
-                    `;
-                });
             }
         }
 
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
         function resetGlobalSearch() { 
             document.getElementById('globalSearchInput').value = ''; 
-            document.getElementById('globalSearchType').value = 'all';
             document.getElementById('advFilterPayment').value = 'all';
             document.getElementById('advFilterOrigin').value = 'all';
             document.getElementById('advFilterDestination').value = 'all';
             handleGlobalSearch(); 
         }
-        function deletePassenger(idx) { db.passengers.splice(idx, 1); saveDB(); refreshUI(); }
-        function deleteCargo(idx) { db.cargo.splice(idx, 1); saveDB(); refreshUI(); }
+        function deletePassenger(idx) { db.passengers.splice(idx, 1); validateAndRepairDB(); saveDB(); refreshUI(); }
+        function deleteCargo(idx) { db.cargo.splice(idx, 1); validateAndRepairDB(); saveDB(); refreshUI(); }
         function deleteVoucher(idx) { db.vouchers.splice(idx, 1); saveDB(); refreshUI(); }
         function deleteDebtInvoice(idx) { db.debtInvoices.splice(idx, 1); saveDB(); refreshUI(); }
 
