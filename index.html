@@ -51,11 +51,10 @@
         input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(0.8) sepia(1) saturate(5) hue-rotate(5deg); }
         
         @media print {
-            @page { size: A4; margin: 10mm; }
+            @page { size: A4 portrait; margin: 8mm; }
             body { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             header, nav, .no-print, button, .modal-overlay { display: none !important; }
             .print-only { display: block !important; }
-            
             .modal-overlay.hidden { display: none !important; }
             #manifestModal:not(.hidden), #cargoManifestModal:not(.hidden), #driverAccountModal:not(.hidden) {
                 position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: auto !important; background: white !important; z-index: 99999 !important; padding: 0 !important; margin: 0 !important; display: block !important;
@@ -84,11 +83,11 @@
             <form onsubmit="handleLogin(event)">
                 <div class="mb-4">
                     <label id="lgUserLbl" class="block text-xs font-bold text-zinc-300 mb-2">اسم المستخدم</label>
-                    <input type="text" id="loginUser" class="w-full bg-darkbg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required placeholder="اسم المستخدم">
+                    <input type="text" id="loginUser" class="w-full bg-darkbg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required placeholder="اسم المستخدم" value="وليد السيد">
                 </div>
                 <div class="mb-6">
                     <label id="lgPassLbl" class="block text-xs font-bold text-zinc-300 mb-2">كلمة المرور</label>
-                    <input type="password" id="loginPass" class="w-full bg-darkbg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required placeholder="••••••••">
+                    <input type="password" id="loginPass" class="w-full bg-darkbg border border-zinc-700 rounded-xl px-4 py-3 text-sm text-zinc-100 outline-none" required placeholder="••••••••" value="708090">
                 </div>
                 <button type="submit" id="lgBtn" class="w-full gold-gradient-bg text-black font-extrabold py-3 rounded-xl shadow-lg transition">دخول النظام</button>
             </form>
@@ -342,10 +341,19 @@
                         </tr>
                     </thead>
                     <tbody id="prDriverItemsTableBody"></tbody>
+                    <tfoot>
+                        <tr class="bg-slate-100 font-black text-slate-900 border-t-2 border-slate-400">
+                            <td class="border border-slate-300 p-2 text-left">إجمالي المبالغ:</td>
+                            <td id="prTotalRoha" class="border border-slate-300 p-2 text-center text-indigo-700">0</td>
+                            <td id="prTotalRajah" class="border border-slate-300 p-2 text-center text-emerald-700">0</td>
+                            <td class="border border-slate-300 p-2"></td>
+                        </tr>
+                    </tfoot>
                 </table>
 
                 <div class="bg-slate-100 p-4 rounded-xl border border-slate-300 space-y-2 text-xs mb-6">
                     <h4 class="font-black text-slate-800 border-b border-slate-300 pb-1 mb-2">تسوية حساب السائق وتكاليف الرحلة</h4>
+                    <div class="flex justify-between"><span>إجمالي مصروفات الرحلة (روحة + رجعة):</span> <strong id="prDriverTotalExp" class="text-red-700">0</strong></div>
                     <div class="flex justify-between"><span>حساب السائق للرحلة:</span> <strong id="prDriverTripDue" class="text-indigo-700">0</strong></div>
                     <div class="flex justify-between"><span>متبقي حساب:</span> <strong id="prDriverRemaining" class="text-amber-700">0</strong></div>
                     <div class="flex justify-between text-sm font-black pt-2 border-t border-slate-300 text-emerald-700">
@@ -733,7 +741,7 @@
                     </div>
 
                     <div class="bg-darkbg p-4 rounded-xl border border-zinc-800 space-y-3">
-                        <span class="text-xs font-bold text-gold block mb-2">بنود المصروفات وحسابات الرحلة (ترحل تلقائياً للمصروفات العامة):</span>
+                        <span class="text-xs font-bold text-gold block mb-2">بنود المصروفات وحسابات الرحلة (تُجمع تلقائياً لأسفل الجدول وتُرحل للصندوق):</span>
                         <div class="overflow-x-auto">
                             <table class="w-full text-right text-xs" style="direction: inherit;">
                                 <thead>
@@ -745,6 +753,14 @@
                                     </tr>
                                 </thead>
                                 <tbody id="driverItemsRowsContainer"></tbody>
+                                <tfoot>
+                                    <tr class="bg-zinc-900 font-black text-gold border-t border-gold/40">
+                                        <td class="p-2 text-left">إجمالي المبالغ:</td>
+                                        <td id="formTotalRoha" class="p-2 text-center text-indigo-300">0</td>
+                                        <td id="formTotalRajah" class="p-2 text-center text-emerald-300">0</td>
+                                        <td class="p-2"></td>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -1671,7 +1687,7 @@
             }
         }
 
-        // --- وظائف إدارة حسابات السائقين ---
+        // --- وظائف إدارة حسابات السائقين (الروحة والرجعة مع المجاميع اللحظية) ---
         function buildDriverItemsRows(existingItems = null) {
             const container = document.getElementById('driverItemsRowsContainer');
             if(!container) return;
@@ -1695,9 +1711,26 @@
                 `;
                 container.appendChild(tr);
             });
+            calculateDriverNet();
         }
 
         function calculateDriverNet() {
+            let totalRoha = 0;
+            let totalRajah = 0;
+            const rows = document.querySelectorAll('#driverItemsRowsContainer tr');
+            rows.forEach(tr => {
+                const roha = parseFloat(tr.querySelector('.drv-roha').value) || 0;
+                const rajah = parseFloat(tr.querySelector('.drv-rajah').value) || 0;
+                totalRoha += roha;
+                totalRajah += rajah;
+            });
+
+            // تحديث مجاميع جدول النموذج في الأسفل
+            const formTotalRohaEl = document.getElementById('formTotalRoha');
+            const formTotalRajahEl = document.getElementById('formTotalRajah');
+            if(formTotalRohaEl) formTotalRohaEl.innerText = totalRoha;
+            if(formTotalRajahEl) formTotalRajahEl.innerText = totalRajah;
+
             const tripDue = parseFloat(document.getElementById('drvTripDue').value) || 0;
             const remaining = parseFloat(document.getElementById('drvRemaining').value) || 0;
             let net = tripDue - remaining;
@@ -1809,13 +1842,18 @@
             document.getElementById('prDriverBus').innerText = d.busNo;
             document.getElementById('prDriverName').innerText = d.driverName;
             document.getElementById('prDriverDate').innerText = d.date;
+            document.getElementById('prDriverTotalExp').innerText = `${d.totalExpenses || 0} AED`;
             document.getElementById('prDriverTripDue').innerText = `${d.tripDue} AED`;
             document.getElementById('prDriverRemaining').innerText = `${d.remaining} AED`;
             document.getElementById('prDriverNetDue').innerText = `${d.netDue} AED`;
 
+            let sumRoha = 0;
+            let sumRajah = 0;
             const tbody = document.getElementById('prDriverItemsTableBody');
             tbody.innerHTML = '';
             d.items.forEach(it => {
+                sumRoha += (it.roha || 0);
+                sumRajah += (it.rajah || 0);
                 tbody.insertRow().innerHTML = `
                     <td class="border border-slate-300 p-2 font-bold">${it.desc}</td>
                     <td class="border border-slate-300 p-2 text-center">${it.roha}</td>
@@ -1823,6 +1861,11 @@
                     <td class="border border-slate-300 p-2 text-xs">${it.note}</td>
                 `;
             });
+
+            const prTotalRohaEl = document.getElementById('prTotalRoha');
+            const prTotalRajahEl = document.getElementById('prTotalRajah');
+            if(prTotalRohaEl) prTotalRohaEl.innerText = sumRoha;
+            if(prTotalRajahEl) prTotalRajahEl.innerText = sumRajah;
 
             document.getElementById('driverAccountModal').classList.remove('hidden');
         }
@@ -1836,8 +1879,8 @@
             document.getElementById('drvDate').value = d.date;
             document.getElementById('drvTripDue').value = d.tripDue;
             document.getElementById('drvRemaining').value = d.remaining;
-            calculateDriverNet();
             buildDriverItemsRows(d.items);
+            calculateDriverNet();
 
             document.getElementById('drvSubmitBtn').innerText = 'حفظ تعديلات حساب السائق';
             document.getElementById('cancelEditDriverBtn').classList.remove('hidden');
@@ -1860,7 +1903,7 @@
             refreshUI();
         }
 
-        // --- باقي وظائف النظام (الرحلات، التذاكر، الشحن، المالية، المستخدمين) ---
+        // --- باقي وظائف النظام ---
         function handleSaveTrip(e) {
             e.preventDefault();
             const tripDate = document.getElementById('tripDate').value;
