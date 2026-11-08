@@ -56,7 +56,6 @@
             header, nav, .no-print, button, .modal-overlay { display: none !important; }
             .print-only { display: block !important; }
             
-            /* إظهار نافذة المانفستو فقط وجعلها تأخذ مساحة الصفحة الكاملة بدون إخفاء محتوى */
             .modal-overlay.hidden { display: none !important; }
             #manifestModal:not(.hidden), #cargoManifestModal:not(.hidden) {
                 position: absolute !important;
@@ -396,7 +395,7 @@
 
     <!-- CARGO MANIFEST MODAL WITH DATE FILTER & ROLE-BASED PRINT OPTIONS -->
     <div class="modal-overlay hidden" id="cargoManifestModal">
-        <div class="modal-card" style="max-width: 950px;">
+        <div class="modal-card" style="max-width: 1000px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
                 <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> <span id="manCTitle">كشف مانفيستو فواتير الشحن حسب تاريخ الرحلة</span></h3>
                 <div class="flex gap-2 items-center flex-wrap">
@@ -436,7 +435,7 @@
                             <th class="border border-slate-300 p-2">م</th>
                             <th class="border border-slate-300 p-2">الفاتورة</th>
                             <th class="border border-slate-300 p-2">المرسل</th>
-                            <th class="border border-slate-300 p-2">المستلم</th>
+                            <th class="border border-slate-300 p-2">المستلم وعنوانه</th>
                             <th class="border border-slate-300 p-2">وصف الأصناف والعدد</th>
                             <th class="border border-slate-300 p-2 cargo-price-col">الإجمالي</th>
                             <th class="border border-slate-300 p-2">حالة السداد</th>
@@ -928,7 +927,7 @@
                                 <th id="thC1">الفاتورة</th>
                                 <th id="thC2">التاريخ</th>
                                 <th id="thC3">المرسل</th>
-                                <th id="thC4">المستلم</th>
+                                <th id="thC4">المستلم وعنوانه</th>
                                 <th id="thC5">عدد الأصناف</th>
                                 <th id="thC6">الإجمالي</th>
                                 <th id="thC7">الحالة</th>
@@ -1204,7 +1203,7 @@
                 thP1: 'البوليصة', thP2: 'الوكيل', thP3: 'الاسم الرئيسي', thP4: 'الركاب الإضافيون', thP5: 'الهاتف', thP6: 'المسار', thP7: 'تاريخ الرحلة', thP8: 'المبلغ', thP9: 'السداد', thP10: 'الفرع', thP11: 'إجراءات / طباعة',
                 lblCargoHeader: 'إدارة فواتير الشحن والأصناف', lblCargoSub: 'إصدار الفواتير وطباعة مانفيستو الشحن الشامل', btnManifestC: 'كشف مانفيستو الشحن',
                 cargoFormTitle: 'فاتورة أمتعة وبضائع (بأرقام كسرية دقيقة للأسعار)', cancelEditCargoBtn: 'إغلاق التعديل', lblInvNo: 'رقم الفاتورة *', lblInvDate: 'تاريخ الفاتورة *', lblInvStatus: 'حالة السداد *', lblSenderBox: 'بيانات المرسل', lblReceiverBox: 'بيانات المستلم', lblItemsList: 'أصناف الأمتعة (يدعم الأرقام الكسرية الدقيقة)', btnAddItem: 'إضافة صنف', thBDesc: 'الوصف', thBQty: 'العدد', thBPrice: 'السعر الإجمالي للصنف (كسري)', thBDel: 'حذف', lblTotalCalc: 'الإجمالي النهائي المحسوب للأصناف:', cargoSubmitBtn: 'حفظ فاتورة الشحن والأصناف', lblCargoLog: 'سجل فواتير الشحن والأصناف',
-                thC1: 'الفاتورة', thC2: 'التاريخ', thC3: 'المرسل', thC4: 'المستلم', thC5: 'عدد الأصناف', thC6: 'الإجمالي', thC7: 'الحالة', thC8: 'الفرع', thC9: 'إجراءات / طباعة',
+                thC1: 'الفاتورة', thC2: 'التاريخ', thC3: 'المرسل', thC4: 'المستلم وعنوانه', thC5: 'عدد الأصناف', thC6: 'الإجمالي', thC7: 'الحالة', thC8: 'الفرع', thC9: 'إجراءات / طباعة',
                 lblFin1: 'إجمالي التذاكر', lblFin2: 'إجمالي الشحن', lblFin3: 'المصروفات', lblFin4: 'صافي الصندوق',
                 lblVoucherHead: 'سندات القبض والصرف والنثريات', btnSaveV: 'حفظ السند المالي', thV1: 'النوع', thV2: 'التاريخ', thV3: 'البيان', thV4: 'المبلغ', thV5: 'المسؤول', thV6: 'الفرع', thV7: 'إجراء',
                 lblDebtHead: 'فواتير وحسابات الذمم الآجلة', btnNewDebt: 'إنشاء فاتورة آجل', thD1: 'الفاتورة', thD2: 'التاريخ', thD3: 'الاسم', thD4: 'الهاتف', thD5: 'المجموع', thD6: 'المدفوع', thD7: 'المتبقي', thD8: 'الفرع', thD9: 'إجراءات / PDF',
@@ -1233,7 +1232,7 @@
                 thP1: 'Policy', thP2: 'Agent', thP3: 'Main Name', thP4: 'Extra Passengers', thP5: 'Phone', thP6: 'Route', thP7: 'Trip Date', thP8: 'Amount', thP9: 'Status', thP10: 'Branch', thP11: 'Actions / Print',
                 lblCargoHeader: 'Cargo Invoices & Items Management', lblCargoSub: 'Issue invoices and print comprehensive cargo manifest', btnManifestC: 'Cargo Manifest by Date',
                 cargoFormTitle: 'Luggage & Cargo Invoice (Supports Precise Decimal Prices)', cancelEditCargoBtn: 'Cancel Edit', lblInvNo: 'Invoice No *', lblInvDate: 'Invoice Date *', lblInvStatus: 'Payment Status *', lblSenderBox: 'Sender Information', lblReceiverBox: 'Receiver Information', lblItemsList: 'Luggage Items (Supports exact decimals)', btnAddItem: 'Add Item', thBDesc: 'Description', thBQty: 'Qty', thBPrice: 'Total Item Price (Decimal)', thBDel: 'Delete', lblTotalCalc: 'Calculated Final Grand Total:', cargoSubmitBtn: 'Save Cargo Invoice & Items', lblCargoLog: 'Cargo Invoices Record',
-                thC1: 'Invoice', thC2: 'Date', thC3: 'Sender', thC4: 'Receiver', thC5: 'Items Count', thC6: 'Total', thC7: 'Status', thC8: 'Branch', thC9: 'Actions / Print',
+                thC1: 'Invoice', thC2: 'Date', thC3: 'Sender', thC4: 'Receiver & Address', thC5: 'Items Count', thC6: 'Total', thC7: 'Status', thC8: 'Branch', thC9: 'Actions / Print',
                 lblFin1: 'Total Tickets', lblFin2: 'Total Cargo', lblFin3: 'Expenses', lblFin4: 'Net Cash Box',
                 lblVoucherHead: 'Receipts, Payments & Vouchers', btnSaveV: 'Save Financial Voucher', thV1: 'Type', thV2: 'Date', thV3: 'Description', thV4: 'Amount', thV5: 'User', thV6: 'Branch', thV7: 'Action',
                 lblDebtHead: 'Deferred Accounts & Debts Invoices', btnNewDebt: 'Create Debt Invoice', thD1: 'Invoice', thD2: 'Date', thD3: 'Name', thD4: 'Phone', thD5: 'Total', thD6: 'Paid', thD7: 'Remaining', thD8: 'Branch', thD9: 'Actions / PDF',
@@ -2100,7 +2099,7 @@
                 cargoTbody.innerHTML = '';
                 let searchC = filteredCargo.filter(c => {
                     if(!query) return true;
-                    return c.sender.toLowerCase().includes(query) || String(c.id).includes(query) || c.receiver.toLowerCase().includes(query);
+                    return c.sender.toLowerCase().includes(query) || String(c.id).includes(query) || c.receiver.toLowerCase().includes(query) || (c.receiverAddress && c.receiverAddress.toLowerCase().includes(query));
                 });
                 
                 searchC.forEach((c) => {
@@ -2111,7 +2110,7 @@
                         <td><strong>#${c.id}</strong></td>
                         <td><strong class="text-gold">${c.date || '-'}</strong></td>
                         <td>${c.sender}<br><span class="text-[10px] text-zinc-400">${c.senderPhone}</span></td>
-                        <td><strong>${c.receiver}</strong><br><span class="text-[10px] text-zinc-400">${c.receiverPhone}</span></td>
+                        <td><strong>${c.receiver}</strong><br><span class="text-[10px] text-zinc-400">${c.receiverPhone}</span><br><span class="text-[10px] text-amber-400">العنوان: ${c.receiverAddress || 'عدن'}</span></td>
                         <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs">${itemCount}</span></td>
                         <td>${c.grandTotal} AED</td>
                         <td style="color:${c.paymentStatus==='مدفوع'?'#10b981':'#f59e0b'}">${c.paymentStatus}</td>
@@ -2315,7 +2314,7 @@
                     <td class="border border-slate-300 p-2 text-center">${idx+1}</td>
                     <td class="border border-slate-300 p-2 font-bold">#${c.id}</td>
                     <td class="border border-slate-300 p-2"><strong>${c.sender}</strong><br><span class="text-[10px] text-slate-500">${c.senderPhone}</span></td>
-                    <td class="border border-slate-300 p-2"><strong>${c.receiver}</strong><br><span class="text-[10px] text-slate-500">${c.receiverPhone}</span></td>
+                    <td class="border border-slate-300 p-2"><strong>${c.receiver}</strong><br><span class="text-[10px] text-slate-500">${c.receiverPhone}</span><br><span class="text-[10px] text-amber-600 font-bold">العنوان: ${c.receiverAddress || 'عدن'}</span></td>
                     <td class="border border-slate-300 p-2 text-xs leading-relaxed">${itemsStr}</td>
                 `;
 
