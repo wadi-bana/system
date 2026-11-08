@@ -89,7 +89,7 @@
                 background: white !important;
                 box-shadow: none !important;
                 color: black !important;
-                page-break-inside: avoid;
+                page-break-inside: auto;
             }
             table { page-break-inside: auto; width: 100% !important; }
             tr { page-break-inside: avoid; page-break-after: auto; }
@@ -341,7 +341,7 @@
                 <div class="flex gap-2 items-center flex-wrap">
                     <button onclick="printManifestPassenger('driver')" class="bg-amber-600 text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow"><i class="fa-solid fa-id-card ml-1"></i> طباعة للسائق (بدون أسعار)</button>
                     <button onclick="printManifestPassenger('management')" class="bg-gold text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow"><i class="fa-solid fa-chart-line ml-1"></i> طباعة للإدارة (بالأسعار)</button>
-                    <button onclick="exportToPDF('manifestPrintArea', 'WadiBina_Manifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> PDF</button>
+                    <button onclick="exportMultiPagePDF('manifestPrintArea', 'WadiBina_Manifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> PDF (تصدير كامل)</button>
                     <button onclick="closeModal('manifestModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
             </div>
@@ -387,7 +387,7 @@
                 </table>
             </div>
             <div class="mt-5 flex gap-3 no-print">
-                <button onclick="exportToPDF('manifestPrintArea', 'WadiBina_Manifest_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow">PDF</button>
+                <button onclick="exportMultiPagePDF('manifestPrintArea', 'WadiBina_Manifest_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow">PDF (تصدير كامل)</button>
                 <button onclick="closeModal('manifestModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
             </div>
         </div>
@@ -401,7 +401,7 @@
                 <div class="flex gap-2 items-center flex-wrap">
                     <button onclick="printManifestCargo('driver')" class="bg-amber-600 text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow"><i class="fa-solid fa-id-card ml-1"></i> طباعة للسائق (بدون أسعار)</button>
                     <button onclick="printManifestCargo('management')" class="bg-gold text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow"><i class="fa-solid fa-chart-line ml-1"></i> طباعة للإدارة (بالأسعار)</button>
-                    <button onclick="exportToPDF('cargoManifestPrintArea', 'WadiBina_CargoManifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> PDF</button>
+                    <button onclick="exportMultiPagePDF('cargoManifestPrintArea', 'WadiBina_CargoManifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> PDF (تصدير كامل)</button>
                     <button onclick="closeModal('cargoManifestModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
             </div>
@@ -445,7 +445,7 @@
                 </table>
             </div>
             <div class="mt-5 flex gap-3 no-print">
-                <button onclick="exportToPDF('cargoManifestPrintArea', 'WadiBina_CargoManifest_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow">PDF</button>
+                <button onclick="exportMultiPagePDF('cargoManifestPrintArea', 'WadiBina_CargoManifest_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow">PDF (تصدير كامل)</button>
                 <button onclick="closeModal('cargoManifestModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
             </div>
         </div>
@@ -1611,6 +1611,35 @@
                 const imgWidth = 210;
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
                 pdf.addImage(imgData, 'PNG', 0, 10, imgWidth, imgHeight);
+                pdf.save(`${filePrefix}${Date.now()}.pdf`);
+            });
+        }
+
+        /* دالة لضمان تصدير كامل محتوى جداول المانفيستو الطويلة في صفحات متعددة داخل ملف الـ PDF بدون قص أو اختفاء */
+        function exportMultiPagePDF(elementId, filePrefix) {
+            const element = document.getElementById(elementId);
+            html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                
+                const pageWidth = 210; // A4 width in mm
+                const pageHeight = 295; // A4 height in mm
+                const imgWidth = pageWidth;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                let heightLeft = imgHeight;
+                let position = 0;
+
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
                 pdf.save(`${filePrefix}${Date.now()}.pdf`);
             });
         }
