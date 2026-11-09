@@ -33,6 +33,9 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
     
+    <!-- JsBarcode Library -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -127,8 +130,10 @@
                             <p id="tktCoSub" class="text-[11px] text-slate-500">بوليصة حجز تذكرة سفر ركاب</p>
                         </div>
                     </div>
-                    <div class="text-left">
+                    <div class="text-left flex flex-col items-end">
                         <strong id="imgTicketCode" class="text-lg font-black text-amber-600">#115</strong>
+                        <!-- عنصر الباركود للتذكرة -->
+                        <svg id="ticketBarcode" class="w-32 h-10 mt-1"></svg>
                         <p class="text-[11px] text-slate-500 font-bold">Passenger Ticket</p>
                     </div>
                 </div>
@@ -2542,6 +2547,17 @@
             document.getElementById('imgTktTime').innerText = item.reportingTime;
             document.getElementById('imgTktFare').innerText = `${item.fare} AED`;
             document.getElementById('imgTktPayStatus').innerText = item.payMethod;
+
+            // توليد الباركود تلقائياً
+            try {
+                JsBarcode("#ticketBarcode", String(item.id), {
+                    format: "CODE128",
+                    lineColor: "#000",
+                    width: 2,
+                    height: 35,
+                    displayValue: false
+                });
+            } catch(e) { console.error("خطأ في توليد الباركود", e); }
 
             let extraBox = document.getElementById('imgTicketExtraBox');
             extraBox.innerHTML = '';
