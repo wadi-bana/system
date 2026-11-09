@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>باركود التذاكر | وادي بناء</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background:#09090b; color:#f4f4f5; }
+    .panel { background:#121215; border:1px solid #D4AF3740; }
+    #ticketPrint { background:#fff; color:#111827; }
+    @media print {
+      body { background:#fff; color:#111; }
+      body * { visibility:hidden; }
+      #ticketPrint, #ticketPrint * { visibility:visible; }
+      #ticketPrint { position:absolute; inset:0; width:100%; padding:24px; }
+      .no-print { display:none !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+  <main class="max-w-3xl mx-auto space-y-6">
+    <header class="text-center">
+      <h1 class="text-2xl font-black text-amber-400">باركود تذاكر الركاب</h1>
+      <p class="text-sm text-zinc-400 mt-2">إصدار رمز QR للتذكرة والتحقق منها وتسجيل الصعود عند الباص</p>
+    </header>
+
+    <section class="panel rounded-2xl p-5 space-y-3 no-print">
+      <h2 class="font-bold text-amber-300">إصدار / طباعة باركود التذكرة</h2>
+      <p class="text-xs text-zinc-400">أدخل رقم البوليصة الموجود في النظام. يحتوي الرمز على رقم التذكرة فقط، وتُجلب بياناتها من قاعدة البيانات عند التحقق.</p>
+      <div class="flex flex-col sm:flex-row gap-2">
+        <input id="ticketNumber" inputmode="numeric" class="flex-1 rounded-xl bg-zinc-900 border border-zinc-700 px-4 py-3 text-white" placeholder="رقم التذكرة، مثال: 140">
+        <button id="generateButton" class="rounded-xl bg-amber-500 text-black font-bold px-5 py-3">إنشاء الباركود</button>
+      </div>
+      <p id="generatorMessage" class="text-sm" role="status"></p>
+    </section>
+
+    <section id="ticketPrint" class="hidden rounded-2xl p-6 text-center">
+      <h2 class="font-black text-xl">شركة وادي بناء للنقل البري</h2>
+      <p class="text-sm text-gray-600 mt-1">بوليصة تذكرة سفر — امسح الرمز للتحقق عند الباص</p>
+      <div class="my-4 text-right text-sm space-y-1">
+        <div>رقم التذكرة: <strong id="printId"></strong></div>
+        <div>اسم المسافر: <strong id="printName"></strong></div>
+        <div>المسار: <span id="printRoute"></span></div>
+        <div>تاريخ الرحلة: <span id="printDate"></span></div>
+        <div>حالة السداد: <span id="printPayment"></span></div>
+      </div>
+      <div id="ticketQr" class="flex justify-center my-4"></div>
+      <div class="text-xs text-gray-500">WADI-TICKET:<span id="printCodeText"></span></div>
+      <div class="no-print mt-4 flex justify-center gap-2">
+        <button onclick="window.print()" class="rounded-xl bg-zinc-800 text-white px-5 py-2">طباعة التذكرة</button>
+        <button onclick="document.getElementById('ticketPrint').classList.add('hidden')" class="rounded-xl bg-zinc-200 text-black px-5 py-2">إغلاق</button>
+      </div>
+    </section>
+
+    <section class="panel rounded-2xl p-5 space-y-4 no-print">
+      <div>
+        <h2 class="font-bold text-amber-300">قارئ الباركود عند الباص</h2>
+        <p class="text-xs text-zinc-400 mt-1">يتطلب استخدام الكاميرا عبر HTTPS أو localhost. عند نجاح القراءة تُسجل التذكرة كصاعدة، وتُرفض محاولة تسجيلها مرة أخرى.</p>
+      </div>
+      <label class="block text-xs text-zinc-300">اسم الموظف / القائم بالتحقق
+        <input id="checkedInBy" class="mt-1 w-full rounded-xl bg-zinc-900 border border-zinc-700 px-3 py-2 text-white" placeholder="اسم الموظف">
+      </label>
+      <div id="reader" class="max-w-md mx-auto overflow-hidden rounded-xl"></div>
+      <div class="flex flex-wrap gap-2 justify-center">
+        <button id="startScanner" class="rounded-xl bg-emerald-600 text-white font-bold px-5 py-2">تشغيل الكاميرا</button>
+        <button id="stopScanner" class="rounded-xl bg-zinc-700 text-white px-5 py-2" disabled>إيقاف الكاميرا</button>
+      </div>
+      <p id="scanResult" class="min-h-6 text-center font-bold" role="status" aria-live="polite"></p>
+      <p id="dbStatus" class="text-center text-xs text-zinc-500" role="status">جارٍ الاتصال بقاعدة البيانات…</p>
+    </section>
+  </main>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCX0AnjNnffeRCFGDugKeOI8k8adJC1aqs",
+      authDomain: "wadi-bana-b585b.firebaseapp.com",
+      databaseURL: "https://wadi-bana-b585b-default-rtdb.firebaseio.com",
+      projectId: "wadi-bana-b585b",
+      storageBucket: "wadi-bana-b585b.firebasestorage.app",
+      messagingSenderId: "57806694102",
+      appId: "1:57806694102:web:8b2f38f1b86c0240290b77"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const dataRef = db.ref('systemUnifiedData');
+    const checkInsRef = db.ref('ticketCheckIns');
+    let passengerRecords = [];
+    let scanner = null;
+    let processingScan = false;
+
+    dataRef.child('passengers').on('value', snapshot => {
+      const value = snapshot.val();
+      passengerRecords = Array.isArray(value) ? value.filter(Boolean) : (value ? Object.values(value) : []);
+      document.getElementById('dbStatus').textContent = 'متصل بقاعدة البيانات — التذاكر المتاحة: ' + passengerRecords.length;
+    }, error => {
+      document.getElementById('dbStatus').textContent = 'تعذر تحميل التذاكر: ' + error.message;
+    });
+
+    function normalizeTicketCode(text) {
+      const match = String(text || '').trim().match(/^WADI-TICKET:(.+)$/i);
+      return match ? match[1].trim() : null;
+    }
+
+    function findTicket(id) {
+      return passengerRecords.find(ticket => String(ticket.id) === String(id));
+    }
+
+    document.getElementById('generateButton').addEventListener('click', () => {
+      const id = document.getElementById('ticketNumber').value.trim();
+      const message = document.getElementById('generatorMessage');
+      const ticket = findTicket(id);
+      if (!id || !ticket) {
+        message.textContent = 'لم يتم العثور على تذكرة بهذا الرقم. تحقق من رقم البوليصة أو اتصال قاعدة البيانات.';
+        message.className = 'text-sm text-red-400';
+        return;
+      }
+      document.getElementById('printId').textContent = '#' + ticket.id;
+      document.getElementById('printName').textContent = ticket.name || '-';
+      document.getElementById('printRoute').textContent = (ticket.origin || '-') + ' → ' + (ticket.destination || '-');
+      document.getElementById('printDate').textContent = ticket.date || '-';
+      document.getElementById('printPayment').textContent = ticket.payMethod || '-';
+      document.getElementById('printCodeText').textContent = ticket.id;
+      document.getElementById('ticketQr').replaceChildren();
+      new QRCode(document.getElementById('ticketQr'), {
+        text: 'WADI-TICKET:' + ticket.id,
+        width: 180,
+        height: 180,
+        correctLevel: QRCode.CorrectLevel.M
+      });
+      document.getElementById('ticketPrint').classList.remove('hidden');
+      message.textContent = 'تم إصدار رمز التذكرة #' + ticket.id + '. اطبع التذكرة من الزر أدناه.';
+      message.className = 'text-sm text-emerald-400';
+    });
+
+    async function handleScan(decodedText) {
+      if (processingScan) return;
+      processingScan = true;
+      const result = document.getElementById('scanResult');
+      const ticketId = normalizeTicketCode(decodedText);
+      if (!ticketId) {
+        result.textContent = 'رمز غير صالح لتذاكر وادي بناء.';
+        result.className = 'min-h-6 text-center font-bold text-red-400';
+        processingScan = false;
+        return;
+      }
+      const ticket = findTicket(ticketId);
+      if (!ticket) {
+        result.textContent = 'التذكرة #' + ticketId + ' غير موجودة في النظام.';
+        result.className = 'min-h-6 text-center font-bold text-red-400';
+        processingScan = false;
+        return;
+      }
+
+      const recordRef = checkInsRef.child(encodeURIComponent(String(ticketId)));
+      const checkedInBy = document.getElementById('checkedInBy').value.trim() || 'موظف الباص';
+      recordRef.transaction(current => current === null ? {
+        ticketId: String(ticket.id),
+        tripId: ticket.tripId || '',
+        passengerName: ticket.name || '',
+        tripDate: ticket.date || '',
+        checkedInBy,
+        checkedInAt: firebase.database.ServerValue.TIMESTAMP
+      } : undefined, (error, committed, snapshot) => {
+        if (error) {
+          result.textContent = 'تعذر تسجيل الصعود: ' + error.message;
+          result.className = 'min-h-6 text-center font-bold text-red-400';
+        } else if (committed) {
+          result.textContent = 'تم التحقق وتسجيل الصعود بنجاح — #' + ticket.id + ' — ' + (ticket.name || '');
+          result.className = 'min-h-6 text-center font-bold text-emerald-400';
+        } else {
+          const prior = snapshot.val() || {};
+          result.textContent = 'تنبيه: التذكرة #' + ticket.id + ' مسجلة للصعود مسبقاً' + (prior.checkedInBy ? ' بواسطة ' + prior.checkedInBy : '') + '.';
+          result.className = 'min-h-6 text-center font-bold text-amber-300';
+        }
+        setTimeout(() => { processingScan = false; }, 1800);
+      }, false);
+    }
+
+    document.getElementById('startScanner').addEventListener('click', async () => {
+      const result = document.getElementById('scanResult');
+      try {
+        scanner = scanner || new Html5Qrcode('reader');
+        await scanner.start({ facingMode: 'environment' }, { fps: 10, qrbox: { width: 230, height: 230 } }, handleScan, () => {});
+        document.getElementById('startScanner').disabled = true;
+        document.getElementById('stopScanner').disabled = false;
+        result.textContent = 'وجّه الكاميرا إلى رمز QR الموجود على التذكرة.';
+        result.className = 'min-h-6 text-center font-bold text-zinc-300';
+      } catch (error) {
+        result.textContent = 'تعذر تشغيل الكاميرا. اسمح بإذن الكاميرا وافتح الصفحة عبر HTTPS.';
+        result.className = 'min-h-6 text-center font-bold text-red-400';
+      }
+    });
+
+    document.getElementById('stopScanner').addEventListener('click', async () => {
+      if (scanner && scanner.isScanning) await scanner.stop();
+      document.getElementById('startScanner').disabled = false;
+      document.getElementById('stopScanner').disabled = true;
+    });
+  </script>
+</body>
+</html>
