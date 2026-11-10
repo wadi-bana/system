@@ -114,7 +114,7 @@
         </div>
     </div>
 
-    <!-- PREVIEW TICKET MODAL -->
+    <!-- PREVIEW TICKET MODAL (مع زر الواتساب) -->
     <div class="modal-overlay hidden" id="ticketPreviewModal">
         <div class="modal-card" style="max-width: 700px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
@@ -174,14 +174,15 @@
                 </div>
             </div>
             <div class="mt-5 flex gap-2 flex-wrap no-print">
-                <button onclick="exportToPDF('ticketCaptureArea', 'WadiBina_Ticket_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow hover:bg-red-500"><i class="fa-solid fa-file-pdf ml-1"></i> PDF</button>
-                <button onclick="downloadCapturedImage('ticketCaptureArea', 'WadiBina_Ticket_')" class="flex-1 gold-gradient-bg text-black font-extrabold py-3 rounded-xl text-xs shadow"><i class="fa-solid fa-download ml-1"></i> Image</button>
+                <button onclick="sendTicketViaWhatsApp()" class="flex-1 bg-emerald-600 text-white font-extrabold py-3 rounded-xl text-xs shadow hover:bg-emerald-500 flex items-center justify-center gap-1.5"><i class="fa-brands fa-whatsapp text-base"></i> إرسال للواتساب (الراكب)</button>
+                <button onclick="exportToPDF('ticketCaptureArea', 'WadiBina_Ticket_')" class="bg-red-600 text-white font-extrabold px-4 py-3 rounded-xl text-xs shadow hover:bg-red-500"><i class="fa-solid fa-file-pdf ml-1"></i> PDF</button>
+                <button onclick="downloadCapturedImage('ticketCaptureArea', 'WadiBina_Ticket_')" class="gold-gradient-bg text-black font-extrabold px-4 py-3 rounded-xl text-xs shadow"><i class="fa-solid fa-download ml-1"></i> Image</button>
                 <button onclick="closeModal('ticketPreviewModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
             </div>
         </div>
     </div>
 
-    <!-- PREVIEW CARGO MODAL -->
+    <!-- PREVIEW CARGO MODAL (مع زر الواتساب للمرسل) -->
     <div class="modal-overlay hidden" id="cargoPreviewModal">
         <div class="modal-card" style="max-width: 750px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
@@ -218,8 +219,9 @@
                     </div>
                 </div>
 
-                <div class="bg-slate-100 p-2.5 rounded-lg border border-slate-200 text-xs mb-4">
-                    <strong>منفذ الإجراء:</strong> <span id="imgCargoCreatedBy" class="font-bold text-indigo-800"></span>
+                <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 text-xs mb-4 flex justify-between flex-wrap gap-2">
+                    <div><strong>الرحلة المرتبطة:</strong> <span id="imgCargoTripInfo" class="font-bold text-indigo-900"></span></div>
+                    <div><strong>منفذ الإجراء:</strong> <span id="imgCargoCreatedBy" class="font-bold text-amber-800"></span></div>
                 </div>
 
                 <table class="w-full border-collapse text-right text-xs mb-4" style="direction: inherit;">
@@ -250,8 +252,9 @@
                 </div>
             </div>
             <div class="mt-5 flex gap-2 flex-wrap no-print">
-                <button onclick="exportToPDF('cargoCaptureArea', 'WadiBina_Cargo_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow hover:bg-red-500"><i class="fa-solid fa-file-pdf ml-1"></i> PDF</button>
-                <button onclick="downloadCapturedImage('cargoCaptureArea', 'WadiBina_CargoInvoice_')" class="flex-1 gold-gradient-bg text-black font-extrabold py-3 rounded-xl text-xs shadow"><i class="fa-solid fa-download ml-1"></i> Image</button>
+                <button onclick="sendCargoViaWhatsApp()" class="flex-1 bg-emerald-600 text-white font-extrabold py-3 rounded-xl text-xs shadow hover:bg-emerald-500 flex items-center justify-center gap-1.5"><i class="fa-brands fa-whatsapp text-base"></i> إرسال للمرسل (واتساب)</button>
+                <button onclick="exportToPDF('cargoCaptureArea', 'WadiBina_Cargo_')" class="bg-red-600 text-white font-extrabold px-4 py-3 rounded-xl text-xs shadow hover:bg-red-500"><i class="fa-solid fa-file-pdf ml-1"></i> PDF</button>
+                <button onclick="downloadCapturedImage('cargoCaptureArea', 'WadiBina_CargoInvoice_')" class="gold-gradient-bg text-black font-extrabold px-4 py-3 rounded-xl text-xs shadow"><i class="fa-solid fa-download ml-1"></i> Image</button>
                 <button onclick="closeModal('cargoPreviewModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
             </div>
         </div>
@@ -497,6 +500,7 @@
                             <th class="border border-slate-300 p-2">الفاتورة</th>
                             <th class="border border-slate-300 p-2">المرسل</th>
                             <th class="border border-slate-300 p-2">المستلم وعنوانه</th>
+                            <th class="border border-slate-300 p-2">الرحلة المرتبطة</th>
                             <th class="border border-slate-300 p-2">وصف الأصناف والعدد</th>
                             <th class="border border-slate-300 p-2 cargo-price-col">الإجمالي</th>
                             <th class="border border-slate-300 p-2">منفذ الإجراء</th>
@@ -624,9 +628,9 @@
             </table>
         </div>
 
-        <!-- فلتر الأفرع للـمدير -->
+        <!-- فلتر الأفرع للـمدير العام والمدراء -->
         <div id="managerBranchFilterContainer" class="hidden bg-cardbg border border-bordergold p-3.5 rounded-2xl shadow-xl mb-6 flex flex-col sm:flex-row items-center justify-between gap-3 no-print">
-            <span class="text-xs font-bold text-gold flex items-center gap-1.5"><i class="fa-solid fa-filter"></i> تصفية الأفرع (لوحة تحكم المدير):</span>
+            <span class="text-xs font-bold text-gold flex items-center gap-1.5"><i class="fa-solid fa-filter"></i> تصفية الأفرع (لوحة التحكم والمدراء):</span>
             <select id="selectedManagerBranch" onchange="refreshUI()" class="bg-darkbg border border-gold text-gold text-xs px-4 py-2.5 rounded-xl outline-none font-bold w-full sm:w-auto">
                 <option value="ALL">🌐 جميع الأفرع مجتمعة (عجمان، ابوظبي، عمان، اليمن)</option>
                 <option value="فرع عجمان">فرع عجمان</option>
@@ -729,7 +733,7 @@
             </div>
         </section>
 
-        <!-- TAB DRIVERS: حسابات السائقين (الروحة والرجعة) -->
+        <!-- TAB DRIVERS: حسابات السائقين -->
         <section id="module-drivers" class="tab-content hidden space-y-6">
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -824,7 +828,7 @@
             </div>
         </section>
 
-        <!-- TAB TRIPS: إدارة الرحلات (محدث مع إمكانية التعديل وزر غادرت الرحلة) -->
+        <!-- TAB TRIPS: إدارة الرحلات -->
         <section id="module-trips" class="tab-content hidden space-y-6">
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -1055,10 +1059,16 @@
                 </h2>
                 <form id="cargoForm" onsubmit="handleSaveCargo(event)" class="space-y-4">
                     <input type="hidden" id="cargoEditId" value="">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <div>
                             <label id="lblInvNo" class="block text-xs text-gold mb-1 font-bold">رقم الفاتورة *</label>
                             <input type="text" id="cargoInvNo" required class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs" value="126">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gold mb-1 font-bold">ربط برحلة مجدولة (اختياري)</label>
+                            <select id="cargoTripSelect" onchange="onTripSelectedForCargo()" class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs outline-none">
+                                <option value="">-- اختر الرحلة المرتبطة --</option>
+                            </select>
                         </div>
                         <div>
                             <label id="lblInvDate" class="block text-xs text-gold mb-1 font-bold">تاريخ الفاتورة (تقويم منسدل)</label>
@@ -1132,6 +1142,7 @@
                                 <th id="thC2">التاريخ</th>
                                 <th id="thC3">المرسل</th>
                                 <th id="thC4">المستلم وعنوانه</th>
+                                <th>الرحلة المرتبطة</th>
                                 <th id="thC5">عدد الأصناف</th>
                                 <th id="thC6">الإجمالي</th>
                                 <th>منفذ الإجراء</th>
@@ -1278,30 +1289,31 @@
         <section id="module-users" class="tab-content hidden space-y-6">
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <h3 class="text-gold font-bold text-sm border-b border-zinc-800 pb-3 flex items-center justify-between">
-                    <span><i class="fa-solid fa-users-gear ml-1"></i> لوحة إدارة المستخدمين وصلاحيات الأفرع (صلاحية المدير)</span>
+                    <span><i class="fa-solid fa-users-gear ml-1"></i> لوحة إدارة المستخدمين وصلاحيات الأفرع (مدير عام / مدير فرع)</span>
                 </h3>
                 
                 <form id="userForm" onsubmit="handleSaveUser(event)" class="bg-darkbg p-4 rounded-xl border border-zinc-800 space-y-3">
                     <input type="hidden" id="userEditOriginalName" value="">
                     <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                         <div>
-                            <label class="block text-xs text-zinc-400 mb-1">اسم المستخدم</label>
+                            <label class="block text-xs text-zinc-400 mb-1 font-bold">اسم المستخدم</label>
                             <input type="text" id="manageUsername" required class="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-100" placeholder="اسم المستخدم">
                         </div>
                         <div>
-                            <label class="block text-xs text-zinc-400 mb-1">كلمة المرور</label>
+                            <label class="block text-xs text-zinc-400 mb-1 font-bold">كلمة المرور</label>
                             <input type="text" id="managePassword" required class="w-full bg-zinc-900 border border-gold rounded p-2 text-xs text-gold font-bold" placeholder="كلمة المرور">
                         </div>
                         <div>
-                            <label class="block text-xs text-zinc-400 mb-1">الدور والصلاحية</label>
-                            <select id="manageRole" class="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200">
-                                <option value="موظف">موظف</option>
-                                <option value="مدير">مدير</option>
+                            <label class="block text-xs text-zinc-400 mb-1 font-bold">الدور والصلاحية</label>
+                            <select id="manageRole" class="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200 font-bold">
+                                <option value="مدير عام">👑 مدير عام (كل الأفرع)</option>
+                                <option value="مدير فرع">⭐ مدير فرع</option>
+                                <option value="موظف">👤 موظف</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs text-zinc-400 mb-1">فرع الشركة</label>
-                            <select id="manageBranch" class="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200">
+                            <label class="block text-xs text-zinc-400 mb-1 font-bold">فرع الشركة</label>
+                            <select id="manageBranch" class="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200 font-bold">
                                 <option value="فرع عجمان">فرع عجمان</option>
                                 <option value="فرع ابوظبي">فرع ابوظبي</option>
                                 <option value="فرع عمان">فرع عمان</option>
@@ -1321,7 +1333,7 @@
                             <tr>
                                 <th>اسم المستخدم</th>
                                 <th>كلمة المرور</th>
-                                <th>الصلاحية</th>
+                                <th>الصلاحية والوظيفة</th>
                                 <th>الفرع التابع له</th>
                                 <th>إجراءات</th>
                             </tr>
@@ -1353,10 +1365,12 @@
         let currentUser = JSON.parse(localStorage.getItem('WADI_BINA_USER')) || null;
         let currentLang = localStorage.getItem('WADI_BINA_LANG') || 'ar';
         let currentTab = 'dashboard';
+        let currentPreviewTicket = null;
+        let currentPreviewCargo = null;
 
         const DEFAULT_USERS = [
-            { username: 'وليد السيد', password: '708090', role: 'مدير', branch: 'فرع عجمان' },
-            { username: 'محمود', password: '102030', role: 'موظف', branch: 'فرع عجمان' },
+            { username: 'وليد السيد', password: '708090', role: 'مدير عام', branch: 'فرع عجمان' },
+            { username: 'محمود', password: '102030', role: 'مدير فرع', branch: 'فرع عجمان' },
             { username: 'يوسف', password: '405060', role: 'موظف', branch: 'فرع اليمن' }
         ];
 
@@ -1371,10 +1385,10 @@
             ],
             drivers: [],
             passengers: [
-                { id: "140", tripId: "trip_1", agent: "النظام", name: "محسن فيصل احمد", phone: "05", passport: "12605475", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "4:00 عصراً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان", createdBy: "وليد السيد" }
+                { id: "140", tripId: "trip_1", agent: "النظام", name: "محسن فيصل احمد", phone: "0508200749", passport: "12605475", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "4:00 عصراً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان", createdBy: "وليد السيد" }
             ],
             cargo: [
-                { id: "130", date: "2026-11-08", sender: "عبد الكريم عبد الله بندر عدن", senderPhone: "0567777133", senderAddress: "عجمان", receiver: "النادي الدولي للسيارات", receiverPhone: "0778826198", receiverAddress: "عدن", items: [{desc: "كرتون صغير به فواتير", qty: 1, price: 50}], grandTotal: 50, paymentStatus: "مدفوع", branch: "فرع عجمان", createdBy: "وليد السيد" }
+                { id: "130", tripId: "trip_1", date: "2026-11-08", sender: "عبد الكريم عبد الله", senderPhone: "0567777133", senderAddress: "عجمان", receiver: "النادي الدولي للسيارات", receiverPhone: "0778826198", receiverAddress: "عدن", items: [{desc: "كرتون صغير به فواتير", qty: 1, price: 50}], grandTotal: 50, paymentStatus: "مدفوع", branch: "فرع عجمان", createdBy: "وليد السيد" }
             ],
             vouchers: [],
             debtInvoices: [],
@@ -1414,6 +1428,67 @@
 
         function getCurrentUserName() {
             return currentUser ? currentUser.username : 'النظام';
+        }
+
+        // --- تهيئة أرقام الهواتف وتجهيزها لصيغة الواتساب الدولية ---
+        function formatPhoneForWhatsApp(phoneStr) {
+            if(!phoneStr) return '';
+            let cleaned = phoneStr.replace(/\D/g, ''); // إزالة الأشكال والمسافات
+            
+            // إذا كان الرقم يبدأ بـ 05 (مثل الإمارت) تحويله لـ 9715
+            if (cleaned.startsWith('05')) {
+                cleaned = '971' + cleaned.substring(1);
+            } 
+            // إذا كان يبدأ بـ 7 (أرقام اليمن مثل 77 أو 78 أو 73) تحويله لـ 967
+            else if (cleaned.length === 9 && (cleaned.startsWith('77') || cleaned.startsWith('78') || cleaned.startsWith('73') || cleaned.startsWith('71') || cleaned.startsWith('70'))) {
+                cleaned = '967' + cleaned;
+            }
+            // إذا كان يبدأ بـ 07 (رقم يمني أرضي أو سيار)
+            else if (cleaned.startsWith('07')) {
+                cleaned = '967' + cleaned.substring(1);
+            }
+            return cleaned;
+        }
+
+        // --- وظيفة إرسال صورة/بيانات التذكرة للواتس اب الخاص بالراكب ---
+        function sendTicketViaWhatsApp() {
+            if(!currentPreviewTicket) return;
+            const tkt = currentPreviewTicket;
+            const targetPhone = formatPhoneForWhatsApp(tkt.phone);
+
+            if(!targetPhone) {
+                alert('عذراً، رقم هاتف الراكب غير مسجل أو غير صحيح!');
+                return;
+            }
+
+            const msgText = `مرحباً بك ${tkt.name} 👋🏼\nمرفق لكم تفاصيل بوليصة حجز التذكرة من *شركة وادي بناء للنقل البري*:\n\n🎫 *رقم التذكرة:* #${tkt.id}\n📍 *المسار:* ${tkt.origin} ➔ ${tkt.destination}\n📅 *تاريخ الرحلة:* ${tkt.date || '-'}\n⏰ *وقت الحضور:* ${tkt.reportingTime}\n💳 *المبلغ:* ${tkt.fare} AED (${tkt.payMethod})\n\nنتمنى لكم رحلة موفقة وآمنة! 🚌`;
+            const waUrl = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msgText)}`;
+            
+            window.open(waUrl, '_blank');
+        }
+
+        // --- وظيفة إرسال صورة/بيانات فاتورة الشحن للواتس اب الخاص بالمرسل ---
+        function sendCargoViaWhatsApp() {
+            if(!currentPreviewCargo) return;
+            const cargo = currentPreviewCargo;
+            const targetPhone = formatPhoneForWhatsApp(cargo.senderPhone);
+
+            if(!targetPhone) {
+                alert('عذراً، رقم هاتف المرسل غير مسجل أو غير صحيح!');
+                return;
+            }
+
+            let itemsSummary = "";
+            if (cargo.items && cargo.items.length > 0) {
+                cargo.items.forEach((it, i) => {
+                    itemsSummary += `\n ${i+1}. ${it.desc} (العدد: ${it.qty})`;
+                });
+            }
+
+            const msgText = `مرحباً بك ${cargo.sender} 👋🏼\nمرفق لكم تفاصيل فاتورة الشحن من *شركة وادي بناء للنقل البري*:\n\n📦 *رقم الفاتورة:* #${cargo.id}\n👤 *المستلم:* ${cargo.receiver} (${cargo.receiverPhone})\n📍 *عنوان التسليم:* ${cargo.receiverAddress || 'عدن'}\n📋 *الأصناف:*${itemsSummary}\n💰 *الإجمالي النهائي:* ${cargo.grandTotal} AED (${cargo.paymentStatus})\n\nشكراً لثقتكم بوادي بناء! 🚛`;
+            const waUrl = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msgText)}`;
+            
+            window.open(waUrl, '_blank');
         }
 
         function toggleLanguage() {
@@ -1464,7 +1539,7 @@
                 document.getElementById('userInfoBadge').innerText = `${currentUser.username} (${currentUser.role} - ${currentUser.branch || 'فرع عجمان'})`;
                 document.getElementById('loginOverlay').style.display = 'none';
                 
-                if(currentUser.role === 'مدير') {
+                if(currentUser.role === 'مدير عام' || currentUser.role === 'مدير' || currentUser.role === 'مدير فرع') {
                     document.getElementById('tab-users').classList.remove('hidden');
                     document.getElementById('managerBranchFilterContainer').classList.remove('hidden');
                 } else {
@@ -1658,7 +1733,7 @@
                 renderVouchersTable();
                 renderDebtInvoicesTable();
             }
-            if(currentTab === 'users' && currentUser && currentUser.role === 'مدير') {
+            if(currentTab === 'users' && currentUser && (currentUser.role === 'مدير عام' || currentUser.role === 'مدير' || currentUser.role === 'مدير فرع')) {
                 renderUsersTable();
             }
         }
@@ -1668,7 +1743,7 @@
 
         function getFilteredData(list) {
             if(!currentUser) return list;
-            if(currentUser.role !== 'مدير') {
+            if(currentUser.role !== 'مدير عام' && currentUser.role !== 'مدير') {
                 return list.filter(item => item.branch === (currentUser.branch || 'فرع عجمان'));
             }
             const branchSelect = document.getElementById('selectedManagerBranch');
@@ -1734,7 +1809,7 @@
             }
         }
 
-        // --- وظائف إدارة حسابات السائقين (الروحة والرجعة مع المجاميع اللحظية) ---
+        // --- وظائف إدارة حسابات السائقين ---
         function buildDriverItemsRows(existingItems = null) {
             const container = document.getElementById('driverItemsRowsContainer');
             if(!container) return;
@@ -1955,7 +2030,7 @@
             refreshUI();
         }
 
-        // --- إدارة وتعديل الرحلات وتغيير حالتها (زر غادرت الرحلة) ---
+        // --- إدارة وتعديل الرحلات ---
         function handleSaveTrip(e) {
             e.preventDefault();
             const editId = document.getElementById('tripEditId').value;
@@ -2058,17 +2133,35 @@
         }
 
         function populateTripsDropdown() {
-            const sel = document.getElementById('passTripSelect');
-            if(!sel) return;
-            const currentVal = sel.value;
-            sel.innerHTML = '<option value="">-- اختر الرحلة المرتبطة --</option>';
+            const passSel = document.getElementById('passTripSelect');
+            const cargoSel = document.getElementById('cargoTripSelect');
+            
+            const currentPassVal = passSel ? passSel.value : '';
+            const currentCargoVal = cargoSel ? cargoSel.value : '';
+
+            if(passSel) passSel.innerHTML = '<option value="">-- اختر الرحلة أولاً --</option>';
+            if(cargoSel) cargoSel.innerHTML = '<option value="">-- اختر الرحلة المرتبطة (اختياري) --</option>';
+
             db.trips.forEach(trip => {
-                const opt = document.createElement('option');
-                opt.value = trip.id;
-                opt.textContent = `${trip.date !== '-' ? trip.date : 'بدون تاريخ'} (${trip.route}) - ${trip.busInfo} [${trip.status || 'مجدولة'}]`;
-                sel.appendChild(opt);
+                const text = `${trip.date !== '-' ? trip.date : 'بدون تاريخ'} (${trip.route}) - ${trip.busInfo} [${trip.status || 'مجدولة'}]`;
+                
+                if(passSel) {
+                    const opt = document.createElement('option');
+                    opt.value = trip.id;
+                    opt.textContent = text;
+                    passSel.appendChild(opt);
+                }
+
+                if(cargoSel) {
+                    const opt = document.createElement('option');
+                    opt.value = trip.id;
+                    opt.textContent = text;
+                    cargoSel.appendChild(opt);
+                }
             });
-            if(currentVal) sel.value = currentVal;
+
+            if(passSel && currentPassVal) passSel.value = currentPassVal;
+            if(cargoSel && currentCargoVal) cargoSel.value = currentCargoVal;
         }
 
         function onTripSelectedForTicket() {
@@ -2077,6 +2170,14 @@
             if(trip && trip.date && trip.date !== '-') {
                 document.getElementById('passDate').value = trip.date;
                 updateReportingTimeAutomatically();
+            }
+        }
+
+        function onTripSelectedForCargo() {
+            const tripId = document.getElementById('cargoTripSelect').value;
+            const trip = db.trips.find(t => t.id === tripId);
+            if(trip && trip.date && trip.date !== '-') {
+                document.getElementById('cargoDate').value = trip.date;
             }
         }
 
@@ -2359,6 +2460,7 @@
             e.preventDefault();
             const editId = document.getElementById('cargoEditId').value;
             const invNo = document.getElementById('cargoInvNo').value.trim();
+            const tripId = document.getElementById('cargoTripSelect').value || '';
 
             let itemsList = [];
             const rows = document.querySelectorAll('#cargoItemsRowsContainer tr');
@@ -2374,6 +2476,7 @@
 
             const cargoData = {
                 id: invNo,
+                tripId: tripId,
                 date: document.getElementById('cargoDate').value || '-',
                 sender: document.getElementById('cargoSenderName').value,
                 senderPhone: document.getElementById('cargoSenderPhone').value,
@@ -2412,6 +2515,7 @@
             if(!item) return;
             document.getElementById('cargoEditId').value = item.id;
             document.getElementById('cargoInvNo').value = item.id;
+            document.getElementById('cargoTripSelect').value = item.tripId || '';
             document.getElementById('cargoDate').value = item.date !== '-' ? item.date : '';
             document.getElementById('cargoPaymentStatus').value = item.paymentStatus || 'مدفوع';
             document.getElementById('cargoSenderName').value = item.sender || '';
@@ -2439,6 +2543,7 @@
             document.getElementById('cargoForm').reset();
             document.getElementById('cargoEditId').value = '';
             document.getElementById('cargoInvNo').value = db.nextCargoNo;
+            document.getElementById('cargoTripSelect').value = '';
             document.getElementById('cargoItemsRowsContainer').innerHTML = '';
             addCargoItemRow();
             document.getElementById('cargoFormTitle').innerText = 'فاتورة أمتعة وبضائع (بأرقام كسرية دقيقة للأسعار)';
@@ -2498,10 +2603,17 @@
             let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
             
             users.forEach((u, idx) => {
+                let roleBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-zinc-800 text-zinc-300">${u.role}</span>`;
+                if(u.role === 'مدير عام') {
+                    roleBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold gold-gradient-bg text-black shadow"><i class="fa-solid fa-crown ml-1"></i>مدير عام (جميع الأفرع)</span>`;
+                } else if(u.role === 'مدير' || u.role === 'مدير فرع') {
+                    roleBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-950 border border-gold text-gold"><i class="fa-solid fa-star ml-1"></i>مدير فرع</span>`;
+                }
+
                 tbody.insertRow().innerHTML = `
                     <td><strong>${u.username}</strong></td>
                     <td><span class="text-gold font-bold">${u.password}</span></td>
-                    <td><span class="px-2 py-0.5 rounded text-xs ${u.role==='مدير'?'bg-amber-950 text-amber-300':'bg-zinc-800 text-zinc-300'}">${u.role}</span></td>
+                    <td>${roleBadge}</td>
                     <td><span class="text-indigo-300 font-bold">${u.branch || 'فرع عجمان'}</span></td>
                     <td class="space-x-1 space-x-reverse">
                         <button onclick="editUser('${u.username}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i> تعديل</button>
@@ -2631,12 +2743,15 @@
                 searchC.forEach((c) => {
                     let itemCount = c.items ? c.items.length : 1;
                     const realIdx = db.cargo.findIndex(x => x.id === c.id);
+                    const linkedTrip = db.trips.find(t => t.id === c.tripId);
+                    const tripText = linkedTrip ? `${linkedTrip.date} (${linkedTrip.busInfo})` : 'غير مرتبطة';
 
                     cargoTbody.insertRow().innerHTML = `
                         <td><strong>#${c.id}</strong></td>
                         <td><strong class="text-gold">${c.date || '-'}</strong></td>
                         <td>${c.sender}<br><span class="text-[10px] text-zinc-400">${c.senderPhone}</span></td>
                         <td><strong>${c.receiver}</strong><br><span class="text-[10px] text-zinc-400">${c.receiverPhone}</span><br><span class="text-[10px] text-amber-400">العنوان: ${c.receiverAddress || 'عدن'}</span></td>
+                        <td><span class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded text-[10px] font-bold">${tripText}</span></td>
                         <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs">${itemCount}</span></td>
                         <td>${c.grandTotal} AED</td>
                         <td><span class="text-indigo-300 font-bold text-xs">${c.createdBy || 'النظام'}</span></td>
@@ -2655,6 +2770,8 @@
         function previewTicket(id) {
             const item = db.passengers.find(x => String(x.id) === String(id));
             if(!item) return;
+            currentPreviewTicket = item;
+
             document.getElementById('imgTicketCode').innerText = `#${item.id}`;
             document.getElementById('imgTktName').innerText = item.name;
             document.getElementById('imgTktPhone').innerText = item.phone;
@@ -2692,7 +2809,8 @@
         function previewCargo(id) {
             const item = db.cargo.find(x => String(x.id) === String(id));
             if(!item) return;
-            
+            currentPreviewCargo = item;
+
             document.getElementById('imgCargoCode').innerText = `#${item.id}`;
             document.getElementById('imgCargoSenderName').innerText = item.sender;
             document.getElementById('imgCargoSenderPhone').innerText = item.senderPhone;
@@ -2702,6 +2820,9 @@
             document.getElementById('imgCargoReceiverAddress').innerText = item.receiverAddress || 'عدن';
             document.getElementById('imgCargoPayStatus').innerText = item.paymentStatus;
             document.getElementById('imgCargoCreatedBy').innerText = item.createdBy || 'النظام';
+
+            const linkedTrip = db.trips.find(t => t.id === item.tripId);
+            document.getElementById('imgCargoTripInfo').innerText = linkedTrip ? `${linkedTrip.date} (${linkedTrip.route} - ${linkedTrip.busInfo})` : 'غير مرتبطة برحلة';
 
             let tbody = document.getElementById('imgCargoItemsTableBody');
             tbody.innerHTML = '';
@@ -2850,11 +2971,15 @@
                     itemsStr += `• ${it.desc} (العدد / الكمية: ${it.qty})<br>`;
                 });
 
+                const linkedTrip = db.trips.find(t => t.id === c.tripId);
+                const tripText = linkedTrip ? `${linkedTrip.route} (${linkedTrip.busInfo})` : 'غير مرتبطة';
+
                 let rowHtml = `
                     <td class="border border-slate-300 p-2 text-center">${idx+1}</td>
                     <td class="border border-slate-300 p-2 font-bold">#${c.id}</td>
                     <td class="border border-slate-300 p-2"><strong>${c.sender}</strong><br><span class="text-[10px] text-slate-500">${c.senderPhone}</span></td>
                     <td class="border border-slate-300 p-2"><strong>${c.receiver}</strong><br><span class="text-[10px] text-slate-500">${c.receiverPhone}</span><br><span class="text-[10px] text-amber-600 font-bold">العنوان: ${c.receiverAddress || 'عدن'}</span></td>
+                    <td class="border border-slate-300 p-2 text-xs font-bold text-indigo-900">${tripText}</td>
                     <td class="border border-slate-300 p-2 text-xs leading-relaxed">${itemsStr}</td>
                 `;
 
