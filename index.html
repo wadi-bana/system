@@ -132,7 +132,6 @@
                     </div>
                     <div class="text-left flex flex-col items-end">
                         <strong id="imgTicketCode" class="text-lg font-black text-amber-600">#115</strong>
-                        <!-- عنصر الباركود للتذكرة -->
                         <svg id="ticketBarcode" class="w-32 h-10 mt-1"></svg>
                         <p class="text-[11px] text-slate-500 font-bold">Passenger Ticket</p>
                     </div>
@@ -1730,7 +1729,6 @@
                 totalRajah += rajah;
             });
 
-            // تحديث مجاميع جدول النموذج في الأسفل
             const formTotalRohaEl = document.getElementById('formTotalRoha');
             const formTotalRajahEl = document.getElementById('formTotalRajah');
             if(formTotalRohaEl) formTotalRohaEl.innerText = totalRoha;
@@ -2548,7 +2546,6 @@
             document.getElementById('imgTktFare').innerText = `${item.fare} AED`;
             document.getElementById('imgTktPayStatus').innerText = item.payMethod;
 
-            // توليد الباركود تلقائياً
             try {
                 JsBarcode("#ticketBarcode", String(item.id), {
                     format: "CODE128",
