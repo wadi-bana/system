@@ -13,8 +13,7 @@
                 extend: {
                     colors: {
                         gold: { DEFAULT: '#D4AF37', 400: '#F3E5AB', 500: '#D4AF37', 600: '#AA8C2C', 700: '#806921' },
-                        darkbg: '#09090b', cardbg: '#121215', bordergold: '#D4AF3740',
-                        formbg: '#f8fafc', borderred: '#dc2626'
+                        darkbg: '#09090b', cardbg: '#121215', bordergold: '#D4AF3740'
                     },
                     fontFamily: { sans: ['Cairo', 'Tajawal', 'sans-serif'] }
                 }
@@ -46,7 +45,6 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(0.8) sepia(1) saturate(5) hue-rotate(5deg); }
         
-        /* التنسيق الخاص بالواجهة المماثلة للصورة (تصميم فاخر بأطراف حمراء/داكنة وحقول واضحة) */
         .image-styled-card {
             background-color: #ffffff;
             border: 1.5px solid #b91c1c;
@@ -151,34 +149,33 @@
                 </div>
 
                 <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 text-xs space-y-2 mb-4">
-                    <div><strong id="lblPrName">الراكب الرئيسي:</strong> <span id="imgTktName" class="font-bold"></span></div>
-                    <div><strong id="lblPrPhone">رقم الهاتف:</strong> <span id="imgTktPhone"></span></div>
-                    <div><strong id="lblPrPass">رقم الجواز / الهوية:</strong> <span id="imgTktPassport"></span></div>
+                    <div><strong>اسم الراكب:</strong> <span id="imgTktName" class="font-bold text-base text-slate-900"></span></div>
+                    <div><strong>رقم الهاتف:</strong> <span id="imgTktPhone" class="font-bold"></span></div>
+                    <div><strong>رقم الجواز:</strong> <span id="imgTktPassport" class="font-bold"></span></div>
                     <div class="pt-1 border-t border-slate-200 flex justify-between flex-wrap gap-2">
-                        <div><strong id="lblPrRoute">المسار:</strong> <span id="imgTktRoute"></span></div>
-                        <div><strong id="lblPrDate">تاريخ الرحلة:</strong> <span id="imgTktDate" class="text-amber-700 font-bold"></span></div>
-                        <div><strong id="lblPrTime">وقت الحضور:</strong> <span id="imgTktTime" class="text-indigo-700 font-bold"></span></div>
+                        <div><strong>جهة الصعود:</strong> <span id="imgTktOrigin" class="font-bold"></span></div>
+                        <div><strong>جهة الوصول:</strong> <span id="imgTktDest" class="font-bold"></span></div>
+                        <div><strong>تاريخ الرحلة:</strong> <span id="imgTktDate" class="text-amber-700 font-bold"></span></div>
                     </div>
+                    <div id="imgTicketExtraBox" class="pt-2 border-t border-slate-200"></div>
                     <div class="pt-1 border-t border-slate-200 text-amber-800 font-bold no-print">
                         <span>الموظف منفذ الإجراء: </span><span id="imgTktCreatedBy"></span>
                     </div>
                 </div>
 
-                <div id="imgTicketExtraBox"></div>
-
                 <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm font-black mb-6">
                     <div class="flex items-center gap-2">
-                        <span id="lblPrTotal" class="text-indigo-900">إجمالي المبلغ:</span>
+                        <span class="text-indigo-900">إجمالي المبلغ:</span>
                         <span id="imgTktFare" class="text-amber-600 text-base">0 AED</span>
                     </div>
                     <div class="text-xs">
-                        <span id="lblPrPayStatus" class="text-slate-500 font-normal ml-1">حالة السداد:</span>
+                        <span class="text-slate-500 font-normal ml-1">حالة السداد:</span>
                         <span id="imgTktPayStatus" class="px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-bold">مدفوع</span>
                     </div>
                 </div>
 
                 <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
-                    <div id="tktFootNote">* رحلة موفقة وآمنة مع وادي بناء للنقل الدولي. أرقام التواصل بالمكاتب:</div>
+                    <div>* رحلة موفقة وآمنة مع وادي بناء للنقل الدولي. أرقام التواصل بالمكاتب:</div>
                     <div class="grid grid-cols-1 gap-0.5 font-bold text-slate-800">
                         <div>• عجمان (الجرف 2): 0508200749 - 0558675501</div>
                         <div>• بني ياس: 0508200754 - 0558675501</div>
@@ -210,8 +207,8 @@
                     </div>
                     <div class="text-left flex items-center gap-3">
                         <div>
-                            <h2 id="cargoCoName" class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
-                            <p id="cargoCoSub" class="text-[11px] text-slate-500">فاتورة استلام أمتعة وبضائع</p>
+                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
+                            <p class="text-[11px] text-slate-500">فاتورة استلام أمتعة وبضائع</p>
                         </div>
                         <div class="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center text-amber-400 font-black text-lg shadow">و</div>
                     </div>
@@ -219,26 +216,26 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 text-xs">
                     <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 space-y-1">
-                        <span id="lblSenderInfo" class="text-indigo-800 font-bold block mb-1">بيانات المرسل:</span>
-                        <div><strong id="lblSndName">الاسم:</strong> <span id="imgCargoSenderName" class="font-bold text-slate-900"></span></div>
-                        <div><strong id="lblSndPhone">رقم الهاتف:</strong> <span id="imgCargoSenderPhone"></span></div>
-                        <div><strong id="lblSndAddr">العنوان:</strong> <span id="imgCargoSenderAddress"></span></div>
+                        <span class="text-indigo-800 font-bold block mb-1">بيانات المرسل:</span>
+                        <div><strong>الاسم:</strong> <span id="imgCargoSenderName" class="font-bold text-slate-900"></span></div>
+                        <div><strong>رقم الهاتف:</strong> <span id="imgCargoSenderPhone"></span></div>
+                        <div><strong>العنوان:</strong> <span id="imgCargoSenderAddress"></span></div>
                     </div>
                     <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 space-y-1">
-                        <span id="lblReceiverInfo" class="text-indigo-800 font-bold block mb-1">بيانات المستلم:</span>
-                        <div><strong id="lblRcvName">الاسم:</strong> <span id="imgCargoReceiverName" class="font-bold text-slate-900"></span></div>
-                        <div><strong id="lblRcvPhone">رقم الهاتف:</strong> <span id="imgCargoReceiverPhone"></span></div>
-                        <div><strong id="lblRcvAddr">العنوان:</strong> <span id="imgCargoReceiverAddress"></span></div>
+                        <span class="text-indigo-800 font-bold block mb-1">بيانات المستلم:</span>
+                        <div><strong>الاسم:</strong> <span id="imgCargoReceiverName" class="font-bold text-slate-900"></span></div>
+                        <div><strong>رقم الهاتف:</strong> <span id="imgCargoReceiverPhone"></span></div>
+                        <div><strong>العنوان:</strong> <span id="imgCargoReceiverAddress"></span></div>
                     </div>
                 </div>
 
                 <table class="w-full border-collapse text-right text-xs mb-4" style="direction: inherit;">
                     <thead>
                         <tr class="bg-slate-200 text-slate-800">
-                            <th class="border border-slate-300 p-2 w-12 text-center" id="thNum">م</th>
-                            <th class="border border-slate-300 p-2" id="thItem">الصنف</th>
-                            <th class="border border-slate-300 p-2 w-20 text-center" id="thQty">العدد</th>
-                            <th class="border border-slate-300 p-2 w-32 text-left" id="thTotalItem">الإجمالي النهائي</th>
+                            <th class="border border-slate-300 p-2 w-12 text-center">م</th>
+                            <th class="border border-slate-300 p-2">محتوى البضاعة / الصنف</th>
+                            <th class="border border-slate-300 p-2 w-20 text-center">العدد</th>
+                            <th class="border border-slate-300 p-2 w-32 text-left">السعر الإجمالي</th>
                         </tr>
                     </thead>
                     <tbody id="imgCargoItemsTableBody"></tbody>
@@ -246,17 +243,17 @@
 
                 <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm font-black mb-6">
                     <div class="flex items-center gap-2">
-                        <span id="lblGrandTotal" class="text-indigo-900">الإجمالي النهائي:</span>
+                        <span class="text-indigo-900">السعر الإجمالي النهائي:</span>
                         <span id="imgCargoGrandTotal" class="text-amber-600 text-base">0 AED</span>
                     </div>
                     <div class="text-xs">
-                        <span id="lblPayStatusInv" class="text-slate-500 font-normal ml-1">حالة السداد:</span>
+                        <span class="text-slate-500 font-normal ml-1">حالة الدفع:</span>
                         <span id="imgCargoPayStatus" class="px-2.5 py-1 rounded-md bg-indigo-100 text-indigo-800 font-bold">مدفوع</span>
                     </div>
                 </div>
 
                 <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
-                    <div id="cargoFootNote">* شكراً لاختياركم وادي بناء لشحن أمتعتكم. أرقام التواصل بالمكاتب:</div>
+                    <div>* شكراً لاختياركم وادي بناء لشحن أمتعتكم. أرقام التواصل بالمكاتب:</div>
                     <div class="grid grid-cols-1 gap-0.5 font-bold text-slate-800">
                         <div>• عجمان (الجرف 2): 0508200749 - 0558675501</div>
                         <div>• بني ياس: 0508200754 - 0558675501</div>
@@ -278,8 +275,8 @@
         <div class="flex items-center gap-3">
             <div class="w-11 h-11 gold-gradient-bg rounded-full flex items-center justify-center text-black font-black text-xl shadow">و</div>
             <div>
-                <h1 id="headTitle" class="text-base sm:text-lg font-black gold-gradient-text leading-tight">شركة وادي بناء للنقل الدولي</h1>
-                <p id="headSub" class="text-[11px] text-zinc-400">النظام الموحد الشامل لإدارة السفريات والشحن والمالية</p>
+                <h1 class="text-base sm:text-lg font-black gold-gradient-text leading-tight">شركة وادي بناء للنقل الدولي</h1>
+                <p class="text-[11px] text-zinc-400">النظام الموحد الشامل لإدارة السفريات والشحن والمالية</p>
             </div>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
@@ -287,27 +284,19 @@
                 <i class="fa-solid fa-user-gear text-gold"></i> <span class="hidden sm:inline">تبديل / إضافة حساب</span>
             </button>
             <button onclick="openChangePasswordModal()" class="bg-zinc-800 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-bold">
-                <i class="fa-solid fa-key"></i> <span id="btnChangePass" class="hidden sm:inline">كلمة المرور</span>
-            </button>
-            <button onclick="toggleLanguage()" id="langToggleBtn" class="bg-gold/20 text-gold border border-gold/40 px-3 py-1.5 rounded-xl text-xs font-extrabold hover:bg-gold/30">
-                <i class="fa-solid fa-globe"></i> English
+                <i class="fa-solid fa-key"></i> <span class="hidden sm:inline">كلمة المرور</span>
             </button>
             <span id="userInfoBadge" class="bg-zinc-800 border border-zinc-700 text-gold px-3 py-1.5 rounded-xl text-xs font-bold"></span>
             
             <button onclick="exportBackupJSON()" class="bg-zinc-800 text-gold border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1">
-                <i class="fa-solid fa-download"></i> <span class="hidden sm:inline" id="btnBackup">نسخة JSON</span>
+                <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">نسخة JSON</span>
             </button>
 
             <button onclick="exportSystemBackupPDF()" class="bg-red-600 text-white border border-red-500 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 hover:bg-red-500">
-                <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline" id="btnBackupPDF">PDF شامل</span>
+                <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline">PDF شامل</span>
             </button>
-            
-            <label class="bg-zinc-800 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1 hover:border-gold">
-                <i class="fa-solid fa-upload"></i> <span class="hidden sm:inline" id="btnRestore">استرجاع</span>
-                <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
-            </label>
 
-            <button onclick="handleLogout()" id="btnLogout" class="bg-red-600/20 text-red-400 border border-red-600/30 px-3 py-1.5 rounded-xl text-xs font-bold">خروج</button>
+            <button onclick="handleLogout()" class="bg-red-600/20 text-red-400 border border-red-600/30 px-3 py-1.5 rounded-xl text-xs font-bold">خروج</button>
         </div>
     </header>
 
@@ -374,7 +363,6 @@
             <div class="grid grid-cols-3 gap-3 mb-6 text-xs bg-slate-100 p-4 rounded-xl border border-slate-200">
                 <div>إجمالي التذاكر: <strong id="repTotalTkt" class="text-indigo-700 font-black text-sm">0</strong></div>
                 <div>إجمالي فواتير الشحن: <strong id="repTotalCargo" class="text-emerald-700 font-black text-sm">0</strong></div>
-                <div>إجمالي الذمم والآجال: <strong id="repTotalDebt" class="text-amber-700 font-black text-sm">0</strong></div>
             </div>
 
             <h3 class="font-bold text-sm text-slate-800 mb-2 border-b border-slate-300 pb-1">أحدث التذاكر المسجلة في النظام:</h3>
@@ -386,7 +374,6 @@
                         <th class="border border-slate-300 p-2">الهاتف</th>
                         <th class="border border-slate-300 p-2">المسار</th>
                         <th class="border border-slate-300 p-2">المبلغ</th>
-                        <th class="border border-slate-300 p-2">منفذ الإجراء</th>
                         <th class="border border-slate-300 p-2">السداد</th>
                     </tr>
                 </thead>
@@ -405,19 +392,19 @@
             </select>
         </div>
 
-        <!-- GLOBAL SEARCH & ADVANCED FILTERS -->
+        <!-- GLOBAL SEARCH -->
         <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl mb-6 space-y-3 no-print">
             <div class="flex flex-col sm:flex-row items-center gap-3">
                 <div class="relative w-full flex-1">
                     <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-gold"></i>
-                    <input type="text" id="globalSearchInput" oninput="handleGlobalSearch()" placeholder="بحث ذكي شامل: رقم البوليصة، اسم العميل، الهاتف، أو الصنف..." class="w-full bg-darkbg border border-zinc-700 rounded-xl pr-11 pl-4 py-3 text-xs text-zinc-100 outline-none focus:border-gold">
+                    <input type="text" id="globalSearchInput" oninput="handleGlobalSearch()" placeholder="بحث ذكي شامل: رقم البوليصة، اسم العميل، الهاتف..." class="w-full bg-darkbg border border-zinc-700 rounded-xl pr-11 pl-4 py-3 text-xs text-zinc-100 outline-none focus:border-gold">
                 </div>
                 <select id="globalSearchType" onchange="handleGlobalSearch()" class="bg-darkbg border border-zinc-700 text-gold text-xs px-4 py-3 rounded-xl outline-none">
                     <option value="all">🌐 جميع السجلات</option>
                     <option value="ticket">🎫 تذاكر ركاب فقط</option>
                     <option value="cargo">📦 فواتير شحن فقط</option>
                 </select>
-                <button onclick="resetGlobalSearch()" id="btnResetSearch" class="bg-zinc-800 text-zinc-300 px-4 py-3 rounded-xl text-xs font-bold hover:bg-zinc-700">إلغاء</button>
+                <button onclick="resetGlobalSearch()" class="bg-zinc-800 text-zinc-300 px-4 py-3 rounded-xl text-xs font-bold hover:bg-zinc-700">إلغاء</button>
             </div>
         </div>
 
@@ -426,7 +413,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl flex items-center justify-between">
                     <div>
-                        <span id="lblStat1" class="text-zinc-400 text-xs block">إجمالي حجوزات الركاب</span>
+                        <span class="text-zinc-400 text-xs block">إجمالي حجوزات الركاب</span>
                         <h3 id="dashTotalPassengers" class="text-xl font-black text-gold mt-1">0</h3>
                     </div>
                     <div class="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center text-gold text-lg"><i class="fa-solid fa-ticket"></i></div>
@@ -440,14 +427,14 @@
                 </div>
                 <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl flex items-center justify-between">
                     <div>
-                        <span id="lblStat3" class="text-zinc-400 text-xs block">إجمالي المصروفات العامة</span>
+                        <span class="text-zinc-400 text-xs block">إجمالي المصروفات العامة</span>
                         <h3 id="dashTotalExpenses" class="text-xl font-black text-red-400 mt-1">0 AED</h3>
                     </div>
                     <div class="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-400 text-lg"><i class="fa-solid fa-receipt"></i></div>
                 </div>
                 <div class="bg-cardbg border border-gold p-4 rounded-2xl shadow-xl flex items-center justify-between bg-opacity-50">
                     <div>
-                        <span id="lblStat4" class="text-gold text-xs block font-bold">صافي رصيد الصندوق العام</span>
+                        <span class="text-gold text-xs block font-bold">صافي رصيد الصندوق العام</span>
                         <h3 id="dashNetProfit" class="text-xl font-black text-amber-300 mt-1">0 AED</h3>
                     </div>
                     <div class="w-10 h-10 rounded-xl gold-gradient-bg flex items-center justify-center text-black text-lg"><i class="fa-solid fa-chart-line"></i></div>
@@ -456,11 +443,11 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl">
-                    <h3 id="lblChart1" class="text-gold font-bold text-xs mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-column"></i> مقارنة الإيرادات والمصروفات المالية</h3>
+                    <h3 class="text-gold font-bold text-xs mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-column"></i> مقارنة الإيرادات والمصروفات المالية</h3>
                     <div class="relative h-64"><canvas id="financialBarChart"></canvas></div>
                 </div>
                 <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl">
-                    <h3 id="lblChart2" class="text-gold font-bold text-xs mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-pie"></i> نسب حالات سداد الفواتير والتذاكر</h3>
+                    <h3 class="text-gold font-bold text-xs mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-pie"></i> نسب حالات سداد الفواتير والتذاكر</h3>
                     <div class="relative h-64 flex justify-center"><canvas id="paymentStatusPieChart"></canvas></div>
                 </div>
             </div>
@@ -471,7 +458,7 @@
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
                     <h3 class="text-gold font-extrabold text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-bus text-gold"></i> <span id="tripFormTitle">إنشاء / تعديل رحلة</span>
+                        <i class="fa-solid fa-bus text-gold"></i> إنشاء / تعديل رحلة
                     </h3>
                     <button id="cancelEditTripBtn" onclick="resetTripForm()" class="hidden text-xs text-red-400 font-bold bg-red-950/40 border border-red-800 px-2.5 py-1 rounded-lg">إغلاق التعديل</button>
                 </div>
@@ -504,7 +491,7 @@
                         </select>
                     </div>
                     <div class="flex items-end">
-                        <button type="submit" id="tripSubmitBtn" class="w-full gold-gradient-bg text-black font-extrabold py-2.5 rounded-xl text-xs shadow">إنشاء الرحلة</button>
+                        <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-2.5 rounded-xl text-xs shadow">إنشاء الرحلة</button>
                     </div>
                 </form>
             </div>
@@ -522,7 +509,7 @@
                                 <th>الحالة</th>
                                 <th>التذاكر المرتبطة</th>
                                 <th>منفذ الإجراء</th>
-                                <th>إجراءات / غادرت الرحلة</th>
+                                <th>إجراءات</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -531,13 +518,13 @@
             </div>
         </section>
 
-        <!-- TAB CREATE TICKET (صفحة إصدار التذاكر بتنسيق مطابق للصورة) -->
+        <!-- TAB CREATE TICKET (صفحة إصدار التذاكر بالحقول المطابقة تماماً) -->
         <section id="module-create-ticket" class="tab-content hidden space-y-6">
             <div class="max-w-6xl mx-auto">
                 <div class="flex justify-between items-center mb-4 no-print">
                     <div>
-                        <h2 id="passFormTitle" class="text-gold font-black text-lg">إصدار وإدارة تذكرة سفر ركاب جديدة</h2>
-                        <p class="text-xs text-zinc-400">واجهة الحجز الموحدة بالتقسيم المطابق للتصميم المعتمد</p>
+                        <h2 class="text-gold font-black text-lg">إصدار وإدارة تذكرة سفر ركاب جديدة</h2>
+                        <p class="text-xs text-zinc-400">واجهة حجز التذاكر الموحدة بالتقسيم المطابق للتصميم والدقة المطلوبة</p>
                     </div>
                     <button onclick="switchTab('passengers')" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3.5 py-2 rounded-xl text-xs font-bold"><i class="fa-solid fa-arrow-right ml-1"></i>العودة لسجل التذاكر</button>
                 </div>
@@ -547,32 +534,23 @@
                     
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
                         
-                        <!-- الكرت الأيسر (تفاصيل الحجز والرسوم والمراجع) -->
+                        <!-- القسم الأيسر/الفرعي (المرجع، التواريخ، الرسوم وطريقة الدفع) -->
                         <div class="lg:col-span-4 image-styled-card flex flex-col justify-between">
                             <div class="space-y-3.5">
                                 <div class="grid grid-cols-2 gap-2">
                                     <div>
-                                        <label class="image-styled-label">تاريخ التسليم / الرحلة</label>
-                                        <input type="date" id="passDate" onchange="updateReportingTimeAutomatically()" class="image-styled-field font-bold">
+                                        <label class="image-styled-label">تاريخ الرحلة</label>
+                                        <input type="date" id="passDate" class="image-styled-field font-bold">
                                     </div>
                                     <div>
-                                        <label class="image-styled-label"># الكود المرجعي / التذكرة</label>
+                                        <label class="image-styled-label"># رقم التذكرة</label>
                                         <input type="text" id="passTicketNo" required class="image-styled-field font-black text-center text-red-700">
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label class="image-styled-label">الشركة / التاجر / الوكيل</label>
-                                    <select id="passAgentSelect" class="image-styled-field">
-                                        <option value="شركة وادي بناء">شركة وادي بناء للنقل</option>
-                                        <option value="وكيل خارجي">وكيل معتمد</option>
-                                        <option value="مكتب عجمان">مكتب عجمان الرئيسي</option>
-                                    </select>
-                                </div>
-
-                                <div>
                                     <label class="image-styled-label">طريقة الدفع</label>
-                                    <select id="passPayMethod" class="image-styled-field">
+                                    <select id="passPayMethod" class="image-styled-field font-bold">
                                         <option value="مدفوع">مدفوع نقداً</option>
                                         <option value="تحويل">تحويل بنكي</option>
                                         <option value="آجل">آجل / بالدين</option>
@@ -580,67 +558,56 @@
                                 </div>
 
                                 <div>
-                                    <label class="image-styled-label">تحمل رسوم التوصيل / السفر</label>
-                                    <select id="passFeeResponsibility" class="image-styled-field">
-                                        <option value="عند الراكب">عند الراكب / العميل</option>
-                                        <option value="عند التاجر">عند التاجر / الشركة</option>
+                                    <label class="image-styled-label">المبلغ الإجمالي (درهم) *</label>
+                                    <input type="number" step="any" id="passManualTotal" required class="image-styled-field font-bold text-red-700 text-base" value="350">
+                                </div>
+
+                                <div>
+                                    <label class="image-styled-label">ربط بالرحلة المجدولة *</label>
+                                    <select id="passTripSelect" required onchange="onTripSelectedForTicket()" class="image-styled-field font-bold">
+                                        <option value="">-- اختر الرحلة أولاً --</option>
                                     </select>
                                 </div>
 
-                                <div class="grid grid-cols-3 gap-2">
-                                    <div>
-                                        <label class="image-styled-label">مبلغ التذكرة</label>
-                                        <input type="number" id="passManualTotal" required class="image-styled-field font-bold" value="350">
-                                    </div>
-                                    <div>
-                                        <label class="image-styled-label">رسوم التوصيل</label>
-                                        <input type="number" id="passDeliveryFee" class="image-styled-field" value="0">
-                                    </div>
-                                    <div>
-                                        <label class="image-styled-label">رسوم إضافية</label>
-                                        <input type="number" id="passExtraFee" class="image-styled-field" value="0">
-                                    </div>
-                                </div>
-
-                                <div class="pt-2">
-                                    <label class="image-styled-label">هل الرحلة خارجية / دولية؟</label>
-                                    <input type="text" id="passIsExternal" readonly class="image-styled-field bg-slate-100 font-bold text-center" value="خارجية (دولي)">
+                                <div>
+                                    <label class="image-styled-label">فرع الإصدار</label>
+                                    <input type="text" id="passBranchCreated" readonly class="image-styled-field bg-slate-100 font-bold" value="فرع عجمان">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- الكرت الأيمن (تفاصيل العميل والرحلة والأفراد) -->
+                        <!-- القسم الأيمن/الرئيسي (بيانات الراكب الأساسي والركاب الإضافيين) -->
                         <div class="lg:col-span-8 image-styled-card flex flex-col justify-between">
                             <div class="space-y-4">
-                                <h3 class="text-sm font-bold text-slate-700 border-b pb-2"><i class="fa-solid fa-user-tag text-red-600 ml-1"></i> تفاصيل العميل والراكب الرئيسي</h3>
+                                <h3 class="text-sm font-bold text-slate-700 border-b pb-2"><i class="fa-solid fa-user-tag text-red-600 ml-1"></i> تفاصيل الراكب الأساسي وجهات السفر</h3>
                                 
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div>
-                                        <label class="image-styled-label">رقم العميل / الهاتف *</label>
+                                        <label class="image-styled-label">الاسم كاملاً *</label>
+                                        <input type="text" id="passName" required placeholder="الاسم الكامل للراكب" class="image-styled-field font-bold">
+                                    </div>
+                                    <div>
+                                        <label class="image-styled-label">رقم الهاتف *</label>
                                         <input type="tel" id="passPhone" required placeholder="9715xxxxxxxx" class="image-styled-field font-bold">
                                     </div>
                                     <div>
-                                        <label class="image-styled-label">اسم العميل / الراكب *</label>
-                                        <input type="text" id="passName" required placeholder="الاسم الكامل" class="image-styled-field font-bold">
-                                    </div>
-                                    <div>
-                                        <label class="image-styled-label">بريد العميل / رقم آخر / جواز</label>
-                                        <input type="text" id="passPassport" required placeholder="رقم الجواز / الهوية" class="image-styled-field">
+                                        <label class="image-styled-label">رقم الجواز *</label>
+                                        <input type="text" id="passPassport" required placeholder="رقم الجواز أو الهوية" class="image-styled-field font-bold">
                                     </div>
                                 </div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div>
-                                        <label class="image-styled-label">إمارة العميل / الانطلاق</label>
-                                        <select id="passOrigin" onchange="updateReportingTimeAutomatically()" class="image-styled-field font-bold">
+                                        <label class="image-styled-label">جهة الصعود *</label>
+                                        <select id="passOrigin" class="image-styled-field font-bold">
                                             <option value="عجمان">عجمان</option>
                                             <option value="بني ياس">بني ياس (أبوظبي)</option>
                                             <option value="العين">العين</option>
-                                            <option value="دبي">دبي</option>
+                                            <option value="عبري">عبري</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="image-styled-label">مدينة العميل / الوصول</label>
+                                        <label class="image-styled-label">جهة الوصول *</label>
                                         <select id="passDestination" class="image-styled-field font-bold">
                                             <option value="عدن" selected>عدن</option>
                                             <option value="المكلا">المكلا</option>
@@ -648,51 +615,26 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="image-styled-label">عدد الركاب</label>
+                                        <label class="image-styled-label">عدد الركاب *</label>
                                         <select id="passCount" onchange="onPassengerCountChanged()" class="image-styled-field font-bold">
                                             <option value="1">1 راكب</option>
-                                            <option value="2">2 ركاب</option>
+                                            <option value="2">2 ركاب (مع مرافق)</option>
                                             <option value="3">3 ركاب</option>
                                             <option value="4">4 ركاب</option>
                                         </select>
                                     </div>
                                 </div>
 
+                                <!-- حقول الركاب الإضافيين التلقائية -->
                                 <div id="extraPassengersContainer" class="hidden bg-slate-50 p-3 rounded-lg border space-y-2">
-                                    <span class="text-xs font-bold text-red-600 block"><i class="fa-solid fa-users ml-1"></i> بيانات الركاب الإضافيين</span>
+                                    <span class="text-xs font-bold text-red-600 block"><i class="fa-solid fa-users ml-1"></i> بيانات الركاب الإضافيين (تُصدر لهم بوليصة وتذاكر فرعية تلقائياً)</span>
                                     <div id="extraPassengersRows" class="space-y-2"></div>
-                                </div>
-
-                                <div>
-                                    <label class="image-styled-label">ملاحظات والتفاصيل</label>
-                                    <textarea id="passNotes" rows="2" placeholder="ملاحظات إضافية حول التذكرة أو الأمتعة..." class="image-styled-field"></textarea>
-                                </div>
-
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-                                    <div>
-                                        <label class="image-styled-label">ربط بالرحلة المجدولة *</label>
-                                        <select id="passTripSelect" required onchange="onTripSelectedForTicket()" class="image-styled-field font-bold text-red-700">
-                                            <option value="">-- اختر الرحلة أولاً --</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="image-styled-label">الفرع المنشأ</label>
-                                        <input type="text" id="passBranchCreated" readonly class="image-styled-field bg-slate-100 font-bold" value="فرع عجمان">
-                                    </div>
-                                    <div>
-                                        <label class="image-styled-label">الفرع المستلم / الوجهة</label>
-                                        <select id="passBranchReceiver" class="image-styled-field">
-                                            <option value="فرع عدن">فرع عدن</option>
-                                            <option value="فرع المكلا">فرع المكلا</option>
-                                            <option value="فرع شحن">فرع شحن</option>
-                                        </select>
-                                    </div>
                                 </div>
                             </div>
 
                             <div class="mt-6 flex gap-2 pt-3 border-t">
-                                <button type="submit" id="passSubmitBtn" class="flex-1 gold-gradient-bg text-black font-black py-3 rounded-xl shadow-md text-xs">حفظ وإصدار التذكرة</button>
-                                <button type="button" id="cancelEditPassBtn" onclick="resetPassengerForm()" class="hidden bg-slate-700 text-white px-5 py-3 rounded-xl text-xs font-bold">إلغاء التعديل</button>
+                                <button type="submit" class="flex-1 gold-gradient-bg text-black font-black py-3 rounded-xl shadow-md text-xs">حفظ وإصدار التذكرة وتوليد التذاكر الفرعية</button>
+                                <button type="button" id="cancelEditPassBtn" onclick="resetPassengerForm()" class="hidden bg-slate-700 text-white px-5 py-3 rounded-xl text-xs font-bold">إغلاق التعديل</button>
                             </div>
                         </div>
 
@@ -719,17 +661,17 @@
                     <table class="custom-table" id="passengersTable">
                         <thead>
                             <tr>
-                                <th id="thP1">البوليصة</th>
-                                <th id="thP2">الشركة/التاجر</th>
-                                <th id="thP3">الاسم الرئيسي</th>
-                                <th id="thP5">الهاتف</th>
-                                <th id="thP6">المسار</th>
-                                <th id="thP7">تاريخ الرحلة</th>
-                                <th id="thP8">المبلغ</th>
+                                <th>البوليصة</th>
+                                <th>اسم الراكب</th>
+                                <th>رقم الجواز</th>
+                                <th>الهاتف</th>
+                                <th>المسار (من ➔ إلى)</th>
+                                <th>تاريخ الرحلة</th>
+                                <th>المبلغ</th>
                                 <th class="no-print">منفذ الإجراء</th>
-                                <th id="thP9">السداد</th>
-                                <th id="thP10">الفرع المنشأ</th>
-                                <th id="thP11">إجراءات / طباعة</th>
+                                <th>السداد</th>
+                                <th>الفرع</th>
+                                <th>إجراءات / طباعة</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -738,13 +680,13 @@
             </div>
         </section>
 
-        <!-- TAB CREATE CARGO (صفحة إصدار فواتير الشحن بتنسيق مطابق للصورة) -->
+        <!-- TAB CREATE CARGO (صفحة إصدار فواتير الشحن بالحقول المطلوبة تماماً) -->
         <section id="module-create-cargo" class="tab-content hidden space-y-6">
             <div class="max-w-6xl mx-auto">
                 <div class="flex justify-between items-center mb-4 no-print">
                     <div>
-                        <h2 id="cargoFormTitle" class="text-indigo-400 font-black text-lg">إصدار وإدارة فاتورة أمتعة وبضائع</h2>
-                        <p class="text-xs text-zinc-400">تصميم الفاتورة الموحد المتوافق مع نموذج النظام المعتمد</p>
+                        <h2 class="text-indigo-400 font-black text-lg">إصدار وإدارة فاتورة أمتعة وبضائع</h2>
+                        <p class="text-xs text-zinc-400">نموذج فواتير الشحن المتوافق مع متطلبات المرسل والمستلم والمحتوى والسعر الإجمالي</p>
                     </div>
                     <button onclick="switchTab('cargo')" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3.5 py-2 rounded-xl text-xs font-bold"><i class="fa-solid fa-arrow-right ml-1"></i>العودة لسجل الشحن</button>
                 </div>
@@ -754,7 +696,7 @@
                     
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
                         
-                        <!-- الكرت الأيسر (تفاصيل الفاتورة والرسوم) -->
+                        <!-- القسم الأيسر/الفرعي (التاريخ، رقم الفاتورة، السداد والمجموع) -->
                         <div class="lg:col-span-4 image-styled-card flex flex-col justify-between">
                             <div class="space-y-3.5">
                                 <div class="grid grid-cols-2 gap-2">
@@ -769,63 +711,76 @@
                                 </div>
 
                                 <div>
-                                    <label class="image-styled-label">طريقة الدفع</label>
+                                    <label class="image-styled-label">طبيعة ودفع الفاتورة *</label>
                                     <select id="cargoPaymentStatus" class="image-styled-field font-bold">
                                         <option value="مدفوع">مدفوع نقداً</option>
                                         <option value="تحويل">تحويل بنكي</option>
-                                        <option value="آجل">آجل (على المستلم/المرسل)</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="image-styled-label">طبيعة الشحنة</label>
-                                    <select id="cargoType" class="image-styled-field">
-                                        <option value="أمتعة شخصية">أمتعة وهدايا شخصية</option>
-                                        <option value="بضائع تجارية">بضائع تجارية</option>
-                                        <option value="مستندات وأوراق">مستندات وأوراق رسمية</option>
+                                        <option value="آجل">آجل / بالدين</option>
                                     </select>
                                 </div>
 
                                 <div class="bg-slate-50 p-3 rounded-lg border space-y-2">
                                     <div class="flex justify-between items-center text-xs font-bold">
-                                        <span>إجمالي قيمة الشحنة:</span>
+                                        <span>السعر الاجمالي النهائي:</span>
                                         <span id="cargoCalculatedTotal" class="text-indigo-700 font-black text-sm">0 AED</span>
                                         <input type="hidden" id="cargoManualTotal" value="0">
                                     </div>
                                 </div>
+
+                                <div>
+                                    <label class="image-styled-label">ربط بالرحلة (اختياري)</label>
+                                    <select id="cargoTripSelect" onchange="onTripSelectedForCargo()" class="image-styled-field font-bold">
+                                        <option value="">-- اختر الرحلة المرتبطة --</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- الكرت الأيمن (بيانات المرسل والمستلم والأصناف) -->
+                        <!-- القسم الأيمن/الرئيسي (اسم المرسل، هاتف المرسل، عنوان المرسل، اسم المستلم، هاتف المستلم، عنوان المستلم، والمحتوى) -->
                         <div class="lg:col-span-8 image-styled-card flex flex-col justify-between">
                             <div class="space-y-4">
-                                <h3 class="text-sm font-bold text-slate-700 border-b pb-2"><i class="fa-solid fa-boxes-packing text-indigo-600 ml-1"></i> تفاصيل المرسل والمستلم والأصناف</h3>
+                                <h3 class="text-sm font-bold text-slate-700 border-b pb-2"><i class="fa-solid fa-boxes-packing text-indigo-600 ml-1"></i> تفاصيل المرسل والمستلم ومحتوى الشحنة</h3>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-3 rounded-lg border">
-                                    <div class="space-y-2">
-                                        <span class="text-xs font-bold text-indigo-700 block"><i class="fa-solid fa-user-ninja ml-1"></i> بيانات المرسل</span>
-                                        <input type="text" id="cargoSenderName" required placeholder="اسم المرسل الكامل" class="image-styled-field font-bold">
-                                        <input type="tel" id="cargoSenderPhone" required placeholder="رقم هاتف المرسل" class="image-styled-field">
-                                        <input type="text" id="cargoSenderAddress" required placeholder="عنوان المرسل (مثال: عجمان)" class="image-styled-field" value="عجمان">
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-3 rounded-lg border">
+                                    <div>
+                                        <label class="image-styled-label">اسم المرسل *</label>
+                                        <input type="text" id="cargoSenderName" required placeholder="اسم المرسل" class="image-styled-field font-bold">
                                     </div>
-                                    <div class="space-y-2">
-                                        <span class="text-xs font-bold text-emerald-700 block"><i class="fa-solid fa-truck-ramp-box ml-1"></i> بيانات المستلم</span>
-                                        <input type="text" id="cargoReceiverName" required placeholder="اسم المستلم الكامل" class="image-styled-field font-bold">
+                                    <div>
+                                        <label class="image-styled-label">هاتف المرسل *</label>
+                                        <input type="tel" id="cargoSenderPhone" required placeholder="رقم الهاتف" class="image-styled-field">
+                                    </div>
+                                    <div>
+                                        <label class="image-styled-label">عنوان المرسل *</label>
+                                        <input type="text" id="cargoSenderAddress" required placeholder="مثال: عجمان" class="image-styled-field" value="عجمان">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-3 rounded-lg border">
+                                    <div>
+                                        <label class="image-styled-label">اسم المستلم *</label>
+                                        <input type="text" id="cargoReceiverName" required placeholder="اسم المستلم باليمن" class="image-styled-field font-bold">
+                                    </div>
+                                    <div>
+                                        <label class="image-styled-label">هاتف المستلم *</label>
                                         <input type="tel" id="cargoReceiverPhone" required placeholder="رقم هاتف المستلم" class="image-styled-field">
-                                        <input type="text" id="cargoReceiverAddress" required placeholder="عنوان التسليم باليمن (عدن/المكلا)" class="image-styled-field" value="عدن">
+                                    </div>
+                                    <div>
+                                        <label class="image-styled-label">عنوان المستلم *</label>
+                                        <input type="text" id="cargoReceiverAddress" required placeholder="مثال: عدن شارع تعز" class="image-styled-field" value="عدن">
                                     </div>
                                 </div>
 
                                 <div>
                                     <div class="flex justify-between items-center mb-2">
-                                        <label class="image-styled-label font-bold text-slate-800">قائمة الأصناف المحملة</label>
-                                        <button type="button" onclick="addCargoItemRow()" class="bg-indigo-600 text-white font-bold px-3 py-1 rounded text-xs hover:bg-indigo-500"><i class="fa-solid fa-plus ml-1"></i> إضافة صنف</button>
+                                        <label class="image-styled-label font-bold text-slate-800">محتوى البضاعة والأصناف والأسعار</label>
+                                        <button type="button" onclick="addCargoItemRow()" class="bg-indigo-600 text-white font-bold px-3 py-1 rounded text-xs hover:bg-indigo-500"><i class="fa-solid fa-plus ml-1"></i> إضافة صنف للمحتوى</button>
                                     </div>
                                     <div class="overflow-x-auto">
                                         <table class="w-full text-right text-xs" id="cargoItemsBuilderTable">
                                             <thead>
                                                 <tr class="bg-slate-100 text-slate-700 border-b">
-                                                    <th class="p-2">الوصف</th>
+                                                    <th class="p-2">محتوى الصنف والوصف</th>
                                                     <th class="p-2 w-20">العدد</th>
                                                     <th class="p-2 w-28">السعر الإجمالي</th>
                                                     <th class="p-2 w-10 text-center">حذف</th>
@@ -835,31 +790,11 @@
                                         </table>
                                     </div>
                                 </div>
-
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-                                    <div>
-                                        <label class="image-styled-label">ربط بالرحلة (اختياري)</label>
-                                        <select id="cargoTripSelect" onchange="onTripSelectedForCargo()" class="image-styled-field">
-                                            <option value="">-- اختر الرحلة المرتبطة --</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="image-styled-label">الفرع المنشأ</label>
-                                        <input type="text" id="cargoBranchCreated" readonly class="image-styled-field bg-slate-100 font-bold" value="فرع عجمان">
-                                    </div>
-                                    <div>
-                                        <label class="image-styled-label">فرع التسليم المستلم</label>
-                                        <select id="cargoBranchReceiver" class="image-styled-field">
-                                            <option value="فرع عدن">فرع عدن</option>
-                                            <option value="فرع المكلا">فرع المكلا</option>
-                                        </select>
-                                    </div>
-                                </div>
                             </div>
 
                             <div class="mt-6 flex gap-2 pt-3 border-t">
-                                <button type="submit" id="cargoSubmitBtn" class="flex-1 gold-gradient-bg text-black font-black py-3 rounded-xl shadow-md text-xs">حفظ وإصدار فاتورة الشحن</button>
-                                <button type="button" id="cancelEditCargoBtn" onclick="resetCargoForm()" class="hidden bg-slate-700 text-white px-5 py-3 rounded-xl text-xs font-bold">إلغاء التعديل</button>
+                                <button type="submit" class="flex-1 gold-gradient-bg text-black font-black py-3 rounded-xl shadow-md text-xs">حفظ وإصدار فاتورة الشحن</button>
+                                <button type="button" id="cancelEditCargoBtn" onclick="resetCargoForm()" class="hidden bg-slate-700 text-white px-5 py-3 rounded-xl text-xs font-bold">إغلاق التعديل</button>
                             </div>
                         </div>
 
@@ -872,7 +807,7 @@
         <section id="module-cargo" class="tab-content hidden space-y-6">
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <div class="flex flex-wrap justify-between items-center gap-3">
-                    <span id="lblCargoLog" class="font-bold text-gold text-xs">سجل فواتير الشحن والأصناف (ترتيب تنازلي)</span>
+                    <span class="font-bold text-gold text-xs">سجل فواتير الشحن والمحتوى (ترتيب تنازلي)</span>
                     <div class="flex gap-2">
                         <button onclick="switchTab('create-cargo')" class="bg-indigo-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold"><i class="fa-solid fa-plus ml-1"></i>إصدار فاتورة شحن جديدة</button>
                         <button onclick="exportExcel('cargo')" class="bg-emerald-600 text-white px-3 py-2 rounded-xl text-xs font-bold"><i class="fa-solid fa-file-excel"></i> Excel</button>
@@ -882,16 +817,16 @@
                     <table class="custom-table" id="cargoTable">
                         <thead>
                             <tr>
-                                <th id="thC1">الفاتورة</th>
-                                <th id="thC2">التاريخ</th>
-                                <th id="thC3">المرسل</th>
-                                <th id="thC4">المستلم وعنوانه</th>
-                                <th id="thC5">عدد الأصناف</th>
-                                <th id="thC6">الإجمالي</th>
+                                <th>الفاتورة</th>
+                                <th>التاريخ</th>
+                                <th>المرسل وهاتفه وعنوانه</th>
+                                <th>المستلم وهاتفه وعنوانه</th>
+                                <th>المحتوى والأصناف</th>
+                                <th>السعر الإجمالي</th>
                                 <th class="no-print">منفذ الإجراء</th>
-                                <th id="thC7">الحالة</th>
-                                <th id="thC8">الفرع</th>
-                                <th id="thC9">إجراءات / طباعة</th>
+                                <th>حالة الدفع</th>
+                                <th>الفرع</th>
+                                <th>إجراءات / طباعة</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -959,7 +894,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" id="drvSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow">حفظ وتصديق حساب السائق وترحيل المصروفات للصندوق</button>
+                    <button type="submit" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow">حفظ وتصديق حساب السائق وترحيل المصروفات للصندوق</button>
                 </form>
             </div>
 
@@ -991,7 +926,7 @@
         <section id="module-financials" class="tab-content hidden space-y-6">
             <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow">
-                    <span id="lblFin1" class="text-[11px] text-zinc-400 block">إجمالي المقبوضات (تذاكر وشحن)</span>
+                    <span class="text-[11px] text-zinc-400 block">إجمالي المقبوضات (تذاكر وشحن)</span>
                     <strong id="finRevSum" class="text-lg font-black text-emerald-400">0 AED</strong>
                 </div>
                 <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow">
@@ -999,18 +934,18 @@
                     <strong id="finDriverExpSum" class="text-lg font-black text-red-400">0 AED</strong>
                 </div>
                 <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow">
-                    <span id="lblFin3" class="text-[11px] text-zinc-400 block">سندات الصرف والرواتب</span>
+                    <span class="text-[11px] text-zinc-400 block">سندات الصرف والرواتب</span>
                     <strong id="finExpensesSum" class="text-lg font-black text-red-400">0 AED</strong>
                 </div>
                 <div class="bg-cardbg border border-gold p-4 rounded-2xl shadow bg-opacity-40">
-                    <span id="lblFin4" class="text-[11px] text-gold block font-bold">الربح الصافي المباشر / الصندوق</span>
+                    <span class="text-[11px] text-gold block font-bold">الربح الصافي المباشر / الصندوق</span>
                     <strong id="finNetBoxSum" class="text-lg font-black text-amber-300">0 AED</strong>
                 </div>
             </div>
 
             <!-- VOUCHERS -->
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
-                <h3 id="lblVoucherHead" class="text-gold font-bold text-sm border-b border-zinc-800 pb-3">سندات القبض والصرف والنثريات</h3>
+                <h3 class="text-gold font-bold text-sm border-b border-zinc-800 pb-3">سندات القبض والصرف والنثريات</h3>
                 <form id="voucherForm" onsubmit="handleSaveVoucher(event)" class="grid grid-cols-1 sm:grid-cols-6 gap-3 bg-darkbg p-4 rounded-xl border border-zinc-800">
                     <select id="vType" class="bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200">
                         <option value="قبض">سند قبض</option>
@@ -1020,7 +955,7 @@
                     <input type="number" step="any" id="vAmount" required placeholder="المبلغ" class="bg-zinc-900 border border-gold rounded p-2 text-xs text-gold font-bold">
                     <input type="text" id="vReceiver" required placeholder="اسم المستلم..." class="bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200">
                     <input type="text" id="vDesc" required placeholder="البيان والتفاصيل..." class="bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200 sm:col-span-2">
-                    <button type="submit" id="btnSaveV" class="gold-gradient-bg text-black font-extrabold py-2 rounded text-xs sm:col-span-6 shadow">حفظ السند المالي</button>
+                    <button type="submit" class="gold-gradient-bg text-black font-extrabold py-2 rounded text-xs sm:col-span-6 shadow">حفظ السند المالي</button>
                 </form>
                 <div class="overflow-x-auto">
                     <table class="custom-table" id="vouchersTable">
@@ -1139,7 +1074,7 @@
                         </div>
                     </div>
                     <div class="flex gap-2 pt-2">
-                        <button type="submit" id="userSubmitBtn" class="gold-gradient-bg text-black font-bold px-4 py-2 rounded text-xs">إضافة مستخدم جديد</button>
+                        <button type="submit" class="gold-gradient-bg text-black font-bold px-4 py-2 rounded text-xs">إضافة مستخدم جديد</button>
                     </div>
                 </form>
 
@@ -1180,7 +1115,6 @@
 
         let currentUser = JSON.parse(localStorage.getItem('WADI_BINA_USER')) || null;
         let activeSessions = JSON.parse(localStorage.getItem('WADI_BINA_SESSIONS')) || [];
-        let currentLang = localStorage.getItem('WADI_BINA_LANG') || 'ar';
         let currentTab = 'dashboard';
         let currentPreviewTicket = null;
         let currentPreviewCargo = null;
@@ -1202,13 +1136,12 @@
             ],
             drivers: [],
             passengers: [
-                { id: "141", tripId: "trip_1", agent: "شركة وادي بناء", name: "محسن فيصل احمد", phone: "0508200749", passport: "12605475", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "4:00 عصراً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان", createdBy: "وليد السيد" }
+                { id: "141", tripId: "trip_1", name: "محسن فيصل احمد", phone: "0508200749", passport: "12605475", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان", createdBy: "وليد السيد" }
             ],
             cargo: [
                 { id: "131", tripId: "trip_1", date: "2026-11-08", sender: "عبد الكريم عبد الله", senderPhone: "0567777133", senderAddress: "عجمان", receiver: "النادي الدولي للسيارات", receiverPhone: "0778826198", receiverAddress: "عدن", items: [{desc: "كرتون صغير به فواتير", qty: 1, price: 50}], grandTotal: 50, paymentStatus: "مدفوع", branch: "فرع عجمان", createdBy: "وليد السيد" }
             ],
             vouchers: [],
-            debtInvoices: [],
             employees: [
                 { id: "emp_1", name: "أحمد علي", job: "محاسب رئيسي", salary: 4500, branch: "فرع عجمان" }
             ],
@@ -1231,7 +1164,7 @@
             const tkt = currentPreviewTicket;
             const targetPhone = formatPhoneForWhatsApp(tkt.phone);
             if(!targetPhone) { alert('رقم هاتف الراكب غير صحيح!'); return; }
-            const msgText = `🌟 *شركة وادي بناء للنقل الدولي* 🌟\nمرحباً بك أستاذ/ة *${tkt.name}*\n🎫 *رقم التذكرة:* #${tkt.id}\n📍 *المسار:* ${tkt.origin} ➔ ${tkt.destination}\n📅 *تاريخ الرحلة:* ${tkt.date}\n⏰ *وقت الحضور:* ${tkt.reportingTime}\n💳 *المبلغ:* ${tkt.fare} AED (${tkt.payMethod})\nنتمنى لكم رحلة موفقة وآمنة!`;
+            const msgText = `🌟 *شركة وادي بناء للنقل الدولي* 🌟\nمرحباً بك أستاذ/ة *${tkt.name}*\n🎫 *رقم التذكرة:* #${tkt.id}\n📍 *المسار:* ${tkt.origin} ➔ ${tkt.destination}\n📅 *تاريخ الرحلة:* ${tkt.date}\n💳 *المبلغ:* ${tkt.fare} AED (${tkt.payMethod})\nنتمنى لكم رحلة موفقة وآمنة!`;
             window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msgText)}`, '_blank');
         }
 
@@ -1240,7 +1173,7 @@
             const cargo = currentPreviewCargo;
             const targetPhone = formatPhoneForWhatsApp(cargo.senderPhone);
             if(!targetPhone) { alert('رقم هاتف المرسل غير صحيح!'); return; }
-            const msgText = `📦 *شركة وادي بناء للنقل الدولي* 📦\nمرحباً *${cargo.sender}*\n🧾 *رقم الفاتورة:* #${cargo.id}\n👤 *المستلم:* ${cargo.receiver} (${cargo.receiverPhone})\n💰 *الإجمالي:* ${cargo.grandTotal} AED\nشكراً لثقتكم بنا!`;
+            const msgText = `📦 *شركة وادي بناء للنقل الدولي* 📦\nمرحباً *${cargo.sender}*\n🧾 *رقم الفاتورة:* #${cargo.id}\n👤 *المستلم:* ${cargo.receiver} (${cargo.receiverPhone})\n💰 *السعر الإجمالي:* ${cargo.grandTotal} AED\nشكراً لثقتكم بنا!`;
             window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msgText)}`, '_blank');
         }
 
@@ -1263,13 +1196,10 @@
             if(found) {
                 currentUser = found;
                 localStorage.setItem('WADI_BINA_USER', JSON.stringify(currentUser));
-                
-                // إضافة الجلسة لقائمة الجلسات الفعالة
                 if(!activeSessions.some(s => s.username === found.username)) {
                     activeSessions.push(found);
                     localStorage.setItem('WADI_BINA_SESSIONS', JSON.stringify(activeSessions));
                 }
-                
                 document.getElementById('loginOverlay').style.display = 'none';
                 updateUserBadge();
                 initSync();
@@ -1394,7 +1324,6 @@
             document.getElementById('drvDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('vDate').value = new Date().toISOString().split('T')[0];
             onPassengerCountChanged();
-            updateReportingTimeAutomatically();
             addCargoItemRow();
             buildDriverItemsRows();
             calculateNextSequenceNumbers();
@@ -1655,7 +1584,6 @@
             const trip = db.trips.find(t => t.id === tripId);
             if(trip && trip.date && trip.date !== '-') {
                 document.getElementById('passDate').value = trip.date;
-                updateReportingTimeAutomatically();
             }
         }
 
@@ -1690,7 +1618,6 @@
                     <td class="border border-slate-300 p-1.5">${p.phone}</td>
                     <td class="border border-slate-300 p-1.5">${p.origin} → ${p.destination}</td>
                     <td class="border border-slate-300 p-1.5 font-bold">${p.fare} AED</td>
-                    <td class="border border-slate-300 p-1.5">${p.createdBy || 'النظام'}</td>
                     <td class="border border-slate-300 p-1.5">${p.payMethod}</td>
                 `;
             });
@@ -1709,16 +1636,6 @@
             });
         }
 
-        function updateReportingTimeAutomatically() {
-            const origin = document.getElementById('passOrigin').value;
-            const timeField = document.getElementById('passReportingTime');
-            if(!timeField) return;
-            if (origin === 'عجمان') timeField.value = '4:00 عصراً';
-            else if (origin === 'بني ياس') timeField.value = '7:30 مساءً';
-            else if (origin === 'العين') timeField.value = '10:00 ليلا';
-            else timeField.value = '4:00 عصراً';
-        }
-
         function onPassengerCountChanged() {
             const count = parseInt(document.getElementById('passCount').value) || 1;
             document.getElementById('passManualTotal').value = count * 350;
@@ -1729,10 +1646,9 @@
                 container.classList.remove('hidden');
                 for (let i = 1; i < count; i++) {
                     rowsContainer.innerHTML += `
-                        <div class="grid grid-cols-3 gap-2 bg-white p-2 rounded border">
-                            <input type="text" placeholder="الراكب الإضافي ${i}" class="extra-name image-styled-field" required>
-                            <input type="tel" placeholder="رقم الهاتف" class="extra-phone image-styled-field" required>
-                            <input type="text" placeholder="رقم الجواز" class="extra-passport image-styled-field" required>
+                        <div class="grid grid-cols-2 gap-2 bg-white p-2 rounded border">
+                            <input type="text" placeholder="اسم الراكب الإضافي ${i}" class="extra-name image-styled-field" required>
+                            <input type="text" placeholder="رقم جواز الراكب الإضافي ${i}" class="extra-passport image-styled-field" required>
                         </div>`;
                 }
             } else { container.classList.add('hidden'); }
@@ -1744,7 +1660,7 @@
             const tr = document.createElement('tr');
             tr.className = "border-b";
             tr.innerHTML = `
-                <td class="p-1.5"><input type="text" value="${desc}" placeholder="وصف الصنف..." class="cargo-item-desc image-styled-field" required></td>
+                <td class="p-1.5"><input type="text" value="${desc}" placeholder="محتوى البضاعة أو الصنف..." class="cargo-item-desc image-styled-field" required></td>
                 <td class="p-1.5"><input type="number" step="any" value="${qty}" min="0.0001" oninput="calculateCargoTotal()" class="cargo-item-qty image-styled-field text-center font-bold" required></td>
                 <td class="p-1.5"><input type="number" step="any" value="${price}" min="0" oninput="calculateCargoTotal()" class="cargo-item-price image-styled-field font-bold text-indigo-700" required></td>
                 <td class="p-1.5 text-center"><button type="button" onclick="this.closest('tr').remove(); calculateCargoTotal();" class="text-red-600"><i class="fa-solid fa-trash"></i></button></td>
@@ -1765,7 +1681,7 @@
         function handleSavePassenger(e) {
             e.preventDefault();
             const editId = document.getElementById('passEditId').value;
-            const ticketNo = document.getElementById('passTicketNo').value.trim();
+            const ticketNo = parseInt(document.getElementById('passTicketNo').value.trim());
             const tripId = document.getElementById('passTripSelect').value;
             if(!tripId) { alert('الرجاء اختيار الرحلة المرتبطة أولاً!'); return; }
             
@@ -1773,16 +1689,17 @@
             let extraList = [];
             if (count > 1) {
                 const names = document.querySelectorAll('.extra-name');
-                const phones = document.querySelectorAll('.extra-phone');
                 const passports = document.querySelectorAll('.extra-passport');
                 for (let i = 0; i < names.length; i++) {
-                    extraList.push({ name: names[i].value, phone: phones[i].value, passport: passports[i].value });
+                    extraList.push({ name: names[i].value, passport: passports[i].value });
                 }
             }
 
-            const tktData = {
-                id: ticketNo, tripId,
-                agent: document.getElementById('passAgentSelect').value,
+            const mainFarePerPax = (parseFloat(document.getElementById('passManualTotal').value) || (count * 350)) / count;
+
+            // تسجيل الراكب الرئيسي
+            const mainTktData = {
+                id: String(ticketNo), tripId,
                 name: document.getElementById('passName').value,
                 phone: document.getElementById('passPhone').value,
                 passport: document.getElementById('passPassport').value,
@@ -1790,23 +1707,41 @@
                 origin: document.getElementById('passOrigin').value,
                 destination: document.getElementById('passDestination').value,
                 date: document.getElementById('passDate').value || '-',
-                reportingTime: '4:00 عصراً',
-                fare: parseFloat(document.getElementById('passManualTotal').value) || (count * 350),
+                fare: mainFarePerPax,
                 payMethod: document.getElementById('passPayMethod').value,
                 branch: currentUser.branch || 'فرع عجمان', createdBy: getCurrentUserName()
             };
 
             if (editId) {
                 const idx = db.passengers.findIndex(p => String(p.id) === String(editId));
-                if (idx !== -1) db.passengers[idx] = tktData;
+                if (idx !== -1) db.passengers[idx] = mainTktData;
                 alert('تم تحديث التذكرة بنجاح!');
             } else {
                 if(db.passengers.some(p => String(p.id) === String(ticketNo))) {
                     alert('رقم التذكرة موجود مسبقاً! يرجى إدخال رقم فريد.');
                     return;
                 }
-                db.passengers.unshift(tktData);
-                alert('تم إصدار التذكرة بنجاح برقم #' + ticketNo);
+                db.passengers.unshift(mainTktData);
+
+                // إصدار تذاكر إضافية فرعية تلقائياً للركاب المرافقين بنفس رقم الهاتف ورقم الجواز الخاص بالمرافق وبأرقام تذاكر متسلسلة
+                extraList.forEach((ext, idx) => {
+                    const subTktNo = ticketNo + idx + 1;
+                    db.passengers.unshift({
+                        id: String(subTktNo), tripId,
+                        name: ext.name + ' (مرافق)',
+                        phone: document.getElementById('passPhone').value,
+                        passport: ext.passport,
+                        passengerCount: 1, extraPassengers: [],
+                        origin: document.getElementById('passOrigin').value,
+                        destination: document.getElementById('passDestination').value,
+                        date: document.getElementById('passDate').value || '-',
+                        fare: mainFarePerPax,
+                        payMethod: document.getElementById('passPayMethod').value,
+                        branch: currentUser.branch || 'فرع عجمان', createdBy: getCurrentUserName()
+                    });
+                });
+
+                alert(`تم إصدار التذكرة الأساسية وتوليد ${extraList.length} تذاكر فرعية للمرافقين تلقائياً بنجاح!`);
             }
             saveDB();
             resetPassengerForm();
@@ -1819,7 +1754,6 @@
             document.getElementById('passEditId').value = item.id;
             document.getElementById('passTicketNo').value = item.id;
             document.getElementById('passTripSelect').value = item.tripId || '';
-            document.getElementById('passAgentSelect').value = item.agent || 'شركة وادي بناء';
             document.getElementById('passCount').value = item.passengerCount || 1;
             onPassengerCountChanged();
             document.getElementById('passDate').value = item.date !== '-' ? item.date : '';
@@ -1839,7 +1773,6 @@
             calculateNextSequenceNumbers();
             document.getElementById('passDate').value = new Date().toISOString().split('T')[0];
             onPassengerCountChanged();
-            updateReportingTimeAutomatically();
         }
 
         function handleSaveCargo(e) {
@@ -2042,10 +1975,10 @@
                     const realIdx = db.passengers.findIndex(x => x.id === p.id);
                     passTbody.insertRow().innerHTML = `
                         <td><strong>#${p.id}</strong></td>
-                        <td>${p.agent || '-'}</td>
                         <td><strong>${p.name}</strong></td>
+                        <td>${p.passport}</td>
                         <td>${p.phone}</td>
-                        <td>${p.origin} → ${p.destination}</td>
+                        <td>${p.origin} ➔ ${p.destination}</td>
                         <td><strong class="text-gold">${p.date || '-'}</strong></td>
                         <td>${p.fare} AED</td>
                         <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${p.createdBy || 'النظام'}</span></td>
@@ -2068,13 +2001,14 @@
                 let searchC = filteredCargo.filter(c => !query || c.sender.toLowerCase().includes(query) || String(c.id).includes(query) || c.receiver.toLowerCase().includes(query));
                 searchC.forEach(c => {
                     const realIdx = db.cargo.findIndex(x => x.id === c.id);
+                    let itemsDesc = c.items ? c.items.map(i => `${i.desc} (${i.qty})`).join(', ') : '-';
                     cargoTbody.insertRow().innerHTML = `
                         <td><strong>#${c.id}</strong></td>
                         <td><strong class="text-gold">${c.date || '-'}</strong></td>
-                        <td>${c.sender}<br><span class="text-[10px] text-zinc-400">${c.senderPhone}</span></td>
-                        <td><strong>${c.receiver}</strong><br><span class="text-[10px] text-zinc-400">${c.receiverPhone}</span></td>
-                        <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs">${c.items ? c.items.length : 1}</span></td>
-                        <td>${c.grandTotal} AED</td>
+                        <td><strong>${c.sender}</strong><br><span class="text-[10px] text-zinc-400">${c.senderPhone} - ${c.senderAddress}</span></td>
+                        <td><strong>${c.receiver}</strong><br><span class="text-[10px] text-zinc-400">${c.receiverPhone} - ${c.receiverAddress}</span></td>
+                        <td><span class="text-xs text-indigo-300">${itemsDesc}</span></td>
+                        <td><strong class="text-amber-400">${c.grandTotal} AED</strong></td>
                         <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${c.createdBy || 'النظام'}</span></td>
                         <td style="color:${c.paymentStatus==='مدفوع'?'#10b981':'#f59e0b'}">${c.paymentStatus}</td>
                         <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${c.branch || 'فرع عجمان'}</span></td>
@@ -2097,12 +2031,22 @@
             document.getElementById('imgTktName').innerText = item.name;
             document.getElementById('imgTktPhone').innerText = item.phone;
             document.getElementById('imgTktPassport').innerText = item.passport;
-            document.getElementById('imgTktRoute').innerText = `${item.origin} → ${item.destination}`;
+            document.getElementById('imgTktOrigin').innerText = item.origin;
+            document.getElementById('imgTktDest').innerText = item.destination;
             document.getElementById('imgTktDate').innerText = item.date || '-';
-            document.getElementById('imgTktTime').innerText = item.reportingTime || '4:00 عصراً';
             document.getElementById('imgTktFare').innerText = `${item.fare} AED`;
             document.getElementById('imgTktPayStatus').innerText = item.payMethod;
             document.getElementById('imgTktCreatedBy').innerText = item.createdBy || 'النظام';
+
+            let extraBox = document.getElementById('imgTicketExtraBox');
+            extraBox.innerHTML = '';
+            if (item.extraPassengers && item.extraPassengers.length > 0) {
+                let html = '<div class="text-[11px] font-bold text-indigo-900 mt-1">الركاب المرافقون:</div>';
+                item.extraPassengers.forEach((ex, i) => {
+                    html += `<div class="text-[10px]">• ${ex.name} (جواز: ${ex.passport})</div>`;
+                });
+                extraBox.innerHTML = html;
+            }
 
             try { JsBarcode("#ticketBarcode", String(item.id), { format: "CODE128", lineColor: "#000", width: 2, height: 35, displayValue: false }); } catch(e) {}
             document.getElementById('ticketPreviewModal').classList.remove('hidden');
@@ -2184,22 +2128,6 @@
         function exportBackupJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
             const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", `WadiBina_Backup_${Date.now()}.json`); dl.click();
-        }
-
-        function importBackupJSON(e) {
-            const file = e.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                try {
-                    db = JSON.parse(evt.target.result);
-                    validateAndRepairDB();
-                    saveDB();
-                    alert('تم استرجاع النسخة الاحتياطية بنجاح!');
-                    location.reload();
-                } catch(err) { alert('خطأ أثناء قراءة الملف'); }
-            };
-            reader.readAsText(file);
         }
 
         function exportExcel(type) {
