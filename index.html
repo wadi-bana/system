@@ -164,7 +164,7 @@
                     </div>
                 </div>
 
-                <!-- قائمة منسدلة لسجل التتبع والتعديلات (مخفية تماماً عند الطباعة والحفظ كصورة) -->
+                <!-- قائمة منسدلة لسجل التتبع والتعديلات -->
                 <details class="no-print bg-amber-50 border border-amber-300 rounded-lg p-2.5 text-xs text-slate-800 mb-4 shadow-sm">
                     <summary class="font-bold cursor-pointer text-amber-900 flex items-center justify-between">
                         <span><i class="fa-solid fa-clock-rotate-left ml-1 text-amber-700"></i> سجل التواريخ والمستخدمين (من الإنشاء حتى آخر تعديل)</span>
@@ -256,7 +256,7 @@
                     </div>
                 </div>
 
-                <!-- قائمة منسدلة لسجل التتبع لفاتورة الشحن (مخفية تماماً عند الطباعة والحفظ كصورة) -->
+                <!-- قائمة منسدلة لسجل التتبع لفاتورة الشحن -->
                 <details class="no-print bg-indigo-50 border border-indigo-300 rounded-lg p-2.5 text-xs text-slate-800 mb-4 shadow-sm">
                     <summary class="font-bold cursor-pointer text-indigo-900 flex items-center justify-between">
                         <span><i class="fa-solid fa-clock-rotate-left ml-1 text-indigo-700"></i> سجل التواريخ والمستخدمين (من الإنشاء حتى آخر تعديل)</span>
@@ -845,7 +845,7 @@
 
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
-                    <span class="font-bold text-gold text-xs">سجل حسابات السائقين ورحلات الذهاب والعودة</span>
+                    <span class="font-bold text-gold text-xs">سجل حسابات السائقين ورحلات الذهاب والعودة (تنازلي)</span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="custom-table" id="driversTable">
@@ -910,7 +910,7 @@
             </div>
 
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
-                <h3 class="text-gold font-bold text-sm border-b border-zinc-800 pb-3"><i class="fa-solid fa-list-check ml-1"></i> قائمة الرحلات المجدولة والحالية</h3>
+                <h3 class="text-gold font-bold text-sm border-b border-zinc-800 pb-3"><i class="fa-solid fa-list-check ml-1"></i> قائمة الرحلات المجدولة والحالية (تنازلي)</h3>
                 <div class="overflow-x-auto">
                     <table class="custom-table" id="tripsTable">
                         <thead>
@@ -937,7 +937,7 @@
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-calendar-day text-gold text-lg"></i>
                     <div>
-                        <h3 id="lblPassHeader" class="text-xs font-bold text-gold">إدارة رحلات وتذاكر الركاب والركاب الإضافيين (مرتبة أبجدياً / تصاعدياً برقم التذكرة)</h3>
+                        <h3 id="lblPassHeader" class="text-xs font-bold text-gold">إدارة رحلات وتذاكر الركاب والركاب الإضافيين (مرتبة تنازلياً برقم التذكرة الأحدث أولاً)</h3>
                         <p id="lblPassSub" class="text-[11px] text-zinc-400">يبدأ رقم التذكرة تلقائياً من الرقم التالي لأحدث تذكرة مسجلة</p>
                     </div>
                 </div>
@@ -1051,7 +1051,7 @@
 
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
-                    <span id="lblPassLog" class="font-bold text-gold text-xs">سجل جميع التذاكر والركاب الإضافيين</span>
+                    <span id="lblPassLog" class="font-bold text-gold text-xs">سجل جميع التذاكر والركاب الإضافيين (ترتيب تنازلي)</span>
                     <button onclick="exportExcel('passengers')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-file-excel"></i> Excel</button>
                 </div>
                 <div class="overflow-x-auto">
@@ -1084,7 +1084,7 @@
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-boxes-packing text-gold text-lg"></i>
                     <div>
-                        <h3 id="lblCargoHeader" class="text-xs font-bold text-gold">إدارة فواتير الشحن والأصناف (مرتبة أبجدياً / تصاعدياً برقم الفاتورة)</h3>
+                        <h3 id="lblCargoHeader" class="text-xs font-bold text-gold">إدارة فواتير الشحن والأصناف (مرتبة تنازلياً برقم الفاتورة الأحدث أولاً)</h3>
                         <p id="lblCargoSub" class="text-[11px] text-zinc-400">يبدأ رقم الفاتورة تلقائياً من الرقم التالي لأحدث فاتورة مسجلة</p>
                     </div>
                 </div>
@@ -1170,7 +1170,7 @@
 
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
-                    <span id="lblCargoLog" class="font-bold text-gold text-xs">سجل فواتير الشحن والأصناف (مرتبة أبجدياً / تصاعدياً)</span>
+                    <span id="lblCargoLog" class="font-bold text-gold text-xs">سجل فواتير الشحن والأصناف (ترتيب تنازلي)</span>
                     <button onclick="exportExcel('cargo')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-file-excel"></i> Excel</button>
                 </div>
                 <div class="overflow-x-auto">
@@ -1492,7 +1492,6 @@
             return cleaned;
         }
 
-        // دالة إرسال التذكرة للواتساب بالنص المخصص الشامل للمكاتب
         function sendTicketViaWhatsApp() {
             if(!currentPreviewTicket) return;
             const tkt = currentPreviewTicket;
@@ -1523,7 +1522,6 @@
             window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msgText)}`, '_blank');
         }
 
-        // دالة إرسال فاتورة الشحن للواتساب بالنص المخصص الشامل للمكاتب
         function sendCargoViaWhatsApp() {
             if(!currentPreviewCargo) return;
             const cargo = currentPreviewCargo;
@@ -2043,11 +2041,14 @@
             const tbody = document.querySelector('#driversTable tbody');
             if(!tbody) return;
             tbody.innerHTML = '';
-            const filteredDrivers = getFilteredData(db.drivers);
+            let filteredDrivers = getFilteredData(db.drivers);
+            // ترتيب تنازلي حسب تاريخ أو معرف الإنشاء
+            filteredDrivers.sort((a, b) => b.id.localeCompare(a.id));
+
             filteredDrivers.forEach((d, idx) => {
                 const realIdx = db.drivers.findIndex(x => x.id === d.id);
                 tbody.insertRow().innerHTML = `
-                    <td><strong>#${idx + 1}</strong></td>
+                    <td><strong>#${filteredDrivers.length - idx}</strong></td>
                     <td><strong class="text-gold">${d.date}</strong></td>
                     <td>${d.busNo}</td>
                     <td><strong>${d.driverName}</strong></td>
@@ -2236,7 +2237,13 @@
             const tbody = document.querySelector('#tripsTable tbody');
             if(!tbody) return;
             tbody.innerHTML = '';
-            db.trips.forEach((trip, idx) => {
+            
+            // ترتيب الرحلات تنازلياً (الأحدث أولاً)
+            let tripsList = [...db.trips];
+            tripsList.sort((a, b) => b.id.localeCompare(a.id));
+
+            tripsList.forEach((trip, idx) => {
+                const realIdx = db.trips.findIndex(x => x.id === trip.id);
                 const linkedTickets = db.passengers.filter(p => p.tripId === trip.id).length;
                 let statusBadge = '<span class="bg-amber-950 text-amber-300 px-2 py-1 rounded text-xs font-bold">مجدولة</span>';
                 if(trip.status === 'غادرت الرحلة') {
@@ -2248,7 +2255,7 @@
                 }
 
                 tbody.insertRow().innerHTML = `
-                    <td><strong>#${idx + 1}</strong></td>
+                    <td><strong>#${tripsList.length - idx}</strong></td>
                     <td><strong class="text-gold">${trip.date}</strong></td>
                     <td>${trip.route}</td>
                     <td>${trip.busInfo}</td>
@@ -2259,7 +2266,7 @@
                         ${trip.status !== 'غادرت الرحلة' ? `<button onclick="markTripDeparted('${trip.id}')" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs font-bold hover:bg-indigo-500"><i class="fa-solid fa-bus"></i> غادرت الرحلة</button>` : ''}
                         <button onclick="editTrip('${trip.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i> تعديل</button>
                         <button onclick="openManifestForTrip('${trip.date}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-file-lines"></i> مانفيستو</button>
-                        <button onclick="deleteTrip(${idx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="deleteTrip(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 `;
             });
@@ -2275,7 +2282,11 @@
             if(passSel) passSel.innerHTML = '<option value="">-- اختر الرحلة أولاً --</option>';
             if(cargoSel) cargoSel.innerHTML = '<option value="">-- اختر الرحلة المرتبطة (اختياري) --</option>';
 
-            db.trips.forEach(trip => {
+            // عرض الرحلات تنازلياً في القائمة المنسدلة أيضاً
+            let tripsList = [...db.trips];
+            tripsList.sort((a, b) => b.id.localeCompare(a.id));
+
+            tripsList.forEach(trip => {
                 const text = `${trip.date !== '-' ? trip.date : 'بدون تاريخ'} (${trip.route}) - ${trip.busInfo} [${trip.status || 'مجدولة'}]`;
                 
                 if(passSel) {
@@ -2879,9 +2890,9 @@
             const filteredPass = getFilteredData(db.passengers);
             const filteredCargo = getFilteredData(db.cargo);
 
-            // ترتيب ابجدي / تصاعدي برقم الفاتورة أو التذكرة
-            filteredPass.sort((a, b) => (parseInt(a.id) || 0) - (parseInt(b.id) || 0));
-            filteredCargo.sort((a, b) => (parseInt(a.id) || 0) - (parseInt(b.id) || 0));
+            // تطبيق الترتيب التنازلي (الأكبر/الأحدث أولاً)
+            filteredPass.sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
+            filteredCargo.sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
 
             const passTbody = document.querySelector('#passengersTable tbody');
             if (passTbody && (searchType === 'all' || searchType === 'ticket')) {
@@ -2895,7 +2906,7 @@
                 });
 
                 let tktRev = 0;
-                searchP.forEach((p) => {
+                searchP.forEach((p, index) => {
                     tktRev += p.fare || 0;
                     let extraNamesHtml = '-';
                     if(p.extraPassengers && p.extraPassengers.length > 0) {
@@ -2936,7 +2947,7 @@
                     return matchText && matchPay;
                 });
                 
-                searchC.forEach((c) => {
+                searchC.forEach((c, index) => {
                     let itemCount = c.items ? c.items.length : 1;
                     const realIdx = db.cargo.findIndex(x => x.id === c.id);
                     const linkedTrip = db.trips.find(t => t.id === c.tripId);
@@ -3116,7 +3127,8 @@
             tbody.innerHTML = '';
             
             const filteredPass = getFilteredData(db.passengers).filter(p => (p.date || '-') === filterDate);
-            filteredPass.sort((a, b) => (parseInt(a.id) || 0) - (parseInt(b.id) || 0));
+            // ترتيب تنازلي للمانفيستو أيضاً
+            filteredPass.sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
 
             document.getElementById('manifestTotalBookings').innerText = filteredPass.length;
             
@@ -3188,7 +3200,8 @@
             tbody.innerHTML = '';
 
             const filteredCargo = getFilteredData(db.cargo).filter(c => (c.date || '-') === filterDate);
-            filteredCargo.sort((a, b) => (parseInt(a.id) || 0) - (parseInt(b.id) || 0));
+            // ترتيب تنازلي للمانفيستو أيضاً
+            filteredCargo.sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
 
             document.getElementById('cargoManifestTotalInvoices').innerText = filteredCargo.length;
             
@@ -3252,7 +3265,10 @@
 
         function renderVouchersTable() {
             const tbody = document.querySelector('#vouchersTable tbody');
-            const filteredVouchers = getFilteredData(db.vouchers);
+            let filteredVouchers = getFilteredData(db.vouchers);
+            // ترتيب تنازلي للسندات
+            filteredVouchers.sort((a, b) => b.id.localeCompare(a.id));
+
             if (tbody) {
                 tbody.innerHTML = '';
                 filteredVouchers.forEach((v) => {
@@ -3274,7 +3290,8 @@
         function renderDebtInvoicesTable() {
             const tbody = document.querySelector('#debtInvoicesTable tbody');
             const filteredDebts = getFilteredData(db.debtInvoices);
-            filteredDebts.sort((a, b) => (parseInt(a.id) || 0) - (parseInt(b.id) || 0));
+            // ترتيب تنازلي للذمم
+            filteredDebts.sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
 
             if (tbody) {
                 tbody.innerHTML = '';
