@@ -114,7 +114,7 @@
         </div>
     </div>
 
-    <!-- PREVIEW TICKET MODAL (مع زر الواتساب) -->
+    <!-- PREVIEW TICKET MODAL (مع زر الواتساب وسجل التدقيق المخفي عند الطباعة) -->
     <div class="modal-overlay hidden" id="ticketPreviewModal">
         <div class="modal-card" style="max-width: 700px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
@@ -164,6 +164,17 @@
                     </div>
                 </div>
 
+                <!-- قائمة منسدلة لسجل التتبع والتعديلات (تختفي تماماً عند الطباعة أو الحفظ كصورة بفضل فئة no-print) -->
+                <details class="no-print bg-amber-50 border border-amber-300 rounded-lg p-2.5 text-xs text-slate-800 mb-4 shadow-sm">
+                    <summary class="font-bold cursor-pointer text-amber-900 flex items-center justify-between">
+                        <span><i class="fa-solid fa-clock-rotate-left ml-1 text-amber-700"></i> سجل التواريخ والمستخدمين (من الإنشاء حتى آخر تعديل)</span>
+                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                    </summary>
+                    <div id="ticketAuditLogContent" class="mt-2 pt-2 border-t border-amber-200 space-y-1 text-[11px] text-slate-700">
+                        <!-- يُعبأ ديناميكياً -->
+                    </div>
+                </details>
+
                 <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
                     <div id="tktFootNote">* رحلة موفقة وآمنة مع وادي بناء للنقل البري. أرقام التواصل بالمكاتب:</div>
                     <div class="grid grid-cols-1 gap-0.5 font-bold text-slate-800">
@@ -182,7 +193,7 @@
         </div>
     </div>
 
-    <!-- PREVIEW CARGO MODAL (مع زر الواتساب للمرسل) -->
+    <!-- PREVIEW CARGO MODAL (مع زر الواتساب وسجل التدقيق المخفي عند الطباعة) -->
     <div class="modal-overlay hidden" id="cargoPreviewModal">
         <div class="modal-card" style="max-width: 750px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
@@ -247,6 +258,17 @@
                     </div>
                 </div>
 
+                <!-- قائمة منسدلة لسجل التتبع والتعديلات لفاتورة الشحن (تختفي تماماً عند الطباعة أو الحفظ كصورة) -->
+                <details class="no-print bg-indigo-50 border border-indigo-300 rounded-lg p-2.5 text-xs text-slate-800 mb-4 shadow-sm">
+                    <summary class="font-bold cursor-pointer text-indigo-900 flex items-center justify-between">
+                        <span><i class="fa-solid fa-clock-rotate-left ml-1 text-indigo-700"></i> سجل التواريخ والمستخدمين (من الإنشاء حتى آخر تعديل)</span>
+                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                    </summary>
+                    <div id="cargoAuditLogContent" class="mt-2 pt-2 border-t border-indigo-200 space-y-1 text-[11px] text-slate-700">
+                        <!-- يُعبأ ديناميكياً -->
+                    </div>
+                </details>
+
                 <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
                     <div id="cargoFootNote">* شكراً لاختياركم وادي بناء لشحن أمتعتكم. أرقام التواصل بالمكاتب:</div>
                 </div>
@@ -305,6 +327,17 @@
                         <span id="lblDebtStatusBadge" class="px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-bold">حساب آجل</span>
                     </div>
                 </div>
+
+                <!-- قائمة منسدلة لسجل التتبع لفاتورة الآجل (مخفية عند الطباعة والحفظ) -->
+                <details class="no-print bg-zinc-100 border border-zinc-300 rounded-lg p-2.5 text-xs text-slate-800 mb-4 shadow-sm">
+                    <summary class="font-bold cursor-pointer text-slate-900 flex items-center justify-between">
+                        <span><i class="fa-solid fa-clock-rotate-left ml-1 text-amber-700"></i> سجل التواريخ والمستخدمين (من الإنشاء حتى آخر تعديل)</span>
+                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                    </summary>
+                    <div id="debtAuditLogContent" class="mt-2 pt-2 border-t border-zinc-200 space-y-1 text-[11px] text-slate-700">
+                        <!-- يُعبأ ديناميكياً -->
+                    </div>
+                </details>
 
                 <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
                     <div>* تعتبر هذه الفاتورة سند مطالبي رسمي للحسابات الآجلة.</div>
@@ -376,6 +409,17 @@
                         <span>باقي حساب السائق الصافي:</span> <strong id="prDriverNetDue">0 AED</strong>
                     </div>
                 </div>
+
+                <!-- قائمة منسدلة لسجل التتبع لكشف السائق (تختفي عند الطباعة) -->
+                <details class="no-print bg-slate-100 border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800 mb-4 shadow-sm">
+                    <summary class="font-bold cursor-pointer text-slate-900 flex items-center justify-between">
+                        <span><i class="fa-solid fa-clock-rotate-left ml-1 text-amber-700"></i> سجل التواريخ والمستخدمين (من الإنشاء حتى آخر تعديل)</span>
+                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                    </summary>
+                    <div id="driverAuditLogContent" class="mt-2 pt-2 border-t border-slate-200 space-y-1 text-[11px] text-slate-700">
+                        <!-- يُعبأ ديناميكياً -->
+                    </div>
+                </details>
 
                 <div class="grid grid-cols-2 gap-6 pt-4 border-t border-dashed border-slate-400 text-xs font-bold text-center">
                     <div>
@@ -1385,10 +1429,10 @@
             ],
             drivers: [],
             passengers: [
-                { id: "140", tripId: "trip_1", agent: "النظام", name: "محسن فيصل احمد", phone: "0508200749", passport: "12605475", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "4:00 عصراً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان", createdBy: "وليد السيد" }
+                { id: "140", tripId: "trip_1", agent: "النظام", name: "محسن فيصل احمد", phone: "0508200749", passport: "12605475", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "4:00 عصراً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان", createdBy: "وليد السيد", createdAt: "2026-11-08 10:00", auditLog: [{action: "إنشاء التذكرة", user: "وليد السيد", time: "2026-11-08 10:00"}] }
             ],
             cargo: [
-                { id: "130", tripId: "trip_1", date: "2026-11-08", sender: "عبد الكريم عبد الله", senderPhone: "0567777133", senderAddress: "عجمان", receiver: "النادي الدولي للسيارات", receiverPhone: "0778826198", receiverAddress: "عدن", items: [{desc: "كرتون صغير به فواتير", qty: 1, price: 50}], grandTotal: 50, paymentStatus: "مدفوع", branch: "فرع عجمان", createdBy: "وليد السيد" }
+                { id: "130", tripId: "trip_1", date: "2026-11-08", sender: "عبد الكريم عبد الله", senderPhone: "0567777133", senderAddress: "عجمان", receiver: "النادي الدولي للسيارات", receiverPhone: "0778826198", receiverAddress: "عدن", items: [{desc: "كرتون صغير به فواتير", qty: 1, price: 50}], grandTotal: 50, paymentStatus: "مدفوع", branch: "فرع عجمان", createdBy: "وليد السيد", createdAt: "2026-11-08 10:30", auditLog: [{action: "إنشاء الفاتورة", user: "وليد السيد", time: "2026-11-08 10:30"}] }
             ],
             vouchers: [],
             debtInvoices: [],
@@ -1430,27 +1474,29 @@
             return currentUser ? currentUser.username : 'النظام';
         }
 
-        // --- تهيئة أرقام الهواتف وتجهيزها لصيغة الواتساب الدولية ---
+        function getFormattedDateTime() {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const hh = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+        }
+
         function formatPhoneForWhatsApp(phoneStr) {
             if(!phoneStr) return '';
-            let cleaned = phoneStr.replace(/\D/g, ''); // إزالة الأشكال والمسافات
-            
-            // إذا كان الرقم يبدأ بـ 05 (مثل الإمارت) تحويله لـ 9715
+            let cleaned = phoneStr.replace(/\D/g, '');
             if (cleaned.startsWith('05')) {
                 cleaned = '971' + cleaned.substring(1);
-            } 
-            // إذا كان يبدأ بـ 7 (أرقام اليمن مثل 77 أو 78 أو 73) تحويله لـ 967
-            else if (cleaned.length === 9 && (cleaned.startsWith('77') || cleaned.startsWith('78') || cleaned.startsWith('73') || cleaned.startsWith('71') || cleaned.startsWith('70'))) {
+            } else if (cleaned.length === 9 && (cleaned.startsWith('77') || cleaned.startsWith('78') || cleaned.startsWith('73') || cleaned.startsWith('71') || cleaned.startsWith('70'))) {
                 cleaned = '967' + cleaned;
-            }
-            // إذا كان يبدأ بـ 07 (رقم يمني أرضي أو سيار)
-            else if (cleaned.startsWith('07')) {
+            } else if (cleaned.startsWith('07')) {
                 cleaned = '967' + cleaned.substring(1);
             }
             return cleaned;
         }
 
-        // --- وظيفة إرسال صورة/بيانات التذكرة للواتس اب الخاص بالراكب ---
         function sendTicketViaWhatsApp() {
             if(!currentPreviewTicket) return;
             const tkt = currentPreviewTicket;
@@ -1462,12 +1508,9 @@
             }
 
             const msgText = `مرحباً بك ${tkt.name} 👋🏼\nمرفق لكم تفاصيل بوليصة حجز التذكرة من *شركة وادي بناء للنقل البري*:\n\n🎫 *رقم التذكرة:* #${tkt.id}\n📍 *المسار:* ${tkt.origin} ➔ ${tkt.destination}\n📅 *تاريخ الرحلة:* ${tkt.date || '-'}\n⏰ *وقت الحضور:* ${tkt.reportingTime}\n💳 *المبلغ:* ${tkt.fare} AED (${tkt.payMethod})\n\nنتمنى لكم رحلة موفقة وآمنة! 🚌`;
-            const waUrl = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msgText)}`;
-            
-            window.open(waUrl, '_blank');
+            window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msgText)}`, '_blank');
         }
 
-        // --- وظيفة إرسال صورة/بيانات فاتورة الشحن للواتس اب الخاص بالمرسل ---
         function sendCargoViaWhatsApp() {
             if(!currentPreviewCargo) return;
             const cargo = currentPreviewCargo;
@@ -1486,9 +1529,7 @@
             }
 
             const msgText = `مرحباً بك ${cargo.sender} 👋🏼\nمرفق لكم تفاصيل فاتورة الشحن من *شركة وادي بناء للنقل البري*:\n\n📦 *رقم الفاتورة:* #${cargo.id}\n👤 *المستلم:* ${cargo.receiver} (${cargo.receiverPhone})\n📍 *عنوان التسليم:* ${cargo.receiverAddress || 'عدن'}\n📋 *الأصناف:*${itemsSummary}\n💰 *الإجمالي النهائي:* ${cargo.grandTotal} AED (${cargo.paymentStatus})\n\nشكراً لثقتكم بوادي بناء! 🚛`;
-            const waUrl = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msgText)}`;
-            
-            window.open(waUrl, '_blank');
+            window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msgText)}`, '_blank');
         }
 
         function toggleLanguage() {
@@ -1587,54 +1628,24 @@
             if(!db.vouchers || !Array.isArray(db.vouchers)) { db.vouchers = []; fixed = true; }
             if(!db.debtInvoices || !Array.isArray(db.debtInvoices)) { db.debtInvoices = []; fixed = true; }
             
-            db.trips.forEach(t => {
-                if(!t.status) { t.status = "مجدولة"; fixed = true; }
-                if(!t.createdBy) { t.createdBy = "وليد السيد"; fixed = true; }
-            });
-
             db.passengers.forEach(p => {
-                if(!p.createdBy) { p.createdBy = "وليد السيد"; fixed = true; }
-                if(p.payMethod !== 'مدفوع') {
-                    const exists = db.debtInvoices.some(d => String(d.id) === String('T-' + p.id));
-                    if(!exists) {
-                        db.debtInvoices.push({
-                            id: 'T-' + p.id,
-                            date: p.date || '-',
-                            name: p.name,
-                            phone: p.phone,
-                            address: p.origin + ' ➔ ' + p.destination,
-                            subTotal: p.fare || 350,
-                            paidAmount: 0,
-                            netTotal: p.fare || 350,
-                            branch: p.branch || 'فرع عجمان',
-                            createdBy: p.createdBy || 'وليد السيد'
-                        });
-                        fixed = true;
-                    }
-                }
+                if(!p.createdAt) { p.createdAt = p.date ? p.date + ' 09:00' : '2026-11-01 09:00'; fixed = true; }
+                if(!p.auditLog) { p.auditLog = [{action: 'إنشاء التذكرة', user: p.createdBy || 'وليد السيد', time: p.createdAt}]; fixed = true; }
             });
 
             db.cargo.forEach(c => {
-                if(!c.createdBy) { c.createdBy = "وليد السيد"; fixed = true; }
-                if(c.paymentStatus !== 'مدفوع') {
-                    const exists = db.debtInvoices.some(d => String(d.id) === String('C-' + c.id));
-                    if(!exists) {
-                        db.debtInvoices.push({
-                            id: 'C-' + c.id,
-                            date: c.date || '-',
-                            name: c.sender,
-                            senderPhone: c.senderPhone,
-                            phone: c.senderPhone,
-                            address: c.senderAddress + ' ➔ ' + c.receiverAddress,
-                            subTotal: c.grandTotal || 0,
-                            paidAmount: 0,
-                            netTotal: c.grandTotal || 0,
-                            branch: c.branch || 'فرع عجمان',
-                            createdBy: c.createdBy || 'وليد السيد'
-                        });
-                        fixed = true;
-                    }
-                }
+                if(!c.createdAt) { c.createdAt = c.date ? c.date + ' 09:00' : '2026-11-01 09:00'; fixed = true; }
+                if(!c.auditLog) { c.auditLog = [{action: 'إنشاء الفاتورة', user: c.createdBy || 'وليد السيد', time: c.createdAt}]; fixed = true; }
+            });
+
+            db.debtInvoices.forEach(d => {
+                if(!d.createdAt) { d.createdAt = d.date ? d.date + ' 09:00' : '2026-11-01 09:00'; fixed = true; }
+                if(!d.auditLog) { d.auditLog = [{action: 'إنشاء الفاتورة الآجلة', user: d.createdBy || 'وليد السيد', time: d.createdAt}]; fixed = true; }
+            });
+
+            db.drivers.forEach(dr => {
+                if(!dr.createdAt) { dr.createdAt = dr.date ? dr.date + ' 09:00' : '2026-11-01 09:00'; fixed = true; }
+                if(!dr.auditLog) { dr.auditLog = [{action: 'إنشاء حساب السائق', user: dr.createdBy || 'وليد السيد', time: dr.createdAt}]; fixed = true; }
             });
 
             if(fixed) { saveDB(); }
@@ -1809,7 +1820,6 @@
             }
         }
 
-        // --- وظائف إدارة حسابات السائقين ---
         function buildDriverItemsRows(existingItems = null) {
             const container = document.getElementById('driverItemsRowsContainer');
             if(!container) return;
@@ -1861,6 +1871,8 @@
         function handleSaveDriverAccount(e) {
             e.preventDefault();
             const editId = document.getElementById('driverEditId').value;
+            const nowStr = getFormattedDateTime();
+            const author = getCurrentUserName();
             
             let items = [];
             let totalDriverExpenses = 0;
@@ -1883,28 +1895,39 @@
             const busNo = document.getElementById('drvBusNo').value;
             const date = document.getElementById('drvDate').value;
 
-            const existingRecord = editId ? db.drivers.find(d => d.id === editId) : null;
-
-            const record = {
-                id: editId || 'drv_' + Date.now(),
-                date: date,
-                busNo: busNo,
-                driverName: driverName,
-                items: items,
-                totalExpenses: totalDriverExpenses,
-                tripDue: tripDue,
-                remaining: remaining,
-                netDue: tripDue - remaining,
-                branch: currentUser.branch || 'فرع عجمان',
-                createdBy: existingRecord ? (existingRecord.createdBy || getCurrentUserName()) : getCurrentUserName()
-            };
-
             if(editId) {
                 const idx = db.drivers.findIndex(d => d.id === editId);
-                if(idx !== -1) db.drivers[idx] = record;
+                if(idx !== -1) {
+                    let rec = db.drivers[idx];
+                    rec.date = date;
+                    rec.busNo = busNo;
+                    rec.driverName = driverName;
+                    rec.items = items;
+                    rec.totalExpenses = totalDriverExpenses;
+                    rec.tripDue = tripDue;
+                    rec.remaining = remaining;
+                    rec.netDue = tripDue - remaining;
+                    if(!rec.auditLog) rec.auditLog = [{action: 'إنشاء', user: rec.createdBy || author, time: rec.createdAt || nowStr}];
+                    rec.auditLog.push({action: 'تعديل حساب السائق', user: author, time: nowStr});
+                }
                 alert('تم تحديث حساب السائق وترحيل المصروفات للصندوق بنجاح!');
                 resetDriverForm();
             } else {
+                const record = {
+                    id: 'drv_' + Date.now(),
+                    date: date,
+                    busNo: busNo,
+                    driverName: driverName,
+                    items: items,
+                    totalExpenses: totalDriverExpenses,
+                    tripDue: tripDue,
+                    remaining: remaining,
+                    netDue: tripDue - remaining,
+                    branch: currentUser.branch || 'فرع عجمان',
+                    createdBy: author,
+                    createdAt: nowStr,
+                    auditLog: [{action: 'إنشاء حساب السائق', user: author, time: nowStr}]
+                };
                 db.drivers.unshift(record);
                 alert('تم حفظ وتسجيل حساب السائق وترحيل مصروفات الرحلة تلقائياً إلى الصندوق المالي!');
                 document.getElementById('driverForm').reset();
@@ -1994,6 +2017,17 @@
             if(prTotalRohaEl) prTotalRohaEl.innerText = sumRoha;
             if(prTotalRajahEl) prTotalRajahEl.innerText = sumRajah;
 
+            // تعبئة سجل التتبع لكشف السائق
+            const auditContainer = document.getElementById('driverAuditLogContent');
+            auditContainer.innerHTML = '';
+            if(d.auditLog && d.auditLog.length > 0) {
+                d.auditLog.forEach(log => {
+                    auditContainer.innerHTML += `<div>• <strong>${log.action}</strong> بواسطة (${log.user}) في تاريخ ووقت: <span class="text-amber-800 font-bold">${log.time}</span></div>`;
+                });
+            } else {
+                auditContainer.innerHTML = `<div>• تم الإنشاء بواسطة (${d.createdBy || 'النظام'}) في ${d.createdAt || 'غير محدد'}</div>`;
+            }
+
             document.getElementById('driverAccountModal').classList.remove('hidden');
         }
 
@@ -2030,7 +2064,6 @@
             refreshUI();
         }
 
-        // --- إدارة وتعديل الرحلات ---
         function handleSaveTrip(e) {
             e.preventDefault();
             const editId = document.getElementById('tripEditId').value;
@@ -2358,6 +2391,8 @@
             const tripId = document.getElementById('passTripSelect').value;
             if(!tripId) { alert('الرجاء اختيار الرحلة المرتبطة أولاً!'); return; }
             const count = parseInt(document.getElementById('passCount').value) || 1;
+            const nowStr = getFormattedDateTime();
+            const author = getCurrentUserName();
             
             let extraList = [];
             if (count > 1) {
@@ -2369,33 +2404,61 @@
                 }
             }
 
-            const existingTkt = editId ? db.passengers.find(p => String(p.id) === String(editId)) : null;
-
-            const tktData = {
-                id: ticketNo,
-                tripId: tripId,
-                agent: document.getElementById('passAgent').value.trim(),
-                name: document.getElementById('passName').value,
-                phone: document.getElementById('passPhone').value,
-                passport: document.getElementById('passPassport').value,
-                passengerCount: count,
-                extraPassengers: extraList,
-                origin: document.getElementById('passOrigin').value,
-                destination: document.getElementById('passDestination').value,
-                date: document.getElementById('passDate').value || '-',
-                reportingTime: document.getElementById('passReportingTime').value,
-                fare: parseFloat(document.getElementById('passManualTotal').value) || (count * 350),
-                payMethod: document.getElementById('passPayMethod').value,
-                branch: currentUser.branch || 'فرع عجمان',
-                createdBy: existingTkt ? (existingTkt.createdBy || getCurrentUserName()) : getCurrentUserName()
-            };
+            const agentVal = document.getElementById('passAgent').value.trim();
+            const nameVal = document.getElementById('passName').value;
+            const phoneVal = document.getElementById('passPhone').value;
+            const passVal = document.getElementById('passPassport').value;
+            const originVal = document.getElementById('passOrigin').value;
+            const destVal = document.getElementById('passDestination').value;
+            const dateVal = document.getElementById('passDate').value || '-';
+            const repTimeVal = document.getElementById('passReportingTime').value;
+            const fareVal = parseFloat(document.getElementById('passManualTotal').value) || (count * 350);
+            const payVal = document.getElementById('passPayMethod').value;
 
             if (editId) {
                 const idx = db.passengers.findIndex(p => String(p.id) === String(editId));
-                if (idx !== -1) db.passengers[idx] = tktData;
+                if (idx !== -1) {
+                    let item = db.passengers[idx];
+                    item.tripId = tripId;
+                    item.agent = agentVal;
+                    item.name = nameVal;
+                    item.phone = phoneVal;
+                    item.passport = passVal;
+                    item.passengerCount = count;
+                    item.extraPassengers = extraList;
+                    item.origin = originVal;
+                    item.destination = destVal;
+                    item.date = dateVal;
+                    item.reportingTime = repTimeVal;
+                    item.fare = fareVal;
+                    item.payMethod = payVal;
+
+                    if(!item.auditLog) item.auditLog = [{action: 'إنشاء التذكرة', user: item.createdBy || author, time: item.createdAt || nowStr}];
+                    item.auditLog.push({action: 'تعديل بيانات التذكرة', user: author, time: nowStr});
+                }
                 alert('تم تحديث التذكرة بنجاح!');
                 resetPassengerForm();
             } else {
+                const tktData = {
+                    id: ticketNo,
+                    tripId: tripId,
+                    agent: agentVal,
+                    name: nameVal,
+                    phone: phoneVal,
+                    passport: passVal,
+                    passengerCount: count,
+                    extraPassengers: extraList,
+                    origin: originVal,
+                    destination: destVal,
+                    date: dateVal,
+                    reportingTime: repTimeVal,
+                    fare: fareVal,
+                    payMethod: payVal,
+                    branch: currentUser.branch || 'فرع عجمان',
+                    createdBy: author,
+                    createdAt: nowStr,
+                    auditLog: [{action: 'إنشاء التذكرة', user: author, time: nowStr}]
+                };
                 db.passengers.unshift(tktData);
                 db.nextTicketNo = parseInt(ticketNo) + 1;
                 document.getElementById('passengerForm').reset();
@@ -2461,6 +2524,8 @@
             const editId = document.getElementById('cargoEditId').value;
             const invNo = document.getElementById('cargoInvNo').value.trim();
             const tripId = document.getElementById('cargoTripSelect').value || '';
+            const nowStr = getFormattedDateTime();
+            const author = getCurrentUserName();
 
             let itemsList = [];
             const rows = document.querySelectorAll('#cargoItemsRowsContainer tr');
@@ -2472,31 +2537,56 @@
                 });
             });
 
-            const existingCargo = editId ? db.cargo.find(c => String(c.id) === String(editId)) : null;
-
-            const cargoData = {
-                id: invNo,
-                tripId: tripId,
-                date: document.getElementById('cargoDate').value || '-',
-                sender: document.getElementById('cargoSenderName').value,
-                senderPhone: document.getElementById('cargoSenderPhone').value,
-                senderAddress: document.getElementById('cargoSenderAddress').value || 'عجمان',
-                receiver: document.getElementById('cargoReceiverName').value,
-                receiverPhone: document.getElementById('cargoReceiverPhone').value,
-                receiverAddress: document.getElementById('cargoReceiverAddress').value || 'عدن',
-                items: itemsList,
-                grandTotal: parseFloat(document.getElementById('cargoManualTotal').value) || 0,
-                paymentStatus: document.getElementById('cargoPaymentStatus').value,
-                branch: currentUser.branch || 'فرع عجمان',
-                createdBy: existingCargo ? (existingCargo.createdBy || getCurrentUserName()) : getCurrentUserName()
-            };
+            const dateVal = document.getElementById('cargoDate').value || '-';
+            const sName = document.getElementById('cargoSenderName').value;
+            const sPhone = document.getElementById('cargoSenderPhone').value;
+            const sAddr = document.getElementById('cargoSenderAddress').value || 'عجمان';
+            const rName = document.getElementById('cargoReceiverName').value;
+            const rPhone = document.getElementById('cargoReceiverPhone').value;
+            const rAddr = document.getElementById('cargoReceiverAddress').value || 'عدن';
+            const gTotal = parseFloat(document.getElementById('cargoManualTotal').value) || 0;
+            const pStatus = document.getElementById('cargoPaymentStatus').value;
 
             if (editId) {
                 const idx = db.cargo.findIndex(c => String(c.id) === String(editId));
-                if (idx !== -1) db.cargo[idx] = cargoData;
+                if (idx !== -1) {
+                    let item = db.cargo[idx];
+                    item.tripId = tripId;
+                    item.date = dateVal;
+                    item.sender = sName;
+                    item.senderPhone = sPhone;
+                    item.senderAddress = sAddr;
+                    item.receiver = rName;
+                    item.receiverPhone = rPhone;
+                    item.receiverAddress = rAddr;
+                    item.items = itemsList;
+                    item.grandTotal = gTotal;
+                    item.paymentStatus = pStatus;
+
+                    if(!item.auditLog) item.auditLog = [{action: 'إنشاء الفاتورة', user: item.createdBy || author, time: item.createdAt || nowStr}];
+                    item.auditLog.push({action: 'تعديل فاتورة الشحن', user: author, time: nowStr});
+                }
                 alert('تم تحديث فاتورة الشحن بنجاح!');
                 resetCargoForm();
             } else {
+                const cargoData = {
+                    id: invNo,
+                    tripId: tripId,
+                    date: dateVal,
+                    sender: sName,
+                    senderPhone: sPhone,
+                    senderAddress: sAddr,
+                    receiver: rName,
+                    receiverPhone: rPhone,
+                    receiverAddress: rAddr,
+                    items: itemsList,
+                    grandTotal: gTotal,
+                    paymentStatus: pStatus,
+                    branch: currentUser.branch || 'فرع عجمان',
+                    createdBy: author,
+                    createdAt: nowStr,
+                    auditLog: [{action: 'إنشاء الفاتورة', user: author, time: nowStr}]
+                };
                 db.cargo.unshift(cargoData);
                 db.nextCargoNo = parseInt(invNo) + 1 || (db.nextCargoNo + 1);
                 document.getElementById('cargoForm').reset();
@@ -2554,6 +2644,9 @@
         function handleSaveDebtInvoice(e) {
             e.preventDefault();
             const invNo = document.getElementById('debtInvNo').value.trim();
+            const nowStr = getFormattedDateTime();
+            const author = getCurrentUserName();
+
             const newInv = {
                 id: invNo,
                 date: document.getElementById('debtInvDate').value || '-',
@@ -2564,7 +2657,9 @@
                 paidAmount: parseFloat(document.getElementById('debtInvPaidAmount').value) || 0,
                 netTotal: parseFloat(document.getElementById('debtInvNetTotal').value) || 0,
                 branch: currentUser.branch || 'فرع عجمان',
-                createdBy: getCurrentUserName()
+                createdBy: author,
+                createdAt: nowStr,
+                auditLog: [{action: 'إنشاء الفاتورة الآجلة', user: author, time: nowStr}]
             };
             db.debtInvoices.unshift(newInv);
             db.nextDebtInvNo = parseInt(invNo) + 1 || (db.nextDebtInvNo + 1);
@@ -2791,7 +2886,7 @@
                     height: 35,
                     displayValue: false
                 });
-            } catch(e) { console.error("خطأ في توليد الباركود", e); }
+            } catch(e) {}
 
             let extraBox = document.getElementById('imgTicketExtraBox');
             extraBox.innerHTML = '';
@@ -2803,6 +2898,18 @@
                 html += `</div>`;
                 extraBox.innerHTML = html;
             }
+
+            // تعبئة سجل التتبع للتذكرة
+            const auditContainer = document.getElementById('ticketAuditLogContent');
+            auditContainer.innerHTML = '';
+            if(item.auditLog && item.auditLog.length > 0) {
+                item.auditLog.forEach(log => {
+                    auditContainer.innerHTML += `<div>• <strong>${log.action}</strong> بواسطة (${log.user}) في تاريخ ووقت: <span class="text-amber-900 font-bold">${log.time}</span></div>`;
+                });
+            } else {
+                auditContainer.innerHTML = `<div>• تم الإنشاء بواسطة (${item.createdBy || 'النظام'}) في ${item.createdAt || 'غير محدد'}</div>`;
+            }
+
             document.getElementById('ticketPreviewModal').classList.remove('hidden');
         }
 
@@ -2839,6 +2946,18 @@
             });
 
             document.getElementById('imgCargoGrandTotal').innerText = `AED ${item.grandTotal}`;
+
+            // تعبئة سجل التتبع لفاتورة الشحن
+            const auditContainer = document.getElementById('cargoAuditLogContent');
+            auditContainer.innerHTML = '';
+            if(item.auditLog && item.auditLog.length > 0) {
+                item.auditLog.forEach(log => {
+                    auditContainer.innerHTML += `<div>• <strong>${log.action}</strong> بواسطة (${log.user}) في تاريخ ووقت: <span class="text-indigo-900 font-bold">${log.time}</span></div>`;
+                });
+            } else {
+                auditContainer.innerHTML = `<div>• تم الإنشاء بواسطة (${item.createdBy || 'النظام'}) في ${item.createdAt || 'غير محدد'}</div>`;
+            }
+
             document.getElementById('cargoPreviewModal').classList.remove('hidden');
         }
 
@@ -2854,6 +2973,18 @@
             document.getElementById('imgDebtPaid').innerText = inv.paidAmount;
             document.getElementById('imgDebtNetTotal').innerText = `${inv.netTotal} AED`;
             document.getElementById('imgDebtCreatedBy').innerText = inv.createdBy || 'النظام';
+
+            // تعبئة سجل التتبع لفاتورة الآجل
+            const auditContainer = document.getElementById('debtAuditLogContent');
+            auditContainer.innerHTML = '';
+            if(inv.auditLog && inv.auditLog.length > 0) {
+                inv.auditLog.forEach(log => {
+                    auditContainer.innerHTML += `<div>• <strong>${log.action}</strong> بواسطة (${log.user}) في تاريخ ووقت: <span class="text-amber-800 font-bold">${log.time}</span></div>`;
+                });
+            } else {
+                auditContainer.innerHTML = `<div>• تم الإنشاء بواسطة (${inv.createdBy || 'النظام'}) في ${inv.createdAt || 'غير محدد'}</div>`;
+            }
+
             document.getElementById('debtInvPreviewModal').classList.remove('hidden');
         }
 
@@ -3149,7 +3280,9 @@
                         fare: 350,
                         payMethod: "مدفوع",
                         branch: currentUser ? currentUser.branch : "فرع عجمان",
-                        createdBy: getCurrentUserName()
+                        createdBy: getCurrentUserName(),
+                        createdAt: getFormattedDateTime(),
+                        auditLog: [{action: 'استعادة من PDF', user: getCurrentUserName(), time: getFormattedDateTime()}]
                     });
                     recoveredCount++;
                 }
