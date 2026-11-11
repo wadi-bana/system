@@ -27,6 +27,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    
+    <!-- PDF.js for PDF import -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -43,7 +49,7 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(9, 9, 11, 0.92); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .modal-card { background: var(--bg-card); border: 2px solid var(--gold-primary); border-radius: 16px; padding: 25px; width: 100%; max-width: 850px; box-shadow: 0 15px 35px rgba(212, 175, 55, 0.2); position: relative; max-height: 90vh; overflow-y: auto; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(0.8) sepia(1) saturate(5) hue-rotate(5deg); }
+        input[type="date"]::-webkit-calendar-picker-indicator, input[type="month"]::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(0.8) sepia(1) saturate(5) hue-rotate(5deg); }
         
         .image-styled-card {
             background-color: #ffffff;
@@ -82,13 +88,13 @@
             header, nav, .no-print, button, .modal-overlay { display: none !important; }
             .print-only { display: block !important; }
             .modal-overlay.hidden { display: none !important; }
-            #manifestModal:not(.hidden), #cargoManifestModal:not(.hidden), #driverAccountModal:not(.hidden) {
+            #manifestModal:not(.hidden), #cargoManifestModal:not(.hidden), #monthlyReportPrintArea:not(.hidden) {
                 position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: auto !important; background: white !important; z-index: 99999 !important; padding: 0 !important; margin: 0 !important; display: block !important;
             }
-            #manifestModal .modal-card, #cargoManifestModal .modal-card, #driverAccountModal .modal-card {
+            #manifestModal .modal-card, #cargoManifestModal .modal-card {
                 border: none !important; box-shadow: none !important; max-width: 100% !important; width: 100% !important; padding: 0 !important; margin: 0 !important; background: white !important; max-height: none !important; overflow: visible !important;
             }
-            #manifestPrintArea, #cargoManifestPrintArea, #driverAccountPrintArea {
+            #manifestPrintArea, #cargoManifestPrintArea, #monthlyReportPrintArea {
                 display: block !important; width: 100% !important; padding: 5mm !important; margin: 0 !important; background: white !important; color: black !important; page-break-inside: auto;
             }
             table { page-break-inside: auto; width: 100% !important; border-collapse: collapse !important; }
@@ -122,6 +128,23 @@
                 <span class="text-xs text-zinc-400 block mb-2 font-bold"><i class="fa-solid fa-users-rectangle text-gold ml-1"></i> جلسات الحسابات المفتوحة مسبقاً (دخول متعدد):</span>
                 <div id="activeSessionsList" class="flex flex-wrap gap-2 justify-center"></div>
             </div>
+        </div>
+    </div>
+
+    <!-- CHANGE PASSWORD MODAL -->
+    <div class="modal-overlay hidden" id="changePassModal">
+        <div class="modal-card" style="max-width: 400px;">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
+                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-key ml-1"></i> تغيير كلمة المرور الخاصة بي</h3>
+                <button onclick="closeModal('changePassModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="handleUserChangePassword(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-zinc-300 mb-1">كلمة المرور الجديدة</label>
+                    <input type="password" id="newPassInput" required class="w-full bg-darkbg border border-gold rounded-xl px-3 py-2 text-xs text-zinc-100 outline-none" placeholder="أدخل كلمة المرور الجديدة">
+                </div>
+                <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-2.5 rounded-xl text-xs shadow">حفظ كلمة المرور</button>
+            </form>
         </div>
     </div>
 
@@ -262,10 +285,126 @@
                 </div>
             </div>
             <div class="mt-5 flex gap-2 flex-wrap no-print">
-                <button onclick="downloadCargoImageWithWhatsAppPrompt()" class="flex-1 bg-emerald-600 text-white font-extrabold py-3 rounded-xl text-xs shadow hover:bg-emerald-500 flex items-center justify-center gap-1.5"><i class="fa-brands fa-whatsapp text-base"></i> مشاركة الصورة للواتساب</button>
+                <button onclick="sendCargoToReceiverWhatsApp()" class="bg-blue-600 text-white font-extrabold px-3 py-3 rounded-xl text-xs shadow hover:bg-blue-500 flex items-center gap-1"><i class="fa-brands fa-whatsapp text-base"></i> إشعار المستلم</button>
+                <button onclick="downloadCargoImageWithWhatsAppPrompt()" class="flex-1 bg-emerald-600 text-white font-extrabold py-3 rounded-xl text-xs shadow hover:bg-emerald-500 flex items-center justify-center gap-1.5"><i class="fa-brands fa-whatsapp text-base"></i> مشاركة للمرسل</button>
                 <button onclick="exportToPDF('cargoCaptureArea', 'WadiBina_Cargo_')" class="bg-red-600 text-white font-extrabold px-4 py-3 rounded-xl text-xs shadow hover:bg-red-500"><i class="fa-solid fa-file-pdf ml-1"></i> PDF</button>
                 <button onclick="downloadCapturedImage('cargoCaptureArea', 'WadiBina_CargoInvoice_')" class="gold-gradient-bg text-black font-extrabold px-4 py-3 rounded-xl text-xs shadow"><i class="fa-solid fa-download ml-1"></i> Image</button>
                 <button onclick="closeModal('cargoPreviewModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MANIFEST MODAL (PASSENGERS) -->
+    <div class="modal-overlay hidden" id="manifestModal">
+        <div class="modal-card" style="max-width: 950px;">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
+                <div class="flex items-center gap-3">
+                    <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> <span id="manPTitle">كشف رحلة ركاب حسب تاريخ الرحلة</span></h3>
+                </div>
+                <div class="flex gap-2 items-center flex-wrap">
+                    <button onclick="printManifestPassenger('driver')" class="bg-amber-600 text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow"><i class="fa-solid fa-id-card ml-1"></i> طباعة للسائق (بدون أسعار)</button>
+                    <button onclick="printManifestPassenger('management')" class="bg-gold text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow"><i class="fa-solid fa-chart-line ml-1"></i> طباعة للإدارة (بالأسعار)</button>
+                    <button onclick="exportMultiPagePDF('manifestPrintArea', 'WadiBina_Manifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> PDF (تصدير كامل)</button>
+                    <button onclick="closeModal('manifestModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+            </div>
+
+            <div class="bg-darkbg p-3 rounded-xl border border-gold mb-4 flex items-center justify-between gap-3 no-print">
+                <label class="text-xs font-bold text-gold flex items-center gap-2"><i class="fa-solid fa-calendar-days"></i> حدد تاريخ الرحلة المطلوب للمانفيستو:</label>
+                <input type="date" id="manifestFilterDate" onchange="renderPassengerManifestTable()" class="bg-zinc-900 border border-gold text-gold text-xs px-3 py-2 rounded-xl outline-none font-bold">
+            </div>
+
+            <div id="manifestPrintArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl" style="direction: inherit; text-align: inherit;">
+                <div class="flex justify-between items-center border-b-2 border-slate-800 pb-3 mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center text-amber-400 font-black text-xl shadow">و</div>
+                        <div>
+                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
+                            <p id="manifestTypeSubtitle" class="text-[11px] text-slate-600 font-bold">كشف ركاب الرحلة الرسمي (Passenger Manifest)</p>
+                        </div>
+                    </div>
+                    <div class="text-left text-xs space-y-0.5">
+                        <div>تاريخ الرحلة: <strong id="manifestActiveDateBadge" class="text-amber-700"></strong></div>
+                        <div>تاريخ الإصدار: <span id="manifestIssueDate"></span></div>
+                    </div>
+                </div>
+                <div class="mb-4 bg-slate-100 p-3 rounded-lg border border-slate-200 flex justify-between text-xs font-bold">
+                    <span>إجمالي الحجوزات: <span id="manifestTotalBookings" class="text-indigo-700">0</span></span>
+                    <span>إجمالي الركاب: <span id="manifestTotalPassengers" class="text-emerald-700">0</span></span>
+                </div>
+                <table class="w-full border-collapse text-right text-xs" style="direction: inherit;">
+                    <thead>
+                        <tr class="bg-slate-200 text-slate-800">
+                            <th class="border border-slate-300 p-2">م</th>
+                            <th class="border border-slate-300 p-2">البوليصة</th>
+                            <th class="border border-slate-300 p-2">اسم المسافر الرئيسي</th>
+                            <th class="border border-slate-300 p-2">الركاب الإضافيون</th>
+                            <th class="border border-slate-300 p-2">الهاتف</th>
+                            <th class="border border-slate-300 p-2">الجواز</th>
+                            <th class="border border-slate-300 p-2">المسار</th>
+                            <th class="border border-slate-300 p-2 man-price-col">السعر</th>
+                            <th class="border border-slate-300 p-2 no-print">منفذ الإجراء</th>
+                            <th class="border border-slate-300 p-2">حالة السداد</th>
+                        </tr>
+                    </thead>
+                    <tbody id="manifestTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- CARGO MANIFEST MODAL -->
+    <div class="modal-overlay hidden" id="cargoManifestModal">
+        <div class="modal-card" style="max-width: 1000px;">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
+                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> <span id="manCTitle">كشف مانفيستو فواتير الشحن حسب تاريخ الرحلة</span></h3>
+                <div class="flex gap-2 items-center flex-wrap">
+                    <button onclick="printManifestCargo('driver')" class="bg-amber-600 text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow"><i class="fa-solid fa-id-card ml-1"></i> طباعة للسائق (بدون أسعار)</button>
+                    <button onclick="printManifestCargo('management')" class="bg-gold text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow"><i class="fa-solid fa-chart-line ml-1"></i> طباعة للإدارة (بالأسعار)</button>
+                    <button onclick="exportMultiPagePDF('cargoManifestPrintArea', 'WadiBina_CargoManifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> PDF (تصدير كامل)</button>
+                    <button onclick="closeModal('cargoManifestModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+            </div>
+
+            <div class="bg-darkbg p-3 rounded-xl border border-gold mb-4 flex items-center justify-between gap-3 no-print">
+                <label class="text-xs font-bold text-gold flex items-center gap-2"><i class="fa-solid fa-calendar-days"></i> حدد تاريخ فواتير الشحن المطلوب:</label>
+                <input type="date" id="cargoManifestFilterDate" onchange="renderCargoManifestTable()" class="bg-zinc-900 border border-gold text-gold text-xs px-3 py-2 rounded-xl outline-none font-bold">
+            </div>
+
+            <div id="cargoManifestPrintArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl" style="direction: inherit; text-align: inherit;">
+                <div class="flex justify-between items-center border-b-2 border-slate-800 pb-3 mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center text-amber-400 font-black text-xl shadow">و</div>
+                        <div>
+                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
+                            <p id="cargoManifestTypeSubtitle" class="text-[11px] text-slate-600 font-bold">كشف مانفيستو الشحن الرسمي (Cargo Manifest)</p>
+                        </div>
+                    </div>
+                    <div class="text-left text-xs space-y-0.5">
+                        <div>تاريخ الشحن: <strong id="cargoManifestActiveDateBadge" class="text-amber-700"></strong></div>
+                        <div>تاريخ الإصدار: <span id="cargoManifestIssueDate"></span></div>
+                    </div>
+                </div>
+                <div class="mb-4 bg-slate-100 p-3 rounded-lg border border-slate-200 flex justify-between text-xs font-bold">
+                    <span>إجمالي الفواتير: <span id="cargoManifestTotalInvoices" class="text-indigo-700">0</span></span>
+                    <span id="cargoManifestRevBox">إجمالي الإيرادات: <span id="cargoManifestTotalRevenue" class="text-emerald-700">0 AED</span></span>
+                </div>
+                <table class="w-full border-collapse text-right text-xs" style="direction: inherit;">
+                    <thead>
+                        <tr class="bg-slate-200 text-slate-800">
+                            <th class="border border-slate-300 p-2">م</th>
+                            <th class="border border-slate-300 p-2">الفاتورة</th>
+                            <th class="border border-slate-300 p-2">المرسل</th>
+                            <th class="border border-slate-300 p-2">المستلم وعنوانه</th>
+                            <th class="border border-slate-300 p-2">الرحلة المرتبطة</th>
+                            <th class="border border-slate-300 p-2">وصف الأصناف والعدد</th>
+                            <th class="border border-slate-300 p-2 cargo-price-col">الإجمالي</th>
+                            <th class="border border-slate-300 p-2 no-print">منفذ الإجراء</th>
+                            <th class="border border-slate-300 p-2">حالة السداد</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cargoManifestTableBody"></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -295,6 +434,16 @@
             <button onclick="exportSystemBackupPDF()" class="bg-red-600 text-white border border-red-500 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 hover:bg-red-500">
                 <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline">PDF شامل</span>
             </button>
+
+            <label class="bg-amber-950 text-amber-300 border border-amber-800 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1">
+                <i class="fa-solid fa-upload"></i> <span>استرجاع JSON</span>
+                <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
+            </label>
+
+            <label class="bg-indigo-950 text-indigo-300 border border-indigo-800 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1">
+                <i class="fa-solid fa-file-arrow-up"></i> <span>استعادة PDF</span>
+                <input type="file" accept=".pdf" onchange="importBackupPDF(event)" class="hidden">
+            </label>
 
             <button onclick="handleLogout()" class="bg-red-600/20 text-red-400 border border-red-600/30 px-3 py-1.5 rounded-xl text-xs font-bold">خروج</button>
         </div>
@@ -328,8 +477,8 @@
                 <button onclick="switchTab('financials')" id="tab-financials" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
                     <i class="fa-solid fa-calculator ml-1.5"></i> الإدارة المالية والربح اليومي
                 </button>
-                <button onclick="switchTab('employees')" id="tab-employees" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
-                    <i class="fa-solid fa-user-tie ml-1.5"></i> إدارة الموظفين والرواتب
+                <button onclick="switchTab('monthly-reports')" id="tab-monthly-reports" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-emerald-700 text-white hover:bg-emerald-600 shadow">
+                    <i class="fa-solid fa-calendar-check ml-1.5"></i> التقارير الشهرية المتقدمة
                 </button>
                 <button onclick="switchTab('branches')" id="tab-branches" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
                     <i class="fa-solid fa-code-branch ml-1.5"></i> إدارة الأفرع
@@ -518,7 +667,7 @@
             </div>
         </section>
 
-        <!-- TAB CREATE TICKET (صفحة إصدار التذاكر بالحقول المطابقة تماماً) -->
+        <!-- TAB CREATE TICKET -->
         <section id="module-create-ticket" class="tab-content hidden space-y-6">
             <div class="max-w-6xl mx-auto">
                 <div class="flex justify-between items-center mb-4 no-print">
@@ -534,7 +683,6 @@
                     
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
                         
-                        <!-- القسم الأيسر/الفرعي (المرجع، التواريخ، الرسوم وطريقة الدفع) -->
                         <div class="lg:col-span-4 image-styled-card flex flex-col justify-between">
                             <div class="space-y-3.5">
                                 <div class="grid grid-cols-2 gap-2">
@@ -576,7 +724,6 @@
                             </div>
                         </div>
 
-                        <!-- القسم الأيمن/الرئيسي (بيانات الراكب الأساسي والركاب الإضافيين) -->
                         <div class="lg:col-span-8 image-styled-card flex flex-col justify-between">
                             <div class="space-y-4">
                                 <h3 class="text-sm font-bold text-slate-700 border-b pb-2"><i class="fa-solid fa-user-tag text-red-600 ml-1"></i> تفاصيل الراكب الأساسي وجهات السفر</h3>
@@ -625,7 +772,6 @@
                                     </div>
                                 </div>
 
-                                <!-- حقول الركاب الإضافيين التلقائية -->
                                 <div id="extraPassengersContainer" class="hidden bg-slate-50 p-3 rounded-lg border space-y-2">
                                     <span class="text-xs font-bold text-red-600 block"><i class="fa-solid fa-users ml-1"></i> بيانات الركاب الإضافيين (تُصدر لهم بوليصة وتذاكر فرعية تلقائياً)</span>
                                     <div id="extraPassengersRows" class="space-y-2"></div>
@@ -671,7 +817,7 @@
                                 <th class="no-print">منفذ الإجراء</th>
                                 <th>السداد</th>
                                 <th>الفرع</th>
-                                <th>إجراءات / طباعة</th>
+                                <th>إجراءات / طباعة / واتساب</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -680,7 +826,7 @@
             </div>
         </section>
 
-        <!-- TAB CREATE CARGO (صفحة إصدار فواتير الشحن بالحقول المطلوبة تماماً) -->
+        <!-- TAB CREATE CARGO -->
         <section id="module-create-cargo" class="tab-content hidden space-y-6">
             <div class="max-w-6xl mx-auto">
                 <div class="flex justify-between items-center mb-4 no-print">
@@ -696,7 +842,6 @@
                     
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
                         
-                        <!-- القسم الأيسر/الفرعي (التاريخ، رقم الفاتورة، السداد والمجموع) -->
                         <div class="lg:col-span-4 image-styled-card flex flex-col justify-between">
                             <div class="space-y-3.5">
                                 <div class="grid grid-cols-2 gap-2">
@@ -736,7 +881,6 @@
                             </div>
                         </div>
 
-                        <!-- القسم الأيمن/الرئيسي (اسم المرسل، هاتف المرسل، عنوان المرسل، اسم المستلم، هاتف المستلم، عنوان المستلم، والمحتوى) -->
                         <div class="lg:col-span-8 image-styled-card flex flex-col justify-between">
                             <div class="space-y-4">
                                 <h3 class="text-sm font-bold text-slate-700 border-b pb-2"><i class="fa-solid fa-boxes-packing text-indigo-600 ml-1"></i> تفاصيل المرسل والمستلم ومحتوى الشحنة</h3>
@@ -826,7 +970,7 @@
                                 <th class="no-print">منفذ الإجراء</th>
                                 <th>حالة الدفع</th>
                                 <th>الفرع</th>
-                                <th>إجراءات / طباعة</th>
+                                <th>إجراءات / طباعة / واتساب</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -943,7 +1087,6 @@
                 </div>
             </div>
 
-            <!-- VOUCHERS -->
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <h3 class="text-gold font-bold text-sm border-b border-zinc-800 pb-3">سندات القبض والصرف والنثريات</h3>
                 <form id="voucherForm" onsubmit="handleSaveVoucher(event)" class="grid grid-cols-1 sm:grid-cols-6 gap-3 bg-darkbg p-4 rounded-xl border border-zinc-800">
@@ -977,39 +1120,74 @@
             </div>
         </section>
 
-        <!-- TAB EMPLOYEES: إدارة الموظفين والرواتب -->
-        <section id="module-employees" class="tab-content hidden space-y-6">
-            <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
-                <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
-                    <h3 class="text-gold font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-user-tie"></i> سجل وإدارة الموظفين وكشوفات الرواتب</h3>
+        <!-- TAB MONTHLY REPORTS: التقارير الشهرية المتقدمة -->
+        <section id="module-monthly-reports" class="tab-content hidden space-y-6">
+            <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4 no-print">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b border-zinc-800 pb-3">
+                    <div>
+                        <h3 class="text-gold font-extrabold text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-emerald-400"></i> التقارير المالية والتشغيلية الشهرية المتقدمة
+                        </h3>
+                        <p class="text-xs text-zinc-400">تحليل وإحصائيات المبيعات، الشحن، والمصروفات حسب الشهر والأفرع</p>
+                    </div>
+                    <div class="flex gap-2 items-center w-full sm:w-auto">
+                        <label class="text-xs font-bold text-gold">اختر الشهر:</label>
+                        <input type="month" id="monthlyReportFilterMonth" onchange="renderMonthlyReport()" class="bg-darkbg border border-gold text-gold text-xs px-3 py-2 rounded-xl outline-none font-bold">
+                        <button onclick="exportMonthlyReportPDF()" class="bg-red-600 text-white font-bold px-3 py-2 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> تصدير PDF</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="monthlyReportPrintArea" class="bg-white text-slate-900 p-6 rounded-xl shadow-2xl space-y-6" style="direction: inherit; text-align: inherit;">
+                <div class="flex justify-between items-center border-b-2 border-slate-800 pb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center text-amber-400 font-black text-xl shadow">و</div>
+                        <div>
+                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
+                            <p class="text-[11px] text-slate-600 font-bold">التقرير المالي والأداء الشهري الموحد</p>
+                        </div>
+                    </div>
+                    <div class="text-left text-xs space-y-0.5">
+                        <div>عن شهر: <strong id="repSelectedMonthBadge" class="text-emerald-700 text-sm"></strong></div>
+                        <div>تاريخ الاستخراج: <span id="repPrintDate"></span></div>
+                    </div>
                 </div>
 
-                <form id="employeeForm" onsubmit="handleSaveEmployee(event)" class="bg-darkbg p-4 rounded-xl border border-zinc-800 space-y-3">
-                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                        <input type="text" id="empName" required placeholder="اسم الموظف الكامل" class="bg-zinc-900 border border-zinc-700 p-2 text-xs rounded text-zinc-200">
-                        <input type="text" id="empJob" required placeholder="المسمى الوظيفي (مثال: محاسب/سائق)" class="bg-zinc-900 border border-zinc-700 p-2 text-xs rounded text-zinc-200">
-                        <input type="number" id="empSalary" required placeholder="الراتب الأساسي" class="bg-zinc-900 border border-gold p-2 text-xs rounded text-gold font-bold">
-                        <select id="empBranch" class="bg-zinc-900 border border-zinc-700 p-2 text-xs rounded text-zinc-200">
-                            <option value="فرع عجمان">فرع عجمان</option>
-                            <option value="فرع بني ياس">فرع بني ياس</option>
-                            <option value="فرع اليمن">فرع اليمن</option>
-                        </select>
+                <!-- المخصاصات المخصصة للشهر -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                    <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-lg">
+                        <span class="text-emerald-800 font-bold block mb-1">إجمالي مبيعات التذاكر</span>
+                        <strong id="repMthTktTotal" class="text-emerald-700 text-base font-black">0 AED</strong>
                     </div>
-                    <button type="submit" class="gold-gradient-bg text-black font-extrabold px-4 py-2 rounded text-xs">إضافة موظف جديد</button>
-                </form>
+                    <div class="bg-indigo-50 border border-indigo-200 p-3 rounded-lg">
+                        <span class="text-indigo-800 font-bold block mb-1">إجمالي إيراد الشحن</span>
+                        <strong id="repMthCargoTotal" class="text-indigo-700 text-base font-black">0 AED</strong>
+                    </div>
+                    <div class="bg-red-50 border border-red-200 p-3 rounded-lg">
+                        <span class="text-red-800 font-bold block mb-1">إجمالي المصروفات</span>
+                        <strong id="repMthExpTotal" class="text-red-700 text-base font-black">0 AED</strong>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg">
+                        <span class="text-amber-800 font-bold block mb-1">صافي الأرباح</span>
+                        <strong id="repMthNetTotal" class="text-amber-700 text-base font-black">0 AED</strong>
+                    </div>
+                </div>
 
-                <div class="overflow-x-auto">
-                    <table class="custom-table" id="employeesTable">
+                <!-- ملخص حسب الأفرع -->
+                <div>
+                    <h4 class="font-bold text-xs text-slate-800 mb-2 border-b pb-1">توزيع الأداء المالي حسب الأفرع خلال الشهر:</h4>
+                    <table class="w-full border-collapse text-xs text-right">
                         <thead>
-                            <tr>
-                                <th>اسم الموظف</th>
-                                <th>الوظيفة</th>
-                                <th>الفرع</th>
-                                <th>الراتب الأساسي</th>
-                                <th>إجراء مسير الرواتب</th>
+                            <tr class="bg-slate-200 text-slate-800">
+                                <th class="border border-slate-300 p-2">اسم الفرع</th>
+                                <th class="border border-slate-300 p-2">عدد التذاكر</th>
+                                <th class="border border-slate-300 p-2">إيراد التذاكر</th>
+                                <th class="border border-slate-300 p-2">إيراد الشحن</th>
+                                <th class="border border-slate-300 p-2">المصروفات</th>
+                                <th class="border border-slate-300 p-2">الصافي</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody id="monthlyBranchTableBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -1142,9 +1320,6 @@
                 { id: "131", tripId: "trip_1", date: "2026-11-08", sender: "عبد الكريم عبد الله", senderPhone: "0567777133", senderAddress: "عجمان", receiver: "النادي الدولي للسيارات", receiverPhone: "0778826198", receiverAddress: "عدن", items: [{desc: "كرتون صغير به فواتير", qty: 1, price: 50}], grandTotal: 50, paymentStatus: "مدفوع", branch: "فرع عجمان", createdBy: "وليد السيد" }
             ],
             vouchers: [],
-            employees: [
-                { id: "emp_1", name: "أحمد علي", job: "محاسب رئيسي", salary: 4500, branch: "فرع عجمان" }
-            ],
             nextTicketNo: 142,
             nextCargoNo: 132
         };
@@ -1159,21 +1334,30 @@
             return cleaned;
         }
 
-        function sendTicketViaWhatsApp() {
-            if(!currentPreviewTicket) return;
-            const tkt = currentPreviewTicket;
+        function sendTicketViaWhatsApp(ticketId = null) {
+            const tkt = ticketId ? db.passengers.find(p => String(p.id) === String(ticketId)) : currentPreviewTicket;
+            if(!tkt) return;
             const targetPhone = formatPhoneForWhatsApp(tkt.phone);
             if(!targetPhone) { alert('رقم هاتف الراكب غير صحيح!'); return; }
             const msgText = `🌟 *شركة وادي بناء للنقل الدولي* 🌟\nمرحباً بك أستاذ/ة *${tkt.name}*\n🎫 *رقم التذكرة:* #${tkt.id}\n📍 *المسار:* ${tkt.origin} ➔ ${tkt.destination}\n📅 *تاريخ الرحلة:* ${tkt.date}\n💳 *المبلغ:* ${tkt.fare} AED (${tkt.payMethod})\nنتمنى لكم رحلة موفقة وآمنة!`;
             window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msgText)}`, '_blank');
         }
 
-        function sendCargoViaWhatsApp() {
-            if(!currentPreviewCargo) return;
-            const cargo = currentPreviewCargo;
+        function sendCargoViaWhatsApp(cargoId = null) {
+            const cargo = cargoId ? db.cargo.find(c => String(c.id) === String(cargoId)) : currentPreviewCargo;
+            if(!cargo) return;
             const targetPhone = formatPhoneForWhatsApp(cargo.senderPhone);
             if(!targetPhone) { alert('رقم هاتف المرسل غير صحيح!'); return; }
             const msgText = `📦 *شركة وادي بناء للنقل الدولي* 📦\nمرحباً *${cargo.sender}*\n🧾 *رقم الفاتورة:* #${cargo.id}\n👤 *المستلم:* ${cargo.receiver} (${cargo.receiverPhone})\n💰 *السعر الإجمالي:* ${cargo.grandTotal} AED\nشكراً لثقتكم بنا!`;
+            window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msgText)}`, '_blank');
+        }
+
+        function sendCargoToReceiverWhatsApp(cargoId = null) {
+            const cargo = cargoId ? db.cargo.find(c => String(c.id) === String(cargoId)) : currentPreviewCargo;
+            if(!cargo) return;
+            const targetPhone = formatPhoneForWhatsApp(cargo.receiverPhone);
+            if(!targetPhone) { alert('رقم هاتف المستلم غير صحيح!'); return; }
+            const msgText = `📦 *شركة وادي بناء للنقل الدولي - اليمن* 📦\nمرحباً أستاذ *${cargo.receiver}*\nنود إعلامكم بوجود طرد/شحنة صادرة لكم من: *${cargo.sender}*\n🧾 *رقم الفاتورة:* #${cargo.id}\n📍 *جهة التسليم:* ${cargo.receiverAddress}\nيرجى التواصل لترتيب الاستلام.`;
             window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msgText)}`, '_blank');
         }
 
@@ -1253,6 +1437,26 @@
             renderActiveSessions();
         }
 
+        function openChangePasswordModal() {
+            document.getElementById('newPassInput').value = '';
+            document.getElementById('changePassModal').classList.remove('hidden');
+        }
+
+        function handleUserChangePassword(e) {
+            e.preventDefault();
+            const newPass = document.getElementById('newPassInput').value.trim();
+            if(!newPass) return;
+            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            const userObj = users.find(u => u.username === currentUser.username);
+            if(userObj) { userObj.password = newPass; }
+            localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
+            currentUser.password = newPass;
+            localStorage.setItem('WADI_BINA_USER', JSON.stringify(currentUser));
+            if(useFirebase && rtdb) { rtdb.ref('systemUsers').set(users); }
+            alert('تم تغيير كلمة المرور بنجاح!');
+            closeModal('changePassModal');
+        }
+
         function calculateNextSequenceNumbers() {
             if(db.passengers && db.passengers.length > 0) {
                 let maxTkt = 0;
@@ -1279,7 +1483,6 @@
             if(!db.passengers) db.passengers = [];
             if(!db.cargo) db.cargo = [];
             if(!db.vouchers) db.vouchers = [];
-            if(!db.employees) db.employees = [];
             calculateNextSequenceNumbers();
             saveDB();
         }
@@ -1294,8 +1497,7 @@
                         drivers: val.drivers ? Object.values(val.drivers) : db.drivers,
                         passengers: val.passengers ? Object.values(val.passengers) : db.passengers,
                         cargo: val.cargo ? Object.values(val.cargo) : db.cargo,
-                        vouchers: val.vouchers ? Object.values(val.vouchers) : [],
-                        employees: val.employees ? Object.values(val.employees) : []
+                        vouchers: val.vouchers ? Object.values(val.vouchers) : []
                     };
                     validateAndRepairDB();
                 } else { saveDB(); }
@@ -1319,10 +1521,14 @@
         window.onload = function() {
             loadFromLocal();
             updateUserBadge();
-            document.getElementById('passDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('cargoDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('drvDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('vDate').value = new Date().toISOString().split('T')[0];
+            const todayStr = new Date().toISOString().split('T')[0];
+            const monthStr = new Date().toISOString().substring(0, 7);
+            document.getElementById('passDate').value = todayStr;
+            document.getElementById('cargoDate').value = todayStr;
+            document.getElementById('drvDate').value = todayStr;
+            document.getElementById('vDate').value = todayStr;
+            document.getElementById('monthlyReportFilterMonth').value = monthStr;
+            
             onPassengerCountChanged();
             addCargoItemRow();
             buildDriverItemsRows();
@@ -1340,6 +1546,7 @@
             
             if(tabId === 'create-ticket' && !document.getElementById('passEditId').value) calculateNextSequenceNumbers();
             if(tabId === 'create-cargo' && !document.getElementById('cargoEditId').value) calculateNextSequenceNumbers();
+            if(tabId === 'monthly-reports') renderMonthlyReport();
             refreshUI();
         }
 
@@ -1353,10 +1560,7 @@
                 renderFinancials();
                 renderVouchersTable();
             }
-            if(currentTab === 'employees') renderEmployeesTable();
-            if(currentTab === 'users' && currentUser && (currentUser.role === 'مدير عام' || currentUser.role === 'مدير' || currentUser.role === 'مدير فرع')) {
-                renderUsersTable();
-            }
+            if(currentTab === 'monthly-reports') renderMonthlyReport();
         }
 
         let finBarChartInstance = null;
@@ -1415,6 +1619,61 @@
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
                 });
             }
+        }
+
+        /* --- التقارير الشهرية المتقدمة --- */
+        function renderMonthlyReport() {
+            const selectedMonth = document.getElementById('monthlyReportFilterMonth').value;
+            document.getElementById('repSelectedMonthBadge').innerText = selectedMonth || 'الكل';
+            document.getElementById('repPrintDate').innerText = new Date().toLocaleDateString('ar-EG');
+
+            const passList = getFilteredData(db.passengers).filter(p => p.date && p.date.startsWith(selectedMonth));
+            const cargoList = getFilteredData(db.cargo).filter(c => c.date && c.date.startsWith(selectedMonth));
+            const driverList = getFilteredData(db.drivers).filter(d => d.date && d.date.startsWith(selectedMonth));
+            const voucherList = getFilteredData(db.vouchers).filter(v => v.date && v.date.startsWith(selectedMonth));
+
+            const tktRev = passList.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (p.fare || 0), 0);
+            const cargoRev = cargoList.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + (c.grandTotal || 0), 0);
+            const drvExp = driverList.reduce((s, d) => s + (d.totalExpenses || 0), 0);
+            const vExp = voucherList.filter(v => v.type === 'صرف').reduce((s, v) => s + (v.amount || 0), 0);
+            const totalExp = drvExp + vExp;
+            const netProfit = (tktRev + cargoRev) - totalExp;
+
+            document.getElementById('repMthTktTotal').innerText = `${tktRev} AED`;
+            document.getElementById('repMthCargoTotal').innerText = `${cargoRev} AED`;
+            document.getElementById('repMthExpTotal').innerText = `${totalExp} AED`;
+            document.getElementById('repMthNetTotal').innerText = `${netProfit} AED`;
+
+            // تقسيم الأداء حسب الفرع
+            const branches = ['فرع عجمان', 'فرع بني ياس', 'فرع اليمن'];
+            const tbody = document.getElementById('monthlyBranchTableBody');
+            if(tbody) {
+                tbody.innerHTML = '';
+                branches.forEach(b => {
+                    const bPass = passList.filter(p => (p.branch || 'فرع عجمان') === b);
+                    const bCargo = cargoList.filter(c => (c.branch || 'فرع عجمان') === b);
+                    const bVoucher = voucherList.filter(v => (v.branch || 'فرع عجمان') === b);
+                    const bDriver = driverList.filter(d => (d.branch || 'فرع عجمان') === b);
+
+                    const bTktRev = bPass.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (p.fare || 0), 0);
+                    const bCargoRev = bCargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + (c.grandTotal || 0), 0);
+                    const bExp = bDriver.reduce((s, d) => s + (d.totalExpenses || 0), 0) + bVoucher.filter(v => v.type === 'صرف').reduce((s, v) => s + (v.amount || 0), 0);
+                    const bNet = (bTktRev + bCargoRev) - bExp;
+
+                    tbody.insertRow().innerHTML = `
+                        <td class="border border-slate-300 p-2 font-bold">${b}</td>
+                        <td class="border border-slate-300 p-2 text-center">${bPass.length}</td>
+                        <td class="border border-slate-300 p-2 text-emerald-700 font-bold">${bTktRev} AED</td>
+                        <td class="border border-slate-300 p-2 text-indigo-700 font-bold">${bCargoRev} AED</td>
+                        <td class="border border-slate-300 p-2 text-red-700 font-bold">${bExp} AED</td>
+                        <td class="border border-slate-300 p-2 font-black text-amber-700">${bNet} AED</td>
+                    `;
+                });
+            }
+        }
+
+        function exportMonthlyReportPDF() {
+            exportToPDF('monthlyReportPrintArea', 'WadiBina_MonthlyReport_');
         }
 
         function buildDriverItemsRows(existingItems = null) {
@@ -1603,6 +1862,26 @@
             });
         }
 
+        function exportMultiPagePDF(elementId, filePrefix) {
+            const element = document.getElementById(elementId);
+            html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                const pageWidth = 210, pageHeight = 295, imgWidth = pageWidth;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight, position = 0;
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                pdf.save(`${filePrefix}${Date.now()}.pdf`);
+            });
+        }
+
         function exportSystemBackupPDF() {
             document.getElementById('reportDateBadge').innerText = new Date().toLocaleDateString('ar-EG');
             document.getElementById('reportUserBadge').innerText = currentUser ? currentUser.username : 'النظام';
@@ -1697,7 +1976,6 @@
 
             const mainFarePerPax = (parseFloat(document.getElementById('passManualTotal').value) || (count * 350)) / count;
 
-            // تسجيل الراكب الرئيسي
             const mainTktData = {
                 id: String(ticketNo), tripId,
                 name: document.getElementById('passName').value,
@@ -1723,7 +2001,6 @@
                 }
                 db.passengers.unshift(mainTktData);
 
-                // إصدار تذاكر إضافية فرعية تلقائياً للركاب المرافقين بنفس رقم الهاتف ورقم الجواز الخاص بالمرافق وبأرقام تذاكر متسلسلة
                 extraList.forEach((ext, idx) => {
                     const subTktNo = ticketNo + idx + 1;
                     db.passengers.unshift({
@@ -1853,53 +2130,6 @@
             addCargoItemRow();
         }
 
-        function handleSaveEmployee(e) {
-            e.preventDefault();
-            db.employees.unshift({
-                id: 'emp_' + Date.now(),
-                name: document.getElementById('empName').value,
-                job: document.getElementById('empJob').value,
-                salary: parseFloat(document.getElementById('empSalary').value) || 0,
-                branch: document.getElementById('empBranch').value
-            });
-            saveDB();
-            alert('تم إضافة الموظف بنجاح!');
-            document.getElementById('employeeForm').reset();
-            renderEmployeesTable();
-        }
-
-        function renderEmployeesTable() {
-            const tbody = document.querySelector('#employeesTable tbody');
-            if(!tbody) return;
-            tbody.innerHTML = '';
-            db.employees.forEach((emp, idx) => {
-                tbody.insertRow().innerHTML = `
-                    <td><strong>${emp.name}</strong></td>
-                    <td>${emp.job}</td>
-                    <td>${emp.branch}</td>
-                    <td class="text-gold font-bold">${emp.salary} AED</td>
-                    <td><button onclick="payEmployeeSalary('${emp.name}', ${emp.salary}, '${emp.branch}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold">صرف راتب</button></td>
-                `;
-            });
-        }
-
-        function payEmployeeSalary(name, salary, branch) {
-            if(confirm(`هل تريد صرف راتب الموظف (${name}) بمبلغ ${salary} AED وترحيله لسندات الصرف؟`)) {
-                db.vouchers.unshift({
-                    id: Date.now().toString(),
-                    type: 'صرف',
-                    date: new Date().toISOString().split('T')[0],
-                    amount: salary,
-                    receiver: name,
-                    desc: `صرف راتب شهر - الموظف ${name}`,
-                    user: currentUser.username, branch: branch || 'فرع عجمان'
-                });
-                saveDB();
-                alert('تم تسجيل صرف الراتب وترحيله للصندوق العام بنجاح!');
-                refreshUI();
-            }
-        }
-
         function handleSaveVoucher(e) {
             e.preventDefault();
             db.vouchers.unshift({
@@ -1985,6 +2215,7 @@
                         <td style="color:${p.payMethod==='مدفوع'?'#10b981':'#f59e0b'}">${p.payMethod}</td>
                         <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${p.branch || 'فرع عجمان'}</span></td>
                         <td class="space-x-1 space-x-reverse">
+                            <button onclick="sendTicketViaWhatsApp('${p.id}')" title="إرسال عبر الواتساب" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-brands fa-whatsapp"></i></button>
                             <button onclick="previewTicket('${p.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-file-pdf"></i></button>
                             <button onclick="editPassenger('${p.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>
                             <button onclick="deletePassenger(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
@@ -2013,6 +2244,8 @@
                         <td style="color:${c.paymentStatus==='مدفوع'?'#10b981':'#f59e0b'}">${c.paymentStatus}</td>
                         <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${c.branch || 'فرع عجمان'}</span></td>
                         <td class="space-x-1 space-x-reverse">
+                            <button onclick="sendCargoViaWhatsApp('${c.id}')" title="إرسال للمرسل عبر الواتساب" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-brands fa-whatsapp"></i></button>
+                            <button onclick="sendCargoToReceiverWhatsApp('${c.id}')" title="إشعار المستلم" class="bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-paper-plane"></i></button>
                             <button onclick="previewCargo('${c.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-file-pdf"></i></button>
                             <button onclick="editCargo('${c.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>
                             <button onclick="deleteCargo(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
@@ -2128,6 +2361,66 @@
         function exportBackupJSON() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
             const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", `WadiBina_Backup_${Date.now()}.json`); dl.click();
+        }
+
+        function importBackupJSON(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const importedData = JSON.parse(evt.target.result);
+                    if(importedData && importedData.passengers && importedData.cargo) {
+                        db = importedData;
+                        validateAndRepairDB();
+                        saveDB();
+                        alert('تم استرجاع النسخة الاحتياطية بنجاح!');
+                        location.reload();
+                    } else { alert('ملف النسخة الاحتياطية غير صالح!'); }
+                } catch(err) { alert('خطأ أثناء قراءة الملف'); }
+            };
+            reader.readAsText(file);
+        }
+
+        async function importBackupPDF(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            const fileReader = new FileReader();
+            fileReader.onload = async function() {
+                const typedarray = new Uint8Array(this.result);
+                try {
+                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                    let fullText = "";
+                    for(let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        fullText += textContent.items.map(item => item.str).join(" ") + "\n";
+                    }
+                    parseAndImportPdfText(fullText);
+                } catch(error) { alert('تعذر قراءة ملف PDF.'); }
+            };
+            fileReader.readAsArrayBuffer(file);
+        }
+
+        function parseAndImportPdfText(text) {
+            let recoveredCount = 0;
+            const ticketMatches = text.matchAll(/(?:#|بوليصة|Ticket)\s*(\d+)/gi);
+            for(const match of ticketMatches) {
+                const tId = match[1];
+                if(tId && !db.passengers.some(p => String(p.id) === String(tId))) {
+                    db.passengers.unshift({
+                        id: tId, tripId: db.trips[0] ? db.trips[0].id : "trip_1",
+                        name: "راكب مستعاد #" + tId, phone: "0500000000", passport: "00000000",
+                        passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن",
+                        date: "-", fare: 350, payMethod: "مدفوع", branch: currentUser ? currentUser.branch : "فرع عجمان", createdBy: getCurrentUserName()
+                    });
+                    recoveredCount++;
+                }
+            }
+            validateAndRepairDB();
+            saveDB();
+            refreshUI();
+            alert(`تم استعادة (${recoveredCount}) سجل بنجاح من ملف PDF!`);
         }
 
         function exportExcel(type) {
