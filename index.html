@@ -1,1208 +1,416 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" class="dark" id="htmlRoot">
+<html lang="ar" dir="rtl" id="htmlRoot">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title id="pageTitle">شركة وادي بناء للنقل الدولي | النظام الموحد واللوحة المتكاملة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">شركة وادي بناء للنقل الدولي | النظام السحابي الموحد</title>
     
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        gold: {
-                            DEFAULT: '#D4AF37',
-                            300: '#F8EEB4',
-                            400: '#F3E5AB',
-                            500: '#D4AF37',
-                            600: '#AA8C2C',
-                            700: '#806921',
-                            800: '#594815',
-                            900: '#33290A'
-                        },
-                        darkbg: '#09090b',
-                        cardbg: '#121215',
-                        subcard: '#18181c',
-                        bordergold: '#D4AF3740'
-                    },
-                    fontFamily: {
-                        sans: ['Cairo', 'Tajawal', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-
-    <!-- External Libraries & Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     
-    <!-- Export & Visualization Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js for Dashboard Analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- jsPDF & html2canvas for PDF Reports & Captures -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- JsBarcode for Barcode Generation -->
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-
-    <!-- PDF.js for Backup Recovery -->
+    
+    <!-- SheetJS (XLSX) for Excel Export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <!-- PDF.js for PDF import/recovery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
-        if (window.pdfjsLib) {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        }
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
 
-    <!-- Firebase SDK (v8/Compat Unified) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <!-- Firebase SDKs (Realtime Database & App) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <style>
-        :root {
-            --bg-dark: #09090b;
-            --bg-card: #121215;
-            --bg-sub: #18181c;
-            --gold-primary: #D4AF37;
-            --gold-secondary: #AA8C2C;
-            --border-color: #D4AF3740;
-            --text-main: #f4f4f5;
-            --text-muted: #a1a1aa;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+        body { font-family: 'Cairo', sans-serif; background-color: #0f172a; color: #f1f5f9; }
+        .gold-gradient-bg { background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%); }
+        .gold-glow { box-shadow: 0 0 20px rgba(191, 149, 63, 0.25); }
+        .border-gold { border-color: #d4af37; }
+        .text-gold { color: #d4af37; }
+        .bg-cardbg { background-color: #1e293b; }
+        .bg-darkbg { background-color: #0b0f19; }
+        
+        .custom-table th { background-color: #1a2234; color: #d4af37; font-size: 11px; padding: 10px; text-align: right; border-bottom: 2px solid #334155; }
+        .custom-table td { padding: 9px 10px; font-size: 11px; border-bottom: 1px solid #334155; color: #e2e8f0; }
+        .custom-table tr:hover { background-color: rgba(212, 175, 55, 0.05); }
 
-        * {
-            box-sizing: border-box;
-        }
+        .badge-paid { background-color: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .badge-pending { background-color: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
 
-        body {
-            font-family: 'Cairo', 'Tajawal', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Custom Scrollbars */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0d0d0f;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #3d3519;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #D4AF37;
-        }
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Gradients & Aesthetics */
-        .gold-gradient-text {
-            background: linear-gradient(135deg, #FFF 0%, #F3E5AB 30%, #D4AF37 65%, #AA8C2C 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .gold-gradient-bg {
-            background: linear-gradient(135deg, #BF953F 0%, #FCF6BA 25%, #D4AF37 55%, #AA8C2C 100%);
-        }
-
-        .gold-glow {
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
-        }
-
-        /* Tables Styling */
-        .custom-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: inherit;
-            font-size: 0.8rem;
-        }
-
-        .custom-table th {
-            background: rgba(255, 255, 255, 0.03);
-            color: var(--gold-primary);
-            padding: 12px 10px;
-            border-bottom: 2px solid var(--border-color);
-            white-space: nowrap;
-            font-weight: 800;
-            letter-spacing: 0.2px;
-        }
-
-        .custom-table td {
-            padding: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            vertical-align: middle;
-        }
-
-        .custom-table tbody tr {
-            transition: background-color 0.2s ease;
-        }
-
-        .custom-table tbody tr:hover {
-            background-color: rgba(212, 175, 55, 0.04);
-        }
-
-        /* Modal Overlays */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(9, 9, 11, 0.92);
-            backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 16px;
-        }
-
-        .modal-card {
-            background: var(--bg-card);
-            border: 2px solid var(--gold-primary);
-            border-radius: 18px;
-            padding: 24px;
-            width: 100%;
-            max-width: 850px;
-            box-shadow: 0 20px 45px rgba(212, 175, 55, 0.22);
-            position: relative;
-            max-height: 92vh;
-            overflow-y: auto;
-            animation: modalFadeIn 0.25s ease-out;
-        }
-
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.96) translateY(8px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            cursor: pointer;
-            filter: invert(0.8) sepia(1) saturate(5) hue-rotate(5deg);
-        }
-
-        /* Status Badges */
-        .badge-paid {
-            background-color: rgba(16, 185, 129, 0.15);
-            color: #34d399;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-        .badge-pending {
-            background-color: rgba(245, 158, 11, 0.15);
-            color: #fbbf24;
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
-        .badge-danger {
-            background-color: rgba(239, 68, 68, 0.15);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        /* Print Media Rules */
         @media print {
-            @page {
-                size: A4 portrait;
-                margin: 8mm;
-            }
-            body {
-                background: white !important;
-                color: black !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            header, nav, .no-print, button, .modal-overlay {
-                display: none !important;
-            }
-            .print-only {
-                display: block !important;
-            }
-            .modal-overlay.hidden {
-                display: none !important;
-            }
-            #manifestModal:not(.hidden),
-            #cargoManifestModal:not(.hidden),
-            #driverAccountModal:not(.hidden),
-            #ticketPreviewModal:not(.hidden),
-            #cargoPreviewModal:not(.hidden),
-            #debtInvPreviewModal:not(.hidden) {
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100% !important;
-                height: auto !important;
-                background: white !important;
-                z-index: 99999 !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                display: block !important;
-            }
-            #manifestModal .modal-card,
-            #cargoManifestModal .modal-card,
-            #driverAccountModal .modal-card,
-            #ticketPreviewModal .modal-card,
-            #cargoPreviewModal .modal-card,
-            #debtInvPreviewModal .modal-card {
-                border: none !important;
-                box-shadow: none !important;
-                max-width: 100% !important;
-                width: 100% !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                background: white !important;
-                max-height: none !important;
-                overflow: visible !important;
-            }
-            #manifestPrintArea,
-            #cargoManifestPrintArea,
-            #driverAccountPrintArea,
-            #ticketCaptureArea,
-            #cargoCaptureArea,
-            #debtInvCaptureArea {
-                display: block !important;
-                width: 100% !important;
-                padding: 5mm !important;
-                margin: 0 !important;
-                background: white !important;
-                color: black !important;
-                page-break-inside: auto;
-                box-shadow: none !important;
-            }
-            table {
-                page-break-inside: auto;
-                width: 100% !important;
-                border-collapse: collapse !important;
-            }
-            tr {
-                page-break-inside: avoid !important;
-                page-break-after: auto !important;
-                break-inside: avoid !important;
-            }
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .print-container { width: 100% !important; margin: 0 !important; padding: 0 !important; background: white !important; color: black !important; }
         }
     </style>
 </head>
-<body class="bg-darkbg text-zinc-100 min-h-screen flex flex-col justify-between selection:bg-gold selection:text-black">
+<body class="min-h-screen flex flex-col antialiased">
 
     <!-- ===================================================================== -->
-    <!-- 1. AUTHENTICATION & SECURITY MODALS                                   -->
+    <!-- LOGIN OVERLAY MODAL                                                   -->
     <!-- ===================================================================== -->
-    
-    <!-- LOGIN MODAL -->
-    <div class="modal-overlay" id="loginOverlay">
-        <div class="modal-card" style="max-width: 420px;">
-            <div class="text-center mb-6">
-                <div class="relative w-20 h-20 mx-auto mb-3">
-                    <img src="logo_2.jpeg" alt="Logo" class="w-20 h-20 object-cover rounded-full border-2 border-gold shadow-xl" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="w-20 h-20 gold-gradient-bg rounded-full hidden items-center justify-center text-black text-3xl font-black shadow-xl">
-                        <i class="fa-solid fa-bus"></i>
-                    </div>
-                </div>
-                <h2 id="lgTitle" class="text-xl font-black text-gold">تسجيل الدخول للنظام الموحد</h2>
-                <p id="lgSub" class="text-zinc-400 text-xs mt-1">شركة وادي بناء للنقل الدولي — بوابة التحكم المتكاملة</p>
-            </div>
-            <form onsubmit="handleLogin(event)" class="space-y-4">
-                <div>
-                    <label id="lgUserLbl" class="block text-xs font-bold text-zinc-300 mb-1.5">اسم المستخدم</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-user absolute right-3.5 top-1/2 -translate-y-1/2 text-gold text-xs"></i>
-                        <input type="text" id="loginUser" class="w-full bg-darkbg border border-zinc-700 focus:border-gold rounded-xl pr-10 pl-4 py-3 text-sm text-zinc-100 outline-none transition" required placeholder="أدخل اسم المستخدم" value="وليد السيد">
-                    </div>
-                </div>
-                <div>
-                    <label id="lgPassLbl" class="block text-xs font-bold text-zinc-300 mb-1.5">كلمة المرور</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-lock absolute right-3.5 top-1/2 -translate-y-1/2 text-gold text-xs"></i>
-                        <input type="password" id="loginPass" class="w-full bg-darkbg border border-zinc-700 focus:border-gold rounded-xl pr-10 pl-4 py-3 text-sm text-zinc-100 outline-none transition" required placeholder="••••••••" value="708090">
-                    </div>
-                </div>
-                <button type="submit" id="lgBtn" class="w-full gold-gradient-bg text-black font-black py-3.5 rounded-xl shadow-lg transition hover:opacity-95 mt-2">
-                    <i class="fa-solid fa-right-to-bracket ml-1.5"></i> دخول النظام الموحد
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- CHANGE PASSWORD MODAL -->
-    <div class="modal-overlay hidden" id="changePassModal">
-        <div class="modal-card" style="max-width: 400px;">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-key ml-1"></i> تغيير كلمة المرور الخاصة بي</h3>
-                <button onclick="closeModal('changePassModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <form onsubmit="handleUserChangePassword(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-zinc-300 mb-1.5">كلمة المرور الجديدة</label>
-                    <input type="password" id="newPassInput" required class="w-full bg-darkbg border border-gold rounded-xl px-4 py-2.5 text-xs text-zinc-100 outline-none" placeholder="أدخل كلمة المرور الجديدة">
-                </div>
-                <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-2.5 rounded-xl text-xs shadow">حفظ وتحديث كلمة المرور</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- ===================================================================== -->
-    <!-- 2. PREVIEW & PRINT MODALS (TICKETS, CARGO, DEBTS, DRIVERS, MANIFESTS) -->
-    <!-- ===================================================================== -->
-
-    <!-- PREVIEW TICKET MODAL -->
-    <div class="modal-overlay hidden" id="ticketPreviewModal">
-        <div class="modal-card" style="max-width: 720px;">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-ticket ml-1"></i> <span id="tktPreviewHead">معاينة وتنزيل بوليصة التذكرة</span></h3>
-                <button onclick="closeModal('ticketPreviewModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            
-            <div id="ticketCaptureArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl" style="direction: inherit; text-align: inherit;">
-                <div class="flex justify-between items-center border-b-2 border-slate-300 pb-3 mb-4">
-                    <div class="flex items-center gap-3">
-                        <img src="logo_2.jpeg" alt="Logo" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=WB'">
-                        <div>
-                            <h2 id="tktCoName" class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
-                            <p id="tktCoSub" class="text-[11px] text-slate-500 font-bold">بوليصة حجز تذكرة سفر ركاب معتمدة</p>
-                        </div>
-                    </div>
-                    <div class="text-left flex flex-col items-end">
-                        <strong id="imgTicketCode" class="text-xl font-black text-amber-600">#140</strong>
-                        <svg id="ticketBarcode" class="w-32 h-10 mt-1"></svg>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Passenger Ticket</p>
-                    </div>
-                </div>
-
-                <div class="bg-slate-100 p-3.5 rounded-lg border border-slate-200 text-xs space-y-2 mb-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <div><strong id="lblPrName">الراكب الرئيسي:</strong> <span id="imgTktName" class="font-bold text-slate-900"></span></div>
-                        <div><strong id="lblPrPhone">رقم الهاتف:</strong> <span id="imgTktPhone" class="font-bold"></span></div>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <div><strong id="lblPrPass">رقم الجواز / الهوية:</strong> <span id="imgTktPassport" class="font-bold"></span></div>
-                        <div><strong>الوكيل / المكتب:</strong> <span id="imgTktAgent" class="font-bold text-indigo-800"></span></div>
-                    </div>
-                    <div class="pt-2 border-t border-slate-300 flex justify-between flex-wrap gap-2">
-                        <div><strong id="lblPrRoute">المسار:</strong> <span id="imgTktRoute" class="font-bold text-slate-900"></span></div>
-                        <div><strong id="lblPrDate">تاريخ الرحلة:</strong> <span id="imgTktDate" class="text-amber-700 font-black"></span></div>
-                        <div><strong id="lblPrTime">وقت الحضور:</strong> <span id="imgTktTime" class="text-indigo-700 font-black"></span></div>
-                    </div>
-                    <div class="pt-1.5 border-t border-slate-200 text-amber-800 font-bold no-print">
-                        <span>الموظف منفذ الإجراء: </span><span id="imgTktCreatedBy"></span>
-                    </div>
-                </div>
-
-                <div id="imgTicketExtraBox"></div>
-
-                <div class="flex justify-between items-center bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-sm font-black mb-5">
-                    <div class="flex items-center gap-2">
-                        <span id="lblPrTotal" class="text-indigo-900">إجمالي المبلغ:</span>
-                        <span id="imgTktFare" class="text-amber-600 text-base">0 AED</span>
-                    </div>
-                    <div class="text-xs">
-                        <span id="lblPrPayStatus" class="text-slate-500 font-normal ml-1">حالة السداد:</span>
-                        <span id="imgTktPayStatus" class="px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-bold">مدفوع</span>
-                    </div>
-                </div>
-
-                <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
-                    <div id="tktFootNote" class="font-bold text-slate-700">* رحلة موفقة وآمنة مع وادي بناء للنقل الدولي. أرقام التواصل بالمكاتب:</div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-1 font-bold text-slate-800 pt-1">
-                        <div>• عجمان (الجرف 2): 0508200749 - 0558675501</div>
-                        <div>• بني ياس: 0508200754 - 0558675501</div>
-                        <div>• عدن: 0783424999 - 0776363101</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-5 flex gap-2 flex-wrap no-print">
-                <button onclick="downloadTicketImageWithWhatsAppPrompt()" class="flex-1 bg-emerald-600 text-white font-extrabold py-3 rounded-xl text-xs shadow hover:bg-emerald-500 flex items-center justify-center gap-1.5 transition">
-                    <i class="fa-brands fa-whatsapp text-base"></i> تحميل وإرسال للواتساب
-                </button>
-                <button onclick="window.print()" class="bg-indigo-600 text-white font-extrabold px-4 py-3 rounded-xl text-xs shadow hover:bg-indigo-500">
-                    <i class="fa-solid fa-print ml-1"></i> طباعة
-                </button>
-                <button onclick="exportToPDF('ticketCaptureArea', 'WadiBina_Ticket_')" class="bg-red-600 text-white font-extrabold px-4 py-3 rounded-xl text-xs shadow hover:bg-red-500">
-                    <i class="fa-solid fa-file-pdf ml-1"></i> PDF
-                </button>
-                <button onclick="downloadCapturedImage('ticketCaptureArea', 'WadiBina_Ticket_')" class="gold-gradient-bg text-black font-extrabold px-4 py-3 rounded-xl text-xs shadow">
-                    <i class="fa-solid fa-download ml-1"></i> صورة
-                </button>
-                <button onclick="closeModal('ticketPreviewModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs hover:bg-zinc-700">إغلاق</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- PREVIEW CARGO MODAL -->
-    <div class="modal-overlay hidden" id="cargoPreviewModal">
-        <div class="modal-card" style="max-width: 750px;">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-boxes-packing ml-1"></i> <span id="cargoPreviewHead">معاينة وتنزيل فاتورة الشحن والأصناف</span></h3>
-                <button onclick="closeModal('cargoPreviewModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-
-            <div id="cargoCaptureArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl" style="direction: inherit; text-align: inherit;">
-                <div class="flex justify-between items-start border-b-2 border-slate-300 pb-3 mb-4">
-                    <div>
-                        <strong id="imgCargoCode" class="text-xl font-black text-indigo-700">#130</strong>
-                        <p class="text-[11px] text-slate-500 font-bold">Cargo Shipping Invoice</p>
-                    </div>
-                    <div class="text-left flex items-center gap-3">
-                        <div>
-                            <h2 id="cargoCoName" class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
-                            <p id="cargoCoSub" class="text-[11px] text-slate-500 font-bold">فاتورة استلام وشحن أمتعة وبضائع</p>
-                        </div>
-                        <img src="logo_2.jpeg" alt="Logo" class="w-12 h-12 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/50?text=WB'">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 text-xs">
-                    <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 space-y-1">
-                        <span id="lblSenderInfo" class="text-indigo-800 font-black block mb-1">بيانات المرسل:</span>
-                        <div><strong id="lblSndName">الاسم:</strong> <span id="imgCargoSenderName" class="font-bold text-slate-900"></span></div>
-                        <div><strong id="lblSndPhone">رقم الهاتف:</strong> <span id="imgCargoSenderPhone" class="font-bold"></span></div>
-                        <div><strong id="lblSndAddr">العنوان:</strong> <span id="imgCargoSenderAddress"></span></div>
-                    </div>
-                    <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 space-y-1">
-                        <span id="lblReceiverInfo" class="text-indigo-800 font-black block mb-1">بيانات المستلم:</span>
-                        <div><strong id="lblRcvName">الاسم:</strong> <span id="imgCargoReceiverName" class="font-bold text-slate-900"></span></div>
-                        <div><strong id="lblRcvPhone">رقم الهاتف:</strong> <span id="imgCargoReceiverPhone" class="font-bold"></span></div>
-                        <div><strong id="lblRcvAddr">العنوان:</strong> <span id="imgCargoReceiverAddress" class="font-bold text-amber-800"></span></div>
-                    </div>
-                </div>
-
-                <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 text-xs mb-4 flex justify-between flex-wrap gap-2">
-                    <div><strong>تاريخ الفاتورة:</strong> <span id="imgCargoDate" class="font-bold text-slate-800"></span></div>
-                    <div><strong>الرحلة المرتبطة:</strong> <span id="imgCargoTripInfo" class="font-bold text-indigo-900"></span></div>
-                    <div class="no-print"><strong>منفذ الإجراء:</strong> <span id="imgCargoCreatedBy" class="font-bold text-amber-800"></span></div>
-                </div>
-
-                <table class="w-full border-collapse text-right text-xs mb-4" style="direction: inherit;">
-                    <thead>
-                        <tr class="bg-slate-200 text-slate-800">
-                            <th class="border border-slate-300 p-2 w-12 text-center" id="thNum">م</th>
-                            <th class="border border-slate-300 p-2" id="thItem">الصنف / الوصف</th>
-                            <th class="border border-slate-300 p-2 w-24 text-center" id="thQty">العدد / الكمية</th>
-                            <th class="border border-slate-300 p-2 w-32 text-left" id="thTotalItem">الإجمالي</th>
-                        </tr>
-                    </thead>
-                    <tbody id="imgCargoItemsTableBody"></tbody>
-                </table>
-
-                <div class="flex justify-between items-center bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-sm font-black mb-5">
-                    <div class="flex items-center gap-2">
-                        <span id="lblGrandTotal" class="text-indigo-900">الإجمالي النهائي:</span>
-                        <span id="imgCargoGrandTotal" class="text-amber-600 text-base">0 AED</span>
-                    </div>
-                    <div class="text-xs">
-                        <span id="lblPayStatusInv" class="text-slate-500 font-normal ml-1">حالة السداد:</span>
-                        <span id="imgCargoPayStatus" class="px-2.5 py-1 rounded-md bg-indigo-100 text-indigo-800 font-bold">مدفوع</span>
-                    </div>
-                </div>
-
-                <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
-                    <div id="cargoFootNote" class="font-bold text-slate-700">* شكراً لاختياركم وادي بناء لشحن أمتعتكم. أرقام التواصل بالمكاتب:</div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-1 font-bold text-slate-800 pt-1">
-                        <div>• عجمان (الجرف 2): 0508200749 - 0558675501</div>
-                        <div>• بني ياس: 0508200754 - 0558675501</div>
-                        <div>• عدن: 0783424999 - 0776363101</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-5 flex gap-2 flex-wrap no-print">
-                <button onclick="downloadCargoImageWithWhatsAppPrompt()" class="flex-1 bg-emerald-600 text-white font-extrabold py-3 rounded-xl text-xs shadow hover:bg-emerald-500 flex items-center justify-center gap-1.5 transition">
-                    <i class="fa-brands fa-whatsapp text-base"></i> تحميل وإرسال للواتساب
-                </button>
-                <button onclick="window.print()" class="bg-indigo-600 text-white font-extrabold px-4 py-3 rounded-xl text-xs shadow hover:bg-indigo-500">
-                    <i class="fa-solid fa-print ml-1"></i> طباعة
-                </button>
-                <button onclick="exportToPDF('cargoCaptureArea', 'WadiBina_Cargo_')" class="bg-red-600 text-white font-extrabold px-4 py-3 rounded-xl text-xs shadow hover:bg-red-500">
-                    <i class="fa-solid fa-file-pdf ml-1"></i> PDF
-                </button>
-                <button onclick="downloadCapturedImage('cargoCaptureArea', 'WadiBina_CargoInvoice_')" class="gold-gradient-bg text-black font-extrabold px-4 py-3 rounded-xl text-xs shadow">
-                    <i class="fa-solid fa-download ml-1"></i> صورة
-                </button>
-                <button onclick="closeModal('cargoPreviewModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs hover:bg-zinc-700">إغلاق</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- PREVIEW DEBT INVOICE MODAL -->
-    <div class="modal-overlay hidden" id="debtInvPreviewModal">
-        <div class="modal-card" style="max-width: 700px;">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-invoice-dollar ml-1"></i> <span id="debtPreviewHead">معاينة وتنزيل فاتورة الحساب الآجل</span></h3>
-                <button onclick="closeModal('debtInvPreviewModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-
-            <div id="debtInvCaptureArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl" style="direction: inherit; text-align: inherit;">
-                <div class="flex justify-between items-center border-b-2 border-slate-300 pb-3 mb-4">
-                    <div class="flex items-center gap-3">
-                        <img src="logo_2.jpeg" alt="Logo" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=WB'">
-                        <div>
-                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
-                            <p class="text-[11px] text-slate-500 font-bold">فاتورة حسابات وذمم مالية آجلة</p>
-                        </div>
-                    </div>
-                    <div class="text-left">
-                        <strong id="imgDebtInvCode" class="text-lg font-black text-amber-600">#1</strong>
-                        <p class="text-[11px] text-slate-500 font-bold">Deferred Invoice</p>
-                    </div>
-                </div>
-
-                <div class="bg-slate-100 p-3.5 rounded-lg border border-slate-200 text-xs space-y-1.5 mb-4">
-                    <div><strong id="lblDebtCust">اسم العميل:</strong> <span id="imgDebtName" class="font-bold text-slate-900"></span></div>
-                    <div><strong id="lblDebtPhone">رقم الهاتف:</strong> <span id="imgDebtPhone" class="font-bold"></span></div>
-                    <div><strong id="lblDebtAddr">العنوان:</strong> <span id="imgDebtAddress"></span></div>
-                    <div><strong id="lblDebtDate">تاريخ الفاتورة:</strong> <span id="imgDebtDate" class="font-bold"></span></div>
-                    <div class="no-print"><strong>منفذ الإجراء:</strong> <span id="imgDebtCreatedBy" class="text-indigo-800 font-bold"></span></div>
-                </div>
-
-                <div class="space-y-1.5 text-xs mb-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
-                    <div class="flex justify-between"><strong id="lblDebtSub">المجموع الكلي:</strong> <span class="font-bold"><span id="imgDebtSubTotal"></span> AED</span></div>
-                    <div class="flex justify-between"><strong id="lblDebtPaid">المبلغ المدفوع:</strong> <span class="text-emerald-700 font-bold"><span id="imgDebtPaid"></span> AED</span></div>
-                </div>
-
-                <div class="flex justify-between items-center bg-amber-50 p-3.5 rounded-lg border border-amber-300 text-sm font-black mb-5">
-                    <div class="flex items-center gap-2">
-                        <span id="lblDebtRem" class="text-indigo-900">المبلغ المتبقي:</span>
-                        <span id="imgDebtNetTotal" class="text-amber-700 text-base">0 AED</span>
-                    </div>
-                    <div class="text-xs">
-                        <span class="text-slate-500 font-normal ml-1">الحالة:</span>
-                        <span id="lblDebtStatusBadge" class="px-2.5 py-1 rounded-md bg-amber-200 text-amber-900 font-bold">حساب آجل</span>
-                    </div>
-                </div>
-
-                <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
-                    <div>* تعتبر هذه الفاتورة سند مطالبة مالي رسمي للحسابات الآجلة لدى شركة وادي بناء للنقل الدولي.</div>
-                </div>
-            </div>
-
-            <div class="mt-5 flex gap-2 flex-wrap no-print">
-                <button onclick="window.print()" class="bg-indigo-600 text-white font-extrabold px-4 py-3 rounded-xl text-xs shadow">
-                    <i class="fa-solid fa-print ml-1"></i> طباعة
-                </button>
-                <button onclick="exportToPDF('debtInvCaptureArea', 'WadiBina_DebtInv_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow hover:bg-red-500">
-                    <i class="fa-solid fa-file-pdf ml-1"></i> تصدير PDF
-                </button>
-                <button onclick="downloadCapturedImage('debtInvCaptureArea', 'WadiBina_DebtInvoice_')" class="flex-1 gold-gradient-bg text-black font-extrabold py-3 rounded-xl text-xs shadow">
-                    <i class="fa-solid fa-download ml-1"></i> تحميل صورة
-                </button>
-                <button onclick="closeModal('debtInvPreviewModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- DRIVER ACCOUNT PREVIEW / PRINT MODAL -->
-    <div class="modal-overlay hidden" id="driverAccountModal">
-        <div class="modal-card" style="max-width: 860px;">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-invoice-dollar ml-1"></i> جدول حساب الرحلة وتسوية السائق (ذهاب وعودة)</h3>
-                <div class="flex gap-2">
-                    <button onclick="window.print()" class="bg-amber-600 text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow">
-                        <i class="fa-solid fa-print ml-1"></i> طباعة
-                    </button>
-                    <button onclick="exportToPDF('driverAccountPrintArea', 'WadiBina_DriverAccount_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs shadow">
-                        <i class="fa-solid fa-file-pdf ml-1"></i> PDF
-                    </button>
-                    <button onclick="closeModal('driverAccountModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-                </div>
-            </div>
-
-            <div id="driverAccountPrintArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl" style="direction: rtl; text-align: right;">
-                <div class="flex justify-between items-center border-b-2 border-slate-800 pb-3 mb-4">
-                    <div class="flex items-center gap-3">
-                        <img src="logo_2.jpeg" alt="Logo" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=WB'">
-                        <div>
-                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
-                            <p class="text-[11px] text-slate-600 font-bold">جدول حساب الرحلة (الروحة والرجعة) وتصفيات السائقين</p>
-                        </div>
-                    </div>
-                    <div class="text-left text-xs space-y-1">
-                        <div>رقم الباص: <strong id="prDriverBus" class="text-amber-700"></strong></div>
-                        <div>اسم السائق: <strong id="prDriverName" class="text-slate-900"></strong></div>
-                        <div>تاريخ الرحلة: <strong id="prDriverDate" class="text-indigo-700"></strong></div>
-                        <div class="no-print">منفذ الإجراء: <strong id="prDriverCreatedBy" class="text-emerald-700"></strong></div>
-                    </div>
-                </div>
-
-                <table class="w-full border-collapse text-right text-xs mb-4" style="direction: inherit;">
-                    <thead>
-                        <tr class="bg-slate-200 text-slate-800">
-                            <th class="border border-slate-300 p-2">الوصف والمصروفات</th>
-                            <th class="border border-slate-300 p-2 w-28 text-center">الروحة</th>
-                            <th class="border border-slate-300 p-2 w-28 text-center">الرجعة</th>
-                            <th class="border border-slate-300 p-2">ملاحظات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="prDriverItemsTableBody"></tbody>
-                    <tfoot>
-                        <tr class="bg-slate-100 font-black text-slate-900 border-t-2 border-slate-400">
-                            <td class="border border-slate-300 p-2 text-left">إجمالي المبالغ:</td>
-                            <td id="prTotalRoha" class="border border-slate-300 p-2 text-center text-indigo-700">0</td>
-                            <td id="prTotalRajah" class="border border-slate-300 p-2 text-center text-emerald-700">0</td>
-                            <td class="border border-slate-300 p-2"></td>
-                        </tr>
-                    </tfoot>
-                </table>
-
-                <div class="bg-slate-100 p-4 rounded-xl border border-slate-300 space-y-2 text-xs mb-6">
-                    <h4 class="font-black text-slate-800 border-b border-slate-300 pb-1 mb-2">تسوية حساب السائق وتكاليف الرحلة</h4>
-                    <div class="flex justify-between"><span>إجمالي مصروفات الرحلة (روحة + رجعة):</span> <strong id="prDriverTotalExp" class="text-red-700">0</strong></div>
-                    <div class="flex justify-between"><span>حساب السائق للرحلة:</span> <strong id="prDriverTripDue" class="text-indigo-700">0</strong></div>
-                    <div class="flex justify-between"><span>متبقي حساب / سلف سابقة:</span> <strong id="prDriverRemaining" class="text-amber-700">0</strong></div>
-                    <div class="flex justify-between text-sm font-black pt-2 border-t border-slate-300 text-emerald-700">
-                        <span>باقي حساب السائق الصافي:</span> <strong id="prDriverNetDue">0 AED</strong>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-6 pt-4 border-t border-dashed border-slate-400 text-xs font-bold text-center">
-                    <div>
-                        <p class="mb-8">توقيع المحاسب / الفرع</p>
-                        <div class="border-b border-slate-400 w-40 mx-auto"></div>
-                    </div>
-                    <div>
-                        <p class="mb-8">توقيع الإدارة العامة</p>
-                        <div class="border-b border-slate-400 w-40 mx-auto"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-5 flex gap-2 no-print">
-                <button onclick="closeModal('driverAccountModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-2.5 rounded-xl text-xs w-full">إغلاق</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- PASSENGER MANIFEST MODAL -->
-    <div class="modal-overlay hidden" id="manifestModal">
-        <div class="modal-card" style="max-width: 960px;">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print flex-wrap gap-2">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> <span id="manPTitle">كشف رحلة ركاب حسب تاريخ الرحلة (Manifest)</span></h3>
-                <div class="flex gap-2 items-center flex-wrap">
-                    <button onclick="printManifestPassenger('driver')" class="bg-amber-600 text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow">
-                        <i class="fa-solid fa-id-card ml-1"></i> طباعة للسائق (بدون أسعار)
-                    </button>
-                    <button onclick="printManifestPassenger('management')" class="bg-gold text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow">
-                        <i class="fa-solid fa-chart-line ml-1"></i> طباعة للإدارة (بالأسعار)
-                    </button>
-                    <button onclick="exportMultiPagePDF('manifestPrintArea', 'WadiBina_Manifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs">
-                        <i class="fa-solid fa-file-pdf ml-1"></i> تصدير PDF
-                    </button>
-                    <button onclick="closeModal('manifestModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-                </div>
-            </div>
-
-            <div class="bg-darkbg p-3 rounded-xl border border-gold mb-4 flex items-center justify-between gap-3 no-print flex-wrap">
-                <label class="text-xs font-bold text-gold flex items-center gap-2"><i class="fa-solid fa-calendar-days"></i> حدد تاريخ الرحلة المطلوب للمانفيستو:</label>
-                <input type="date" id="manifestFilterDate" onchange="renderPassengerManifestTable()" class="bg-zinc-900 border border-gold text-gold text-xs px-3 py-2 rounded-xl outline-none font-bold">
-            </div>
-
-            <div id="manifestPrintArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl" style="direction: inherit; text-align: inherit;">
-                <div class="flex justify-between items-center border-b-2 border-slate-800 pb-3 mb-4">
-                    <div class="flex items-center gap-3">
-                        <img src="logo_2.jpeg" alt="Logo" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=WB'">
-                        <div>
-                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
-                            <p id="manifestTypeSubtitle" class="text-[11px] text-slate-600 font-bold">كشف ركاب الرحلة الرسمي (Passenger Manifest)</p>
-                        </div>
-                    </div>
-                    <div class="text-left text-xs space-y-0.5">
-                        <div>تاريخ الرحلة: <strong id="manifestActiveDateBadge" class="text-amber-700"></strong></div>
-                        <div>تاريخ الإصدار: <span id="manifestIssueDate"></span></div>
-                    </div>
-                </div>
-
-                <div class="mb-4 bg-slate-100 p-3 rounded-lg border border-slate-200 flex justify-between text-xs font-bold">
-                    <span>إجمالي الحجوزات: <span id="manifestTotalBookings" class="text-indigo-700">0</span></span>
-                    <span>إجمالي عدد الركاب الفعلي: <span id="manifestTotalPassengers" class="text-emerald-700">0</span></span>
-                </div>
-
-                <table class="w-full border-collapse text-right text-xs" style="direction: inherit;">
-                    <thead>
-                        <tr class="bg-slate-200 text-slate-800">
-                            <th class="border border-slate-300 p-2">م</th>
-                            <th class="border border-slate-300 p-2">البوليصة</th>
-                            <th class="border border-slate-300 p-2">اسم المسافر الرئيسي</th>
-                            <th class="border border-slate-300 p-2">الركاب المرافقون</th>
-                            <th class="border border-slate-300 p-2">الهاتف</th>
-                            <th class="border border-slate-300 p-2">الجواز</th>
-                            <th class="border border-slate-300 p-2">المسار</th>
-                            <th class="border border-slate-300 p-2 man-price-col">السعر</th>
-                            <th class="border border-slate-300 p-2 no-print">الموظف</th>
-                            <th class="border border-slate-300 p-2">حالة السداد</th>
-                        </tr>
-                    </thead>
-                    <tbody id="manifestTableBody"></tbody>
-                </table>
-            </div>
-
-            <div class="mt-5 flex gap-3 no-print">
-                <button onclick="exportMultiPagePDF('manifestPrintArea', 'WadiBina_Manifest_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow">تصدير PDF كامل</button>
-                <button onclick="closeModal('manifestModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- CARGO MANIFEST MODAL -->
-    <div class="modal-overlay hidden" id="cargoManifestModal">
-        <div class="modal-card" style="max-width: 1000px;">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print flex-wrap gap-2">
-                <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> <span id="manCTitle">كشف مانفيستو فواتير الشحن حسب تاريخ الرحلة</span></h3>
-                <div class="flex gap-2 items-center flex-wrap">
-                    <button onclick="printManifestCargo('driver')" class="bg-amber-600 text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow">
-                        <i class="fa-solid fa-id-card ml-1"></i> طباعة للسائق (بدون أسعار)
-                    </button>
-                    <button onclick="printManifestCargo('management')" class="bg-gold text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow">
-                        <i class="fa-solid fa-chart-line ml-1"></i> طباعة للإدارة (بالأسعار)
-                    </button>
-                    <button onclick="exportMultiPagePDF('cargoManifestPrintArea', 'WadiBina_CargoManifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs">
-                        <i class="fa-solid fa-file-pdf ml-1"></i> تصدير PDF
-                    </button>
-                    <button onclick="closeModal('cargoManifestModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-                </div>
-            </div>
-
-            <div class="bg-darkbg p-3 rounded-xl border border-gold mb-4 flex items-center justify-between gap-3 no-print flex-wrap">
-                <label class="text-xs font-bold text-gold flex items-center gap-2"><i class="fa-solid fa-calendar-days"></i> حدد تاريخ فواتير الشحن المطلوب:</label>
-                <input type="date" id="cargoManifestFilterDate" onchange="renderCargoManifestTable()" class="bg-zinc-900 border border-gold text-gold text-xs px-3 py-2 rounded-xl outline-none font-bold">
-            </div>
-
-            <div id="cargoManifestPrintArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl" style="direction: inherit; text-align: inherit;">
-                <div class="flex justify-between items-center border-b-2 border-slate-800 pb-3 mb-4">
-                    <div class="flex items-center gap-3">
-                        <img src="logo_2.jpeg" alt="Logo" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=WB'">
-                        <div>
-                            <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
-                            <p id="cargoManifestTypeSubtitle" class="text-[11px] text-slate-600 font-bold">كشف مانفيستو الشحن الرسمي (Cargo Manifest)</p>
-                        </div>
-                    </div>
-                    <div class="text-left text-xs space-y-0.5">
-                        <div>تاريخ الشحن: <strong id="cargoManifestActiveDateBadge" class="text-amber-700"></strong></div>
-                        <div>تاريخ الإصدار: <span id="cargoManifestIssueDate"></span></div>
-                    </div>
-                </div>
-
-                <div class="mb-4 bg-slate-100 p-3 rounded-lg border border-slate-200 flex justify-between text-xs font-bold">
-                    <span>إجمالي الفواتير: <span id="cargoManifestTotalInvoices" class="text-indigo-700">0</span></span>
-                    <span id="cargoManifestRevBox">إجمالي الإيرادات: <span id="cargoManifestTotalRevenue" class="text-emerald-700">0 AED</span></span>
-                </div>
-
-                <table class="w-full border-collapse text-right text-xs" style="direction: inherit;">
-                    <thead>
-                        <tr class="bg-slate-200 text-slate-800">
-                            <th class="border border-slate-300 p-2">م</th>
-                            <th class="border border-slate-300 p-2">الفاتورة</th>
-                            <th class="border border-slate-300 p-2">المرسل</th>
-                            <th class="border border-slate-300 p-2">المستلم وعنوانه</th>
-                            <th class="border border-slate-300 p-2">الرحلة المرتبطة</th>
-                            <th class="border border-slate-300 p-2">وصف الأصناف والعدد</th>
-                            <th class="border border-slate-300 p-2 cargo-price-col">الإجمالي</th>
-                            <th class="border border-slate-300 p-2 no-print">الموظف</th>
-                            <th class="border border-slate-300 p-2">حالة السداد</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cargoManifestTableBody"></tbody>
-                </table>
-            </div>
-
-            <div class="mt-5 flex gap-3 no-print">
-                <button onclick="exportMultiPagePDF('cargoManifestPrintArea', 'WadiBina_CargoManifest_')" class="flex-1 bg-red-600 text-white font-extrabold py-3 rounded-xl text-xs shadow">تصدير PDF كامل</button>
-                <button onclick="closeModal('cargoManifestModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===================================================================== -->
-    <!-- 3. MAIN HEADER & NAVIGATION BAR                                       -->
-    <!-- ===================================================================== -->
-
-    <header class="bg-cardbg border-b border-bordergold px-4 sm:px-6 py-3.5 flex items-center justify-between sticky top-0 z-50 backdrop-blur-md bg-opacity-95 shadow-lg">
-        <div class="flex items-center gap-3">
-            <div class="relative w-11 h-11">
-                <img src="logo_2.jpeg" alt="Logo" class="w-11 h-11 object-cover rounded-full border border-gold shadow" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="w-11 h-11 gold-gradient-bg rounded-xl hidden items-center justify-center text-black font-black text-lg shadow">
+    <div id="loginOverlay" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-cardbg border border-gold w-full max-w-md p-8 rounded-3xl shadow-2xl gold-glow space-y-6">
+            <div class="text-center space-y-2">
+                <div class="inline-flex w-16 h-16 rounded-2xl gold-gradient-bg items-center justify-center text-black text-2xl font-black shadow-lg mb-1">
                     <i class="fa-solid fa-bus"></i>
                 </div>
+                <h1 id="lgTitle" class="text-xl font-black text-gold">تسجيل الدخول للنظام السحابي</h1>
+                <p id="lgSub" class="text-xs text-zinc-400">شركة وادي بناء للنقل الدولي — بوابة التحكم السحابية</p>
             </div>
-            <div>
-                <h1 id="headTitle" class="text-base sm:text-lg font-black gold-gradient-text leading-tight">شركة وادي بناء للنقل الدولي</h1>
-                <p id="headSub" class="text-[11px] text-zinc-400">النظام الموحد الشامل لإدارة التذاكر، الشحن، السائقين والمالية</p>
+
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label id="lgUserLbl" class="block text-xs text-zinc-300 font-bold mb-1.5">اسم المستخدم</label>
+                    <input type="text" id="loginUser" required class="w-full bg-darkbg border border-zinc-700 rounded-xl p-3 text-xs text-zinc-100 focus:border-gold outline-none" placeholder="أدخل اسم المستخدم...">
+                </div>
+                <div>
+                    <label id="lgPassLbl" class="block text-xs text-zinc-300 font-bold mb-1.5">كلمة المرور</label>
+                    <input type="password" id="loginPass" required class="w-full bg-darkbg border border-zinc-700 rounded-xl p-3 text-xs text-zinc-100 focus:border-gold outline-none" placeholder="••••••••">
+                </div>
+                <button type="submit" id="lgBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl text-xs shadow-lg hover:opacity-90 transition">
+                    دخول النظام الموحد
+                </button>
+            </form>
+            <div class="text-center text-[11px] text-zinc-500 pt-2 border-t border-zinc-800">
+                مزامنة سحابية لحظية متعددة الأفرع (عجمان، أبوظبي، عمان، اليمن)
             </div>
         </div>
+    </div>
 
-        <div class="flex items-center gap-2 flex-wrap">
-            <span id="userInfoBadge" class="bg-zinc-900 border border-gold text-gold px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm"></span>
+    <!-- ===================================================================== -->
+    <!-- HEADER BAR                                                            -->
+    <!-- ===================================================================== -->
+    <header class="bg-cardbg border-b border-bordergold py-3 px-4 sm:px-8 no-print shadow-xl">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl gold-gradient-bg flex items-center justify-center text-black font-black text-lg shadow-md">
+                    <i class="fa-solid fa-bus"></i>
+                </div>
+                <div>
+                    <h1 id="headTitle" class="text-base sm:text-lg font-black text-gold tracking-wide">شركة وادي بناء للنقل الدولي</h1>
+                    <p id="headSub" class="text-[11px] text-zinc-400">النظام السحابي الشامل لإدارة التذاكر، الشحن، السائقين والمالية</p>
+                </div>
+            </div>
 
-            <button onclick="openChangePasswordModal()" class="bg-zinc-800 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-zinc-700 transition">
-                <i class="fa-solid fa-key"></i> <span class="hidden md:inline" id="btnChangePass">كلمة المرور</span>
-            </button>
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- Branch Selector for Managers -->
+                <div id="managerBranchFilterContainer" class="hidden">
+                    <select id="selectedManagerBranch" onchange="refreshUI()" class="bg-darkbg border border-gold rounded-xl px-3 py-1.5 text-xs text-gold font-bold">
+                        <option value="ALL">🌐 جميع الأفرع (مدير عام)</option>
+                        <option value="فرع عجمان">فرع عجمان</option>
+                        <option value="فرع ابوظبي">فرع أبوظبي</option>
+                        <option value="فرع عمان">فرع عمان</option>
+                        <option value="فرع اليمن">فرع اليمن</option>
+                    </select>
+                </div>
 
-            <button onclick="toggleLanguage()" id="langToggleBtn" class="bg-gold/15 text-gold border border-gold/40 px-3 py-1.5 rounded-xl text-xs font-extrabold hover:bg-gold/25 transition">
-                <i class="fa-solid fa-globe"></i> English
-            </button>
+                <button onclick="openChangePasswordModal()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-xl text-xs font-bold border border-zinc-700">
+                    <i class="fa-solid fa-key ml-1"></i> كلمة المرور
+                </button>
 
-            <button onclick="exportBackupJSON()" class="bg-zinc-800 text-gold border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 hover:border-gold transition">
-                <i class="fa-solid fa-download"></i> <span class="hidden sm:inline" id="btnBackup">نسخة JSON</span>
-            </button>
+                <div class="bg-zinc-900 border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield text-gold"></i>
+                    <span id="userInfoBadge" class="text-zinc-200">المدير العام</span>
+                </div>
 
-            <button onclick="exportSystemBackupPDF()" class="bg-red-600 text-white border border-red-500 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 hover:bg-red-500 transition">
-                <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline" id="btnBackupPDF">تقرير PDF</span>
-            </button>
+                <button onclick="toggleLanguage()" id="langToggleBtn" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-xl text-xs font-bold border border-zinc-700">
+                    <i class="fa-solid fa-globe"></i> English
+                </button>
 
-            <label class="bg-zinc-800 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1 hover:border-gold transition">
-                <i class="fa-solid fa-upload"></i> <span class="hidden sm:inline" id="btnRestore">استرجاع JSON</span>
-                <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
-            </label>
-
-            <label class="bg-red-950/60 text-red-400 border border-red-700 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1 hover:bg-red-900 hover:text-white transition">
-                <i class="fa-solid fa-file-import"></i> <span class="hidden sm:inline" id="btnRestorePDF">استعادة PDF</span>
-                <input type="file" accept=".pdf" onchange="importBackupPDF(event)" class="hidden">
-            </label>
-
-            <button onclick="handleLogout()" id="btnLogout" class="bg-red-600/20 text-red-400 border border-red-600/30 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition">
-                <i class="fa-solid fa-power-off"></i> <span class="hidden sm:inline">خروج</span>
-            </button>
+                <button onclick="handleLogout()" class="bg-red-950/60 hover:bg-red-900/60 text-red-400 border border-red-800 px-3 py-1.5 rounded-xl text-xs font-bold">
+                    <i class="fa-solid fa-power-off"></i> خروج
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- NAVIGATION TABS (ISOLATED MODULES) -->
-    <nav class="bg-zinc-950/95 border-b border-zinc-800 sticky top-[61px] z-40 backdrop-blur">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex space-x-2 space-x-reverse py-2.5 overflow-x-auto no-scrollbar">
+    <!-- ===================================================================== -->
+    <!-- NAVIGATION TABS & GLOBAL SEARCH                                       -->
+    <!-- ===================================================================== -->
+    <nav class="bg-cardbg border-b border-zinc-800 px-4 sm:px-8 py-2.5 no-print shadow-inner">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0 scrollbar-none">
                 <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition gold-gradient-bg text-black shadow whitespace-nowrap">
-                    <i class="fa-solid fa-chart-pie ml-1.5"></i> <span id="tDashboard">لوحة التحكم</span>
+                    <i class="fa-solid fa-chart-pie ml-1"></i> <span id="tDashboard">لوحة التحكم</span>
                 </button>
                 <button onclick="switchTab('passengers')" id="tab-passengers" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold whitespace-nowrap">
-                    <i class="fa-solid fa-ticket ml-1.5"></i> <span id="tPassengers">حجز التذاكر والركاب</span>
+                    <i class="fa-solid fa-ticket ml-1"></i> <span id="tPassengers">حجز التذاكر والركاب</span>
                 </button>
                 <button onclick="switchTab('cargo')" id="tab-cargo" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold whitespace-nowrap">
-                    <i class="fa-solid fa-boxes-packing ml-1.5"></i> <span id="tCargo">فواتير الشحن والأصناف</span>
+                    <i class="fa-solid fa-boxes-stacked ml-1"></i> <span id="tCargo">فواتير الشحن والأصناف</span>
                 </button>
                 <button onclick="switchTab('trips')" id="tab-trips" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold whitespace-nowrap">
-                    <i class="fa-solid fa-bus ml-1.5"></i> <span>إدارة الرحلات</span>
+                    <i class="fa-solid fa-route ml-1"></i> إدارة الرحلات
                 </button>
                 <button onclick="switchTab('drivers')" id="tab-drivers" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold whitespace-nowrap">
-                    <i class="fa-solid fa-id-card-clip ml-1.5"></i> <span>حسابات السائقين</span>
+                    <i class="fa-solid fa-id-card-clip ml-1"></i> حسابات السائقين
                 </button>
                 <button onclick="switchTab('financials')" id="tab-financials" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold whitespace-nowrap">
-                    <i class="fa-solid fa-calculator ml-1.5"></i> <span id="tFin">الإدارة المالية</span>
+                    <i class="fa-solid fa-wallet ml-1"></i> <span id="tFin">الإدارة المالية</span>
                 </button>
-                <button onclick="switchTab('users')" id="tab-users" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold hidden whitespace-nowrap">
-                    <i class="fa-solid fa-users-gear ml-1.5"></i> <span>إدارة المستخدمين</span>
+                <button onclick="switchTab('users')" id="tab-users" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold whitespace-nowrap hidden">
+                    <i class="fa-solid fa-users-gear ml-1"></i> إدارة المستخدمين
                 </button>
+            </div>
+
+            <!-- Global Search & Backup/Restore Panel -->
+            <div class="flex items-center gap-2 w-full lg:w-auto justify-end flex-wrap">
+                <div class="flex items-center bg-darkbg border border-zinc-700 rounded-xl px-3 py-1.5 gap-2 w-full sm:w-72">
+                    <i class="fa-solid fa-search text-zinc-400 text-xs"></i>
+                    <input type="text" id="globalSearchInput" oninput="handleGlobalSearch()" placeholder="بحث شامل برقم التذكرة، الاسم، الهاتف..." class="bg-transparent text-xs text-zinc-100 outline-none w-full">
+                    <select id="globalSearchType" onchange="handleGlobalSearch()" class="bg-zinc-800 text-zinc-300 text-[10px] rounded p-1 border-0 outline-none cursor-pointer">
+                        <option value="all">الكل</option>
+                        <option value="ticket">تذاكر</option>
+                        <option value="cargo">شحن</option>
+                    </select>
+                </div>
+
+                <!-- Advanced Filters Dropdown Trigger -->
+                <details class="relative">
+                    <summary class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-2 rounded-xl text-xs font-bold cursor-pointer list-none flex items-center gap-1">
+                        <i class="fa-solid fa-filter text-gold"></i> تصفية
+                    </summary>
+                    <div class="absolute left-0 mt-2 w-64 bg-cardbg border border-bordergold p-3 rounded-xl shadow-2xl z-50 space-y-2 text-xs">
+                        <div>
+                            <span class="text-gold font-bold block mb-1">حالة السداد:</span>
+                            <select id="advFilterPayment" onchange="handleGlobalSearch()" class="w-full bg-darkbg border border-zinc-700 rounded p-1.5 text-zinc-200">
+                                <option value="all">الكل</option>
+                                <option value="مدفوع">مدفوع</option>
+                                <option value="عند الباص">عند الباص / آجل</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span class="text-gold font-bold block mb-1">الانطلاق:</span>
+                            <select id="advFilterOrigin" onchange="handleGlobalSearch()" class="w-full bg-darkbg border border-zinc-700 rounded p-1.5 text-zinc-200">
+                                <option value="all">الكل</option>
+                                <option value="عجمان">عجمان</option>
+                                <option value="بني ياس">بني ياس</option>
+                                <option value="العين">العين</option>
+                                <option value="عبري">عبري</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span class="text-gold font-bold block mb-1">الوجهة:</span>
+                            <select id="advFilterDestination" onchange="handleGlobalSearch()" class="w-full bg-darkbg border border-zinc-700 rounded p-1.5 text-zinc-200">
+                                <option value="all">الكل</option>
+                                <option value="عدن">عدن</option>
+                                <option value="المكلا">المكلا</option>
+                                <option value="تعز">تعز</option>
+                                <option value="صنعاء">صنعاء</option>
+                            </select>
+                        </div>
+                        <button onclick="resetGlobalSearch()" id="btnResetSearch" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 py-1 rounded text-center">إلغاء التصفية</button>
+                    </div>
+                </details>
+
+                <!-- Export & Backup Options Dropdown -->
+                <details class="relative">
+                    <summary class="bg-zinc-800 hover:bg-zinc-700 text-gold px-3 py-2 rounded-xl text-xs font-bold cursor-pointer list-none flex items-center gap-1 border border-gold/40">
+                        <i class="fa-solid fa-cloud-arrow-down"></i> النسخ والتقارير
+                    </summary>
+                    <div class="absolute left-0 mt-2 w-48 bg-cardbg border border-bordergold p-2 rounded-xl shadow-2xl z-50 space-y-1 text-xs">
+                        <button onclick="exportBackupJSON()" id="btnBackup" class="w-full text-right px-2.5 py-1.5 hover:bg-zinc-800 rounded text-zinc-200">نسخة JSON سحابية</button>
+                        <button onclick="exportSystemBackupPDF()" id="btnBackupPDF" class="w-full text-right px-2.5 py-1.5 hover:bg-zinc-800 rounded text-zinc-200">تقرير شامل PDF</button>
+                        <label class="w-full text-right px-2.5 py-1.5 hover:bg-zinc-800 rounded text-zinc-200 block cursor-pointer">
+                            <span id="btnRestore">استرجاع JSON</span>
+                            <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
+                        </label>
+                        <label class="w-full text-right px-2.5 py-1.5 hover:bg-zinc-800 rounded text-zinc-200 block cursor-pointer">
+                            <span id="btnRestorePDF">استعادة من PDF</span>
+                            <input type="file" accept=".pdf" onchange="importBackupPDF(event)" class="hidden">
+                        </label>
+                    </div>
+                </details>
             </div>
         </div>
     </nav>
 
     <!-- ===================================================================== -->
-    <!-- 4. MAIN WORKSPACE CONTAINER                                           -->
+    <!-- MAIN CONTENT AREA                                                     -->
     <!-- ===================================================================== -->
-    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 flex-grow w-full pb-24">
-
-        <!-- HIDDEN SYSTEM BACKUP REPORT AREA FOR PDF EXPORT -->
-        <div id="systemReportPrintArea" class="hidden bg-white text-slate-900 p-8 rounded-xl shadow-2xl" style="direction: rtl; text-align: right; width: 210mm;">
-            <div class="flex justify-between items-center border-b-2 border-amber-600 pb-4 mb-6">
-                <div class="flex items-center gap-3">
-                    <img src="logo_2.jpeg" alt="Logo" class="w-16 h-16 object-cover rounded-full border-2 border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=WB'">
-                    <div>
-                        <h2 class="text-lg font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
-                        <p class="text-xs text-slate-600 font-bold">تقرير النسخة الاحتياطية الشاملة للنظام الموحد</p>
-                    </div>
-                </div>
-                <div class="text-left text-xs space-y-1">
-                    <div>تاريخ التقرير: <strong id="reportDateBadge" class="text-amber-700"></strong></div>
-                    <div>المسؤول: <span id="reportUserBadge" class="font-bold"></span></div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-3 mb-6 text-xs bg-slate-100 p-4 rounded-xl border border-slate-200">
-                <div>إجمالي التذاكر: <strong id="repTotalTkt" class="text-indigo-700 font-black text-sm">0</strong></div>
-                <div>إجمالي فواتير الشحن: <strong id="repTotalCargo" class="text-emerald-700 font-black text-sm">0</strong></div>
-                <div>إجمالي الذمم والآجال: <strong id="repTotalDebt" class="text-amber-700 font-black text-sm">0</strong></div>
-            </div>
-
-            <h3 class="font-bold text-sm text-slate-800 mb-2 border-b border-slate-300 pb-1">أحدث التذاكر المسجلة في النظام:</h3>
-            <table class="w-full border-collapse text-xs mb-6">
-                <thead>
-                    <tr class="bg-slate-200 text-slate-800">
-                        <th class="border border-slate-300 p-2">البوليصة</th>
-                        <th class="border border-slate-300 p-2">الاسم</th>
-                        <th class="border border-slate-300 p-2">الهاتف</th>
-                        <th class="border border-slate-300 p-2">المسار</th>
-                        <th class="border border-slate-300 p-2">المبلغ</th>
-                        <th class="border border-slate-300 p-2">الموظف</th>
-                        <th class="border border-slate-300 p-2">السداد</th>
-                    </tr>
-                </thead>
-                <tbody id="repTicketsTbody"></tbody>
-            </table>
-        </div>
-
-        <!-- MANAGER BRANCH FILTER BAR -->
-        <div id="managerBranchFilterContainer" class="hidden bg-cardbg border border-bordergold p-3.5 rounded-2xl shadow-xl mb-6 flex flex-col sm:flex-row items-center justify-between gap-3 no-print">
-            <span class="text-xs font-bold text-gold flex items-center gap-1.5">
-                <i class="fa-solid fa-building-shield"></i> تصفية الأفرع (صلاحية الإدارة العليا):
-            </span>
-            <select id="selectedManagerBranch" onchange="refreshUI()" class="bg-darkbg border border-gold text-gold text-xs px-4 py-2.5 rounded-xl outline-none font-bold w-full sm:w-auto">
-                <option value="ALL">🌐 جميع الأفرع مجتمعة (عجمان، أبوظبي، عمان، اليمن)</option>
-                <option value="فرع عجمان">فرع عجمان</option>
-                <option value="فرع ابوظبي">فرع أبوظبي</option>
-                <option value="فرع عمان">فرع عمان</option>
-                <option value="فرع اليمن">فرع اليمن</option>
-            </select>
-        </div>
-
-        <!-- SMART GLOBAL SEARCH & ADVANCED FILTERS -->
-        <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl mb-6 space-y-3 no-print">
-            <div class="flex flex-col sm:flex-row items-center gap-3">
-                <div class="relative w-full flex-1">
-                    <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-gold"></i>
-                    <input type="text" id="globalSearchInput" oninput="handleGlobalSearch()" placeholder="بحث ذكي شامل: رقم البوليصة، اسم العميل، الهاتف، الوكيل، أو الصنف..." class="w-full bg-darkbg border border-zinc-700 rounded-xl pr-11 pl-4 py-3 text-xs text-zinc-100 outline-none focus:border-gold transition">
-                </div>
-                <select id="globalSearchType" onchange="handleGlobalSearch()" class="bg-darkbg border border-zinc-700 text-gold text-xs px-4 py-3 rounded-xl outline-none font-bold">
-                    <option value="all">🌐 جميع السجلات</option>
-                    <option value="ticket">🎫 تذاكر ركاب فقط</option>
-                    <option value="cargo">📦 فواتير شحن فقط</option>
-                </select>
-                <button onclick="resetGlobalSearch()" id="btnResetSearch" class="bg-zinc-800 text-zinc-300 px-4 py-3 rounded-xl text-xs font-bold hover:bg-zinc-700 transition">إلغاء البحث</button>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-zinc-800 text-xs">
-                <div>
-                    <label class="block text-[11px] text-zinc-400 mb-1 font-bold">فلترة حسب حالة السداد:</label>
-                    <select id="advFilterPayment" onchange="handleGlobalSearch()" class="w-full bg-darkbg border border-zinc-700 text-gold rounded-xl px-3 py-2 outline-none font-bold">
-                        <option value="all">كل حالات السداد</option>
-                        <option value="مدفوع">مدفوع بالكامل</option>
-                        <option value="آجل">آجل / غير مدفوع</option>
-                        <option value="الدفع عند الباص">الدفع عند الباص</option>
-                        <option value="أجل بالامارات">أجل بالإمارات</option>
-                        <option value="الدفع باليمن">الدفع باليمن</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[11px] text-zinc-400 mb-1 font-bold">فلترة حسب مدينة الانطلاق:</label>
-                    <select id="advFilterOrigin" onchange="handleGlobalSearch()" class="w-full bg-darkbg border border-zinc-700 text-gold rounded-xl px-3 py-2 outline-none font-bold">
-                        <option value="all">كل نقاط الانطلاق</option>
-                        <option value="عجمان">عجمان</option>
-                        <option value="بني ياس">بني ياس</option>
-                        <option value="العين">العين</option>
-                        <option value="عبري">عبري</option>
-                        <option value="شحن">شحن</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[11px] text-zinc-400 mb-1 font-bold">فلترة حسب الوجهة:</label>
-                    <select id="advFilterDestination" onchange="handleGlobalSearch()" class="w-full bg-darkbg border border-zinc-700 text-gold rounded-xl px-3 py-2 outline-none font-bold">
-                        <option value="all">كل الوجهات</option>
-                        <option value="عدن">عدن</option>
-                        <option value="المكلا">المكلا</option>
-                        <option value="تعز">تعز</option>
-                        <option value="صنعاء">صنعاء</option>
-                    </select>
-                </div>
-            </div>
-        </div>
+    <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-6 py-5 flex-1">
 
         <!-- ================================================================= -->
-        <!-- TAB 0: DASHBOARD                                                  -->
+        <!-- TAB 1: DASHBOARD (لوحة التحكم والإحصائيات)                         -->
         <!-- ================================================================= -->
         <section id="module-dashboard" class="tab-content space-y-6">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl flex items-center justify-between">
-                    <div>
-                        <span id="lblStat1" class="text-zinc-400 text-xs block">إجمالي حجوزات الركاب</span>
-                        <h3 id="dashTotalPassengers" class="text-xl font-black text-gold mt-1">0</h3>
+                <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-lg">
+                    <div class="flex justify-between items-center mb-2">
+                        <span id="lblStat1" class="text-xs text-zinc-400 font-bold">إجمالي حجوزات الركاب</span>
+                        <i class="fa-solid fa-users text-gold text-lg"></i>
                     </div>
-                    <div class="w-11 h-11 rounded-xl bg-gold/10 flex items-center justify-center text-gold text-lg"><i class="fa-solid fa-ticket"></i></div>
+                    <strong id="dashTotalPassengers" class="text-2xl font-black text-white">0</strong>
                 </div>
-                <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl flex items-center justify-between">
-                    <div>
-                        <span class="text-zinc-400 text-xs block">إجمالي مصروفات السائقين</span>
-                        <h3 id="dashTotalDriversExp" class="text-xl font-black text-red-400 mt-1">0 AED</h3>
+                <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-lg">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs text-zinc-400 font-bold">مصروفات رحلات السائقين</span>
+                        <i class="fa-solid fa-gas-pump text-amber-400 text-lg"></i>
                     </div>
-                    <div class="w-11 h-11 rounded-xl bg-red-500/10 flex items-center justify-center text-red-400 text-lg"><i class="fa-solid fa-id-card-clip"></i></div>
+                    <strong id="dashTotalDriversExp" class="text-2xl font-black text-amber-400">0 AED</strong>
                 </div>
-                <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl flex items-center justify-between">
-                    <div>
-                        <span id="lblStat3" class="text-zinc-400 text-xs block">إجمالي المصروفات العامة</span>
-                        <h3 id="dashTotalExpenses" class="text-xl font-black text-red-400 mt-1">0 AED</h3>
+                <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-lg">
+                    <div class="flex justify-between items-center mb-2">
+                        <span id="lblStat3" class="text-xs text-zinc-400 font-bold">إجمالي المصروفات العامة</span>
+                        <i class="fa-solid fa-money-bill-trend-up text-red-400 text-lg"></i>
                     </div>
-                    <div class="w-11 h-11 rounded-xl bg-red-500/10 flex items-center justify-center text-red-400 text-lg"><i class="fa-solid fa-receipt"></i></div>
+                    <strong id="dashTotalExpenses" class="text-2xl font-black text-red-400">0 AED</strong>
                 </div>
-                <div class="bg-cardbg border border-gold p-4 rounded-2xl shadow-xl flex items-center justify-between gold-glow">
-                    <div>
-                        <span id="lblStat4" class="text-gold text-xs block font-bold">صافي رصيد الصندوق العام</span>
-                        <h3 id="dashNetProfit" class="text-xl font-black text-emerald-400 mt-1">0 AED</h3>
+                <div class="bg-cardbg border border-gold p-5 rounded-2xl shadow-lg gold-glow">
+                    <div class="flex justify-between items-center mb-2">
+                        <span id="lblStat4" class="text-xs text-gold font-bold">صافي رصيد الصندوق العام</span>
+                        <i class="fa-solid fa-sack-dollar text-emerald-400 text-lg"></i>
                     </div>
-                    <div class="w-11 h-11 rounded-xl gold-gradient-bg flex items-center justify-center text-black text-lg"><i class="fa-solid fa-chart-line"></i></div>
+                    <strong id="dashNetProfit" class="text-2xl font-black text-emerald-400">0 AED</strong>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl">
-                    <h3 id="lblChart1" class="text-gold font-bold text-xs mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-column"></i> مقارنة الإيرادات والمصروفات المالية</h3>
-                    <div class="relative h-64"><canvas id="financialBarChart"></canvas></div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl">
+                    <h3 id="lblChart1" class="text-gold font-bold text-sm mb-4">مقارنة الإيرادات والمصروفات المالية</h3>
+                    <div class="h-64">
+                        <canvas id="financialBarChart"></canvas>
+                    </div>
                 </div>
                 <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl">
-                    <h3 id="lblChart2" class="text-gold font-bold text-xs mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-pie"></i> نسب حالات سداد الفواتير والتذاكر</h3>
-                    <div class="relative h-64 flex justify-center"><canvas id="paymentStatusPieChart"></canvas></div>
+                    <h3 id="lblChart2" class="text-gold font-bold text-sm mb-4">نسب حالات سداد الفواتير والتذاكر</h3>
+                    <div class="h-64">
+                        <canvas id="paymentStatusPieChart"></canvas>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- ================================================================= -->
-        <!-- TAB 1: PASSENGERS & TICKETS INTERFACE (واجهة حجز التذاكر المستقلة) -->
+        <!-- TAB 2: PASSENGERS & TICKETS (حجز التذاكر والركاب)                  -->
         <!-- ================================================================= -->
         <section id="module-passengers" class="tab-content hidden space-y-6">
-            <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl flex flex-col sm:flex-row justify-between items-center gap-3">
-                <div class="flex items-center gap-2.5">
-                    <i class="fa-solid fa-ticket text-gold text-xl"></i>
-                    <div>
-                        <h3 id="lblPassHeader" class="text-xs font-bold text-gold">واجهة حجز التذاكر والركاب المرافقين (مرتبة تنازلياً برقم البوليصة الأحدث)</h3>
-                        <p id="lblPassSub" class="text-[11px] text-zinc-400">ترقيم تسلسلي تلقائي يبدأ من الرقم التالي لأحدث تذكرة مسجلة في النظام</p>
-                    </div>
-                </div>
-                <button onclick="openManifestModal()" id="btnManifestP" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-xs shadow transition">
-                    <i class="fa-solid fa-file-lines ml-1"></i> كشف مانفيستو الركاب (Manifest)
-                </button>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
-                    <h2 class="text-gold font-extrabold text-base border-b border-zinc-800 pb-3 flex items-center justify-between">
-                        <span><i class="fa-solid fa-ticket ml-1"></i> <span id="passFormTitle">إصدار تذكرة سفر جديدة</span></span>
-                        <button id="cancelEditPassBtn" onclick="resetPassengerForm()" class="hidden text-xs text-red-400 font-bold bg-red-950/40 border border-red-800 px-2.5 py-1 rounded-lg">إلغاء التعديل</button>
-                    </h2>
-
-                    <form id="passengerForm" onsubmit="handleSavePassenger(event)" class="space-y-4">
-                        <input type="hidden" id="passEditId" value="">
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div>
-                                <label id="lblTktNo" class="block text-xs text-gold mb-1 font-bold">رقم البوليصة / التذكرة *</label>
-                                <input type="text" id="passTicketNo" required placeholder="رقم التذكرة..." class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2.5 text-xs outline-none focus:ring-1 focus:ring-gold">
-                            </div>
-                            <div>
-                                <label id="lblAgent" class="block text-xs text-gold mb-1 font-bold">ربط برحلة مجدولة *</label>
-                                <select id="passTripSelect" required onchange="onTripSelectedForTicket()" class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2.5 text-xs outline-none">
-                                    <option value="">-- اختر الرحلة أولاً --</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs text-gold mb-1 font-bold">اسم الوكيل / الحاجز *</label>
-                                <input type="text" id="passAgent" required placeholder="اسم الوكيل أو المكتب..." class="w-full bg-darkbg border border-gold rounded-xl px-3 py-2.5 text-xs text-zinc-200 outline-none" value="أبو خالد">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block text-xs text-gold mb-1 font-bold">تاريخ السفر</label>
-                                <input type="date" id="passDate" onchange="updateReportingTimeAutomatically()" class="w-full bg-darkbg border border-gold rounded-xl px-3 py-2.5 text-xs text-zinc-100 outline-none font-bold">
-                            </div>
-                            <div>
-                                <label id="lblFare" class="block text-xs text-gold mb-1 font-bold">إجمالي الأجرة (AED) *</label>
-                                <input type="number" step="any" id="passManualTotal" required class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2.5 text-xs outline-none" value="350">
-                            </div>
-                            <div>
-                                <label id="lblCount" class="block text-xs text-zinc-400 mb-1 font-bold">عدد الركاب في التذكرة *</label>
-                                <select id="passCount" onchange="onPassengerCountChanged()" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-200 font-bold">
-                                    <option value="1">1 راكب</option>
-                                    <option value="2">2 ركاب</option>
-                                    <option value="3">3 ركاب</option>
-                                    <option value="4">4 ركاب</option>
-                                    <option value="5">5 ركاب</option>
-                                    <option value="6">6 ركاب</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="bg-darkbg p-3.5 rounded-xl border border-zinc-800 space-y-3">
-                            <span id="lblMainPax" class="text-xs font-bold text-emerald-400 block"><i class="fa-solid fa-user ml-1"></i> بيانات الراكب الرئيسي</span>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <input type="text" id="passName" required placeholder="الاسم الكامل للراكب..." class="bg-zinc-900 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200 outline-none focus:border-gold">
-                                <input type="tel" id="passPhone" required placeholder="رقم الهاتف (واتساب)..." class="bg-zinc-900 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200 outline-none focus:border-gold">
-                                <input type="text" id="passPassport" required placeholder="رقم الجواز / الهوية..." class="bg-zinc-900 border border-zinc-800 rounded-xl p-2.5 text-xs text-zinc-200 outline-none focus:border-gold">
-                            </div>
-                        </div>
-
-                        <div id="extraPassengersContainer" class="space-y-3 hidden bg-darkbg p-3.5 rounded-xl border border-amber-500/30">
-                            <span id="lblExtraPax" class="text-xs font-bold text-amber-400 block"><i class="fa-solid fa-users ml-1"></i> بيانات الركاب الإضافيين المرافقين</span>
-                            <div id="extraPassengersRows" class="space-y-2"></div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block text-xs text-gold mb-1 font-bold">محطة الانطلاق *</label>
-                                <select id="passOrigin" onchange="updateReportingTimeAutomatically()" class="w-full bg-darkbg border border-gold rounded-xl px-3 py-2.5 text-xs text-gold font-bold">
-                                    <option value="عجمان">فرع عجمان</option>
-                                    <option value="بني ياس">فرع بني ياس</option>
-                                    <option value="العين">العين</option>
-                                    <option value="عبري">عبري</option>
-                                    <option value="شحن">شحن</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs text-zinc-400 mb-1 font-bold">محطة الوصول / الوجهة *</label>
-                                <select id="passDestination" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-200 font-bold">
-                                    <option value="عدن" selected>عدن</option>
-                                    <option value="المكلا">المكلا</option>
-                                    <option value="تعز">تعز</option>
-                                    <option value="صنعاء">صنعاء</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs text-zinc-400 mb-1 font-bold">حالة السداد *</label>
-                                <select id="passPayMethod" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-200 font-bold">
-                                    <option value="مدفوع">مدفوع بالكامل</option>
-                                    <option value="الدفع عند الباص">الدفع عند الباص</option>
-                                    <option value="آجل">آجل / غير مدفوع</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs text-amber-400 mb-1 font-bold">وقت الحضور للرحلة (تلقائي حسب المحطة والتاريخ) *</label>
-                            <input type="text" id="passReportingTime" required class="w-full bg-darkbg border border-amber-500/80 font-bold text-amber-300 rounded-xl px-3 py-2.5 text-xs outline-none" value="4:00 عصراً">
-                        </div>
-
-                        <button type="submit" id="passSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow-lg hover:opacity-95 transition">
-                            <i class="fa-solid fa-check-circle ml-1"></i> حفظ وإصدار تذكرة السفر
+            <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
+                <div class="flex flex-wrap justify-between items-center gap-2 border-b border-zinc-800 pb-3">
+                    <h3 id="passFormTitle" class="text-gold font-extrabold text-sm">إصدار تذكرة سفر جديدة</h3>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="openManifestModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold">
+                            <i class="fa-solid fa-clipboard-list ml-1"></i> كشف مانفيستو الركاب
                         </button>
-                    </form>
-                </div>
-
-                <!-- Summary & Quick Stats Card -->
-                <div class="bg-cardbg border border-bordergold p-5 rounded-2xl flex flex-col justify-between shadow-xl space-y-4">
-                    <div class="space-y-4">
-                        <h3 id="lblPassStats" class="text-gold font-bold text-sm border-b border-zinc-800 pb-2">ملخص وإحصائيات التذاكر</h3>
-                        <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800 space-y-3 text-xs">
-                            <div class="flex justify-between items-center">
-                                <span id="lblTktCount" class="text-zinc-400">عدد التذاكر المسجلة:</span>
-                                <strong id="statTicketCount" class="text-gold text-base font-black">0</strong>
-                            </div>
-                            <div class="flex justify-between items-center border-t border-zinc-800 pt-2">
-                                <span id="lblTktRev" class="text-zinc-400">إجمالي قيمة التذاكر:</span>
-                                <strong id="statTicketRevenue" class="text-emerald-400 text-base font-black">0 AED</strong>
-                            </div>
-                        </div>
-                        <div class="bg-darkbg p-3.5 rounded-xl border border-zinc-800/80 text-[11px] text-zinc-400 space-y-1.5 leading-relaxed">
-                            <div class="text-gold font-bold"><i class="fa-solid fa-circle-info ml-1"></i> تعليمات الحجز السريع:</div>
-                            <p>• يتم احتساب الأجرة تلقائياً (350 درهم لكل راكب) مع إمكانية التعديل اليدوي.</p>
-                            <p>• يتغير وقت الحضور تلقائياً حسب محطة الانطلاق المختارة.</p>
-                            <p>• يمكنك إرسال التذكرة مباشرة للراكب عبر الواتساب بعد المعاينة.</p>
-                        </div>
+                        <button type="button" id="cancelEditPassBtn" onclick="resetPassengerForm()" class="hidden bg-red-950 text-red-300 border border-red-700 px-3 py-1.5 rounded-xl text-xs font-bold">
+                            إلغاء التعديل
+                        </button>
                     </div>
                 </div>
+
+                <form id="passengerForm" onsubmit="handleSavePassenger(event)" class="space-y-4">
+                    <input type="hidden" id="passEditId" value="">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                        <div>
+                            <label class="block text-xs text-gold font-bold mb-1">رقم البوليصة / التذكرة *</label>
+                            <input type="text" id="passTicketNo" required class="w-full bg-darkbg border border-gold rounded-xl p-2.5 text-xs text-gold font-black">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs text-gold font-bold mb-1">الرحلة المجدولة المرتبطة *</label>
+                            <select id="passTripSelect" onchange="onTripSelectedForTicket()" required class="w-full bg-darkbg border border-gold rounded-xl p-2.5 text-xs text-zinc-100 font-bold"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 font-bold mb-1">اسم الوكيل / المكتب</label>
+                            <input type="text" id="passAgent" placeholder="مثال: مكتب عجمان" class="w-full bg-darkbg border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-100">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                        <div>
+                            <label class="block text-xs text-zinc-400 font-bold mb-1">اسم الراكب الرئيسي *</label>
+                            <input type="text" id="passName" required placeholder="الاسم الكامل حسب الجواز" class="w-full bg-darkbg border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-100">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 font-bold mb-1">رقم الهاتف (واتساب) *</label>
+                            <input type="tel" id="passPhone" required placeholder="05xxxxxxxx / 77xxxxxxx" class="w-full bg-darkbg border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-100">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 font-bold mb-1">رقم الجواز *</label>
+                            <input type="text" id="passPassport" required placeholder="رقم جواز السفر" class="w-full bg-darkbg border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-100">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gold font-bold mb-1">عدد الركاب في التذكرة *</label>
+                            <input type="number" id="passCount" min="1" max="15" value="1" oninput="onPassengerCountChanged()" required class="w-full bg-darkbg border border-gold rounded-xl p-2.5 text-xs text-gold font-bold text-center">
+                        </div>
+                    </div>
+
+                    <div id="extraPassengersContainer" class="hidden bg-darkbg p-3.5 rounded-xl border border-amber-500/30 space-y-2">
+                        <span class="text-xs font-bold text-amber-400 block">بيانات الركاب المرافقين:</span>
+                        <div id="extraPassengersRows" class="space-y-2"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-6 gap-3">
+                        <div>
+                            <label class="block text-xs text-zinc-400 font-bold mb-1">نقطة الانطلاق *</label>
+                            <select id="passOrigin" onchange="updateReportingTimeAutomatically()" class="w-full bg-darkbg border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-100 font-bold">
+                                <option value="عجمان">عجمان</option>
+                                <option value="بني ياس">بني ياس</option>
+                                <option value="العين">العين</option>
+                                <option value="عبري">عبري</option>
+                                <option value="عدن">عدن</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 font-bold mb-1">وجهة الوصول *</label>
+                            <select id="passDestination" class="w-full bg-darkbg border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-100 font-bold">
+                                <option value="عدن">عدن</option>
+                                <option value="المكلا">المكلا</option>
+                                <option value="تعز">تعز</option>
+                                <option value="صنعاء">صنعاء</option>
+                                <option value="الإمارات">الإمارات</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gold font-bold mb-1">تاريخ الرحلة *</label>
+                            <input type="date" id="passDate" onchange="updateReportingTimeAutomatically()" required class="w-full bg-darkbg border border-gold rounded-xl p-2.5 text-xs text-gold font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 font-bold mb-1">وقت الحضور</label>
+                            <input type="text" id="passReportingTime" value="4:00 عصراً" class="w-full bg-darkbg border border-zinc-700 rounded-xl p-2.5 text-xs text-amber-300 font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gold font-bold mb-1">الإجمالي (AED) *</label>
+                            <input type="number" step="any" id="passManualTotal" value="350" required class="w-full bg-darkbg border border-gold rounded-xl p-2.5 text-xs text-gold font-black">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-zinc-400 font-bold mb-1">حالة الدفع *</label>
+                            <select id="passPayMethod" class="w-full bg-darkbg border border-zinc-700 rounded-xl p-2.5 text-xs text-emerald-400 font-bold">
+                                <option value="مدفوع">مدفوع</option>
+                                <option value="عند الباص">عند الباص</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="passSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl text-xs shadow-lg hover:opacity-95 transition">
+                        <i class="fa-solid fa-check-circle ml-1"></i> حفظ وإصدار تذكرة السفر
+                    </button>
+                </form>
             </div>
 
+            <!-- Passengers List Table -->
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
-                <div class="p-4 border-b border-zinc-800 flex justify-between items-center flex-wrap gap-2">
-                    <span id="lblPassLog" class="font-bold text-gold text-xs">سجل جميع التذاكر والركاب المرافقين (ترتيب تنازلي)</span>
-                    <button onclick="exportExcel('passengers')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">
+                <div class="p-4 border-b border-zinc-800 flex flex-wrap justify-between items-center gap-2">
+                    <div class="flex items-center gap-4 text-xs">
+                        <span class="font-bold text-gold">سجل التذاكر والحجوزات</span>
+                        <span class="bg-zinc-900 px-3 py-1 rounded-lg border border-zinc-800">العدد: <strong id="statTicketCount" class="text-gold">0</strong></span>
+                        <span class="bg-zinc-900 px-3 py-1 rounded-lg border border-zinc-800">الإجمالي: <strong id="statTicketRevenue" class="text-emerald-400">0 AED</strong></span>
+                    </div>
+                    <button onclick="exportExcel('passengers')" class="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold">
                         <i class="fa-solid fa-file-excel ml-1"></i> تصدير Excel
                     </button>
                 </div>
@@ -1210,19 +418,19 @@
                     <table class="custom-table" id="passengersTable">
                         <thead>
                             <tr>
-                                <th id="thP1">البوليصة</th>
-                                <th id="thP2">الوكيل</th>
-                                <th id="thP3">الراكب الرئيسي</th>
-                                <th id="thP4">الركاب المرافقون</th>
-                                <th id="thP5">الهاتف</th>
-                                <th id="thP6">خط السير</th>
-                                <th id="thP7">تاريخ الرحلة</th>
-                                <th id="thP8">المبلغ</th>
+                                <th>البوليصة</th>
+                                <th>الوكيل</th>
+                                <th>اسم الراكب</th>
+                                <th>المرافقون</th>
+                                <th>الهاتف</th>
+                                <th>خط السير</th>
+                                <th>التاريخ</th>
+                                <th>المبلغ</th>
                                 <th class="no-print">الموظف</th>
-                                <th class="no-print">سجل التدقيق والتواريخ</th>
-                                <th id="thP9">السداد</th>
-                                <th id="thP10">الفرع</th>
-                                <th id="thP11">إجراءات / طباعة</th>
+                                <th class="no-print">سجل التعديلات</th>
+                                <th>الحالة</th>
+                                <th>الفرع</th>
+                                <th>الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -1232,110 +440,117 @@
         </section>
 
         <!-- ================================================================= -->
-        <!-- TAB 2: CARGO INVOICES INTERFACE (واجهة فواتير الشحن المستقلة)     -->
+        <!-- TAB 3: CARGO INVOICES (فواتير الشحن والأصناف)                     -->
         <!-- ================================================================= -->
         <section id="module-cargo" class="tab-content hidden space-y-6">
-            <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow-xl flex flex-col sm:flex-row justify-between items-center gap-3">
-                <div class="flex items-center gap-2.5">
-                    <i class="fa-solid fa-boxes-packing text-gold text-xl"></i>
-                    <div>
-                        <h3 id="lblCargoHeader" class="text-xs font-bold text-gold">واجهة فواتير الشحن والأصناف (مرتبة تنازلياً برقم الفاتورة الأحدث)</h3>
-                        <p id="lblCargoSub" class="text-[11px] text-zinc-400">تدعم الأصناف المتعددة والأرقام الكسرية الدقيقة للكميات والأسعار</p>
+            <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
+                <div class="flex flex-wrap justify-between items-center gap-2 border-b border-zinc-800 pb-3">
+                    <h3 id="cargoFormTitle" class="text-gold font-extrabold text-sm">إنشاء فاتورة أمتعة وبضائع جديدة</h3>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="openCargoManifestModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold">
+                            <i class="fa-solid fa-truck-ramp-box ml-1"></i> مانفيستو الشحن
+                        </button>
+                        <button type="button" id="cancelEditCargoBtn" onclick="resetCargoForm()" class="hidden bg-red-950 text-red-300 border border-red-700 px-3 py-1.5 rounded-xl text-xs font-bold">
+                            إلغاء التعديل
+                        </button>
                     </div>
                 </div>
-                <button onclick="openCargoManifestModal()" id="btnManifestC" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-xs shadow transition">
-                    <i class="fa-solid fa-file-lines ml-1"></i> كشف مانفيستو الشحن (Cargo Manifest)
-                </button>
-            </div>
-
-            <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
-                <h2 class="text-gold font-extrabold text-base border-b border-zinc-800 pb-3 flex justify-between items-center">
-                    <span><i class="fa-solid fa-boxes-packing ml-1"></i> <span id="cargoFormTitle">إنشاء فاتورة أمتعة وبضائع جديدة</span></span>
-                    <button id="cancelEditCargoBtn" onclick="resetCargoForm()" class="hidden text-xs text-red-400 font-bold bg-red-950/40 border border-red-800 px-2.5 py-1 rounded-lg">إلغاء التعديل</button>
-                </h2>
 
                 <form id="cargoForm" onsubmit="handleSaveCargo(event)" class="space-y-4">
                     <input type="hidden" id="cargoEditId" value="">
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                         <div>
-                            <label id="lblInvNo" class="block text-xs text-gold mb-1 font-bold">رقم الفاتورة *</label>
-                            <input type="text" id="cargoInvNo" required placeholder="رقم الفاتورة..." class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2.5 text-xs outline-none focus:ring-1 focus:ring-gold">
+                            <label class="block text-xs text-gold font-bold mb-1">رقم فاتورة الشحن *</label>
+                            <input type="text" id="cargoInvNo" required class="w-full bg-darkbg border border-gold rounded-xl p-2.5 text-xs text-gold font-black">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs text-zinc-400 font-bold mb-1">الرحلة المجدولة المرتبطة</label>
+                            <select id="cargoTripSelect" onchange="onTripSelectedForCargo()" class="w-full bg-darkbg border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-100 font-bold"></select>
                         </div>
                         <div>
-                            <label class="block text-xs text-gold mb-1 font-bold">ربط برحلة مجدولة (اختياري)</label>
-                            <select id="cargoTripSelect" onchange="onTripSelectedForCargo()" class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2.5 text-xs outline-none">
-                                <option value="">-- رحلة عامة (اختياري) --</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label id="lblInvDate" class="block text-xs text-gold mb-1 font-bold">تاريخ الفاتورة</label>
-                            <input type="date" id="cargoDate" class="w-full bg-darkbg border border-gold rounded-xl px-3 py-2.5 text-xs text-zinc-100 font-bold">
-                        </div>
-                        <div>
-                            <label id="lblInvStatus" class="block text-xs text-zinc-400 mb-1 font-bold">حالة سداد الفاتورة *</label>
-                            <select id="cargoPaymentStatus" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-zinc-200 font-bold">
-                                <option value="مدفوع">مدفوع بالكامل</option>
-                                <option value="أجل بالامارات">أجل بالإمارات</option>
-                                <option value="الدفع باليمن">الدفع باليمن</option>
-                                <option value="آجل">آجل / غير مدفوع</option>
-                            </select>
+                            <label class="block text-xs text-gold font-bold mb-1">تاريخ الشحن *</label>
+                            <input type="date" id="cargoDate" required class="w-full bg-darkbg border border-gold rounded-xl p-2.5 text-xs text-gold font-bold">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="bg-darkbg p-3.5 rounded-xl border border-zinc-800 space-y-2.5">
-                            <span id="lblSenderBox" class="text-xs font-bold text-gold block"><i class="fa-solid fa-paper-plane ml-1"></i> بيانات المرسل</span>
-                            <input type="text" id="cargoSenderName" required placeholder="اسم المرسل الكامل..." class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs outline-none focus:border-gold">
-                            <input type="tel" id="cargoSenderPhone" required placeholder="رقم هاتف المرسل (واتساب)..." class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs outline-none focus:border-gold">
-                            <input type="text" id="cargoSenderAddress" required placeholder="عنوان المرسل..." class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs outline-none focus:border-gold" value="عجمان">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-darkbg p-3.5 rounded-xl border border-zinc-800">
+                        <div>
+                            <label class="block text-xs text-amber-400 font-bold mb-1">اسم المُرسل *</label>
+                            <input type="text" id="cargoSenderName" required placeholder="اسم المرسل" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-100">
                         </div>
-                        <div class="bg-darkbg p-3.5 rounded-xl border border-zinc-800 space-y-2.5">
-                            <span id="lblReceiverBox" class="text-xs font-bold text-emerald-400 block"><i class="fa-solid fa-location-dot ml-1"></i> بيانات المستلم</span>
-                            <input type="text" id="cargoReceiverName" required placeholder="اسم المستلم الكامل..." class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs outline-none focus:border-gold">
-                            <input type="tel" id="cargoReceiverPhone" required placeholder="رقم هاتف المستلم..." class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs outline-none focus:border-gold">
-                            <input type="text" id="cargoReceiverAddress" required placeholder="عنوان التسليم والوجهة..." class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs outline-none focus:border-gold" value="عدن">
+                        <div>
+                            <label class="block text-xs text-amber-400 font-bold mb-1">هاتف المُرسل *</label>
+                            <input type="tel" id="cargoSenderPhone" required placeholder="05xxxxxxxx" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-100">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-amber-400 font-bold mb-1">عنوان / فرع الإرسال</label>
+                            <input type="text" id="cargoSenderAddress" value="عجمان" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-100">
                         </div>
                     </div>
 
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-darkbg p-3.5 rounded-xl border border-zinc-800">
+                        <div>
+                            <label class="block text-xs text-emerald-400 font-bold mb-1">اسم المُستلم *</label>
+                            <input type="text" id="cargoReceiverName" required placeholder="اسم المستلم" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-100">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-emerald-400 font-bold mb-1">هاتف المُستلم *</label>
+                            <input type="tel" id="cargoReceiverPhone" required placeholder="77xxxxxxx" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-100">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-emerald-400 font-bold mb-1">وجهة التسليم *</label>
+                            <input type="text" id="cargoReceiverAddress" value="عدن" required class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-100">
+                        </div>
+                    </div>
+
+                    <!-- Cargo Items Table -->
                     <div class="bg-darkbg p-4 rounded-xl border border-zinc-800 space-y-3">
-                        <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
-                            <span id="lblItemsList" class="text-xs font-bold text-gold"><i class="fa-solid fa-list-check ml-1"></i> أصناف الأمتعة والبضائع (يدعم الأرقام الكسرية الدقيقة)</span>
-                            <button type="button" onclick="addCargoItemRow()" id="btnAddItem" class="bg-gold text-black font-extrabold px-3 py-1.5 rounded-lg text-xs hover:bg-gold-400 transition">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-gold">الأصناف والطرود المشحونة:</span>
+                            <button type="button" onclick="addCargoItemRow()" class="bg-zinc-800 hover:bg-zinc-700 text-gold px-3 py-1 rounded-lg text-xs font-bold">
                                 <i class="fa-solid fa-plus ml-1"></i> إضافة صنف
                             </button>
                         </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-right text-xs" id="cargoItemsBuilderTable" style="direction: inherit;">
-                                <thead>
-                                    <tr class="text-zinc-400 border-b border-zinc-800">
-                                        <th class="p-2" id="thBDesc">وصف الصنف / البضاعة</th>
-                                        <th class="p-2 w-28 text-center" id="thBQty">العدد / الكمية</th>
-                                        <th class="p-2 w-40" id="thBPrice">السعر (AED)</th>
-                                        <th class="p-2 w-12 text-center" id="thBDel">حذف</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="cargoItemsRowsContainer"></tbody>
-                            </table>
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="text-zinc-400 border-b border-zinc-800">
+                                    <th class="p-2 text-right">وصف الصنف / الطرد</th>
+                                    <th class="p-2 w-24 text-center">الكمية / العدد</th>
+                                    <th class="p-2 w-28 text-left">سعر الوحدة (AED)</th>
+                                    <th class="p-2 w-10"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="cargoItemsRowsContainer"></tbody>
+                        </table>
+                        <div class="flex flex-wrap justify-between items-center gap-3 pt-2 border-t border-zinc-800">
+                            <div class="text-xs text-zinc-400">المجموع المحسوب تلقائياً: <strong id="cargoCalculatedTotal" class="text-gold text-sm">0 AED</strong></div>
+                            <div class="flex items-center gap-3">
+                                <div>
+                                    <label class="text-[11px] text-gold font-bold ml-1">الإجمالي النهائي:</label>
+                                    <input type="number" step="any" id="cargoManualTotal" required class="w-28 bg-zinc-900 border border-gold rounded-lg p-2 text-xs text-gold font-black">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] text-zinc-400 font-bold ml-1">حالة الدفع:</label>
+                                    <select id="cargoPaymentStatus" class="bg-zinc-900 border border-zinc-700 rounded-lg p-2 text-xs text-emerald-400 font-bold">
+                                        <option value="مدفوع">مدفوع</option>
+                                        <option value="عند الاستلام">عند الاستلام / آجل</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="flex justify-between items-center bg-zinc-900 p-4 rounded-xl border border-gold">
-                        <span id="lblTotalCalc" class="text-xs font-bold text-zinc-300">الإجمالي النهائي المحسوب للأصناف:</span>
-                        <span id="cargoCalculatedTotal" class="text-lg font-black text-gold">0 AED</span>
-                        <input type="hidden" id="cargoManualTotal" value="0">
-                    </div>
-
-                    <button type="submit" id="cargoSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow-lg hover:opacity-95 transition">
+                    <button type="submit" id="cargoSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl text-xs shadow-lg hover:opacity-95 transition">
                         <i class="fa-solid fa-check-circle ml-1"></i> حفظ وإصدار فاتورة الشحن والأصناف
                     </button>
                 </form>
             </div>
 
+            <!-- Cargo List Table -->
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
-                <div class="p-4 border-b border-zinc-800 flex justify-between items-center flex-wrap gap-2">
-                    <span id="lblCargoLog" class="font-bold text-gold text-xs">سجل فواتير الشحن والأصناف (ترتيب تنازلي)</span>
-                    <button onclick="exportExcel('cargo')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">
+                <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
+                    <span class="font-bold text-gold text-xs">سجل فواتير الشحن والأمتعة</span>
+                    <button onclick="exportExcel('cargo')" class="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold">
                         <i class="fa-solid fa-file-excel ml-1"></i> تصدير Excel
                     </button>
                 </div>
@@ -1343,18 +558,18 @@
                     <table class="custom-table" id="cargoTable">
                         <thead>
                             <tr>
-                                <th id="thC1">الفاتورة</th>
-                                <th id="thC2">التاريخ</th>
-                                <th id="thC3">المرسل</th>
-                                <th id="thC4">المستلم وعنوانه</th>
-                                <th>الرحلة المرتبطة</th>
-                                <th id="thC5">عدد الأصناف</th>
-                                <th id="thC6">الإجمالي</th>
+                                <th>الفاتورة</th>
+                                <th>التاريخ</th>
+                                <th>المُرسل</th>
+                                <th>المُستلم والعنوان</th>
+                                <th>الرحلة</th>
+                                <th>الأصناف</th>
+                                <th>الإجمالي</th>
                                 <th class="no-print">الموظف</th>
-                                <th class="no-print">سجل التدقيق والتواريخ</th>
-                                <th id="thC7">الحالة</th>
-                                <th id="thC8">الفرع</th>
-                                <th id="thC9">إجراءات / طباعة</th>
+                                <th class="no-print">سجل التعديلات</th>
+                                <th>الحالة</th>
+                                <th>الفرع</th>
+                                <th>الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -1364,17 +579,14 @@
         </section>
 
         <!-- ================================================================= -->
-        <!-- TAB 3: TRIPS MANAGEMENT (إدارة الرحلات والجدولة)                  -->
+        <!-- TAB 4: TRIPS MANAGEMENT (إدارة الرحلات المجدولة)                   -->
         <!-- ================================================================= -->
         <section id="module-trips" class="tab-content hidden space-y-6">
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
-                    <h3 class="text-gold font-extrabold text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-bus text-gold"></i> <span id="tripFormTitle">إنشاء / تعديل رحلة مجدولة</span>
-                    </h3>
+                    <h3 id="tripFormTitle" class="text-gold font-bold text-sm">إنشاء / تعديل رحلة مجدولة</h3>
                     <button id="cancelEditTripBtn" onclick="resetTripForm()" class="hidden text-xs text-red-400 font-bold bg-red-950/40 border border-red-800 px-2.5 py-1 rounded-lg">إلغاء التعديل</button>
                 </div>
-
                 <form id="tripForm" onsubmit="handleSaveTrip(event)" class="grid grid-cols-1 sm:grid-cols-5 gap-3">
                     <input type="hidden" id="tripEditId" value="">
                     <div>
@@ -1432,7 +644,7 @@
         </section>
 
         <!-- ================================================================= -->
-        <!-- TAB 4: DRIVERS ACCOUNTS (حسابات السائقين وتصفيات الذهاب والعودة)  -->
+        <!-- TAB 5: DRIVERS ACCOUNTS (حسابات السائقين وتصفيات الذهاب والعودة)  -->
         <!-- ================================================================= -->
         <section id="module-drivers" class="tab-content hidden space-y-6">
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
@@ -1532,7 +744,7 @@
         </section>
 
         <!-- ================================================================= -->
-        <!-- TAB 5: FINANCIAL MANAGEMENT (الإدارة المالية والسندات والآجال)     -->
+        <!-- TAB 6: FINANCIAL MANAGEMENT (الإدارة المالية والسندات والآجال)     -->
         <!-- ================================================================= -->
         <section id="module-financials" class="tab-content hidden space-y-6">
             <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
@@ -1666,7 +878,7 @@
         </section>
 
         <!-- ================================================================= -->
-        <!-- TAB 6: USERS MANAGEMENT (إدارة المستخدمين وصلاحيات الأفرع)         -->
+        <!-- TAB 7: USERS MANAGEMENT (إدارة المستخدمين وصلاحيات الأفرع)         -->
         <!-- ================================================================= -->
         <section id="module-users" class="tab-content hidden space-y-6">
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
@@ -1729,7 +941,271 @@
     </main>
 
     <!-- ===================================================================== -->
-    <!-- 5. FOOTER                                                             -->
+    <!-- MODALS & PREVIEWS (TICKET, CARGO, MANIFESTS, CHANGE PASSWORD)         -->
+    <!-- ===================================================================== -->
+
+    <!-- Change Password Modal -->
+    <div id="changePassModal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-cardbg border border-gold p-6 rounded-2xl w-full max-w-sm space-y-4 shadow-2xl">
+            <h3 class="text-gold font-bold text-sm">تغيير كلمة المرور الخاصة بك</h3>
+            <form onsubmit="handleUserChangePassword(event)" class="space-y-3">
+                <input type="password" id="newPassInput" required placeholder="كلمة المرور الجديدة" class="w-full bg-darkbg border border-zinc-700 p-2.5 rounded-xl text-xs text-zinc-100">
+                <div class="flex gap-2">
+                    <button type="submit" class="gold-gradient-bg text-black font-bold px-4 py-2 rounded-xl text-xs flex-1">حفظ</button>
+                    <button type="button" onclick="closeModal('changePassModal')" class="bg-zinc-800 text-zinc-300 px-4 py-2 rounded-xl text-xs">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Ticket Preview Modal -->
+    <div id="ticketPreviewModal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white text-black w-full max-w-lg p-6 rounded-2xl shadow-2xl space-y-4 print-container" id="ticketCaptureArea">
+            <div class="text-center border-b pb-3">
+                <h2 class="font-black text-lg text-amber-800">شركة وادي بناء للنقل الدولي</h2>
+                <p class="text-xs text-slate-600">تذكرة سفر رسمية وبوليصة ركاب</p>
+            </div>
+            <div class="flex justify-between items-center bg-slate-100 p-3 rounded-xl text-xs font-bold">
+                <span>رقم التذكرة: <strong id="imgTicketCode" class="text-amber-700"></strong></span>
+                <span>تاريخ الإصدار: <strong id="imgTktDate"></strong></span>
+            </div>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+                <div><span>اسم الراكب:</span> <strong id="imgTktName" class="block text-sm"></strong></div>
+                <div><span>رقم الهاتف:</span> <strong id="imgTktPhone" class="block"></strong></div>
+                <div><span>رقم الجواز:</span> <strong id="imgTktPassport" class="block"></strong></div>
+                <div><span>الوكيل / المكتب:</span> <strong id="imgTktAgent" class="block"></strong></div>
+                <div><span>خط السير:</span> <strong id="imgTktRoute" class="block"></strong></div>
+                <div><span>وقت الحضور:</span> <strong id="imgTktTime" class="block text-amber-700"></strong></div>
+            </div>
+            <div id="imgTicketExtraBox"></div>
+            <div class="flex justify-between items-center bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs">
+                <span>إجمالي الأجرة: <strong id="imgTktFare" class="text-amber-800 font-black text-sm"></strong></span>
+                <span>الحالة: <strong id="imgTktPayStatus" class="text-emerald-700 font-bold"></strong></span>
+            </div>
+            <div class="text-center pt-2">
+                <svg id="ticketBarcode" class="mx-auto"></svg>
+                <span class="text-[10px] text-slate-400 block mt-1">الموظف المسئول: <span id="imgTktCreatedBy"></span></span>
+            </div>
+            <div class="flex gap-2 pt-3 no-print">
+                <button onclick="downloadTicketImageWithWhatsAppPrompt()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold flex-1"><i class="fa-brands fa-whatsapp ml-1"></i> تحميل وإرسال واتساب</button>
+                <button onclick="window.print()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-xl text-xs font-bold"><i class="fa-solid fa-print ml-1"></i> طباعة</button>
+                <button onclick="closeModal('ticketPreviewModal')" class="bg-slate-300 text-slate-800 px-4 py-2 rounded-xl text-xs font-bold">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cargo Preview Modal -->
+    <div id="cargoPreviewModal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white text-black w-full max-w-lg p-6 rounded-2xl shadow-2xl space-y-4 print-container" id="cargoCaptureArea">
+            <div class="text-center border-b pb-3">
+                <h2 class="font-black text-lg text-amber-800">شركة وادي بناء للنقل الدولي</h2>
+                <p class="text-xs text-slate-600">فاتورة شحن الأمتعة والبضائع</p>
+            </div>
+            <div class="flex justify-between items-center bg-slate-100 p-3 rounded-xl text-xs font-bold">
+                <span>رقم الفاتورة: <strong id="imgCargoCode" class="text-amber-700"></strong></span>
+                <span>التاريخ: <strong id="imgCargoDate"></strong></span>
+            </div>
+            <div class="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-3 rounded-xl border">
+                <div><span>المُرسل:</span> <strong id="imgCargoSenderName" class="block"></strong> (<span id="imgCargoSenderPhone"></span>) - <span id="imgCargoSenderAddress"></span></div>
+                <div><span>المُستلم:</span> <strong id="imgCargoReceiverName" class="block"></strong> (<span id="imgCargoReceiverPhone"></span>) - <span id="imgCargoReceiverAddress"></span></div>
+            </div>
+            <div class="text-xs">
+                <span>الرحلة المرتبطة: <strong id="imgCargoTripInfo" class="text-indigo-900"></strong></span>
+            </div>
+            <table class="w-full text-xs border-collapse">
+                <thead>
+                    <tr class="bg-slate-100">
+                        <th class="border border-slate-300 p-1.5 text-center">#</th>
+                        <th class="border border-slate-300 p-1.5">الوصف والصنف</th>
+                        <th class="border border-slate-300 p-1.5 text-center">الكمية</th>
+                        <th class="border border-slate-300 p-1.5 text-left">المبلغ</th>
+                    </tr>
+                </thead>
+                <tbody id="imgCargoItemsTableBody"></tbody>
+            </table>
+            <div class="flex justify-between items-center bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs">
+                <span>حالة السداد: <strong id="imgCargoPayStatus" class="text-emerald-700 font-bold"></strong></span>
+                <span>الإجمالي النهائي: <strong id="imgCargoGrandTotal" class="text-amber-800 font-black text-sm"></strong></span>
+            </div>
+            <div class="text-center text-[10px] text-slate-400">
+                الموظف: <span id="imgCargoCreatedBy"></span>
+            </div>
+            <div class="flex gap-2 pt-3 no-print">
+                <button onclick="downloadCargoImageWithWhatsAppPrompt()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold flex-1"><i class="fa-brands fa-whatsapp ml-1"></i> إرسال واتساب</button>
+                <button onclick="window.print()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-xl text-xs font-bold"><i class="fa-solid fa-print ml-1"></i> طباعة</button>
+                <button onclick="closeModal('cargoPreviewModal')" class="bg-slate-300 text-slate-800 px-4 py-2 rounded-xl text-xs font-bold">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Debt Invoice Preview Modal -->
+    <div id="debtInvPreviewModal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+        <div class="bg-white text-black w-full max-w-md p-6 rounded-2xl shadow-2xl space-y-4">
+            <div class="text-center border-b pb-3">
+                <h2 class="font-black text-base text-amber-800">شركة وادي بناء للنقل الدولي</h2>
+                <p class="text-xs text-slate-600">فاتورة حساب آجل / ذمم</p>
+            </div>
+            <div class="text-xs space-y-2">
+                <div>رقم الفاتورة: <strong id="imgDebtInvCode" class="text-amber-700"></strong></div>
+                <div>اسم العميل: <strong id="imgDebtName"></strong></div>
+                <div>الهاتف: <strong id="imgDebtPhone"></strong></div>
+                <div>العنوان: <strong id="imgDebtAddress"></strong></div>
+                <div>التاريخ: <strong id="imgDebtDate"></strong></div>
+                <hr>
+                <div class="flex justify-between"><span>المجموع الكلي:</span> <strong id="imgDebtSubTotal"></strong></div>
+                <div class="flex justify-between text-emerald-600"><span>المدفوع:</span> <strong id="imgDebtPaid"></strong></div>
+                <div class="flex justify-between text-amber-700 font-bold text-sm"><span>المتبقي:</span> <strong id="imgDebtNetTotal"></strong></div>
+            </div>
+            <div class="flex gap-2 pt-3 no-print">
+                <button onclick="window.print()" class="bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-bold flex-1">طباعة</button>
+                <button onclick="closeModal('debtInvPreviewModal')" class="bg-slate-300 text-slate-800 px-4 py-2 rounded-xl text-xs">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Driver Account Preview Modal -->
+    <div id="driverAccountModal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white text-black w-full max-w-xl p-6 rounded-2xl shadow-2xl space-y-4 print-container">
+            <div class="text-center border-b pb-3">
+                <h2 class="font-black text-lg text-amber-800">شركة وادي بناء للنقل الدولي</h2>
+                <p class="text-xs text-slate-600">كشف حساب رحلة السائق وتصفيات الذهاب والعودة</p>
+            </div>
+            <div class="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-3 rounded-xl">
+                <div>اسم السائق: <strong id="prDriverName" class="text-sm"></strong></div>
+                <div>رقم الباص: <strong id="prDriverBus"></strong></div>
+                <div>تاريخ الرحلة: <strong id="prDriverDate"></strong></div>
+                <div>المسؤول: <strong id="prDriverCreatedBy"></strong></div>
+            </div>
+            <table class="w-full text-xs border-collapse">
+                <thead>
+                    <tr class="bg-slate-100">
+                        <th class="border border-slate-300 p-2">بند المصروف</th>
+                        <th class="border border-slate-300 p-2 text-center">الروحة (ذهاب)</th>
+                        <th class="border border-slate-300 p-2 text-center">الرجعة (عودة)</th>
+                        <th class="border border-slate-300 p-2">ملاحظات</th>
+                    </tr>
+                </thead>
+                <tbody id="prDriverItemsTableBody"></tbody>
+                <tfoot>
+                    <tr class="bg-slate-100 font-bold">
+                        <td class="border border-slate-300 p-2">الإجمالي:</td>
+                        <td id="prTotalRoha" class="border border-slate-300 p-2 text-center text-indigo-700">0</td>
+                        <td id="prTotalRajah" class="border border-slate-300 p-2 text-center text-emerald-700">0</td>
+                        <td class="border border-slate-300 p-2"></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="grid grid-cols-3 gap-2 text-xs bg-amber-50 p-3 rounded-xl border border-amber-200">
+                <div>إجمالي المصروفات: <strong id="prDriverTotalExp" class="text-red-600 block"></strong></div>
+                <div>حساب الرحلة: <strong id="prDriverTripDue" class="block"></strong></div>
+                <div>الصافي المستحق: <strong id="prDriverNetDue" class="text-emerald-700 font-black text-sm block"></strong></div>
+            </div>
+            <div class="flex gap-2 pt-3 no-print">
+                <button onclick="window.print()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-xl text-xs font-bold flex-1"><i class="fa-solid fa-print ml-1"></i> طباعة الكشف</button>
+                <button onclick="closeModal('driverAccountModal')" class="bg-slate-300 text-slate-800 px-4 py-2 rounded-xl text-xs font-bold">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Passenger Manifest Modal -->
+    <div id="manifestModal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white text-black w-full max-w-4xl p-6 rounded-2xl shadow-2xl space-y-4 print-container">
+            <div class="flex justify-between items-center border-b pb-3 no-print">
+                <div class="flex items-center gap-3">
+                    <label class="text-xs font-bold text-slate-700">تاريخ الرحلة للكشف:</label>
+                    <input type="date" id="manifestFilterDate" onchange="renderPassengerManifestTable()" class="bg-slate-100 border rounded p-1.5 text-xs font-bold">
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="printManifestPassenger('management')" class="bg-amber-700 text-white px-3 py-1.5 rounded text-xs font-bold"><i class="fa-solid fa-print ml-1"></i> طباعة نسخة الإدارة (بالأسعار)</button>
+                    <button onclick="printManifestPassenger('driver')" class="bg-indigo-700 text-white px-3 py-1.5 rounded text-xs font-bold"><i class="fa-solid fa-print ml-1"></i> طباعة نسخة السائق (بدون أسعار)</button>
+                    <button onclick="closeModal('manifestModal')" class="bg-slate-300 text-slate-800 px-3 py-1.5 rounded text-xs font-bold">إغلاق</button>
+                </div>
+            </div>
+
+            <div class="text-center border-b pb-3">
+                <h2 class="font-black text-xl text-amber-900">شركة وادي بناء للنقل الدولي</h2>
+                <p id="manifestTypeSubtitle" class="text-xs font-bold text-slate-700 mt-1">كشف ركاب الرحلة الرسمي (مانفيستو)</p>
+                <div class="flex justify-between text-xs text-slate-600 px-2 mt-2">
+                    <span>تاريخ الرحلة: <strong id="manifestActiveDateBadge" class="text-black"></strong></span>
+                    <span>تاريخ الطباعة: <strong id="manifestIssueDate"></strong></span>
+                </div>
+            </div>
+
+            <table class="w-full text-xs border-collapse">
+                <thead>
+                    <tr class="bg-slate-100 text-slate-800">
+                        <th class="border border-slate-300 p-2">#</th>
+                        <th class="border border-slate-300 p-2">التذكرة</th>
+                        <th class="border border-slate-300 p-2">اسم الراكب الرئيسي</th>
+                        <th class="border border-slate-300 p-2">المرافقون</th>
+                        <th class="border border-slate-300 p-2">الهاتف</th>
+                        <th class="border border-slate-300 p-2">الجواز</th>
+                        <th class="border border-slate-300 p-2">خط السير</th>
+                        <th class="border border-slate-300 p-2 man-price-col">الأجرة</th>
+                        <th class="border border-slate-300 p-2 no-print">الموظف</th>
+                        <th class="border border-slate-300 p-2">السداد</th>
+                    </tr>
+                </thead>
+                <tbody id="manifestTableBody"></tbody>
+            </table>
+
+            <div class="flex justify-between items-center bg-slate-100 p-3 rounded-xl text-xs font-bold">
+                <span>إجمالي الحجوزات: <strong id="manifestTotalBookings" class="text-amber-800"></strong></span>
+                <span>إجمالي الركاب (الأساسي + المرافقين): <strong id="manifestTotalPassengers" class="text-amber-800"></strong></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cargo Manifest Modal -->
+    <div id="cargoManifestModal" class="hidden fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white text-black w-full max-w-4xl p-6 rounded-2xl shadow-2xl space-y-4 print-container">
+            <div class="flex justify-between items-center border-b pb-3 no-print">
+                <div class="flex items-center gap-3">
+                    <label class="text-xs font-bold text-slate-700">تاريخ الشحن للكشف:</label>
+                    <input type="date" id="cargoManifestFilterDate" onchange="renderCargoManifestTable()" class="bg-slate-100 border rounded p-1.5 text-xs font-bold">
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="printManifestCargo('management')" class="bg-amber-700 text-white px-3 py-1.5 rounded text-xs font-bold"><i class="fa-solid fa-print ml-1"></i> نسخة الإدارة (بالأسعار)</button>
+                    <button onclick="printManifestCargo('driver')" class="bg-indigo-700 text-white px-3 py-1.5 rounded text-xs font-bold"><i class="fa-solid fa-print ml-1"></i> نسخة السائق (بدون أسعار)</button>
+                    <button onclick="closeModal('cargoManifestModal')" class="bg-slate-300 text-slate-800 px-3 py-1.5 rounded text-xs font-bold">إغلاق</button>
+                </div>
+            </div>
+
+            <div class="text-center border-b pb-3">
+                <h2 class="font-black text-xl text-amber-900">شركة وادي بناء للنقل الدولي</h2>
+                <p id="cargoManifestTypeSubtitle" class="text-xs font-bold text-slate-700 mt-1">كشف مانفيستو الشحن والأمتعة</p>
+                <div class="flex justify-between text-xs text-slate-600 px-2 mt-2">
+                    <span>تاريخ الشحن: <strong id="cargoManifestActiveDateBadge" class="text-black"></strong></span>
+                    <span>وقت الإصدار: <strong id="cargoManifestIssueDate"></strong></span>
+                </div>
+            </div>
+
+            <table class="w-full text-xs border-collapse">
+                <thead>
+                    <tr class="bg-slate-100 text-slate-800">
+                        <th class="border border-slate-300 p-2">#</th>
+                        <th class="border border-slate-300 p-2">الفاتورة</th>
+                        <th class="border border-slate-300 p-2">المُرسل</th>
+                        <th class="border border-slate-300 p-2">المُستلم والعنوان</th>
+                        <th class="border border-slate-300 p-2">الرحلة</th>
+                        <th class="border border-slate-300 p-2">الأصناف والطرود</th>
+                        <th class="border border-slate-300 p-2 cargo-price-col">المبلغ</th>
+                        <th class="border border-slate-300 p-2 no-print">الموظف</th>
+                        <th class="border border-slate-300 p-2">السداد</th>
+                    </tr>
+                </thead>
+                <tbody id="cargoManifestTableBody"></tbody>
+            </table>
+
+            <div class="flex justify-between items-center bg-slate-100 p-3 rounded-xl text-xs font-bold">
+                <span>إجمالي الفواتير: <strong id="cargoManifestTotalInvoices" class="text-amber-800"></strong></span>
+                <span id="cargoManifestRevBox">إجمالي الإيرادات: <strong id="cargoManifestTotalRevenue" class="text-emerald-700"></strong></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 8. FOOTER                                                             -->
     <!-- ===================================================================== -->
     <footer class="bg-cardbg border-t border-bordergold py-3.5 px-6 text-center text-[11px] text-zinc-500 no-print">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
@@ -1739,13 +1215,13 @@
     </footer>
 
     <!-- ===================================================================== -->
-    <!-- 6. UNIFIED JAVASCRIPT APPLICATION LOGIC                               -->
+    <!-- 9. JAVASCRIPT LOGIC (PURE CLOUD REALTIME SYNC - NO BROWSER STORAGE)   -->
     <!-- ===================================================================== -->
     <script>
         const { jsPDF } = window.jspdf;
 
         // ---------------------------------------------------------------------
-        // FIREBASE & LOCAL STORAGE CONFIGURATION
+        // FIREBASE CONFIGURATION (wadi-bana-b585b) - PURE REALTIME CLOUD ONLY
         // ---------------------------------------------------------------------
         const firebaseConfig = {
             apiKey: "AIzaSyCX0AnjNnffeRCFGDugKeOI8k8adJC1aqs",
@@ -1757,21 +1233,16 @@
             appId: "1:57806694102:web:8b2f38f1b86c0240290b77"
         };
 
-        let useFirebase = true;
-        try {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-        } catch (e) {
-            useFirebase = false;
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
-        const rtdb = useFirebase ? firebase.database() : null;
+        const rtdb = firebase.database();
 
         // ---------------------------------------------------------------------
-        // GLOBAL STATE & DEFAULT DATA
+        // IN-MEMORY STATE (NO LOCALSTORAGE USED)
         // ---------------------------------------------------------------------
-        let currentUser = JSON.parse(localStorage.getItem('WADI_BINA_USER')) || null;
-        let currentLang = localStorage.getItem('WADI_BINA_LANG') || 'ar';
+        let currentUser = null;
+        let currentLang = 'ar';
         let currentTab = 'dashboard';
         let currentPreviewTicket = null;
         let currentPreviewCargo = null;
@@ -1783,6 +1254,8 @@
             { username: 'محمود', password: '102030', role: 'مدير فرع', branch: 'فرع عجمان' },
             { username: 'يوسف', password: '405060', role: 'موظف', branch: 'فرع اليمن' }
         ];
+
+        let cloudUsers = [...DEFAULT_USERS];
 
         const standardDriverItems = [
             "العهده",
@@ -1870,7 +1343,7 @@
                 htmlLang: 'ar',
                 pageTitle: 'شركة وادي بناء للنقل الدولي | النظام الموحد واللوحة المتكاملة',
                 lgTitle: 'تسجيل الدخول للنظام الموحد',
-                lgSub: 'شركة وادي بناء للنقل الدولي — بوابة التحكم المتكاملة',
+                lgSub: 'شركة وادي بناء للنقل الدولي — بوابة التحكم السحابية',
                 lgUserLbl: 'اسم المستخدم',
                 lgPassLbl: 'كلمة المرور',
                 lgBtn: 'دخول النظام الموحد',
@@ -1896,7 +1369,7 @@
                 htmlLang: 'en',
                 pageTitle: 'Wadi Bina Overland Transport | Unified System & Dashboard',
                 lgTitle: 'Unified System Login',
-                lgSub: 'Wadi Bina International Transport — Integrated Control Portal',
+                lgSub: 'Wadi Bina International Transport — Cloud Control Portal',
                 lgUserLbl: 'Username',
                 lgPassLbl: 'Password',
                 lgBtn: 'Login to System',
@@ -1921,7 +1394,6 @@
 
         function toggleLanguage() {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
-            localStorage.setItem('WADI_BINA_LANG', currentLang);
             applyLanguage();
         }
 
@@ -1982,29 +1454,29 @@
         }
 
         // ---------------------------------------------------------------------
-        // AUTHENTICATION & USER PERMISSIONS
+        // AUTHENTICATION & USER PERMISSIONS (CLOUD-SYNCED)
         // ---------------------------------------------------------------------
         function handleLogin(e) {
             e.preventDefault();
             const uInput = document.getElementById('loginUser').value.trim();
             const pInput = document.getElementById('loginPass').value.trim();
-            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
-            const found = users.find(u => u.username === uInput && u.password === pInput);
+            const found = cloudUsers.find(u => u.username === uInput && u.password === pInput);
             
             if (found) {
-                currentUser = found;
-                localStorage.setItem('WADI_BINA_USER', JSON.stringify(currentUser));
+                currentUser = { ...found };
                 document.getElementById('loginOverlay').style.display = 'none';
                 updateUserBadge();
-                initSync();
+                refreshUI();
             } else {
                 alert('بيانات الدخول غير صحيحة! يرجى التأكد من اسم المستخدم وكلمة المرور.');
             }
         }
 
         function handleLogout() {
-            localStorage.removeItem('WADI_BINA_USER');
-            location.reload();
+            currentUser = null;
+            document.getElementById('loginUser').value = '';
+            document.getElementById('loginPass').value = '';
+            updateUserBadge();
         }
 
         function updateUserBadge() {
@@ -2020,6 +1492,7 @@
                     document.getElementById('managerBranchFilterContainer').classList.add('hidden');
                 }
             } else {
+                document.getElementById('userInfoBadge').innerText = 'غير مسجل';
                 document.getElementById('loginOverlay').style.display = 'flex';
             }
         }
@@ -2032,30 +1505,24 @@
         function handleUserChangePassword(e) {
             e.preventDefault();
             const newPass = document.getElementById('newPassInput').value.trim();
-            if (!newPass) return;
+            if (!newPass || !currentUser) return;
 
-            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
-            const userObj = users.find(u => u.username === currentUser.username);
+            const userObj = cloudUsers.find(u => u.username === currentUser.username);
             if (userObj) {
                 userObj.password = newPass;
             } else {
                 currentUser.password = newPass;
-                users.push(currentUser);
+                cloudUsers.push({ ...currentUser });
             }
             
-            localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
             currentUser.password = newPass;
-            localStorage.setItem('WADI_BINA_USER', JSON.stringify(currentUser));
-            
-            if (useFirebase && rtdb) {
-                rtdb.ref('systemUsers').set(users);
-            }
-            alert('تم تغيير كلمة المرور بنجاح!');
+            rtdb.ref('systemUsers').set(cloudUsers);
+            alert('تم تغيير كلمة المرور ومزامنتها سحابياً بنجاح!');
             closeModal('changePassModal');
         }
 
         // ---------------------------------------------------------------------
-        // DATABASE SYNCHRONIZATION & SEQUENCE NUMBERS
+        // PURE CLOUD DATABASE SYNCHRONIZATION (NO BROWSER LOCALSTORAGE)
         // ---------------------------------------------------------------------
         function calculateNextSequenceNumbers() {
             if (db.passengers && db.passengers.length > 0) {
@@ -2140,65 +1607,44 @@
             if (fixed) { saveDB(); }
         }
 
-        function initSync() {
-            if (!useFirebase || !rtdb) {
-                loadFromLocal();
-                return;
-            }
-
+        function initCloudRealtimeSync() {
+            // 1. Live Listener for Cloud System Users
             rtdb.ref('systemUsers').on('value', (snapshot) => {
                 const val = snapshot.val();
                 if (val) {
-                    localStorage.setItem('WADI_BINA_USERS', JSON.stringify(Object.values(val)));
+                    cloudUsers = Array.isArray(val) ? val : Object.values(val);
+                    if (currentTab === 'users') renderUsersTable();
                 } else {
                     rtdb.ref('systemUsers').set(DEFAULT_USERS);
                 }
             });
 
+            // 2. Live Listener for Unified Database (Realtime Bidirectional Sync)
             rtdb.ref('systemUnifiedData').on('value', (snapshot) => {
                 const val = snapshot.val();
                 if (val) {
                     db = {
-                        trips: val.trips ? Object.values(val.trips) : db.trips,
-                        drivers: val.drivers ? Object.values(val.drivers) : db.drivers,
-                        passengers: val.passengers ? Object.values(val.passengers) : db.passengers,
-                        cargo: val.cargo ? Object.values(val.cargo) : db.cargo,
-                        vouchers: val.vouchers ? Object.values(val.vouchers) : [],
-                        debtInvoices: val.debtInvoices ? Object.values(val.debtInvoices) : db.debtInvoices,
+                        trips: val.trips ? (Array.isArray(val.trips) ? val.trips : Object.values(val.trips)) : [],
+                        drivers: val.drivers ? (Array.isArray(val.drivers) ? val.drivers : Object.values(val.drivers)) : [],
+                        passengers: val.passengers ? (Array.isArray(val.passengers) ? val.passengers : Object.values(val.passengers)) : [],
+                        cargo: val.cargo ? (Array.isArray(val.cargo) ? val.cargo : Object.values(val.cargo)) : [],
+                        vouchers: val.vouchers ? (Array.isArray(val.vouchers) ? val.vouchers : Object.values(val.vouchers)) : [],
+                        debtInvoices: val.debtInvoices ? (Array.isArray(val.debtInvoices) ? val.debtInvoices : Object.values(val.debtInvoices)) : [],
                         nextTicketNo: val.nextTicketNo || 141,
                         nextCargoNo: val.nextCargoNo || 131,
                         nextDebtInvNo: val.nextDebtInvNo || 1
                     };
                     validateAndRepairDB();
-                    localStorage.setItem('WADI_BINA_UNIFIED_DB', JSON.stringify(db));
                 } else {
                     saveDB();
                 }
                 refreshUI();
-            }, () => {
-                loadFromLocal();
             });
-        }
-
-        function loadFromLocal() {
-            const local = localStorage.getItem('WADI_BINA_UNIFIED_DB');
-            if (local) {
-                try {
-                    db = JSON.parse(local);
-                    validateAndRepairDB();
-                } catch (e) {}
-            } else {
-                validateAndRepairDB();
-            }
-            refreshUI();
         }
 
         function saveDB() {
             calculateNextSequenceNumbers();
-            localStorage.setItem('WADI_BINA_UNIFIED_DB', JSON.stringify(db));
-            if (useFirebase && rtdb && navigator.onLine) {
-                rtdb.ref('systemUnifiedData').set(db).catch(() => {});
-            }
+            rtdb.ref('systemUnifiedData').set(db);
         }
 
         // ---------------------------------------------------------------------
@@ -2462,7 +1908,7 @@
                     const idNote = String(oldId) !== String(ticketNo) ? ` (تغيير الرقم من #${oldId} إلى #${ticketNo})` : '';
                     item.auditLog.push({ action: `تعديل بيانات التذكرة${idNote}`, user: author, time: nowStr });
                 }
-                alert('تم تحديث بيانات التذكرة بنجاح!');
+                alert('تم تحديث بيانات التذكرة ومزامنتها سحابياً بنجاح!');
                 resetPassengerForm();
             } else {
                 if (db.passengers.some(p => String(p.id) === String(ticketNo))) {
@@ -2495,7 +1941,7 @@
                 document.getElementById('passDate').value = new Date().toISOString().split('T')[0];
                 updateReportingTimeAutomatically();
                 onPassengerCountChanged();
-                alert('تم إصدار تذكرة السفر بنجاح برقم #' + ticketNo);
+                alert('تم إصدار تذكرة السفر ومزامنتها بنجاح برقم #' + ticketNo);
             }
             validateAndRepairDB();
             saveDB();
@@ -2644,7 +2090,7 @@
                     const idNote = String(oldId) !== String(invNo) ? ` (تغيير الرقم من #${oldId} إلى #${invNo})` : '';
                     item.auditLog.push({ action: `تعديل فاتورة الشحن${idNote}`, user: author, time: nowStr });
                 }
-                alert('تم تحديث فاتورة الشحن بنجاح!');
+                alert('تم تحديث فاتورة الشحن ومزامنتها بنجاح!');
                 resetCargoForm();
             } else {
                 if (db.cargo.some(c => String(c.id) === String(invNo))) {
@@ -2675,7 +2121,7 @@
                 document.getElementById('cargoItemsRowsContainer').innerHTML = '';
                 addCargoItemRow();
                 calculateNextSequenceNumbers();
-                alert('تم حفظ وإصدار فاتورة الشحن بنجاح برقم #' + invNo);
+                alert('تم حفظ وإصدار فاتورة الشحن ومزامنتها بنجاح برقم #' + invNo);
             }
             validateAndRepairDB();
             saveDB();
@@ -2898,7 +2344,7 @@
                     db.trips[idx].route = tripRoute;
                     db.trips[idx].busInfo = tripBusInfo;
                     db.trips[idx].status = tripStatus;
-                    alert('تم تعديل بيانات الرحلة بنجاح!');
+                    alert('تم تعديل بيانات الرحلة ومزامنتها سحابياً بنجاح!');
                 }
             } else {
                 const newTrip = {
@@ -2911,7 +2357,7 @@
                     createdBy: getCurrentUserName()
                 };
                 db.trips.unshift(newTrip);
-                alert('تم إنشاء الرحلة بنجاح!');
+                alert('تم إنشاء الرحلة ومزامنتها سحابياً بنجاح!');
             }
             saveDB();
             resetTripForm();
@@ -3146,7 +2592,7 @@
                     if (!rec.auditLog) rec.auditLog = [{ action: 'إنشاء', user: rec.createdBy || author, time: rec.createdAt || nowStr }];
                     rec.auditLog.push({ action: 'تعديل حساب السائق', user: author, time: nowStr });
                 }
-                alert('تم تحديث حساب السائق وترحيل المصروفات للصندوق بنجاح!');
+                alert('تم تحديث حساب السائق وترحيل المصروفات للصندوق ومزامنتها سحابياً بنجاح!');
                 resetDriverForm();
             } else {
                 const record = {
@@ -3302,7 +2748,7 @@
             };
             db.debtInvoices.unshift(newInv);
             saveDB();
-            alert('تم حفظ فاتورة الحساب الآجل بنجاح!');
+            alert('تم حفظ فاتورة الحساب الآجل ومزامنتها سحابياً بنجاح!');
             document.getElementById('debtInvoiceForm').reset();
             switchFinancialSubTab('debts');
             refreshUI();
@@ -3326,7 +2772,7 @@
             document.getElementById('voucherForm').reset();
             document.getElementById('vDate').value = new Date().toISOString().split('T')[0];
             refreshUI();
-            alert('تم حفظ السند المالي بنجاح!');
+            alert('تم حفظ السند المالي ومزامنته سحابياً بنجاح!');
         }
 
         function deleteVoucher(idx) {
@@ -3440,15 +2886,14 @@
         }
 
         // ---------------------------------------------------------------------
-        // USERS MANAGEMENT MODULE
+        // USERS MANAGEMENT MODULE (PURE CLOUD SYNC)
         // ---------------------------------------------------------------------
         function renderUsersTable() {
             const tbody = document.querySelector('#usersTable tbody');
             if (!tbody) return;
             tbody.innerHTML = '';
-            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
 
-            users.forEach((u, idx) => {
+            cloudUsers.forEach((u, idx) => {
                 let roleBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-zinc-800 text-zinc-300">${u.role}</span>`;
                 if (u.role === 'مدير عام') {
                     roleBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold gold-gradient-bg text-black shadow"><i class="fa-solid fa-crown ml-1"></i>مدير عام (جميع الأفرع)</span>`;
@@ -3477,34 +2922,28 @@
             const urole = document.getElementById('manageRole').value;
             const ubranch = document.getElementById('manageBranch').value;
 
-            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
-
             if (origName) {
-                const idx = users.findIndex(u => u.username === origName);
+                const idx = cloudUsers.findIndex(u => u.username === origName);
                 if (idx !== -1) {
-                    users[idx] = { username: uname, password: upass, role: urole, branch: ubranch };
+                    cloudUsers[idx] = { username: uname, password: upass, role: urole, branch: ubranch };
                 }
-                alert('تم تحديث بيانات المستخدم بنجاح!');
+                alert('تم تحديث بيانات المستخدم ومزامنتها سحابياً بنجاح!');
             } else {
-                if (users.some(u => u.username === uname)) {
+                if (cloudUsers.some(u => u.username === uname)) {
                     alert('اسم المستخدم موجود مسبقاً!');
                     return;
                 }
-                users.push({ username: uname, password: upass, role: urole, branch: ubranch });
-                alert('تم إضافة المستخدم الجديد بنجاح!');
+                cloudUsers.push({ username: uname, password: upass, role: urole, branch: ubranch });
+                alert('تم إضافة المستخدم الجديد ومزامنته سحابياً بنجاح!');
             }
 
-            localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
-            if (useFirebase && rtdb) {
-                rtdb.ref('systemUsers').set(users);
-            }
+            rtdb.ref('systemUsers').set(cloudUsers);
             resetUserForm();
             renderUsersTable();
         }
 
         function editUser(username) {
-            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
-            const u = users.find(x => x.username === username);
+            const u = cloudUsers.find(x => x.username === username);
             if (!u) return;
 
             document.getElementById('userEditOriginalName').value = u.username;
@@ -3522,16 +2961,12 @@
         }
 
         function deleteUser(idx) {
-            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
-            if (users.length <= 1) {
+            if (cloudUsers.length <= 1) {
                 alert('لا يمكن حذف جميع المستخدمين!');
                 return;
             }
-            users.splice(idx, 1);
-            localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
-            if (useFirebase && rtdb) {
-                rtdb.ref('systemUsers').set(users);
-            }
+            cloudUsers.splice(idx, 1);
+            rtdb.ref('systemUsers').set(cloudUsers);
             renderUsersTable();
         }
 
@@ -3975,8 +3410,8 @@
                         db = importedData;
                         validateAndRepairDB();
                         saveDB();
-                        alert('تم استرجاع النسخة الاحتياطية بنجاح وتحديث النظام!');
-                        location.reload();
+                        refreshUI();
+                        alert('تم استرجاع النسخة الاحتياطية ومزامنتها سحابياً بنجاح!');
                     } else {
                         alert('ملف النسخة الاحتياطية غير صالح أو تالف!');
                     }
@@ -4045,7 +3480,7 @@
             validateAndRepairDB();
             saveDB();
             refreshUI();
-            alert(`تم فحص ملف PDF واستعادة ودمج (${recoveredCount}) سجل بنجاح داخل قاعدة البيانات!`);
+            alert(`تم فحص ملف PDF واستعادة ودمج (${recoveredCount}) سجل سحابياً بنجاح!`);
         }
 
         function exportExcel(type) {
@@ -4060,7 +3495,6 @@
         // INITIALIZATION ON WINDOW LOAD
         // ---------------------------------------------------------------------
         window.onload = function() {
-            loadFromLocal();
             updateUserBadge();
             applyLanguage();
 
@@ -4077,9 +3511,8 @@
             buildDriverItemsRows();
             calculateNextSequenceNumbers();
 
-            if (currentUser) {
-                initSync();
-            }
+            // Start Pure Cloud Realtime Sync Immediately
+            initCloudRealtimeSync();
         };
     </script>
 </body>
