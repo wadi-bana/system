@@ -406,15 +406,6 @@
                     </div>
                 </div>
 
-                <!-- Audit Trail Accordion -->
-                <details class="no-print bg-amber-50 border border-amber-300 rounded-lg p-2.5 text-xs text-slate-800 mb-4 shadow-sm">
-                    <summary class="font-bold cursor-pointer text-amber-900 flex items-center justify-between">
-                        <span><i class="fa-solid fa-clock-rotate-left ml-1 text-amber-700"></i> سجل التدقيق والتواريخ (من الإنشاء حتى آخر تعديل)</span>
-                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                    </summary>
-                    <div id="ticketAuditLogContent" class="mt-2 pt-2 border-t border-amber-200 space-y-1 text-[11px] text-slate-700"></div>
-                </details>
-
                 <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
                     <div id="tktFootNote" class="font-bold text-slate-700">* رحلة موفقة وآمنة مع وادي بناء للنقل الدولي. أرقام التواصل بالمكاتب:</div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-1 font-bold text-slate-800 pt-1">
@@ -510,15 +501,6 @@
                     </div>
                 </div>
 
-                <!-- Audit Trail Accordion -->
-                <details class="no-print bg-indigo-50 border border-indigo-300 rounded-lg p-2.5 text-xs text-slate-800 mb-4 shadow-sm">
-                    <summary class="font-bold cursor-pointer text-indigo-900 flex items-center justify-between">
-                        <span><i class="fa-solid fa-clock-rotate-left ml-1 text-indigo-700"></i> سجل التدقيق والتواريخ (من الإنشاء حتى آخر تعديل)</span>
-                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                    </summary>
-                    <div id="cargoAuditLogContent" class="mt-2 pt-2 border-t border-indigo-200 space-y-1 text-[11px] text-slate-700"></div>
-                </details>
-
                 <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
                     <div id="cargoFootNote" class="font-bold text-slate-700">* شكراً لاختياركم وادي بناء لشحن أمتعتكم. أرقام التواصل بالمكاتب:</div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-1 font-bold text-slate-800 pt-1">
@@ -593,14 +575,6 @@
                         <span id="lblDebtStatusBadge" class="px-2.5 py-1 rounded-md bg-amber-200 text-amber-900 font-bold">حساب آجل</span>
                     </div>
                 </div>
-
-                <details class="no-print bg-zinc-100 border border-zinc-300 rounded-lg p-2.5 text-xs text-slate-800 mb-4 shadow-sm">
-                    <summary class="font-bold cursor-pointer text-slate-900 flex items-center justify-between">
-                        <span><i class="fa-solid fa-clock-rotate-left ml-1 text-amber-700"></i> سجل التدقيق والتواريخ</span>
-                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                    </summary>
-                    <div id="debtAuditLogContent" class="mt-2 pt-2 border-t border-zinc-200 space-y-1 text-[11px] text-slate-700"></div>
-                </details>
 
                 <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
                     <div>* تعتبر هذه الفاتورة سند مطالبة مالي رسمي للحسابات الآجلة لدى شركة وادي بناء للنقل الدولي.</div>
@@ -684,14 +658,6 @@
                         <span>باقي حساب السائق الصافي:</span> <strong id="prDriverNetDue">0 AED</strong>
                     </div>
                 </div>
-
-                <details class="no-print bg-slate-100 border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800 mb-4 shadow-sm">
-                    <summary class="font-bold cursor-pointer text-slate-900 flex items-center justify-between">
-                        <span><i class="fa-solid fa-clock-rotate-left ml-1 text-amber-700"></i> سجل التواريخ والمستخدمين</span>
-                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                    </summary>
-                    <div id="driverAuditLogContent" class="mt-2 pt-2 border-t border-slate-200 space-y-1 text-[11px] text-slate-700"></div>
-                </details>
 
                 <div class="grid grid-cols-2 gap-6 pt-4 border-t border-dashed border-slate-400 text-xs font-bold text-center">
                     <div>
@@ -1253,6 +1219,7 @@
                                 <th id="thP7">تاريخ الرحلة</th>
                                 <th id="thP8">المبلغ</th>
                                 <th class="no-print">الموظف</th>
+                                <th class="no-print">سجل التدقيق والتواريخ</th>
                                 <th id="thP9">السداد</th>
                                 <th id="thP10">الفرع</th>
                                 <th id="thP11">إجراءات / طباعة</th>
@@ -1384,6 +1351,7 @@
                                 <th id="thC5">عدد الأصناف</th>
                                 <th id="thC6">الإجمالي</th>
                                 <th class="no-print">الموظف</th>
+                                <th class="no-print">سجل التدقيق والتواريخ</th>
                                 <th id="thC7">الحالة</th>
                                 <th id="thC8">الفرع</th>
                                 <th id="thC9">إجراءات / طباعة</th>
@@ -2808,6 +2776,9 @@
 
                     const realIdx = db.passengers.findIndex(x => String(x.id) === String(p.id));
                     const statusClass = p.payMethod === 'مدفوع' ? 'badge-paid' : 'badge-pending';
+                    const pAuditHtml = (p.auditLog && p.auditLog.length > 0)
+                        ? p.auditLog.map(l => `<div class="border-b border-zinc-800/70 pb-0.5 mb-0.5 last:border-0 last:pb-0 last:mb-0">• <strong>${l.action}</strong> (${l.user}) <span class="text-amber-400" dir="ltr">${l.time}</span></div>`).join('')
+                        : `<div>• إنشاء (${p.createdBy || 'النظام'}) <span class="text-amber-400" dir="ltr">${p.createdAt || '-'}</span></div>`;
 
                     passTbody.insertRow().innerHTML = `
                         <td><strong class="text-gold">#${p.id}</strong></td>
@@ -2819,6 +2790,15 @@
                         <td><strong class="text-gold">${p.date || '-'}</strong></td>
                         <td class="font-bold">${p.fare} AED</td>
                         <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${p.createdBy || 'النظام'}</span></td>
+                        <td class="no-print min-w-[200px] max-w-[260px] whitespace-normal">
+                            <details class="bg-zinc-900/90 border border-amber-500/30 rounded-lg px-2.5 py-1.5 text-[11px]">
+                                <summary class="cursor-pointer font-bold text-amber-400 select-none flex items-center justify-between gap-1">
+                                    <span><i class="fa-solid fa-clock-rotate-left ml-1"></i> السجل (${p.auditLog ? p.auditLog.length : 1})</span>
+                                    <i class="fa-solid fa-chevron-down text-[9px]"></i>
+                                </summary>
+                                <div class="mt-1.5 pt-1.5 border-t border-zinc-800 text-zinc-300 space-y-1 leading-relaxed">${pAuditHtml}</div>
+                            </details>
+                        </td>
                         <td><span class="px-2 py-0.5 rounded text-[11px] font-bold ${statusClass}">${p.payMethod}</span></td>
                         <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${p.branch || 'فرع عجمان'}</span></td>
                         <td class="space-x-1 space-x-reverse whitespace-nowrap">
@@ -2857,6 +2837,9 @@
                     const linkedTrip = db.trips.find(t => t.id === c.tripId);
                     const tripText = linkedTrip ? `${linkedTrip.date} (${linkedTrip.busInfo})` : 'رحلة عامة';
                     const statusClass = c.paymentStatus === 'مدفوع' ? 'badge-paid' : 'badge-pending';
+                    const cAuditHtml = (c.auditLog && c.auditLog.length > 0)
+                        ? c.auditLog.map(l => `<div class="border-b border-zinc-800/70 pb-0.5 mb-0.5 last:border-0 last:pb-0 last:mb-0">• <strong>${l.action}</strong> (${l.user}) <span class="text-indigo-400" dir="ltr">${l.time}</span></div>`).join('')
+                        : `<div>• إنشاء (${c.createdBy || 'النظام'}) <span class="text-indigo-400" dir="ltr">${c.createdAt || '-'}</span></div>`;
 
                     cargoTbody.insertRow().innerHTML = `
                         <td><strong class="text-gold">#${c.id}</strong></td>
@@ -2867,6 +2850,15 @@
                         <td><span class="bg-indigo-950 text-indigo-300 px-2.5 py-0.5 rounded-full text-xs font-bold">${itemCount}</span></td>
                         <td class="font-bold">${c.grandTotal} AED</td>
                         <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${c.createdBy || 'النظام'}</span></td>
+                        <td class="no-print min-w-[200px] max-w-[260px] whitespace-normal">
+                            <details class="bg-zinc-900/90 border border-indigo-500/30 rounded-lg px-2.5 py-1.5 text-[11px]">
+                                <summary class="cursor-pointer font-bold text-indigo-400 select-none flex items-center justify-between gap-1">
+                                    <span><i class="fa-solid fa-clock-rotate-left ml-1"></i> السجل (${c.auditLog ? c.auditLog.length : 1})</span>
+                                    <i class="fa-solid fa-chevron-down text-[9px]"></i>
+                                </summary>
+                                <div class="mt-1.5 pt-1.5 border-t border-zinc-800 text-zinc-300 space-y-1 leading-relaxed">${cAuditHtml}</div>
+                            </details>
+                        </td>
                         <td><span class="px-2 py-0.5 rounded text-[11px] font-bold ${statusClass}">${c.paymentStatus}</span></td>
                         <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${c.branch || 'فرع عجمان'}</span></td>
                         <td class="space-x-1 space-x-reverse whitespace-nowrap">
@@ -3238,16 +3230,6 @@
             document.getElementById('prTotalRoha').innerText = sumRoha;
             document.getElementById('prTotalRajah').innerText = sumRajah;
 
-            const auditContainer = document.getElementById('driverAuditLogContent');
-            auditContainer.innerHTML = '';
-            if (d.auditLog && d.auditLog.length > 0) {
-                d.auditLog.forEach(log => {
-                    auditContainer.innerHTML += `<div>• <strong>${log.action}</strong> بواسطة (${log.user}) في: <span class="text-amber-800 font-bold">${log.time}</span></div>`;
-                });
-            } else {
-                auditContainer.innerHTML = `<div>• تم الإنشاء بواسطة (${d.createdBy || 'النظام'}) في ${d.createdAt || 'غير محدد'}</div>`;
-            }
-
             document.getElementById('driverAccountModal').classList.remove('hidden');
         }
 
@@ -3594,16 +3576,6 @@
                 extraBox.innerHTML = html;
             }
 
-            const auditContainer = document.getElementById('ticketAuditLogContent');
-            auditContainer.innerHTML = '';
-            if (item.auditLog && item.auditLog.length > 0) {
-                item.auditLog.forEach(log => {
-                    auditContainer.innerHTML += `<div>• <strong>${log.action}</strong> بواسطة (${log.user}) في: <span class="text-amber-900 font-bold">${log.time}</span></div>`;
-                });
-            } else {
-                auditContainer.innerHTML = `<div>• تم الإنشاء بواسطة (${item.createdBy || 'النظام'}) في ${item.createdAt || 'غير محدد'}</div>`;
-            }
-
             document.getElementById('ticketPreviewModal').classList.remove('hidden');
         }
 
@@ -3646,16 +3618,6 @@
 
             document.getElementById('imgCargoGrandTotal').innerText = `AED ${item.grandTotal}`;
 
-            const auditContainer = document.getElementById('cargoAuditLogContent');
-            auditContainer.innerHTML = '';
-            if (item.auditLog && item.auditLog.length > 0) {
-                item.auditLog.forEach(log => {
-                    auditContainer.innerHTML += `<div>• <strong>${log.action}</strong> بواسطة (${log.user}) في: <span class="text-indigo-900 font-bold">${log.time}</span></div>`;
-                });
-            } else {
-                auditContainer.innerHTML = `<div>• تم الإنشاء بواسطة (${item.createdBy || 'النظام'}) في ${item.createdAt || 'غير محدد'}</div>`;
-            }
-
             document.getElementById('cargoPreviewModal').classList.remove('hidden');
         }
 
@@ -3671,16 +3633,6 @@
             document.getElementById('imgDebtPaid').innerText = inv.paidAmount;
             document.getElementById('imgDebtNetTotal').innerText = `${inv.netTotal} AED`;
             document.getElementById('imgDebtCreatedBy').innerText = inv.createdBy || 'النظام';
-
-            const auditContainer = document.getElementById('debtAuditLogContent');
-            auditContainer.innerHTML = '';
-            if (inv.auditLog && inv.auditLog.length > 0) {
-                inv.auditLog.forEach(log => {
-                    auditContainer.innerHTML += `<div>• <strong>${log.action}</strong> بواسطة (${log.user}) في: <span class="text-amber-800 font-bold">${log.time}</span></div>`;
-                });
-            } else {
-                auditContainer.innerHTML = `<div>• تم الإنشاء بواسطة (${inv.createdBy || 'النظام'}) في ${inv.createdAt || 'غير محدد'}</div>`;
-            }
 
             document.getElementById('debtInvPreviewModal').classList.remove('hidden');
         }
