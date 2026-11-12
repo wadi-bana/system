@@ -613,6 +613,9 @@
                 <button onclick="switchTab('cargo')" id="tab-cargo" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
                     <i class="fa-solid fa-boxes-packing ml-1.5"></i> فواتير الشحن
                 </button>
+                <button onclick="switchTab('transit')" id="tab-transit" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
+                    <i class="fa-solid fa-passport ml-1.5"></i> تأشيرات العبور
+                </button>
                 <button onclick="switchTab('financials')" id="tab-financials" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
                     <i class="fa-solid fa-calculator ml-1.5"></i> الإدارة المالية
                 </button>
@@ -955,7 +958,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
                                 <label id="lblTktNo" class="block text-xs text-gold mb-1 font-bold">رقم التذكرة (تلقائي) *</label>
-                                <input type="text" id="passTicketNo" required readonly class="w-full bg-zinc-900 border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs outline-none cursor-not-allowed">
+                                <input type="text" id="passTicketNo" required class="w-full bg-zinc-900 border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs outline-none">
                             </div>
                             <div>
                                 <label id="lblAgent" class="block text-xs text-gold mb-1 font-bold">ربط برحلة مجدولة *</label>
@@ -1103,7 +1106,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <div>
                             <label id="lblInvNo" class="block text-xs text-gold mb-1 font-bold">رقم الفاتورة *</label>
-                            <input type="text" id="cargoInvNo" required readonly class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs cursor-not-allowed">
+                            <input type="text" id="cargoInvNo" required class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs outline-none">
                         </div>
                         <div>
                             <label class="block text-xs text-gold mb-1 font-bold">ربط برحلة مجدولة (اختياري)</label>
@@ -1190,6 +1193,84 @@
                                 <th id="thC7">الحالة</th>
                                 <th id="thC8">الفرع</th>
                                 <th id="thC9">إجراءات / طباعة</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB TRANSIT VISAS: إدارة تأشيرات العبور -->
+        <section id="module-transit" class="tab-content hidden space-y-6">
+            <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
+                    <h2 class="text-gold font-extrabold text-base flex items-center gap-2">
+                        <i class="fa-solid fa-passport text-gold"></i>
+                        <span id="transitFormTitle">إنشاء فاتورة تأشيرة عبور جديدة</span>
+                    </h2>
+                    <button id="cancelEditTransitBtn" onclick="resetTransitForm()" class="hidden text-xs text-red-400 font-bold bg-red-950/40 border border-red-800 px-2.5 py-1 rounded-lg">إغلاق التعديل</button>
+                </div>
+
+                <form id="transitForm" onsubmit="handleSaveTransit(event)" class="space-y-4">
+                    <input type="hidden" id="transitEditId" value="">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs text-gold mb-1 font-bold">رقم الفاتورة (قابل للتعديل) *</label>
+                            <input type="text" id="transitInvNo" required class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gold mb-1 font-bold">الاسم الكامل *</label>
+                            <input type="text" id="transitName" required placeholder="اسم صاحب التأشيرة" class="w-full bg-darkbg border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-100 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gold mb-1 font-bold">رقم الجواز *</label>
+                            <input type="text" id="transitPassport" required placeholder="رقم جواز السفر" class="w-full bg-darkbg border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-100 outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs text-gold mb-1 font-bold">الهوية *</label>
+                            <select id="transitIdentity" onchange="onTransitIdentityChange()" required class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs outline-none">
+                                <option value="زيارة">زيارة (150 - 200 درهم)</option>
+                                <option value="مقيم">مقيم (80 - 100 درهم)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gold mb-1 font-bold">رقم الطلب *</label>
+                            <input type="text" id="transitRequestNo" required placeholder="أدخل رقم الطلب" class="w-full bg-darkbg border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-100 outline-none">
+                        </div>
+                        <div>
+                            <label id="transitAmountLabel" class="block text-xs text-emerald-400 mb-1 font-bold">المبلغ (درهم - النطاق المسموح: 150 إلى 200) *</label>
+                            <input type="number" step="any" id="transitAmount" min="150" max="200" value="150" required class="w-full bg-darkbg border border-emerald-500 font-bold text-emerald-400 rounded-xl px-3 py-2 text-xs outline-none">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="transitSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow-lg">
+                        حفظ وإنشاء فاتورة تأشيرة العبور
+                    </button>
+                </form>
+            </div>
+
+            <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
+                <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
+                    <span class="font-bold text-gold text-xs">سجل فواتير تأشيرات العبور (اختيار حالة السداد مباشرة بعد التسجيل)</span>
+                    <button onclick="exportTransitExcel()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-file-excel"></i> Excel</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="custom-table" id="transitTable">
+                        <thead>
+                            <tr>
+                                <th>رقم الفاتورة</th>
+                                <th>الاسم</th>
+                                <th>رقم الجواز</th>
+                                <th>الهوية</th>
+                                <th>رقم الطلب</th>
+                                <th>المبلغ</th>
+                                <th>حالة السداد (اختيار مباشر)</th>
+                                <th class="no-print">منفذ الإجراء</th>
+                                <th>إجراءات</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -1304,7 +1385,7 @@
                     <h4 id="lblDebtFormTitle" class="text-gold font-bold text-xs">إصدار فاتورة حساب آجل جديدة (يبدأ تسلسلها تلقائياً من الرقم التالي)</h4>
                     <form id="debtInvoiceForm" onsubmit="handleSaveDebtInvoice(event)" class="space-y-3">
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <input type="text" id="debtInvNo" required readonly class="bg-zinc-900 border border-gold p-2 text-xs text-gold font-bold rounded cursor-not-allowed">
+                            <input type="text" id="debtInvNo" required class="bg-zinc-900 border border-gold p-2 text-xs text-gold font-bold rounded outline-none">
                             <input type="date" id="debtInvDate" class="bg-zinc-900 border border-gold p-2 text-xs font-bold rounded">
                             <input type="text" id="debtInvCustomerName" required placeholder="اسم العميل" class="bg-zinc-900 border border-zinc-700 p-2 text-xs rounded">
                         </div>
@@ -1448,13 +1529,262 @@
                   "createdBy": "وليد السيد",
                   "createdAt": "2026-11-11 09:00",
                   "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "152",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "سلطان",
+                  "senderPhone": "05",
+                  "senderAddress": "عجمان",
+                  "receiver": "سلطان",
+                  "receiverPhone": "05",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "دبه لون ازرق", "qty": 10, "price": 200 },
+                    { "desc": "كرتون", "qty": 3, "price": 200 }
+                  ],
+                  "grandTotal": 2600,
+                  "paymentStatus": "الدفع باليمن",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "157",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "ام حمدان",
+                  "senderPhone": "0501184187",
+                  "senderAddress": "عجمان",
+                  "receiver": "طارق محمد راجحي",
+                  "receiverPhone": "734990780",
+                  "receiverAddress": "صنعاء",
+                  "items": [
+                    { "desc": "شنطة", "qty": 1, "price": 300 }
+                  ],
+                  "grandTotal": 300,
+                  "paymentStatus": "مدفوع",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "156",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "ام علوي",
+                  "senderPhone": "0556505151",
+                  "senderAddress": "عجمان",
+                  "receiver": "على الخضر كرده",
+                  "receiverPhone": "0",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "سله", "qty": 2, "price": 150 },
+                    { "desc": "كرتون", "qty": 2, "price": 200 },
+                    { "desc": "سله", "qty": 6, "price": 150 },
+                    { "desc": "شنطة", "qty": 1, "price": 200 }
+                  ],
+                  "grandTotal": 1800,
+                  "paymentStatus": "أجل بالامارات",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "155",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "ام عبد الرحمن",
+                  "senderPhone": "0551970481",
+                  "senderAddress": "عجمان",
+                  "receiver": "سمير عبد الله محمد",
+                  "receiverPhone": "777287043",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "سله", "qty": 1, "price": 500 }
+                  ],
+                  "grandTotal": 500,
+                  "paymentStatus": "مدفوع",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "154",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "ام محمد الغافية",
+                  "senderPhone": "0505691770",
+                  "senderAddress": "عجمان",
+                  "receiver": "ام حسن",
+                  "receiverPhone": "776303718",
+                  "receiverAddress": "القيضة",
+                  "items": [
+                    { "desc": "كرتون", "qty": 1, "price": 100 },
+                    { "desc": "سلال", "qty": 2, "price": 100 }
+                  ],
+                  "grandTotal": 300,
+                  "paymentStatus": "الدفع باليمن",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "153",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "مجموعة السعدي",
+                  "senderPhone": "00",
+                  "senderAddress": "عجمان",
+                  "receiver": "عبد المجيد السعدي",
+                  "receiverPhone": "05",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "كراتين", "qty": 7, "price": 75 },
+                    { "desc": "كيس", "qty": 1, "price": 75 }
+                  ],
+                  "grandTotal": 600,
+                  "paymentStatus": "أجل بالامارات",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "143",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "عبدالرحمن السعدي",
+                  "senderPhone": "0552281154",
+                  "senderAddress": "عجمان",
+                  "receiver": "ابراهيم اليافعي",
+                  "receiverPhone": "0779432685",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "رز", "qty": 2, "price": 100 },
+                    { "desc": "شنطه", "qty": 1, "price": 150 }
+                  ],
+                  "grandTotal": 350,
+                  "paymentStatus": "مدفوع",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "148",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "علي صالح السعدي",
+                  "senderPhone": "0529007994",
+                  "senderAddress": "عجمان",
+                  "receiver": "صلاح محسن عوض حسن",
+                  "receiverPhone": "770154369",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "كرتون حفاظات", "qty": 1, "price": 80 }
+                  ],
+                  "grandTotal": 80,
+                  "paymentStatus": "مدفوع",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "147",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "ام هشام",
+                  "senderPhone": "0552323928",
+                  "senderAddress": "عجمان",
+                  "receiver": "محمد احمد يحي",
+                  "receiverPhone": "774635987",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "شنطتين", "qty": 2, "price": 100 }
+                  ],
+                  "grandTotal": 200,
+                  "paymentStatus": "مدفوع",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "146",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "ام سالم",
+                  "senderPhone": "0508916896",
+                  "senderAddress": "عجمان",
+                  "receiver": "حسن عمر سالم",
+                  "receiverPhone": "737372415",
+                  "receiverAddress": "المكلا",
+                  "items": [
+                    { "desc": "كرتون به مواد غذائية", "qty": 1, "price": 150 }
+                  ],
+                  "grandTotal": 150,
+                  "paymentStatus": "مدفوع",
+                  "branch": "فرع عجمان",
+                  "createdBy": "النظام",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "النظام", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "145",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "هاني يحي احمد الواحدي",
+                  "senderPhone": "770770860",
+                  "senderAddress": "عجمان",
+                  "receiver": "هاني يحي احمد الواحدي",
+                  "receiverPhone": "770770860",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "اجهزة رطوبة", "qty": 6, "price": 150 }
+                  ],
+                  "grandTotal": 900,
+                  "paymentStatus": "الدفع باليمن",
+                  "branch": "فرع عجمان",
+                  "createdBy": "النظام",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "النظام", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "144",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "عبد الله الضالعي ابو شريف",
+                  "senderPhone": "0509988474",
+                  "senderAddress": "عجمان",
+                  "receiver": "وكالة الحاج صالح",
+                  "receiverPhone": "770034038",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "كيس", "qty": 1, "price": 50 }
+                  ],
+                  "grandTotal": 50,
+                  "paymentStatus": "مدفوع",
+                  "branch": "فرع عجمان",
+                  "createdBy": "النظام",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "النظام", "time": "2026-11-11 09:00" }]
                 }
             ],
             vouchers: [],
             debtInvoices: [],
+            transitVisas: [],
             nextTicketNo: 141,
             nextCargoNo: 158,
-            nextDebtInvNo: 2
+            nextDebtInvNo: 2,
+            nextTransitNo: 1
         };
 
         const translations = {
@@ -1731,8 +2061,24 @@
             const cargoInput = document.getElementById('cargoInvNo');
             if(cargoInput) cargoInput.value = db.nextCargoNo;
 
+            if(db.transitVisas && db.transitVisas.length > 0) {
+                let maxTransit = 0;
+                db.transitVisas.forEach(t => {
+                    let val = parseInt(t.id) || 0;
+                    if(val > maxTransit) maxTransit = val;
+                });
+                db.nextTransitNo = maxTransit + 1;
+            } else {
+                db.nextTransitNo = 1;
+            }
+
             const debtInput = document.getElementById('debtInvNo');
             if(debtInput) debtInput.value = db.nextDebtInvNo;
+
+            const transitInput = document.getElementById('transitInvNo');
+            if(transitInput && !document.getElementById('transitEditId').value) {
+                transitInput.value = db.nextTransitNo;
+            }
         }
 
         function validateAndRepairDB() {
@@ -1743,6 +2089,7 @@
             if(!db.cargo || !Array.isArray(db.cargo)) { db.cargo = []; fixed = true; }
             if(!db.vouchers || !Array.isArray(db.vouchers)) { db.vouchers = []; fixed = true; }
             if(!db.debtInvoices || !Array.isArray(db.debtInvoices)) { db.debtInvoices = []; fixed = true; }
+            if(!db.transitVisas || !Array.isArray(db.transitVisas)) { db.transitVisas = []; fixed = true; }
             
             db.passengers.forEach(p => {
                 if(!p.createdAt) { p.createdAt = p.date ? p.date + ' 09:00' : '2026-11-01 09:00'; fixed = true; }
@@ -1768,7 +2115,6 @@
             if(fixed) { saveDB(); }
         }
 
-        // دالة المزامنة السحابية الفورية عند التحميل وإعادة تسجيل الدخول
         function initSync() {
             if(!useFirebase || !rtdb) { loadFromLocal(); return; }
             
@@ -1788,9 +2134,11 @@
                         cargo: val.cargo ? Object.values(val.cargo) : db.cargo,
                         vouchers: val.vouchers ? Object.values(val.vouchers) : [],
                         debtInvoices: val.debtInvoices ? Object.values(val.debtInvoices) : db.debtInvoices,
+                        transitVisas: val.transitVisas ? Object.values(val.transitVisas) : (db.transitVisas || []),
                         nextTicketNo: val.nextTicketNo || 141,
                         nextCargoNo: val.nextCargoNo || 158,
-                        nextDebtInvNo: val.nextDebtInvNo || 2
+                        nextDebtInvNo: val.nextDebtInvNo || 2,
+                        nextTransitNo: val.nextTransitNo || 1
                     };
                     validateAndRepairDB();
                     localStorage.setItem('WADI_BINA_UNIFIED_DB', JSON.stringify(db));
@@ -1859,6 +2207,7 @@
             renderTripsTable();
             renderDriversTable();
             renderFinancialLog();
+            renderTransitTable();
             populateTripsDropdown();
             if(currentTab === 'financials') {
                 renderFinancials();
@@ -1893,13 +2242,14 @@
             const totalPassengersCount = filteredPass.length;
             const totalCargoRev = filteredCargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + c.grandTotal, 0);
             const totalTicketRev = filteredPass.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (p.fare || 0), 0);
+            const totalTransitRev = getFilteredData(db.transitVisas || []).filter(t => t.paymentStatus === 'تم الدفع والاصدار').reduce((s, t) => s + (t.amount || 0), 0);
             
             const totalDriversExp = filteredDrivers.reduce((s, d) => s + (d.totalExpenses || 0), 0);
             const totalVoucherExp = filteredVouchers.filter(v => v.type === 'صرف').reduce((s, v) => s + v.amount, 0);
             const totalExpenses = totalDriversExp + totalVoucherExp;
             
             const totalVoucherRec = filteredVouchers.filter(v => v.type === 'قبض').reduce((s, v) => s + v.amount, 0);
-            const netBox = (totalTicketRev + totalCargoRev + totalVoucherRec) - totalExpenses;
+            const netBox = (totalTicketRev + totalCargoRev + totalTransitRev + totalVoucherRec) - totalExpenses;
 
             document.getElementById('dashTotalPassengers').innerText = totalPassengersCount;
             document.getElementById('dashTotalDriversExp').innerText = `${totalDriversExp} AED`;
@@ -3266,7 +3616,8 @@
 
             const tSum = filteredPass.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (p.fare || 0), 0);
             const cSum = filteredCargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + c.grandTotal, 0);
-            const totalRev = tSum + cSum;
+            const trSum = getFilteredData(db.transitVisas || []).filter(t => t.paymentStatus === 'تم الدفع والاصدار').reduce((s, t) => s + (t.amount || 0), 0);
+            const totalRev = tSum + cSum + trSum;
             
             const driverExp = filteredDrivers.reduce((s, d) => s + (d.totalExpenses || 0), 0);
             const vExp = filteredVouchers.filter(v => v.type === 'صرف').reduce((s, v) => s + v.amount, 0);
@@ -3435,6 +3786,183 @@
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, type);
             XLSX.writeFile(wb, `WadiBina_${type}.xlsx`);
+        }
+    
+        // ================= إدارة تأشيرات العبور =================
+        function onTransitIdentityChange() {
+            const identity = document.getElementById('transitIdentity').value;
+            const amountInput = document.getElementById('transitAmount');
+            const amountLabel = document.getElementById('transitAmountLabel');
+
+            if (identity === 'زيارة') {
+                amountInput.min = 150;
+                amountInput.max = 200;
+                if (!document.getElementById('transitEditId').value) {
+                    amountInput.value = 150;
+                }
+                amountLabel.innerText = 'المبلغ (درهم - النطاق المسموح: 150 إلى 200) *';
+            } else {
+                amountInput.min = 80;
+                amountInput.max = 100;
+                if (!document.getElementById('transitEditId').value) {
+                    amountInput.value = 80;
+                }
+                amountLabel.innerText = 'المبلغ (درهم - النطاق المسموح: 80 إلى 100) *';
+            }
+        }
+
+        function handleSaveTransit(e) {
+            e.preventDefault();
+            if (!db.transitVisas) db.transitVisas = [];
+
+            const editId = document.getElementById('transitEditId').value;
+            const invNo = document.getElementById('transitInvNo').value.trim();
+            const name = document.getElementById('transitName').value.trim();
+            const passport = document.getElementById('transitPassport').value.trim();
+            const identity = document.getElementById('transitIdentity').value;
+            const requestNo = document.getElementById('transitRequestNo').value.trim();
+            const amount = parseFloat(document.getElementById('transitAmount').value);
+
+            if (identity === 'زيارة' && (amount < 150 || amount > 200)) {
+                alert('للهوية (زيارة)، يجب أن يكون المبلغ بين 150 و 200 درهم!');
+                return;
+            }
+            if (identity === 'مقيم' && (amount < 80 || amount > 100)) {
+                alert('للهوية (مقيم)، يجب أن يكون المبلغ بين 80 و 100 درهم!');
+                return;
+            }
+
+            const nowStr = getFormattedDateTime();
+            const author = getCurrentUserName();
+
+            if (editId) {
+                const idx = db.transitVisas.findIndex(t => String(t.uid) === String(editId));
+                if (idx !== -1) {
+                    db.transitVisas[idx].id = invNo;
+                    db.transitVisas[idx].name = name;
+                    db.transitVisas[idx].passport = passport;
+                    db.transitVisas[idx].identity = identity;
+                    db.transitVisas[idx].requestNo = requestNo;
+                    db.transitVisas[idx].amount = amount;
+                }
+                alert('تم تحديث فاتورة تأشيرة العبور بنجاح!');
+                resetTransitForm();
+            } else {
+                const record = {
+                    uid: 'tr_' + Date.now(),
+                    id: invNo,
+                    name: name,
+                    passport: passport,
+                    identity: identity,
+                    requestNo: requestNo,
+                    amount: amount,
+                    paymentStatus: 'بانتظار الدفع',
+                    branch: currentUser ? (currentUser.branch || 'فرع عجمان') : 'فرع عجمان',
+                    createdBy: author,
+                    createdAt: nowStr
+                };
+                db.transitVisas.unshift(record);
+                alert('تم إنشاء فاتورة تأشيرة العبور! يمكنك الآن تحديد حالة السداد من الجدول أدناه.');
+                resetTransitForm();
+            }
+            saveDB();
+            refreshUI();
+        }
+
+        function updateTransitPaymentStatus(uid, newStatus) {
+            const idx = (db.transitVisas || []).findIndex(t => String(t.uid) === String(uid));
+            if (idx !== -1) {
+                db.transitVisas[idx].paymentStatus = newStatus;
+                saveDB();
+                refreshUI();
+            }
+        }
+
+        function renderTransitTable() {
+            const tbody = document.querySelector('#transitTable tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (!db.transitVisas) db.transitVisas = [];
+            const list = getFilteredData(db.transitVisas);
+
+            const statusOptions = [
+                'تم الدفع والاصدار',
+                'تم الاصدار وتأجيل المبلغ',
+                'بانتظار الدفع',
+                'بانتظار الموافقة'
+            ];
+
+            list.forEach(item => {
+                const realIdx = db.transitVisas.findIndex(x => x.uid === item.uid);
+                const optionsHtml = statusOptions.map(st =>
+                    `<option value="${st}" ${item.paymentStatus === st ? 'selected' : ''}>${st}</option>`
+                ).join('');
+
+                let statusColor = 'border-amber-500 text-amber-300';
+                if (item.paymentStatus === 'تم الدفع والاصدار') statusColor = 'border-emerald-500 text-emerald-400';
+                else if (item.paymentStatus === 'تم الاصدار وتأجيل المبلغ') statusColor = 'border-indigo-500 text-indigo-300';
+                else if (item.paymentStatus === 'بانتظار الموافقة') statusColor = 'border-red-500 text-red-300';
+
+                tbody.insertRow().innerHTML = `
+                    <td><strong class="text-gold">#${item.id}</strong></td>
+                    <td><strong>${item.name}</strong></td>
+                    <td>${item.passport}</td>
+                    <td><span class="px-2 py-0.5 rounded text-xs font-bold ${item.identity === 'زيارة' ? 'bg-indigo-950 text-indigo-300' : 'bg-emerald-950 text-emerald-300'}">${item.identity}</span></td>
+                    <td>${item.requestNo}</td>
+                    <td class="font-bold text-gold">${item.amount} AED</td>
+                    <td>
+                        <select onchange="updateTransitPaymentStatus('${item.uid}', this.value)" class="bg-darkbg border ${statusColor} rounded-lg px-2 py-1 text-xs font-bold outline-none">
+                            ${optionsHtml}
+                        </select>
+                    </td>
+                    <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${item.createdBy || 'النظام'}</span></td>
+                    <td class="space-x-1 space-x-reverse">
+                        <button onclick="editTransitVisa('${item.uid}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteTransitVisa(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+            });
+        }
+
+        function editTransitVisa(uid) {
+            const item = (db.transitVisas || []).find(t => t.uid === uid);
+            if (!item) return;
+            document.getElementById('transitEditId').value = item.uid;
+            document.getElementById('transitInvNo').value = item.id;
+            document.getElementById('transitName').value = item.name;
+            document.getElementById('transitPassport').value = item.passport;
+            document.getElementById('transitIdentity').value = item.identity;
+            onTransitIdentityChange();
+            document.getElementById('transitRequestNo').value = item.requestNo;
+            document.getElementById('transitAmount').value = item.amount;
+
+            document.getElementById('transitFormTitle').innerText = `تعديل فاتورة تأشيرة العبور #${item.id}`;
+            document.getElementById('transitSubmitBtn').innerText = 'حفظ التعديلات';
+            document.getElementById('cancelEditTransitBtn').classList.remove('hidden');
+        }
+
+        function resetTransitForm() {
+            document.getElementById('transitForm').reset();
+            document.getElementById('transitEditId').value = '';
+            calculateNextSequenceNumbers();
+            onTransitIdentityChange();
+            document.getElementById('transitFormTitle').innerText = 'إنشاء فاتورة تأشيرة عبور جديدة';
+            document.getElementById('transitSubmitBtn').innerText = 'حفظ وإنشاء فاتورة تأشيرة العبور';
+            document.getElementById('cancelEditTransitBtn').classList.add('hidden');
+        }
+
+        function deleteTransitVisa(idx) {
+            db.transitVisas.splice(idx, 1);
+            saveDB();
+            refreshUI();
+        }
+
+        function exportTransitExcel() {
+            const ws = XLSX.utils.json_to_sheet(getFilteredData(db.transitVisas || []));
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'TransitVisas');
+            XLSX.writeFile(wb, 'WadiBina_TransitVisas.xlsx');
         }
     </script>
 </body>
