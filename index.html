@@ -1118,7 +1118,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
                                 <label id="lblTktNo" class="block text-xs text-gold mb-1 font-bold">رقم البوليصة / التذكرة *</label>
-                                <input type="text" id="passTicketNo" required readonly class="w-full bg-zinc-900 border border-gold font-bold text-gold rounded-xl px-3 py-2.5 text-xs outline-none cursor-not-allowed">
+                                <input type="text" id="passTicketNo" required placeholder="رقم التذكرة..." class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2.5 text-xs outline-none focus:ring-1 focus:ring-gold">
                             </div>
                             <div>
                                 <label id="lblAgent" class="block text-xs text-gold mb-1 font-bold">ربط برحلة مجدولة *</label>
@@ -1293,7 +1293,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <div>
                             <label id="lblInvNo" class="block text-xs text-gold mb-1 font-bold">رقم الفاتورة *</label>
-                            <input type="text" id="cargoInvNo" required readonly class="w-full bg-zinc-900 border border-gold font-bold text-gold rounded-xl px-3 py-2.5 text-xs cursor-not-allowed">
+                            <input type="text" id="cargoInvNo" required placeholder="رقم الفاتورة..." class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2.5 text-xs outline-none focus:ring-1 focus:ring-gold">
                         </div>
                         <div>
                             <label class="block text-xs text-gold mb-1 font-bold">ربط برحلة مجدولة (اختياري)</label>
@@ -1675,7 +1675,7 @@
                     <h4 id="lblDebtFormTitle" class="text-gold font-bold text-xs">إصدار فاتورة حساب آجل جديدة</h4>
                     <form id="debtInvoiceForm" onsubmit="handleSaveDebtInvoice(event)" class="space-y-3">
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <input type="text" id="debtInvNo" required readonly class="bg-zinc-900 border border-gold p-2.5 text-xs text-gold font-bold rounded-lg cursor-not-allowed">
+                            <input type="text" id="debtInvNo" required placeholder="رقم الفاتورة الآجلة..." class="bg-zinc-900 border border-gold p-2.5 text-xs text-gold font-bold rounded-lg outline-none focus:ring-1 focus:ring-gold">
                             <input type="date" id="debtInvDate" class="bg-zinc-900 border border-gold p-2.5 text-xs font-bold rounded-lg">
                             <input type="text" id="debtInvCustomerName" required placeholder="اسم العميل" class="bg-zinc-900 border border-zinc-700 p-2.5 text-xs rounded-lg">
                         </div>
@@ -2124,17 +2124,17 @@
             }
 
             const tktInput = document.getElementById('passTicketNo');
-            if (tktInput && !document.getElementById('passEditId').value) {
+            if (tktInput && !document.getElementById('passEditId').value && document.activeElement !== tktInput) {
                 tktInput.value = db.nextTicketNo;
             }
 
             const cargoInput = document.getElementById('cargoInvNo');
-            if (cargoInput && !document.getElementById('cargoEditId').value) {
+            if (cargoInput && !document.getElementById('cargoEditId').value && document.activeElement !== cargoInput) {
                 cargoInput.value = db.nextCargoNo;
             }
 
             const debtInput = document.getElementById('debtInvNo');
-            if (debtInput) {
+            if (debtInput && document.activeElement !== debtInput) {
                 debtInput.value = db.nextDebtInvNo;
             }
         }
@@ -2467,9 +2467,15 @@
             const payVal = document.getElementById('passPayMethod').value;
 
             if (editId) {
+                if (String(ticketNo) !== String(editId) && db.passengers.some(p => String(p.id) === String(ticketNo))) {
+                    alert(`عذراً، رقم البوليصة/التذكرة (#${ticketNo}) مستخدم بالفعل لتذكرة أخرى!`);
+                    return;
+                }
                 const idx = db.passengers.findIndex(p => String(p.id) === String(editId));
                 if (idx !== -1) {
                     let item = db.passengers[idx];
+                    const oldId = item.id;
+                    item.id = ticketNo;
                     item.tripId = tripId;
                     item.agent = agentVal;
                     item.name = nameVal;
@@ -2485,11 +2491,16 @@
                     item.payMethod = payVal;
 
                     if (!item.auditLog) item.auditLog = [{ action: 'إنشاء التذكرة', user: item.createdBy || author, time: item.createdAt || nowStr }];
-                    item.auditLog.push({ action: 'تعديل بيانات التذكرة', user: author, time: nowStr });
+                    const idNote = String(oldId) !== String(ticketNo) ? ` (تغيير الرقم من #${oldId} إلى #${ticketNo})` : '';
+                    item.auditLog.push({ action: `تعديل بيانات التذكرة${idNote}`, user: author, time: nowStr });
                 }
                 alert('تم تحديث بيانات التذكرة بنجاح!');
                 resetPassengerForm();
             } else {
+                if (db.passengers.some(p => String(p.id) === String(ticketNo))) {
+                    alert(`عذراً، رقم البوليصة/التذكرة (#${ticketNo}) موجود مسبقاً! يرجى إدخال رقم آخر.`);
+                    return;
+                }
                 const tktData = {
                     id: ticketNo,
                     tripId: tripId,
@@ -2640,9 +2651,15 @@
             const pStatus = document.getElementById('cargoPaymentStatus').value;
 
             if (editId) {
+                if (String(invNo) !== String(editId) && db.cargo.some(c => String(c.id) === String(invNo))) {
+                    alert(`عذراً، رقم فاتورة الشحن (#${invNo}) مستخدم بالفعل لفاتورة أخرى!`);
+                    return;
+                }
                 const idx = db.cargo.findIndex(c => String(c.id) === String(editId));
                 if (idx !== -1) {
                     let item = db.cargo[idx];
+                    const oldId = item.id;
+                    item.id = invNo;
                     item.tripId = tripId;
                     item.date = dateVal;
                     item.sender = sName;
@@ -2656,11 +2673,16 @@
                     item.paymentStatus = pStatus;
 
                     if (!item.auditLog) item.auditLog = [{ action: 'إنشاء الفاتورة', user: item.createdBy || author, time: item.createdAt || nowStr }];
-                    item.auditLog.push({ action: 'تعديل فاتورة الشحن', user: author, time: nowStr });
+                    const idNote = String(oldId) !== String(invNo) ? ` (تغيير الرقم من #${oldId} إلى #${invNo})` : '';
+                    item.auditLog.push({ action: `تعديل فاتورة الشحن${idNote}`, user: author, time: nowStr });
                 }
                 alert('تم تحديث فاتورة الشحن بنجاح!');
                 resetCargoForm();
             } else {
+                if (db.cargo.some(c => String(c.id) === String(invNo))) {
+                    alert(`عذراً، رقم فاتورة الشحن (#${invNo}) موجود مسبقاً! يرجى إدخال رقم آخر.`);
+                    return;
+                }
                 const cargoData = {
                     id: invNo,
                     tripId: tripId,
@@ -3275,6 +3297,10 @@
         function handleSaveDebtInvoice(e) {
             e.preventDefault();
             const invNo = document.getElementById('debtInvNo').value.trim();
+            if (db.debtInvoices.some(d => String(d.id) === String(invNo))) {
+                alert(`عذراً، رقم الفاتورة الآجلة (#${invNo}) موجود مسبقاً! يرجى إدخال رقم آخر.`);
+                return;
+            }
             const nowStr = getFormattedDateTime();
             const author = getCurrentUserName();
 
