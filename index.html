@@ -720,6 +720,8 @@
                         <option value="all">كل الوجهات</option>
                         <option value="عدن">عدن</option>
                         <option value="المكلا">المكلا</option>
+                        <option value="صنعاء">صنعاء</option>
+                        <option value="القيضة">القيضة</option>
                     </select>
                 </div>
             </div>
@@ -1018,6 +1020,8 @@
                                 <select id="passDestination" class="w-full bg-darkbg border border-zinc-800 rounded-xl px-2.5 py-2 text-xs text-zinc-200">
                                     <option value="عدن" selected>عدن</option>
                                     <option value="المكلا">المكلا</option>
+                                    <option value="صنعاء">صنعاء</option>
+                                    <option value="القيضة">القيضة</option>
                                 </select>
                             </div>
                             <div>
@@ -1418,19 +1422,285 @@
 
         let db = {
             trips: [
-                { id: "trip_1", date: "2026-11-08", route: "الإمارات ➔ عدن", busInfo: "باص الرحلة الأساسي (الأحد)", status: "مجدولة", createdBy: "وليد السيد" }
+                { id: "trip_1794143414766", date: "2026-11-11", route: "الإمارات ➔ عدن", busInfo: "باص الرحلة الأساسي (الأربعاء)", status: "مجدولة", createdBy: "وليد السيد" }
             ],
             drivers: [],
             passengers: [
-                { id: "140", tripId: "trip_1", agent: "النظام", name: "محسن فيصل احمد", phone: "0508200749", passport: "12605475", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-08", reportingTime: "4:00 عصراً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان", createdBy: "وليد السيد", createdAt: "2026-11-08 10:00", auditLog: [{action: "إنشاء التذكرة", user: "وليد السيد", time: "2026-11-08 10:00"}] }
+                { id: "140", tripId: "trip_1794143414766", agent: "النظام", name: "محسن فيصل احمد", phone: "0508200749", passport: "12605475", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-11", reportingTime: "4:00 عصراً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان", createdBy: "وليد السيد", createdAt: "2026-11-11 10:00", auditLog: [{action: "إنشاء التذكرة", user: "وليد السيد", time: "2026-11-11 10:00"}] }
             ],
             cargo: [
-                { id: "130", tripId: "trip_1", date: "2026-11-08", sender: "عبد الكريم عبد الله", senderPhone: "0567777133", senderAddress: "عجمان", receiver: "النادي الدولي للسيارات", receiverPhone: "0778826198", receiverAddress: "عدن", items: [{desc: "كرتون صغير به فواتير", qty: 1, price: 50}], grandTotal: 50, paymentStatus: "مدفوع", branch: "فرع عجمان", createdBy: "وليد السيد", createdAt: "2026-11-08 10:30", auditLog: [{action: "إنشاء الفاتورة", user: "وليد السيد", time: "2026-11-08 10:30"}] }
+                {
+                  "id": "150",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "احمد منصور",
+                  "senderPhone": "0505030704",
+                  "senderAddress": "عجمان",
+                  "receiver": "عيسى رياض",
+                  "receiverPhone": "779883337-783256789",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "كيس فيه فلتر سيارة", "qty": 1, "price": 50 }
+                  ],
+                  "grandTotal": 50,
+                  "paymentStatus": "مدفوع",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "152",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "سلطان",
+                  "senderPhone": "05",
+                  "senderAddress": "عجمان",
+                  "receiver": "سلطان",
+                  "receiverPhone": "05",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "دبه لون ازرق", "qty": 10, "price": 200 },
+                    { "desc": "كرتون", "qty": 3, "price": 200 }
+                  ],
+                  "grandTotal": 2600,
+                  "paymentStatus": "الدفع باليمن",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "157",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "ام حمدان",
+                  "senderPhone": "0501184187",
+                  "senderAddress": "عجمان",
+                  "receiver": "طارق محمد راجحي",
+                  "receiverPhone": "734990780",
+                  "receiverAddress": "صنعاء",
+                  "items": [
+                    { "desc": "شنطة", "qty": 1, "price": 300 }
+                  ],
+                  "grandTotal": 300,
+                  "paymentStatus": "مدفوع",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "156",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "ام علوي",
+                  "senderPhone": "0556505151",
+                  "senderAddress": "عجمان",
+                  "receiver": "على الخضر كرده",
+                  "receiverPhone": "0",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "سله", "qty": 2, "price": 150 },
+                    { "desc": "كرتون", "qty": 2, "price": 200 },
+                    { "desc": "سله", "qty": 6, "price": 150 },
+                    { "desc": "شنطة", "qty": 1, "price": 200 }
+                  ],
+                  "grandTotal": 1800,
+                  "paymentStatus": "أجل بالامارات",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "155",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "ام عبد الرحمن",
+                  "senderPhone": "0551970481",
+                  "senderAddress": "عجمان",
+                  "receiver": "سمير عبد الله محمد",
+                  "receiverPhone": "777287043",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "سله", "qty": 1, "price": 500 }
+                  ],
+                  "grandTotal": 500,
+                  "paymentStatus": "مدفوع",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "154",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "ام محمد الغافية",
+                  "senderPhone": "0505691770",
+                  "senderAddress": "عجمان",
+                  "receiver": "ام حسن",
+                  "receiverPhone": "776303718",
+                  "receiverAddress": "القيضة",
+                  "items": [
+                    { "desc": "كرتون", "qty": 1, "price": 100 },
+                    { "desc": "سلال", "qty": 2, "price": 100 }
+                  ],
+                  "grandTotal": 300,
+                  "paymentStatus": "الدفع باليمن",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "153",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "مجموعة السعدي",
+                  "senderPhone": "00",
+                  "senderAddress": "عجمان",
+                  "receiver": "عبد المجيد السعدي",
+                  "receiverPhone": "05",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "كراتين", "qty": 7, "price": 75 },
+                    { "desc": "كيس", "qty": 1, "price": 75 }
+                  ],
+                  "grandTotal": 600,
+                  "paymentStatus": "أجل بالامارات",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "143",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "عبدالرحمن السعدي",
+                  "senderPhone": "0552281154",
+                  "senderAddress": "عجمان",
+                  "receiver": "ابراهيم اليافعي",
+                  "receiverPhone": "0779432685",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "رز", "qty": 2, "price": 100 },
+                    { "desc": "شنطه", "qty": 1, "price": 150 }
+                  ],
+                  "grandTotal": 350,
+                  "paymentStatus": "مدفوع",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "148",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "علي صالح السعدي",
+                  "senderPhone": "0529007994",
+                  "senderAddress": "عجمان",
+                  "receiver": "صلاح محسن عوض حسن",
+                  "receiverPhone": "770154369",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "كرتون حفاظات", "qty": 1, "price": 80 }
+                  ],
+                  "grandTotal": 80,
+                  "paymentStatus": "مدفوع",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "147",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "ام هشام",
+                  "senderPhone": "0552323928",
+                  "senderAddress": "عجمان",
+                  "receiver": "محمد احمد يحي",
+                  "receiverPhone": "774635987",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "شنطتين", "qty": 2, "price": 100 }
+                  ],
+                  "grandTotal": 200,
+                  "paymentStatus": "مدفوع",
+                  "branch": "فرع عجمان",
+                  "createdBy": "وليد السيد",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "146",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "ام سالم",
+                  "senderPhone": "0508916896",
+                  "senderAddress": "عجمان",
+                  "receiver": "حسن عمر سالم",
+                  "receiverPhone": "737372415",
+                  "receiverAddress": "المكلا",
+                  "items": [
+                    { "desc": "كرتون به مواد غذائية", "qty": 1, "price": 150 }
+                  ],
+                  "grandTotal": 150,
+                  "paymentStatus": "مدفوع",
+                  "branch": "فرع عجمان",
+                  "createdBy": "النظام",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "النظام", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "145",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "هاني يحي احمد الواحدي",
+                  "senderPhone": "770770860",
+                  "senderAddress": "عجمان",
+                  "receiver": "هاني يحي احمد الواحدي",
+                  "receiverPhone": "770770860",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "اجهزة رطوبة", "qty": 6, "price": 150 }
+                  ],
+                  "grandTotal": 900,
+                  "paymentStatus": "الدفع باليمن",
+                  "branch": "فرع عجمان",
+                  "createdBy": "النظام",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "النظام", "time": "2026-11-11 09:00" }]
+                },
+                {
+                  "id": "144",
+                  "tripId": "trip_1794143414766",
+                  "date": "2026-11-11",
+                  "sender": "عبد الله الضالعي ابو شريف",
+                  "senderPhone": "0509988474",
+                  "senderAddress": "عجمان",
+                  "receiver": "وكالة الحاج صالح",
+                  "receiverPhone": "770034038",
+                  "receiverAddress": "عدن",
+                  "items": [
+                    { "desc": "كيس", "qty": 1, "price": 50 }
+                  ],
+                  "grandTotal": 50,
+                  "paymentStatus": "مدفوع",
+                  "branch": "فرع عجمان",
+                  "createdBy": "النظام",
+                  "createdAt": "2026-11-11 09:00",
+                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "النظام", "time": "2026-11-11 09:00" }]
+                }
             ],
             vouchers: [],
             debtInvoices: [],
             nextTicketNo: 141,
-            nextCargoNo: 131,
+            nextCargoNo: 158,
             nextDebtInvNo: 2
         };
 
@@ -1686,9 +1956,9 @@
                     let val = parseInt(c.id) || 0;
                     if(val > maxCargo) maxCargo = val;
                 });
-                db.nextCargoNo = maxCargo >= 130 ? maxCargo + 1 : 131;
+                db.nextCargoNo = maxCargo >= 158 ? maxCargo + 1 : 158;
             } else {
-                db.nextCargoNo = 131;
+                db.nextCargoNo = 158;
             }
 
             if(db.debtInvoices && db.debtInvoices.length > 0) {
@@ -1765,7 +2035,7 @@
                         vouchers: val.vouchers ? Object.values(val.vouchers) : [],
                         debtInvoices: val.debtInvoices ? Object.values(val.debtInvoices) : db.debtInvoices,
                         nextTicketNo: val.nextTicketNo || 141,
-                        nextCargoNo: val.nextCargoNo || 131,
+                        nextCargoNo: val.nextCargoNo || 158,
                         nextDebtInvNo: val.nextDebtInvNo || 2
                     };
                     validateAndRepairDB();
@@ -2938,7 +3208,8 @@
                 let searchC = filteredCargo.filter(c => {
                     const matchText = !query || c.sender.toLowerCase().includes(query) || String(c.id).includes(query) || c.receiver.toLowerCase().includes(query) || (c.receiverAddress && c.receiverAddress.toLowerCase().includes(query)) || (c.createdBy && c.createdBy.toLowerCase().includes(query));
                     const matchPay = payFilter === 'all' || c.paymentStatus === payFilter;
-                    return matchText && matchPay;
+                    const matchDest = destFilter === 'all' || (c.receiverAddress && c.receiverAddress.includes(destFilter));
+                    return matchText && matchPay && matchDest;
                 });
                 
                 searchC.forEach((c, index) => {
@@ -3377,7 +3648,7 @@
                 if(tId && !db.passengers.some(p => String(p.id) === String(tId))) {
                     db.passengers.unshift({
                         id: tId,
-                        tripId: db.trips[0] ? db.trips[0].id : "trip_1",
+                        tripId: db.trips[0] ? db.trips[0].id : "trip_1794143414766",
                         agent: "استعادة من PDF",
                         name: "راكب مستعاد #" + tId,
                         phone: "0500000000",
