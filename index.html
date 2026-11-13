@@ -635,6 +635,70 @@
         </div>
     </div>
 
+    <!-- TRIP DETAILS VIEW MODAL (BRANCHING: TICKETS & CARGO) -->
+    <div class="modal-overlay hidden" id="tripDetailsModal">
+        <div class="modal-card" style="max-width: 1050px;">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
+                <div>
+                    <h3 class="text-gold font-extrabold text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-bus text-gold"></i>
+                        <span id="tripDetailsModalTitle">عرض تفاصيل الرحلة</span>
+                    </h3>
+                    <p id="tripDetailsModalSub" class="text-[11px] text-zinc-400 mt-0.5"></p>
+                </div>
+                <button onclick="closeModal('tripDetailsModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <!-- خياران متفرعان: الأول عرض التذاكر والثاني عرض فواتير الشحن -->
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <button type="button" id="btnTripSubTickets" onclick="switchTripDetailsBranch('tickets')" class="py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition gold-gradient-bg text-black shadow">
+                    <i class="fa-solid fa-ticket text-base"></i>
+                    <span>1. عرض التذاكر (<span id="tripBranchTktCount">0</span>)</span>
+                </button>
+                <button type="button" id="btnTripSubCargo" onclick="switchTripDetailsBranch('cargo')" class="py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition bg-zinc-800 text-zinc-300 hover:text-gold border border-zinc-700">
+                    <i class="fa-solid fa-boxes-packing text-base"></i>
+                    <span>2. عرض فواتير الشحن (<span id="tripBranchCargoCount">0</span>)</span>
+                </button>
+            </div>
+
+            <!-- شريط ملخص مالي يظهر فقط في وضع الإدارة المالية -->
+            <div id="tripFinancialSummaryBar" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 bg-darkbg p-3.5 rounded-xl border border-gold/50 text-xs">
+                <div class="flex justify-between sm:block">
+                    <span class="text-zinc-400 block">إجمالي مبالغ التذاكر:</span>
+                    <strong id="tripFinTktTotal" class="text-gold font-black text-sm">0 AED</strong>
+                </div>
+                <div class="flex justify-between sm:block">
+                    <span class="text-zinc-400 block">إجمالي فواتير الشحن:</span>
+                    <strong id="tripFinCargoTotal" class="text-indigo-400 font-black text-sm">0 AED</strong>
+                </div>
+                <div class="flex justify-between sm:block">
+                    <span class="text-zinc-400 block">إجمالي إيرادات الرحلة (المدفوع / الكلي):</span>
+                    <strong id="tripFinGrandTotal" class="text-emerald-400 font-black text-sm">0 AED</strong>
+                </div>
+            </div>
+
+            <!-- الفرع الأول: جدول التذاكر -->
+            <div id="tripBranchTicketsContainer" class="overflow-x-auto bg-darkbg rounded-xl border border-zinc-800">
+                <table class="custom-table" id="tripBranchTicketsTable">
+                    <thead id="tripBranchTicketsHead"></thead>
+                    <tbody id="tripBranchTicketsBody"></tbody>
+                </table>
+            </div>
+
+            <!-- الفرع الثاني: جدول فواتير الشحن -->
+            <div id="tripBranchCargoContainer" class="hidden overflow-x-auto bg-darkbg rounded-xl border border-zinc-800">
+                <table class="custom-table" id="tripBranchCargoTable">
+                    <thead id="tripBranchCargoHead"></thead>
+                    <tbody id="tripBranchCargoBody"></tbody>
+                </table>
+            </div>
+
+            <div class="mt-4 flex justify-end">
+                <button onclick="closeModal('tripDetailsModal')" class="bg-zinc-800 text-zinc-300 font-bold px-5 py-2.5 rounded-xl text-xs hover:bg-zinc-700">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
     <!-- HEADER -->
     <header class="bg-cardbg border-b border-bordergold px-4 sm:px-6 py-3.5 flex items-center justify-between sticky top-0 z-50 backdrop-blur-md bg-opacity-95 shadow-lg">
         <div class="flex items-center gap-3">
@@ -1562,6 +1626,36 @@
                 <div class="bg-cardbg border border-gold p-4 rounded-2xl shadow">
                     <span id="lblFin4" class="text-[11px] text-gold block">صافي رصيد الصندوق العام (تذاكر+شحن مدفوع+سندات قبض)</span>
                     <strong id="finNetBoxSum" class="text-lg font-black text-amber-400">0 AED</strong>
+                </div>
+            </div>
+
+            <!-- DEPARTED TRIPS ACCOUNTS MANAGEMENT -->
+            <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3 flex-wrap gap-2">
+                    <h3 class="text-gold font-bold text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-plane-departure text-indigo-400"></i>
+                        <span>الرحلات التي غادرت وإدارة حساباتها (التذاكر وفواتير الشحن والمدفوعات)</span>
+                    </h3>
+                    <span class="text-[11px] text-zinc-400">عرض وتعديل التذاكر والفواتير والأسعار وحالة السداد للرحلات المغادرة</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="custom-table" id="finDepartedTripsTable">
+                        <thead>
+                            <tr>
+                                <th>معرف الرحلة</th>
+                                <th>تاريخ الرحلة</th>
+                                <th>خط السير / الوجهة</th>
+                                <th>الباص والسائق</th>
+                                <th>عدد التذاكر</th>
+                                <th>فواتير الشحن</th>
+                                <th>إجمالي المبالغ</th>
+                                <th>المدفوع</th>
+                                <th>المتبقي / الآجل</th>
+                                <th>إدارة وحسابات الرحلة</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
 
@@ -3070,7 +3164,8 @@
                     <td>${statusBadge}</td>
                     <td><span class="bg-indigo-950 text-indigo-300 px-2.5 py-1 rounded-full text-xs font-bold">${linkedTickets} تذاكر</span></td>
                     <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${trip.createdBy || 'النظام'}</span></td>
-                    <td class="space-x-1 space-x-reverse">
+                    <td class="space-x-1 space-x-reverse whitespace-nowrap">
+                        <button onclick="openTripDetailsModal('${trip.id}', 'ops')" class="bg-sky-600 hover:bg-sky-500 text-white px-2.5 py-1 rounded text-xs font-bold"><i class="fa-solid fa-eye ml-1"></i> عرض الرحلة</button>
                         ${trip.status !== 'غادرت الرحلة' ? `<button onclick="markTripDeparted('${trip.id}')" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs font-bold hover:bg-indigo-500"><i class="fa-solid fa-bus"></i> غادرت الرحلة</button>` : ''}
                         <button onclick="editTrip('${trip.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i> تعديل</button>
                         <button onclick="openManifestForTrip('${trip.date}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-file-lines"></i> مانفيستو</button>
@@ -3751,7 +3846,9 @@
             const passTbody = document.querySelector('#passengersTable tbody');
             if (passTbody && (searchType === 'all' || searchType === 'ticket')) {
                 passTbody.innerHTML = '';
+                const departedTripIds = new Set((db.trips || []).filter(t => t.status === 'غادرت الرحلة').map(t => String(t.id)));
                 let searchP = filteredPass.filter(p => {
+                    if (p.tripId && departedTripIds.has(String(p.tripId))) return false;
                     const matchText = !query || p.name.toLowerCase().includes(query) || String(p.id).includes(query) || p.phone.includes(query) || p.agent.toLowerCase().includes(query) || (p.createdBy && p.createdBy.toLowerCase().includes(query));
                     const matchPay = payFilter === 'all' || p.payMethod === payFilter;
                     const matchOrigin = originFilter === 'all' || p.origin === originFilter;
@@ -3795,7 +3892,9 @@
             const cargoTbody = document.querySelector('#cargoTable tbody');
             if (cargoTbody && (searchType === 'all' || searchType === 'cargo')) {
                 cargoTbody.innerHTML = '';
+                const departedTripIdsCargo = new Set((db.trips || []).filter(t => t.status === 'غادرت الرحلة').map(t => String(t.id)));
                 let searchC = filteredCargo.filter(c => {
+                    if (c.tripId && departedTripIdsCargo.has(String(c.tripId))) return false;
                     const matchText = !query || c.sender.toLowerCase().includes(query) || String(c.id).includes(query) || c.receiver.toLowerCase().includes(query) || (c.receiverAddress && c.receiverAddress.toLowerCase().includes(query)) || (c.createdBy && c.createdBy.toLowerCase().includes(query));
                     const matchPay = payFilter === 'all' || c.paymentStatus === payFilter;
                     const matchDest = destFilter === 'all' || (c.receiverAddress && c.receiverAddress.includes(destFilter));
@@ -4081,6 +4180,313 @@
             document.getElementById('finDriverExpSum').innerText = `${driverExp} AED`;
             document.getElementById('finExpensesSum').innerText = `${vExp} AED`;
             document.getElementById('finNetBoxSum').innerText = `${(totalRev + vRec) - totalExpenses} AED`;
+            renderFinDepartedTripsTable();
+        }
+
+        function renderFinDepartedTripsTable() {
+            const tbody = document.querySelector('#finDepartedTripsTable tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            let departedTrips = (db.trips || []).filter(t => t.status === 'غادرت الرحلة');
+            departedTrips.sort((a, b) => b.id.localeCompare(a.id));
+
+            if (departedTrips.length === 0) {
+                tbody.insertRow().innerHTML = `<td colspan="10" class="text-center text-zinc-500 py-4 text-xs">لا توجد رحلات بحالة "غادرت الرحلة" حالياً.</td>`;
+                return;
+            }
+
+            departedTrips.forEach((trip, idx) => {
+                const tktList = getFilteredData(db.passengers || []).filter(p => String(p.tripId) === String(trip.id));
+                const cargoList = getFilteredData(db.cargo || []).filter(c => String(c.tripId) === String(trip.id));
+
+                const tktTotal = tktList.reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
+                const tktPaid = tktList.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
+
+                const cargoTotal = cargoList.reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
+                const cargoPaid = cargoList.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
+
+                const grandTotal = tktTotal + cargoTotal;
+                const totalPaid = tktPaid + cargoPaid;
+                const totalUnpaid = grandTotal - totalPaid;
+
+                tbody.insertRow().innerHTML = `
+                    <td><strong>#${departedTrips.length - idx}</strong></td>
+                    <td><strong class="text-gold">${trip.date}</strong></td>
+                    <td>${trip.route}</td>
+                    <td>${trip.busInfo}</td>
+                    <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded-full text-xs font-bold">${tktList.length} تذاكر</span></td>
+                    <td><span class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded-full text-xs font-bold">${cargoList.length} فواتير</span></td>
+                    <td class="font-bold text-zinc-200">${grandTotal} AED</td>
+                    <td class="font-bold text-emerald-400">${totalPaid} AED</td>
+                    <td class="font-bold ${totalUnpaid > 0 ? 'text-amber-400' : 'text-zinc-400'}">${totalUnpaid} AED</td>
+                    <td>
+                        <button onclick="openTripDetailsModal('${trip.id}', 'finance')" class="gold-gradient-bg text-black px-3 py-1.5 rounded-lg text-xs font-extrabold shadow hover:opacity-90">
+                            <i class="fa-solid fa-folder-open ml-1"></i> عرض الرحلة وحساباتها
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        let activeTripModalId = null;
+        let activeTripModalMode = 'ops'; // 'ops' (no prices/payment) or 'finance' (full edit + prices + payment)
+        let activeTripModalBranch = 'tickets'; // 'tickets' or 'cargo'
+
+        function openTripDetailsModal(tripId, mode = 'ops') {
+            const trip = (db.trips || []).find(t => String(t.id) === String(tripId));
+            if (!trip) return;
+
+            activeTripModalId = tripId;
+            activeTripModalMode = mode;
+            activeTripModalBranch = 'tickets';
+
+            document.getElementById('tripDetailsModalTitle').innerText = mode === 'finance'
+                ? `إدارة حسابات الرحلة: ${trip.route} (${trip.date})`
+                : `عرض بيانات الرحلة: ${trip.route} (${trip.date})`;
+            document.getElementById('tripDetailsModalSub').innerText = `${trip.busInfo} | الحالة: ${trip.status || 'مجدولة'}`;
+
+            const finBar = document.getElementById('tripFinancialSummaryBar');
+            if (mode === 'finance') {
+                finBar.classList.remove('hidden');
+            } else {
+                finBar.classList.add('hidden');
+            }
+
+            renderTripDetailsModalContent();
+            switchTripDetailsBranch('tickets');
+            document.getElementById('tripDetailsModal').classList.remove('hidden');
+        }
+
+        function switchTripDetailsBranch(branch) {
+            activeTripModalBranch = branch;
+            const btnTkt = document.getElementById('btnTripSubTickets');
+            const btnCargo = document.getElementById('btnTripSubCargo');
+            const boxTkt = document.getElementById('tripBranchTicketsContainer');
+            const boxCargo = document.getElementById('tripBranchCargoContainer');
+
+            if (branch === 'tickets') {
+                btnTkt.className = "py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition gold-gradient-bg text-black shadow";
+                btnCargo.className = "py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition bg-zinc-800 text-zinc-300 hover:text-gold border border-zinc-700";
+                boxTkt.classList.remove('hidden');
+                boxCargo.classList.add('hidden');
+            } else {
+                btnCargo.className = "py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition gold-gradient-bg text-black shadow";
+                btnTkt.className = "py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition bg-zinc-800 text-zinc-300 hover:text-gold border border-zinc-700";
+                boxCargo.classList.remove('hidden');
+                boxTkt.classList.add('hidden');
+            }
+        }
+
+        function renderTripDetailsModalContent() {
+            if (!activeTripModalId) return;
+            const isFinance = activeTripModalMode === 'finance';
+
+            const tktList = getFilteredData(db.passengers || []).filter(p => String(p.tripId) === String(activeTripModalId));
+            const cargoList = getFilteredData(db.cargo || []).filter(c => String(c.tripId) === String(activeTripModalId));
+
+            tktList.sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
+            cargoList.sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
+
+            document.getElementById('tripBranchTktCount').innerText = tktList.length;
+            document.getElementById('tripBranchCargoCount').innerText = cargoList.length;
+
+            if (isFinance) {
+                const tktTotal = tktList.reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
+                const tktPaid = tktList.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
+                const cargoTotal = cargoList.reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
+                const cargoPaid = cargoList.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
+
+                document.getElementById('tripFinTktTotal').innerText = `${tktTotal} AED (مدفوع: ${tktPaid})`;
+                document.getElementById('tripFinCargoTotal').innerText = `${cargoTotal} AED (مدفوع: ${cargoPaid})`;
+                document.getElementById('tripFinGrandTotal').innerText = `${tktPaid + cargoPaid} / ${tktTotal + cargoTotal} AED`;
+            }
+
+            // 1. Render Tickets Branch Table
+            const tktHead = document.getElementById('tripBranchTicketsHead');
+            const tktBody = document.getElementById('tripBranchTicketsBody');
+            if (isFinance) {
+                tktHead.innerHTML = `
+                    <tr>
+                        <th>البوليصة</th>
+                        <th>الوكيل</th>
+                        <th>الاسم الرئيسي</th>
+                        <th>الركاب الإضافيون</th>
+                        <th>الهاتف</th>
+                        <th>المسار</th>
+                        <th>السعر (درهم)</th>
+                        <th>حالة السداد</th>
+                        <th>تعديل / معاينة</th>
+                    </tr>
+                `;
+            } else {
+                tktHead.innerHTML = `
+                    <tr>
+                        <th>البوليصة</th>
+                        <th>الوكيل</th>
+                        <th>الاسم الرئيسي</th>
+                        <th>الركاب الإضافيون</th>
+                        <th>الهاتف</th>
+                        <th>الجواز</th>
+                        <th>المسار</th>
+                        <th>وقت الحضور</th>
+                    </tr>
+                `;
+            }
+
+            tktBody.innerHTML = '';
+            if (tktList.length === 0) {
+                tktBody.insertRow().innerHTML = `<td colspan="${isFinance ? 9 : 8}" class="text-center text-zinc-500 py-4 text-xs">لا توجد تذاكر مسجلة لهذه الرحلة.</td>`;
+            } else {
+                tktList.forEach(p => {
+                    let extraNamesHtml = '-';
+                    if (p.extraPassengers && p.extraPassengers.length > 0) {
+                        extraNamesHtml = p.extraPassengers.map(ex => `<span class="bg-amber-950/60 text-amber-300 px-1.5 py-0.5 rounded text-[10px] inline-block m-0.5">${ex.name}</span>`).join('');
+                    }
+
+                    if (isFinance) {
+                        tktBody.insertRow().innerHTML = `
+                            <td><strong>#${p.id}</strong></td>
+                            <td>${p.agent || '-'}</td>
+                            <td><strong>${p.name}</strong></td>
+                            <td>${extraNamesHtml}</td>
+                            <td>${p.phone}</td>
+                            <td>${p.origin} → ${p.destination}</td>
+                            <td class="font-bold text-gold">${p.fare} AED</td>
+                            <td>
+                                <select onchange="quickUpdateTicketPaymentFromModal('${p.id}', this.value)" class="bg-zinc-900 border ${p.payMethod === 'مدفوع' ? 'border-emerald-500 text-emerald-400' : 'border-amber-500 text-amber-400'} rounded-lg px-2 py-1 text-xs font-bold outline-none">
+                                    <option value="مدفوع" ${p.payMethod === 'مدفوع' ? 'selected' : ''}>مدفوع</option>
+                                    <option value="الدفع عند الباص" ${p.payMethod === 'الدفع عند الباص' ? 'selected' : ''}>الدفع عند الباص</option>
+                                </select>
+                            </td>
+                            <td class="space-x-1 space-x-reverse whitespace-nowrap">
+                                <button onclick="editTicketFromTripModal('${p.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen ml-1"></i> تعديل</button>
+                                <button onclick="previewTicket('${p.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-file-pdf"></i></button>
+                            </td>
+                        `;
+                    } else {
+                        tktBody.insertRow().innerHTML = `
+                            <td><strong>#${p.id}</strong></td>
+                            <td>${p.agent || '-'}</td>
+                            <td><strong>${p.name}</strong></td>
+                            <td>${extraNamesHtml}</td>
+                            <td>${p.phone}</td>
+                            <td>${p.passport || '-'}</td>
+                            <td>${p.origin} → ${p.destination}</td>
+                            <td class="text-amber-300 font-bold">${p.reportingTime || '-'}</td>
+                        `;
+                    }
+                });
+            }
+
+            // 2. Render Cargo Branch Table
+            const cargoHead = document.getElementById('tripBranchCargoHead');
+            const cargoBody = document.getElementById('tripBranchCargoBody');
+            if (isFinance) {
+                cargoHead.innerHTML = `
+                    <tr>
+                        <th>الفاتورة</th>
+                        <th>التاريخ</th>
+                        <th>المرسل</th>
+                        <th>المستلم وعنوانه</th>
+                        <th>الأصناف</th>
+                        <th>الإجمالي (درهم)</th>
+                        <th>حالة السداد</th>
+                        <th>تعديل / معاينة</th>
+                    </tr>
+                `;
+            } else {
+                cargoHead.innerHTML = `
+                    <tr>
+                        <th>الفاتورة</th>
+                        <th>التاريخ</th>
+                        <th>المرسل</th>
+                        <th>المستلم وعنوانه</th>
+                        <th>الأصناف والعدد</th>
+                        <th>الفرع</th>
+                    </tr>
+                `;
+            }
+
+            cargoBody.innerHTML = '';
+            if (cargoList.length === 0) {
+                cargoBody.insertRow().innerHTML = `<td colspan="${isFinance ? 8 : 6}" class="text-center text-zinc-500 py-4 text-xs">لا توجد فواتير شحن مسجلة لهذه الرحلة.</td>`;
+            } else {
+                cargoList.forEach(c => {
+                    let itemsSummary = (c.items && c.items.length > 0)
+                        ? c.items.map(it => `• ${it.desc} (${it.qty})`).join('<br>')
+                        : 'أمتعة متنوعة';
+
+                    if (isFinance) {
+                        cargoBody.insertRow().innerHTML = `
+                            <td><strong>#${c.id}</strong></td>
+                            <td>${c.date || '-'}</td>
+                            <td>${c.sender}<br><span class="text-[10px] text-zinc-400">${c.senderPhone}</span></td>
+                            <td><strong>${c.receiver}</strong><br><span class="text-[10px] text-amber-400">${c.receiverAddress || 'عدن'}</span></td>
+                            <td class="text-xs">${itemsSummary}</td>
+                            <td class="font-bold text-gold">${c.grandTotal} AED</td>
+                            <td>
+                                <select onchange="quickUpdateCargoPaymentFromModal('${c.id}', this.value)" class="bg-zinc-900 border ${c.paymentStatus === 'مدفوع' ? 'border-emerald-500 text-emerald-400' : 'border-amber-500 text-amber-400'} rounded-lg px-2 py-1 text-xs font-bold outline-none">
+                                    <option value="مدفوع" ${c.paymentStatus === 'مدفوع' ? 'selected' : ''}>مدفوع</option>
+                                    <option value="أجل بالامارات" ${c.paymentStatus === 'أجل بالامارات' ? 'selected' : ''}>أجل بالامارات</option>
+                                    <option value="الدفع باليمن" ${c.paymentStatus === 'الدفع باليمن' ? 'selected' : ''}>الدفع باليمن</option>
+                                </select>
+                            </td>
+                            <td class="space-x-1 space-x-reverse whitespace-nowrap">
+                                <button onclick="editCargoFromTripModal('${c.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen ml-1"></i> تعديل</button>
+                                <button onclick="previewCargo('${c.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-file-pdf"></i></button>
+                            </td>
+                        `;
+                    } else {
+                        cargoBody.insertRow().innerHTML = `
+                            <td><strong>#${c.id}</strong></td>
+                            <td>${c.date || '-'}</td>
+                            <td>${c.sender}<br><span class="text-[10px] text-zinc-400">${c.senderPhone}</span></td>
+                            <td><strong>${c.receiver}</strong><br><span class="text-[10px] text-zinc-400">${c.receiverPhone}</span><br><span class="text-[10px] text-amber-400">العنوان: ${c.receiverAddress || 'عدن'}</span></td>
+                            <td class="text-xs">${itemsSummary}</td>
+                            <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${c.branch || 'فرع عجمان'}</span></td>
+                        `;
+                    }
+                });
+            }
+        }
+
+        function quickUpdateTicketPaymentFromModal(ticketId, newStatus) {
+            const idx = (db.passengers || []).findIndex(p => String(p.id) === String(ticketId));
+            if (idx === -1) return;
+            db.passengers[idx].payMethod = newStatus;
+            const nowStr = getFormattedDateTime();
+            const author = getCurrentUserName();
+            if (!db.passengers[idx].auditLog) db.passengers[idx].auditLog = [];
+            db.passengers[idx].auditLog.push({action: `تحديث حالة السداد إلى (${newStatus})`, user: author, time: nowStr});
+            saveDB();
+            renderTripDetailsModalContent();
+            refreshUI();
+        }
+
+        function quickUpdateCargoPaymentFromModal(cargoId, newStatus) {
+            const idx = (db.cargo || []).findIndex(c => String(c.id) === String(cargoId));
+            if (idx === -1) return;
+            db.cargo[idx].paymentStatus = newStatus;
+            const nowStr = getFormattedDateTime();
+            const author = getCurrentUserName();
+            if (!db.cargo[idx].auditLog) db.cargo[idx].auditLog = [];
+            db.cargo[idx].auditLog.push({action: `تحديث حالة السداد إلى (${newStatus})`, user: author, time: nowStr});
+            saveDB();
+            renderTripDetailsModalContent();
+            refreshUI();
+        }
+
+        function editTicketFromTripModal(ticketId) {
+            closeModal('tripDetailsModal');
+            switchTab('passengers');
+            editPassenger(ticketId);
+        }
+
+        function editCargoFromTripModal(cargoId) {
+            closeModal('tripDetailsModal');
+            switchTab('cargo');
+            editCargo(cargoId);
         }
 
         function renderVouchersTable() {
@@ -4402,6 +4808,7 @@
             handleGlobalSearch, resetGlobalSearch,
             calculateDriverNet, handleSaveDriverAccount, previewDriverAccount, editDriverAccount, resetDriverForm, deleteDriverAccount,
             handleSaveTrip, editTrip, markTripDeparted, resetTripForm, deleteTrip, openManifestForTrip,
+            openTripDetailsModal, switchTripDetailsBranch, quickUpdateTicketPaymentFromModal, quickUpdateCargoPaymentFromModal, editTicketFromTripModal, editCargoFromTripModal,
             onTripSelectedForTicket, onTripSelectedForCargo, updateReportingTimeAutomatically, onPassengerCountChanged,
             handleSavePassenger, editPassenger, resetPassengerForm, deletePassenger, previewTicket,
             addCargoItemRow, calculateCargoTotal, handleSaveCargo, editCargo, resetCargoForm, deleteCargo, previewCargo,
