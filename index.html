@@ -3093,13 +3093,24 @@
             let tripsList = [...db.trips];
             tripsList.sort((a, b) => b.id.localeCompare(a.id));
 
+            const passEditId = document.getElementById('passEditId') ? document.getElementById('passEditId').value : '';
+            const cargoEditId = document.getElementById('cargoEditId') ? document.getElementById('cargoEditId').value : '';
+            const editingPassItem = passEditId ? db.passengers.find(x => String(x.id) === String(passEditId)) : null;
+            const editingCargoItem = cargoEditId ? db.cargo.find(x => String(x.id) === String(cargoEditId)) : null;
+
             tripsList.forEach(trip => {
-                const text = `${trip.date !== '-' ? trip.date : 'بدون تاريخ'} (${trip.route}) - ${trip.busInfo} [${trip.status || 'مجدولة'}]`;
+                const isDeparted = trip.status === 'غادرت الرحلة';
+                const text = isDeparted
+                    ? `${trip.date !== '-' ? trip.date : 'بدون تاريخ'} (${trip.route}) - ${trip.busInfo} [غادرت الرحلة - مغلقة]`
+                    : `${trip.date !== '-' ? trip.date : 'بدون تاريخ'} (${trip.route}) - ${trip.busInfo} [${trip.status || 'مجدولة'}]`;
                 
                 if(passSel) {
                     const opt = document.createElement('option');
                     opt.value = trip.id;
                     opt.textContent = text;
+                    if (isDeparted && (!editingPassItem || String(editingPassItem.tripId) !== String(trip.id))) {
+                        opt.disabled = true;
+                    }
                     passSel.appendChild(opt);
                 }
 
@@ -3107,6 +3118,9 @@
                     const opt = document.createElement('option');
                     opt.value = trip.id;
                     opt.textContent = text;
+                    if (isDeparted && (!editingCargoItem || String(editingCargoItem.tripId) !== String(trip.id))) {
+                        opt.disabled = true;
+                    }
                     cargoSel.appendChild(opt);
                 }
             });
@@ -3308,6 +3322,14 @@
             const ticketNo = document.getElementById('passTicketNo').value.trim();
             const tripId = document.getElementById('passTripSelect').value;
             if(!tripId) { alert('الرجاء اختيار الرحلة المرتبطة أولاً!'); return; }
+            const selectedTripForPass = db.trips.find(t => String(t.id) === String(tripId));
+            const existingPassForEdit = editId ? db.passengers.find(p => String(p.id) === String(editId)) : null;
+            if (selectedTripForPass && selectedTripForPass.status === 'غادرت الرحلة') {
+                if (!existingPassForEdit || String(existingPassForEdit.tripId) !== String(tripId)) {
+                    alert('عذراً، لا يمكن إضافة أو ربط تذكرة برحلة حالتها "غادرت الرحلة"!');
+                    return;
+                }
+            }
             const count = parseInt(document.getElementById('passCount').value) || 1;
             const nowStr = getFormattedDateTime();
             const author = getCurrentUserName();
@@ -3393,6 +3415,7 @@
             const item = db.passengers.find(x => String(x.id) === String(id));
             if(!item) return;
             document.getElementById('passEditId').value = item.id;
+            populateTripsDropdown();
             document.getElementById('passTicketNo').value = item.id;
             document.getElementById('passTripSelect').value = item.tripId || '';
             document.getElementById('passAgent').value = item.agent || '';
@@ -3431,6 +3454,7 @@
         function resetPassengerForm() {
             document.getElementById('passengerForm').reset();
             document.getElementById('passEditId').value = '';
+            populateTripsDropdown();
             calculateNextSequenceNumbers();
             document.getElementById('passDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('passFormTitle').innerText = 'إصدار تذكرة سفر جديدة';
@@ -3446,6 +3470,16 @@
             const editId = document.getElementById('cargoEditId').value;
             const invNo = document.getElementById('cargoInvNo').value.trim();
             const tripId = document.getElementById('cargoTripSelect').value || '';
+            if (tripId) {
+                const selectedTripForCargo = db.trips.find(t => String(t.id) === String(tripId));
+                const existingCargoForEdit = editId ? db.cargo.find(c => String(c.id) === String(editId)) : null;
+                if (selectedTripForCargo && selectedTripForCargo.status === 'غادرت الرحلة') {
+                    if (!existingCargoForEdit || String(existingCargoForEdit.tripId) !== String(tripId)) {
+                        alert('عذراً، لا يمكن إضافة أو ربط فاتورة شحن برحلة حالتها "غادرت الرحلة"!');
+                        return;
+                    }
+                }
+            }
             const nowStr = getFormattedDateTime();
             const author = getCurrentUserName();
 
@@ -3525,6 +3559,7 @@
             const item = db.cargo.find(x => String(x.id) === String(id));
             if(!item) return;
             document.getElementById('cargoEditId').value = item.id;
+            populateTripsDropdown();
             document.getElementById('cargoInvNo').value = item.id;
             document.getElementById('cargoTripSelect').value = item.tripId || '';
             document.getElementById('cargoDate').value = item.date !== '-' ? item.date : '';
@@ -3557,6 +3592,7 @@
         function resetCargoForm() {
             document.getElementById('cargoForm').reset();
             document.getElementById('cargoEditId').value = '';
+            populateTripsDropdown();
             calculateNextSequenceNumbers();
             document.getElementById('cargoTripSelect').value = '';
             document.getElementById('cargoItemsRowsContainer').innerHTML = '';
