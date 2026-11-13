@@ -49,6 +49,111 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(0.8) sepia(1) saturate(5) hue-rotate(5deg); }
         
+        /* تنسيق ذكي متجاوب تلقائياً: وضع الأندرويد/الهواتف مقابل وضع الديسك توب */
+        html.device-mobile body {
+            padding-bottom: 72px;
+            font-size: 14px;
+        }
+        html.device-mobile header {
+            padding: 10px 12px !important;
+        }
+        html.device-mobile header h1 {
+            font-size: 0.95rem !important;
+        }
+        html.device-mobile header p {
+            display: none !important;
+        }
+        html.device-mobile header img {
+            width: 36px !important;
+            height: 36px !important;
+        }
+        /* شريط تنقل سفلي بنمط تطبيقات الأندرويد على الهواتف */
+        html.device-mobile nav {
+            position: fixed !important;
+            bottom: 0 !important;
+            top: auto !important;
+            left: 0 !important;
+            right: 0 !important;
+            width: 100% !important;
+            z-index: 60 !important;
+            border-top: 1px solid rgba(212, 175, 55, 0.45) !important;
+            border-bottom: none !important;
+            background: rgba(18, 18, 21, 0.98) !important;
+            box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.7) !important;
+            padding-bottom: env(safe-area-inset-bottom, 4px);
+        }
+        html.device-mobile nav > div {
+            padding-left: 4px !important;
+            padding-right: 4px !important;
+        }
+        html.device-mobile nav .tab-btn {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            min-width: 74px !important;
+            padding: 6px 8px !important;
+            font-size: 10px !important;
+            line-height: 1.25 !important;
+            border-radius: 12px !important;
+            gap: 3px !important;
+            flex-shrink: 0 !important;
+        }
+        html.device-mobile nav .tab-btn i {
+            margin: 0 !important;
+            font-size: 15px !important;
+        }
+        html.device-mobile main {
+            padding: 12px 10px 90px 10px !important;
+        }
+        html.device-mobile input,
+        html.device-mobile select,
+        html.device-mobile textarea {
+            font-size: 16px !important; /* يمنع تكبير الشاشة التلقائي في متصفحات الهواتف */
+            min-height: 44px !important; /* مقاس لمس قياسي لنظام أندرويد */
+        }
+        html.device-mobile button[type="submit"],
+        html.device-mobile .modal-card button {
+            min-height: 44px !important;
+        }
+        html.device-mobile .modal-card {
+            width: 96% !important;
+            max-width: 96% !important;
+            padding: 14px !important;
+            border-radius: 18px !important;
+            max-height: 92vh !important;
+        }
+        html.device-mobile .custom-table th,
+        html.device-mobile .custom-table td {
+            padding: 8px 6px !important;
+            font-size: 0.75rem !important;
+        }
+        /* وضع الديسك توب الكامل */
+        html.device-desktop nav {
+            position: sticky !important;
+            top: 61px !important;
+            bottom: auto !important;
+        }
+        html.device-desktop main {
+            max-width: 1440px !important;
+        }
+        @media (max-width: 768px) {
+            nav {
+                position: fixed !important;
+                bottom: 0 !important;
+                top: auto !important;
+                left: 0 !important;
+                right: 0 !important;
+                z-index: 60 !important;
+                border-top: 1px solid rgba(212, 175, 55, 0.45) !important;
+                border-bottom: none !important;
+                background: rgba(18, 18, 21, 0.98) !important;
+            }
+            main {
+                padding-bottom: 90px !important;
+            }
+        }
+
         @media print {
             @page { size: A4 portrait; margin: 8mm; }
             body { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -524,6 +629,9 @@
         <div class="flex items-center gap-2 flex-wrap">
             <button onclick="openChangePasswordModal()" class="bg-zinc-800 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-bold">
                 <i class="fa-solid fa-key"></i> <span id="btnChangePass">كلمة المرور</span>
+            </button>
+            <button onclick="toggleDeviceLayoutMode()" id="deviceModeBtn" title="تبديل تلقائي/يدوي بين وضع الأندرويد والديسك توب" class="bg-zinc-800 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1">
+                <i class="fa-solid fa-mobile-screen"></i> <span id="deviceModeLabel">وضع الهاتف</span>
             </button>
             <button onclick="toggleLanguage()" id="langToggleBtn" class="bg-gold/20 text-gold border border-gold/40 px-3 py-1.5 rounded-xl text-xs font-extrabold hover:bg-gold/30">
                 <i class="fa-solid fa-globe"></i> English
@@ -2128,7 +2236,46 @@
             }
         }
 
+        let forcedDeviceMode = localStorage.getItem('WADI_BINA_DEVICE_MODE') || 'auto';
+
+        function detectAndApplyDeviceLayout() {
+            const root = document.getElementById('htmlRoot');
+            const label = document.getElementById('deviceModeLabel');
+            const btn = document.getElementById('deviceModeBtn');
+            const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const isSmallScreen = window.innerWidth <= 820;
+            const useMobile = forcedDeviceMode === 'mobile' || (forcedDeviceMode === 'auto' && (isMobileUA || isSmallScreen));
+
+            if (useMobile) {
+                root.classList.add('device-mobile');
+                root.classList.remove('device-desktop');
+                if (label) label.innerText = 'وضع الأندرويد';
+                if (btn) btn.innerHTML = '<i class="fa-brands fa-android"></i> <span id="deviceModeLabel">وضع الأندرويد</span>';
+            } else {
+                root.classList.add('device-desktop');
+                root.classList.remove('device-mobile');
+                if (label) label.innerText = 'وضع الديسك توب';
+                if (btn) btn.innerHTML = '<i class="fa-solid fa-desktop"></i> <span id="deviceModeLabel">وضع الديسك توب</span>';
+            }
+        }
+
+        function toggleDeviceLayoutMode() {
+            const root = document.getElementById('htmlRoot');
+            if (root.classList.contains('device-mobile')) {
+                forcedDeviceMode = 'desktop';
+            } else {
+                forcedDeviceMode = 'mobile';
+            }
+            localStorage.setItem('WADI_BINA_DEVICE_MODE', forcedDeviceMode);
+            detectAndApplyDeviceLayout();
+        }
+
+        window.addEventListener('resize', () => {
+            if (forcedDeviceMode === 'auto') detectAndApplyDeviceLayout();
+        });
+
         window.onload = function() {
+            detectAndApplyDeviceLayout();
             loadFromLocal();
             updateUserBadge();
             applyLanguage();
@@ -4129,7 +4276,7 @@
 
         // ربط جميع الدوال بنافذة المتصفح لتعمل مع أحداث HTML (onclick, onsubmit, onchange) داخل ES Module
         Object.assign(window, {
-            handleLogin, handleLogout, openChangePasswordModal, handleUserChangePassword,
+            toggleDeviceLayoutMode, handleLogin, handleLogout, openChangePasswordModal, handleUserChangePassword,
             toggleLanguage, switchTab, switchFinancialSubTab, refreshUI, closeModal,
             exportBackupJSON, importBackupJSON, exportSystemBackupPDF, importBackupPDF,
             exportToPDF, exportMultiPagePDF, downloadCapturedImage,
