@@ -154,6 +154,24 @@
             }
         }
 
+        /* تصميم القائمة الجانبية القابلة للطي والإخفاء */
+        aside#appSidebar.collapsed {
+            transform: translateX(100%) !important;
+        }
+        @media (min-width: 1024px) {
+            aside#appSidebar.collapsed ~ #mainContentWrapper {
+                margin-right: 0 !important;
+            }
+        }
+        @media (max-width: 1023px) {
+            aside#appSidebar {
+                transform: translateX(100%);
+            }
+            aside#appSidebar.mobile-open {
+                transform: translateX(0) !important;
+            }
+        }
+
         @media print {
             @page { size: A4 portrait; margin: 8mm; }
             body { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -620,80 +638,111 @@
     <!-- HEADER -->
     <header class="bg-cardbg border-b border-bordergold px-4 sm:px-6 py-3.5 flex items-center justify-between sticky top-0 z-50 backdrop-blur-md bg-opacity-95 shadow-lg">
         <div class="flex items-center gap-3">
+            <button onclick="toggleSidebar()" title="إظهار / إخفاء القائمة الجانبية" class="bg-zinc-800 text-gold border border-gold/40 w-10 h-10 rounded-xl flex items-center justify-center hover:bg-gold/20 transition text-base">
+                <i class="fa-solid fa-bars"></i>
+            </button>
             <img src="logo_2.jpeg" alt="Logo" class="w-11 h-11 object-cover rounded-full border border-gold shadow" onerror="this.src='https://via.placeholder.com/44?text=Logo'">
             <div>
                 <h1 id="headTitle" class="text-base sm:text-lg font-black gold-gradient-text leading-tight">شركة وادي بناء للنقل الدولي</h1>
                 <p id="headSub" class="text-[11px] text-zinc-400">النظام الموحد الشامل (Firebase v13.2.0)</p>
             </div>
         </div>
-        <div class="flex items-center gap-2 flex-wrap">
-            <button onclick="openChangePasswordModal()" class="bg-zinc-800 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-bold">
-                <i class="fa-solid fa-key"></i> <span id="btnChangePass">كلمة المرور</span>
-            </button>
-            <button onclick="toggleDeviceLayoutMode()" id="deviceModeBtn" title="تبديل تلقائي/يدوي بين وضع الأندرويد والديسك توب" class="bg-zinc-800 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1">
-                <i class="fa-solid fa-mobile-screen"></i> <span id="deviceModeLabel">وضع الهاتف</span>
-            </button>
-            <button onclick="toggleLanguage()" id="langToggleBtn" class="bg-gold/20 text-gold border border-gold/40 px-3 py-1.5 rounded-xl text-xs font-extrabold hover:bg-gold/30">
-                <i class="fa-solid fa-globe"></i> English
-            </button>
-            <span id="userInfoBadge" class="bg-zinc-800 border border-zinc-700 text-gold px-3 py-1.5 rounded-xl text-xs font-bold"></span>
-            
-            <button onclick="exportBackupJSON()" class="bg-zinc-800 text-gold border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1">
-                <i class="fa-solid fa-download"></i> <span class="hidden sm:inline" id="btnBackup">نسخة JSON</span>
-            </button>
-
-            <button onclick="exportSystemBackupPDF()" class="bg-red-600 text-white border border-red-500 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 hover:bg-red-500">
-                <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline" id="btnBackupPDF">نسخة احتياطية PDF</span>
-            </button>
-            
-            <label class="bg-zinc-800 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1 hover:border-gold">
-                <i class="fa-solid fa-upload"></i> <span class="hidden sm:inline" id="btnRestore">استرجاع JSON</span>
-                <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
-            </label>
-
-            <label class="bg-red-950/60 text-red-400 border border-red-700 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer flex items-center gap-1 hover:bg-red-900 hover:text-white">
-                <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline" id="btnRestorePDF">استعادة من PDF</span>
-                <input type="file" accept=".pdf" onchange="importBackupPDF(event)" class="hidden">
-            </label>
-
-            <button onclick="handleLogout()" id="btnLogout" class="bg-red-600/20 text-red-400 border border-red-600/30 px-3 py-1.5 rounded-xl text-xs font-bold">خروج</button>
-        </div>
     </header>
 
-    <!-- NAVIGATION TABS -->
-    <nav class="bg-zinc-900/90 border-b border-zinc-800 sticky top-[61px] z-40 backdrop-blur">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex space-x-2 space-x-reverse py-2.5 overflow-x-auto no-scrollbar">
-                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition gold-gradient-bg text-black shadow">
-                    <i class="fa-solid fa-chart-pie ml-1.5"></i> لوحة التحكم
+    <!-- SIDEBAR NAVIGATION & MAIN WRAPPER -->
+    <div class="flex-grow flex relative">
+        <!-- Sidebar Toggle Overlay on Mobile -->
+        <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/70 z-40 hidden transition-opacity"></div>
+
+        <!-- Collapsible Side Navigation Bar -->
+        <aside id="appSidebar" class="w-64 bg-cardbg border-l border-bordergold flex-shrink-0 flex flex-col transition-all duration-300 z-50 fixed right-0 top-[61px] bottom-0 overflow-y-auto transform translate-x-0 shadow-2xl">
+            <div class="p-4 border-b border-zinc-800 flex items-center justify-between">
+                <span class="text-xs font-black text-gold flex items-center gap-2"><i class="fa-solid fa-bars-staggered"></i> أقسام النظام</span>
+                <button onclick="toggleSidebar()" class="text-zinc-400 hover:text-white p-1 rounded-lg bg-zinc-800/60"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-3 space-y-1.5 flex-grow">
+                <button onclick="switchTab('dashboard'); if(window.innerWidth < 1024) toggleSidebar();" id="tab-dashboard" class="tab-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition gold-gradient-bg text-black shadow text-right">
+                    <i class="fa-solid fa-chart-pie text-base w-5 text-center"></i> <span>لوحة التحكم</span>
                 </button>
-                <button onclick="switchTab('drivers')" id="tab-drivers" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold hidden">
-                    <i class="fa-solid fa-id-card-clip ml-1.5"></i> حسابات السائقين
+                <button onclick="switchTab('drivers'); if(window.innerWidth < 1024) toggleSidebar();" id="tab-drivers" class="tab-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition bg-zinc-800/80 text-zinc-300 hover:text-gold hover:bg-zinc-800 hidden text-right">
+                    <i class="fa-solid fa-id-card-clip text-base w-5 text-center"></i> <span>حسابات السائقين</span>
                 </button>
-                <button onclick="switchTab('trips')" id="tab-trips" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
-                    <i class="fa-solid fa-bus ml-1.5"></i> إدارة الرحلات
+                <button onclick="switchTab('trips'); if(window.innerWidth < 1024) toggleSidebar();" id="tab-trips" class="tab-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition bg-zinc-800/80 text-zinc-300 hover:text-gold hover:bg-zinc-800 text-right">
+                    <i class="fa-solid fa-bus text-base w-5 text-center"></i> <span>إدارة الرحلات</span>
                 </button>
-                <button onclick="switchTab('passengers')" id="tab-passengers" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
-                    <i class="fa-solid fa-ticket ml-1.5"></i> التذاكر والركاب
+                <button onclick="switchTab('passengers'); if(window.innerWidth < 1024) toggleSidebar();" id="tab-passengers" class="tab-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition bg-zinc-800/80 text-zinc-300 hover:text-gold hover:bg-zinc-800 text-right">
+                    <i class="fa-solid fa-ticket text-base w-5 text-center"></i> <span>التذاكر والركاب</span>
                 </button>
-                <button onclick="switchTab('cargo')" id="tab-cargo" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
-                    <i class="fa-solid fa-boxes-packing ml-1.5"></i> فواتير الشحن
+                <button onclick="switchTab('cargo'); if(window.innerWidth < 1024) toggleSidebar();" id="tab-cargo" class="tab-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition bg-zinc-800/80 text-zinc-300 hover:text-gold hover:bg-zinc-800 text-right">
+                    <i class="fa-solid fa-boxes-packing text-base w-5 text-center"></i> <span>فواتير الشحن</span>
                 </button>
-                <button onclick="switchTab('transit')" id="tab-transit" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
-                    <i class="fa-solid fa-passport ml-1.5"></i> تأشيرات العبور
+                <button onclick="switchTab('transit'); if(window.innerWidth < 1024) toggleSidebar();" id="tab-transit" class="tab-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition bg-zinc-800/80 text-zinc-300 hover:text-gold hover:bg-zinc-800 text-right">
+                    <i class="fa-solid fa-passport text-base w-5 text-center"></i> <span>تأشيرات العبور</span>
                 </button>
-                <button onclick="switchTab('salaries')" id="tab-salaries" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold hidden">
-                    <i class="fa-solid fa-money-check-dollar ml-1.5"></i> إدارة الرواتب والموظفين
+                <button onclick="switchTab('salaries'); if(window.innerWidth < 1024) toggleSidebar();" id="tab-salaries" class="tab-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition bg-zinc-800/80 text-zinc-300 hover:text-gold hover:bg-zinc-800 hidden text-right">
+                    <i class="fa-solid fa-money-check-dollar text-base w-5 text-center"></i> <span>إدارة الرواتب والموظفين</span>
                 </button>
-                <button onclick="switchTab('financials')" id="tab-financials" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold hidden">
-                    <i class="fa-solid fa-calculator ml-1.5"></i> الإدارة المالية
+                <button onclick="switchTab('financials'); if(window.innerWidth < 1024) toggleSidebar();" id="tab-financials" class="tab-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition bg-zinc-800/80 text-zinc-300 hover:text-gold hover:bg-zinc-800 hidden text-right">
+                    <i class="fa-solid fa-calculator text-base w-5 text-center"></i> <span>الإدارة المالية</span>
                 </button>
-                <button onclick="switchTab('users')" id="tab-users" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold hidden">
-                    <i class="fa-solid fa-users-gear ml-1.5"></i> إدارة المستخدمين
+                <button onclick="switchTab('users'); if(window.innerWidth < 1024) toggleSidebar();" id="tab-users" class="tab-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition bg-zinc-800/80 text-zinc-300 hover:text-gold hover:bg-zinc-800 hidden text-right">
+                    <i class="fa-solid fa-users-gear text-base w-5 text-center"></i> <span>إدارة المستخدمين</span>
                 </button>
             </div>
-        </div>
-    </nav>
+            <!-- مفاتيح التحكم والنسخ الاحتياطي أسفل القائمة الجانبية -->
+            <div class="p-3 border-t border-zinc-800 space-y-2 bg-zinc-950/50">
+                <div class="text-[11px] font-bold text-gold px-1 flex items-center gap-1.5">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span id="userInfoBadge" class="truncate"></span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-1.5">
+                    <button onclick="openChangePasswordModal()" class="bg-zinc-800 text-amber-400 border border-amber-500/30 px-2.5 py-2 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1 hover:bg-zinc-700 transition">
+                        <i class="fa-solid fa-key"></i> <span id="btnChangePass">كلمة المرور</span>
+                    </button>
+                    <button onclick="toggleDeviceLayoutMode()" id="deviceModeBtn" title="تبديل تلقائي/يدوي بين وضع الأندرويد والديسك توب" class="bg-zinc-800 text-emerald-400 border border-emerald-500/30 px-2.5 py-2 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1 hover:bg-zinc-700 transition">
+                        <i class="fa-solid fa-mobile-screen"></i> <span id="deviceModeLabel">وضع الهاتف</span>
+                    </button>
+                </div>
+
+                <button onclick="toggleLanguage()" id="langToggleBtn" class="w-full bg-gold/20 text-gold border border-gold/40 px-3 py-2 rounded-xl text-xs font-extrabold hover:bg-gold/30 flex items-center justify-center gap-1.5 transition">
+                    <i class="fa-solid fa-globe"></i> English
+                </button>
+
+                <div class="pt-1 border-t border-zinc-800/80 space-y-1.5">
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <button onclick="exportBackupJSON()" class="bg-zinc-800 text-gold border border-zinc-700 px-2 py-2 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1 hover:border-gold transition">
+                            <i class="fa-solid fa-download"></i> <span id="btnBackup">نسخة JSON</span>
+                        </button>
+                        <button onclick="exportSystemBackupPDF()" class="bg-red-600 text-white border border-red-500 px-2 py-2 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1 hover:bg-red-500 transition">
+                            <i class="fa-solid fa-file-pdf"></i> <span id="btnBackupPDF">نسخة PDF</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <label class="bg-zinc-800 text-zinc-200 border border-zinc-700 px-2 py-2 rounded-xl text-[11px] font-bold cursor-pointer flex items-center justify-center gap-1 hover:border-gold transition text-center">
+                            <i class="fa-solid fa-upload"></i> <span id="btnRestore">استرجاع JSON</span>
+                            <input type="file" accept=".json" onchange="importBackupJSON(event)" class="hidden">
+                        </label>
+                        <label class="bg-red-950/60 text-red-400 border border-red-700 px-2 py-2 rounded-xl text-[11px] font-bold cursor-pointer flex items-center justify-center gap-1 hover:bg-red-900 hover:text-white transition text-center">
+                            <i class="fa-solid fa-file-pdf"></i> <span id="btnRestorePDF">استعادة PDF</span>
+                            <input type="file" accept=".pdf" onchange="importBackupPDF(event)" class="hidden">
+                        </label>
+                    </div>
+                </div>
+
+                <button onclick="handleLogout()" id="btnLogout" class="w-full bg-red-600/20 text-red-400 border border-red-600/30 px-3 py-2 rounded-xl text-xs font-extrabold hover:bg-red-600 hover:text-white transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+                </button>
+
+                <div class="text-[10px] text-zinc-500 text-center pt-1">
+                    شركة وادي بناء للنقل الدولي © 2026
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT CONTAINER WITH MARGIN FOR SIDEBAR -->
+        <div id="mainContentWrapper" class="flex-grow flex flex-col mr-0 lg:mr-64 transition-all duration-300 min-w-0">
 
     <!-- MAIN CONTAINER -->
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 flex-grow w-full pb-24">
@@ -1684,6 +1733,7 @@
         </section>
 
     </main>
+    </div> <!-- End of sidebar + main wrapper -->
 
     <!-- FIREBASE MODULAR SDK v13.2.0 & APP LOGIC -->
     <script type="module">
@@ -1943,6 +1993,8 @@
                 if (el) {
                     if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
                         if (el.placeholder) el.placeholder = t[key];
+                    } else if (key === 'btnLogout') {
+                        el.innerHTML = `<i class="fa-solid fa-right-from-bracket"></i> ${t[key]}`;
                     } else {
                         el.innerText = t[key];
                     }
@@ -2274,6 +2326,30 @@
             if (forcedDeviceMode === 'auto') detectAndApplyDeviceLayout();
         });
 
+        let isSidebarOpen = true;
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('appSidebar');
+            const wrapper = document.getElementById('mainContentWrapper');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            if (window.innerWidth >= 1024) {
+                sidebar.classList.toggle('collapsed');
+                if (sidebar.classList.contains('collapsed')) {
+                    wrapper.style.marginRight = '0px';
+                } else {
+                    wrapper.style.marginRight = '256px';
+                }
+            } else {
+                sidebar.classList.toggle('mobile-open');
+                if (sidebar.classList.contains('mobile-open')) {
+                    overlay.classList.remove('hidden');
+                } else {
+                    overlay.classList.add('hidden');
+                }
+            }
+        }
+
         window.onload = function() {
             detectAndApplyDeviceLayout();
             loadFromLocal();
@@ -2302,8 +2378,14 @@
             currentTab = tabId;
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(`module-${tabId}`).classList.remove('hidden');
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.className = "tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold");
-            document.getElementById(`tab-${tabId}`).className = "tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition gold-gradient-bg text-black shadow";
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                const isHidden = btn.classList.contains('hidden');
+                btn.className = `tab-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition bg-zinc-800/80 text-zinc-300 hover:text-gold hover:bg-zinc-800 text-right ${isHidden ? 'hidden' : ''}`;
+            });
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            if (activeBtn) {
+                activeBtn.className = "tab-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition gold-gradient-bg text-black shadow text-right";
+            }
             refreshUI();
         }
 
@@ -4276,7 +4358,7 @@
 
         // ربط جميع الدوال بنافذة المتصفح لتعمل مع أحداث HTML (onclick, onsubmit, onchange) داخل ES Module
         Object.assign(window, {
-            toggleDeviceLayoutMode, handleLogin, handleLogout, openChangePasswordModal, handleUserChangePassword,
+            toggleSidebar, toggleDeviceLayoutMode, handleLogin, handleLogout, openChangePasswordModal, handleUserChangePassword,
             toggleLanguage, switchTab, switchFinancialSubTab, refreshUI, closeModal,
             exportBackupJSON, importBackupJSON, exportSystemBackupPDF, importBackupPDF,
             exportToPDF, exportMultiPagePDF, downloadCapturedImage,
