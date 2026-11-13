@@ -36,10 +36,6 @@
     <!-- JsBarcode Library -->
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
     <style>
         :root { --bg-dark: #09090b; --bg-card: #121215; --gold-primary: #D4AF37; --border-color: #D4AF3740; }
         body { font-family: 'Cairo', 'Tajawal', sans-serif; background-color: var(--bg-dark); color: #f4f4f5; min-height: 100vh; }
@@ -146,9 +142,6 @@
                         <div><strong id="lblPrDate">تاريخ الرحلة:</strong> <span id="imgTktDate" class="text-amber-700 font-bold"></span></div>
                         <div><strong id="lblPrTime">وقت الحضور:</strong> <span id="imgTktTime" class="text-indigo-700 font-bold"></span></div>
                     </div>
-                    <div class="pt-1 border-t border-slate-200 text-amber-800 font-bold no-print">
-                        <span>الموظف منفذ الإجراء: </span><span id="imgTktCreatedBy"></span>
-                    </div>
                 </div>
 
                 <div id="imgTicketExtraBox"></div>
@@ -163,14 +156,6 @@
                         <span id="imgTktPayStatus" class="px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-bold">مدفوع</span>
                     </div>
                 </div>
-
-                <details class="no-print bg-amber-50 border border-amber-300 rounded-lg p-2.5 text-xs text-slate-800 mb-4 shadow-sm">
-                    <summary class="font-bold cursor-pointer text-amber-900 flex items-center justify-between">
-                        <span><i class="fa-solid fa-clock-rotate-left ml-1 text-amber-700"></i> سجل التواريخ والمستخدمين (من الإنشاء حتى آخر تعديل)</span>
-                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                    </summary>
-                    <div id="ticketAuditLogContent" class="mt-2 pt-2 border-t border-amber-200 space-y-1 text-[11px] text-slate-700"></div>
-                </details>
 
                 <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
                     <div id="tktFootNote">* رحلة موفقة وآمنة مع وادي بناء للنقل الدولي. أرقام التواصل بالمكاتب:</div>
@@ -229,7 +214,6 @@
 
                 <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 text-xs mb-4 flex justify-between flex-wrap gap-2">
                     <div><strong>الرحلة المرتبطة:</strong> <span id="imgCargoTripInfo" class="font-bold text-indigo-900"></span></div>
-                    <div class="no-print"><strong>منفذ الإجراء:</strong> <span id="imgCargoCreatedBy" class="font-bold text-amber-800"></span></div>
                 </div>
 
                 <table class="w-full border-collapse text-right text-xs mb-4" style="direction: inherit;">
@@ -254,14 +238,6 @@
                         <span id="imgCargoPayStatus" class="px-2.5 py-1 rounded-md bg-indigo-100 text-indigo-800 font-bold">مدفوع</span>
                     </div>
                 </div>
-
-                <details class="no-print bg-indigo-50 border border-indigo-300 rounded-lg p-2.5 text-xs text-slate-800 mb-4 shadow-sm">
-                    <summary class="font-bold cursor-pointer text-indigo-900 flex items-center justify-between">
-                        <span><i class="fa-solid fa-clock-rotate-left ml-1 text-indigo-700"></i> سجل التواريخ والمستخدمين (من الإنشاء حتى آخر تعديل)</span>
-                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                    </summary>
-                    <div id="cargoAuditLogContent" class="mt-2 pt-2 border-t border-indigo-200 space-y-1 text-[11px] text-slate-700"></div>
-                </details>
 
                 <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
                     <div id="cargoFootNote">* شكراً لاختياركم وادي بناء لشحن أمتعتكم. أرقام التواصل بالمكاتب:</div>
@@ -308,7 +284,6 @@
                     <div><strong id="lblDebtPhone">رقم الهاتف:</strong> <span id="imgDebtPhone"></span></div>
                     <div><strong id="lblDebtAddr">العنوان:</strong> <span id="imgDebtAddress"></span></div>
                     <div><strong id="lblDebtDate">تاريخ الفاتورة:</strong> <span id="imgDebtDate"></span></div>
-                    <div class="no-print"><strong>منفذ الإجراء:</strong> <span id="imgDebtCreatedBy" class="text-indigo-800 font-bold"></span></div>
                 </div>
 
                 <div class="space-y-1 text-xs mb-4">
@@ -326,14 +301,6 @@
                         <span id="lblDebtStatusBadge" class="px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-bold">حساب آجل</span>
                     </div>
                 </div>
-
-                <details class="no-print bg-zinc-100 border border-zinc-300 rounded-lg p-2.5 text-xs text-slate-800 mb-4 shadow-sm">
-                    <summary class="font-bold cursor-pointer text-slate-900 flex items-center justify-between">
-                        <span><i class="fa-solid fa-clock-rotate-left ml-1 text-amber-700"></i> سجل التواريخ والمستخدمين (من الإنشاء حتى آخر تعديل)</span>
-                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                    </summary>
-                    <div id="debtAuditLogContent" class="mt-2 pt-2 border-t border-zinc-200 space-y-1 text-[11px] text-slate-700"></div>
-                </details>
 
                 <div class="pt-3 border-t border-dashed border-slate-300 text-[10px] text-slate-600 space-y-1">
                     <div>* تعتبر هذه الفاتورة سند مطالبي رسمي للحسابات الآجلة.</div>
@@ -372,7 +339,6 @@
                         <div>رقم الباص: <strong id="prDriverBus" class="text-amber-700"></strong></div>
                         <div>اسم السائق: <strong id="prDriverName" class="text-slate-900"></strong></div>
                         <div>تاريخ الرحلة: <strong id="prDriverDate" class="text-indigo-700"></strong></div>
-                        <div class="no-print">منفذ الإجراء: <strong id="prDriverCreatedBy" class="text-emerald-700"></strong></div>
                     </div>
                 </div>
 
@@ -400,19 +366,11 @@
                     <h4 class="font-black text-slate-800 border-b border-slate-300 pb-1 mb-2">تسوية حساب السائق وتكاليف الرحلة</h4>
                     <div class="flex justify-between"><span>إجمالي مصروفات الرحلة (روحة + رجعة):</span> <strong id="prDriverTotalExp" class="text-red-700">0</strong></div>
                     <div class="flex justify-between"><span>حساب السائق للرحلة:</span> <strong id="prDriverTripDue" class="text-indigo-700">0</strong></div>
-                    <div class="flex justify-between"><span>متبقي حساب:</span> <strong id="prDriverRemaining" class="text-amber-700">0</strong></div>
+                    <div class="flex justify-between"><span>متبقي حساب / سلفيات:</span> <strong id="prDriverRemaining" class="text-amber-700">0</strong></div>
                     <div class="flex justify-between text-sm font-black pt-2 border-t border-slate-300 text-emerald-700">
                         <span>باقي حساب السائق الصافي:</span> <strong id="prDriverNetDue">0 AED</strong>
                     </div>
                 </div>
-
-                <details class="no-print bg-slate-100 border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800 mb-4 shadow-sm">
-                    <summary class="font-bold cursor-pointer text-slate-900 flex items-center justify-between">
-                        <span><i class="fa-solid fa-clock-rotate-left ml-1 text-amber-700"></i> سجل التواريخ والمستخدمين (من الإنشاء حتى آخر تعديل)</span>
-                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                    </summary>
-                    <div id="driverAuditLogContent" class="mt-2 pt-2 border-t border-slate-200 space-y-1 text-[11px] text-slate-700"></div>
-                </details>
 
                 <div class="grid grid-cols-2 gap-6 pt-4 border-t border-dashed border-slate-400 text-xs font-bold text-center">
                     <div>
@@ -560,7 +518,7 @@
             <img src="logo_2.jpeg" alt="Logo" class="w-11 h-11 object-cover rounded-full border border-gold shadow" onerror="this.src='https://via.placeholder.com/44?text=Logo'">
             <div>
                 <h1 id="headTitle" class="text-base sm:text-lg font-black gold-gradient-text leading-tight">شركة وادي بناء للنقل الدولي</h1>
-                <p id="headSub" class="text-[11px] text-zinc-400">النظام الموحد الشامل</p>
+                <p id="headSub" class="text-[11px] text-zinc-400">النظام الموحد الشامل (Firebase v13.2.0)</p>
             </div>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
@@ -601,7 +559,7 @@
                 <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition gold-gradient-bg text-black shadow">
                     <i class="fa-solid fa-chart-pie ml-1.5"></i> لوحة التحكم
                 </button>
-                <button onclick="switchTab('drivers')" id="tab-drivers" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
+                <button onclick="switchTab('drivers')" id="tab-drivers" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold hidden">
                     <i class="fa-solid fa-id-card-clip ml-1.5"></i> حسابات السائقين
                 </button>
                 <button onclick="switchTab('trips')" id="tab-trips" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
@@ -616,7 +574,10 @@
                 <button onclick="switchTab('transit')" id="tab-transit" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
                     <i class="fa-solid fa-passport ml-1.5"></i> تأشيرات العبور
                 </button>
-                <button onclick="switchTab('financials')" id="tab-financials" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold">
+                <button onclick="switchTab('salaries')" id="tab-salaries" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold hidden">
+                    <i class="fa-solid fa-money-check-dollar ml-1.5"></i> إدارة الرواتب والموظفين
+                </button>
+                <button onclick="switchTab('financials')" id="tab-financials" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold hidden">
                     <i class="fa-solid fa-calculator ml-1.5"></i> الإدارة المالية
                 </button>
                 <button onclick="switchTab('users')" id="tab-users" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition bg-zinc-800 text-zinc-300 hover:text-gold hidden">
@@ -833,7 +794,7 @@
                             <input type="number" step="any" id="drvTripDue" oninput="calculateDriverNet()" required class="w-full bg-zinc-900 border border-gold rounded-xl p-2.5 text-xs text-gold font-bold" value="2000">
                         </div>
                         <div>
-                            <label class="block text-xs text-zinc-400 mb-1">متبقي حساب</label>
+                            <label class="block text-xs text-zinc-400 mb-1">متبقي حساب / سلف سابقة</label>
                             <input type="number" step="any" id="drvRemaining" oninput="calculateDriverNet()" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-200" value="0">
                         </div>
                         <div>
@@ -843,6 +804,14 @@
                     </div>
 
                     <button type="submit" id="drvSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow">حفظ وتصديق حساب السائق وترحيل المصروفات للصندوق</button>
+                    
+                    <!-- سجل التواريخ والمستخدمين عند التعديل فقط -->
+                    <div id="driverEditAuditBox" class="hidden bg-zinc-900/90 border border-amber-500/40 rounded-xl p-3 text-xs text-zinc-300 mt-3">
+                        <div class="font-bold text-gold mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-clock-rotate-left"></i> سجل التواريخ والمستخدمين (من الإنشاء حتى آخر تعديل):
+                        </div>
+                        <div id="driverEditAuditList" class="space-y-1 text-[11px] text-zinc-400"></div>
+                    </div>
                 </form>
             </div>
 
@@ -1040,6 +1009,14 @@
                             <input type="text" id="passReportingTime" required class="w-full bg-darkbg border border-amber-500/80 font-bold text-amber-300 rounded-xl px-3 py-2 text-xs outline-none" value="4:00 عصراً">
                         </div>
                         <button type="submit" id="passSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow-lg">حفظ وإصدار التذكرة</button>
+
+                        <!-- سجل التواريخ والمستخدمين عند التعديل فقط -->
+                        <div id="passEditAuditBox" class="hidden bg-zinc-900/90 border border-amber-500/40 rounded-xl p-3 text-xs text-zinc-300 mt-3">
+                            <div class="font-bold text-gold mb-1.5 flex items-center gap-1.5">
+                                <i class="fa-solid fa-clock-rotate-left"></i> سجل التواريخ والمستخدمين (من الإنشاء حتى آخر تعديل):
+                            </div>
+                            <div id="passEditAuditList" class="space-y-1 text-[11px] text-zinc-400"></div>
+                        </div>
                     </form>
                 </div>
 
@@ -1170,6 +1147,14 @@
                     </div>
 
                     <button type="submit" id="cargoSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow">حفظ فاتورة الشحن والأصناف</button>
+
+                    <!-- سجل التواريخ والمستخدمين عند التعديل فقط -->
+                    <div id="cargoEditAuditBox" class="hidden bg-zinc-900/90 border border-amber-500/40 rounded-xl p-3 text-xs text-zinc-300 mt-3">
+                        <div class="font-bold text-gold mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-clock-rotate-left"></i> سجل التواريخ والمستخدمين (من الإنشاء حتى آخر تعديل):
+                        </div>
+                        <div id="cargoEditAuditList" class="space-y-1 text-[11px] text-zinc-400"></div>
+                    </div>
                 </form>
             </div>
 
@@ -1214,10 +1199,14 @@
 
                 <form id="transitForm" onsubmit="handleSaveTransit(event)" class="space-y-4">
                     <input type="hidden" id="transitEditId" value="">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <div>
                             <label class="block text-xs text-gold mb-1 font-bold">رقم الفاتورة (قابل للتعديل) *</label>
                             <input type="text" id="transitInvNo" required class="w-full bg-darkbg border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gold mb-1 font-bold">الوكيل *</label>
+                            <input type="text" id="transitAgent" required placeholder="اسم الوكيل" class="w-full bg-darkbg border border-gold rounded-xl px-3 py-2 text-xs text-zinc-100 outline-none" value="مباشر">
                         </div>
                         <div>
                             <label class="block text-xs text-gold mb-1 font-bold">الاسم الكامل *</label>
@@ -1250,6 +1239,14 @@
                     <button type="submit" id="transitSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow-lg">
                         حفظ وإنشاء فاتورة تأشيرة العبور
                     </button>
+
+                    <!-- سجل التواريخ والمستخدمين عند التعديل فقط -->
+                    <div id="transitEditAuditBox" class="hidden bg-zinc-900/90 border border-amber-500/40 rounded-xl p-3 text-xs text-zinc-300 mt-3">
+                        <div class="font-bold text-gold mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-clock-rotate-left"></i> سجل التواريخ والمستخدمين (من الإنشاء حتى آخر تعديل):
+                        </div>
+                        <div id="transitEditAuditList" class="space-y-1 text-[11px] text-zinc-400"></div>
+                    </div>
                 </form>
             </div>
 
@@ -1263,6 +1260,7 @@
                         <thead>
                             <tr>
                                 <th>رقم الفاتورة</th>
+                                <th>الوكيل</th>
                                 <th>الاسم</th>
                                 <th>رقم الجواز</th>
                                 <th>الهوية</th>
@@ -1271,6 +1269,116 @@
                                 <th>حالة السداد (اختيار مباشر)</th>
                                 <th class="no-print">منفذ الإجراء</th>
                                 <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB SALARIES & EMPLOYEES: إدارة الرواتب والموظفين -->
+        <section id="module-salaries" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- إضافة/تعديل موظف أو سائق -->
+                <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
+                    <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
+                        <h3 class="text-gold font-extrabold text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus text-gold"></i> <span id="empFormTitle">إضافة موظف أو سائق جديد</span>
+                        </h3>
+                        <button id="cancelEditEmpBtn" onclick="resetEmployeeForm()" class="hidden text-xs text-red-400 font-bold bg-red-950/40 border border-red-800 px-2.5 py-1 rounded-lg">إغلاق التعديل</button>
+                    </div>
+                    <form id="employeeForm" onsubmit="handleSaveEmployee(event)" class="space-y-3">
+                        <input type="hidden" id="empEditId" value="">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-gold mb-1 font-bold">الاسم الكامل *</label>
+                                <input type="text" id="empName" required placeholder="اسم الموظف أو السائق" class="w-full bg-darkbg border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-100 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gold mb-1 font-bold">الصفة الوظيفية ونظام الحساب *</label>
+                                <select id="empRoleType" onchange="onEmpRoleTypeChange()" class="w-full bg-darkbg border border-gold rounded-xl p-2.5 text-xs text-gold font-bold outline-none">
+                                    <option value="سائق">🚌 سائق (حساب بالرحلة)</option>
+                                    <option value="موظف">💼 موظف إداري / فرع (مرتب شهري)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label id="empBaseRateLabel" class="block text-xs text-emerald-400 mb-1 font-bold">أجر الرحلة الواحدة (درهم) *</label>
+                                <input type="number" step="any" id="empBaseRate" required value="2000" class="w-full bg-darkbg border border-emerald-500 rounded-xl p-2.5 text-xs text-emerald-300 font-bold outline-none">
+                            </div>
+                            <div>
+                                <label id="empWorkUnitsLabel" class="block text-xs text-indigo-300 mb-1 font-bold">عدد الرحلات المستحقة *</label>
+                                <input type="number" step="any" id="empWorkUnits" required value="0" class="w-full bg-darkbg border border-indigo-500 rounded-xl p-2.5 text-xs text-indigo-300 font-bold outline-none">
+                            </div>
+                        </div>
+                        <button type="submit" id="empSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-2.5 rounded-xl text-xs shadow">حفظ بيانات الموظف / السائق</button>
+
+                        <!-- سجل التواريخ والمستخدمين عند التعديل فقط -->
+                        <div id="empEditAuditBox" class="hidden bg-zinc-900/90 border border-amber-500/40 rounded-xl p-3 text-xs text-zinc-300 mt-2">
+                            <div class="font-bold text-gold mb-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-clock-rotate-left"></i> سجل التواريخ والمستخدمين:
+                            </div>
+                            <div id="empEditAuditList" class="space-y-1 text-[11px] text-zinc-400"></div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- إصدار سند سلفة -->
+                <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
+                    <h3 class="text-amber-400 font-extrabold text-sm border-b border-zinc-800 pb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-hand-holding-dollar text-amber-400"></i> إصدار سند سلفة (تُخصم تلقائياً من حساب الموظف/السائق)
+                    </h3>
+                    <form id="advanceForm" onsubmit="handleSaveAdvance(event)" class="space-y-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-gold mb-1 font-bold">اختر الموظف أو السائق *</label>
+                                <select id="advEmpSelect" required class="w-full bg-darkbg border border-gold rounded-xl p-2.5 text-xs text-gold font-bold outline-none">
+                                    <option value="">-- اختر الاسم --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-amber-400 mb-1 font-bold">مبلغ السلفة (درهم) *</label>
+                                <input type="number" step="any" id="advAmount" required min="1" placeholder="0" class="w-full bg-darkbg border border-amber-500 rounded-xl p-2.5 text-xs text-amber-300 font-bold outline-none">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-zinc-400 mb-1 font-bold">تاريخ السلفة *</label>
+                                <input type="date" id="advDate" required class="w-full bg-darkbg border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-100 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-zinc-400 mb-1 font-bold">ملاحظات السلفة</label>
+                                <input type="text" id="advNote" placeholder="تفاصيل السلفة..." class="w-full bg-darkbg border border-zinc-700 rounded-xl p-2.5 text-xs text-zinc-100 outline-none">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-black font-black py-2.5 rounded-xl text-xs shadow">
+                            <i class="fa-solid fa-file-invoice-dollar ml-1"></i> إصدار سند سلفة وخصمها تلقائياً
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- جدول كشف الرواتب والمستحقات -->
+            <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
+                <div class="p-4 border-b border-zinc-800 flex justify-between items-center flex-wrap gap-2">
+                    <span class="font-bold text-gold text-xs"><i class="fa-solid fa-money-check-dollar ml-1"></i> كشف الرواتب ومستحقات السائقين والموظفين</span>
+                    <span class="text-[11px] text-zinc-400">ملاحظة: الضغط على (استلام نقدي) يصدر سند صرف رسمي باسم المستلم ويصفر الرصيد المستحق</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="custom-table" id="employeesSalaryTable">
+                        <thead>
+                            <tr>
+                                <th>الاسم</th>
+                                <th>الصفة ونظام الحساب</th>
+                                <th>المعدل الأساسي</th>
+                                <th>الرحلات / الأشهر</th>
+                                <th>إجمالي المستحق</th>
+                                <th>السلفيات المخصومة</th>
+                                <th>صافي المتبقي للصرف</th>
+                                <th>الفرع</th>
+                                <th>الإجراءات والقبض النقدي</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -1291,7 +1399,7 @@
                     <strong id="finDriverExpSum" class="text-lg font-black text-red-400">0 AED</strong>
                 </div>
                 <div class="bg-cardbg border border-bordergold p-4 rounded-2xl shadow">
-                    <span id="lblFin3" class="text-[11px] text-zinc-400 block">سندات الصرف العامة</span>
+                    <span id="lblFin3" class="text-[11px] text-zinc-400 block">سندات الصرف العامة والرواتب</span>
                     <strong id="finExpensesSum" class="text-lg font-black text-red-400">0 AED</strong>
                 </div>
                 <div class="bg-cardbg border border-gold p-4 rounded-2xl shadow">
@@ -1411,7 +1519,7 @@
         <section id="module-users" class="tab-content hidden space-y-6">
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <h3 class="text-gold font-bold text-sm border-b border-zinc-800 pb-3 flex items-center justify-between">
-                    <span><i class="fa-solid fa-users-gear ml-1"></i> لوحة إدارة المستخدمين وصلاحيات الأفرع (مدير عام / مدير فرع)</span>
+                    <span><i class="fa-solid fa-users-gear ml-1"></i> لوحة إدارة المستخدمين وصلاحيات الأفرع (مدير عام / محاسب / مدير فرع / موظف)</span>
                 </h3>
                 
                 <form id="userForm" onsubmit="handleSaveUser(event)" class="bg-darkbg p-4 rounded-xl border border-zinc-800 space-y-3">
@@ -1428,7 +1536,8 @@
                         <div>
                             <label class="block text-xs text-zinc-400 mb-1 font-bold">الدور والصلاحية</label>
                             <select id="manageRole" class="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200 font-bold">
-                                <option value="مدير عام">👑 مدير عام (كل الأفرع)</option>
+                                <option value="مدير عام">👑 مدير عام (كل الأفرع والصلاحيات)</option>
+                                <option value="محاسب">🧮 محاسب (المالية والرواتب والسائقين)</option>
                                 <option value="مدير فرع">⭐ مدير فرع</option>
                                 <option value="موظف">👤 موظف</option>
                             </select>
@@ -1468,7 +1577,11 @@
 
     </main>
 
-    <script>
+    <!-- FIREBASE MODULAR SDK v13.2.0 & APP LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-database.js";
+
         const { jsPDF } = window.jspdf;
 
         const firebaseConfig = {
@@ -1480,9 +1593,16 @@
             messagingSenderId: "57806694102",
             appId: "1:57806694102:web:8b2f38f1b86c0240290b77"
         };
+
         let useFirebase = true;
-        try { firebase.initializeApp(firebaseConfig); } catch(e) { useFirebase = false; }
-        const rtdb = useFirebase ? firebase.database() : null;
+        let rtdb = null;
+        try {
+            const app = initializeApp(firebaseConfig);
+            rtdb = getDatabase(app);
+        } catch(e) {
+            console.warn("Firebase init fallback:", e);
+            useFirebase = false;
+        }
 
         let currentUser = JSON.parse(localStorage.getItem('WADI_BINA_USER')) || null;
         let currentLang = localStorage.getItem('WADI_BINA_LANG') || 'ar';
@@ -1506,6 +1626,7 @@
                 { id: "trip_1794143414766", date: "2026-11-11", route: "الإمارات ➔ عدن", busInfo: "باص الرحلة الأساسي (الأربعاء)", status: "مجدولة", createdBy: "وليد السيد" }
             ],
             drivers: [],
+            employees: [],
             passengers: [
                 { id: "140", tripId: "trip_1794143414766", agent: "النظام", name: "محسن فيصل احمد", phone: "0508200749", passport: "12605475", passengerCount: 1, extraPassengers: [], origin: "عجمان", destination: "عدن", date: "2026-11-11", reportingTime: "4:00 عصراً", fare: 350, payMethod: "مدفوع", branch: "فرع عجمان", createdBy: "وليد السيد", createdAt: "2026-11-11 10:00", auditLog: [{action: "إنشاء التذكرة", user: "وليد السيد", time: "2026-11-11 10:00"}] }
             ],
@@ -1529,253 +1650,6 @@
                   "createdBy": "وليد السيد",
                   "createdAt": "2026-11-11 09:00",
                   "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
-                },
-                {
-                  "id": "152",
-                  "tripId": "trip_1794143414766",
-                  "date": "2026-11-11",
-                  "sender": "سلطان",
-                  "senderPhone": "05",
-                  "senderAddress": "عجمان",
-                  "receiver": "سلطان",
-                  "receiverPhone": "05",
-                  "receiverAddress": "عدن",
-                  "items": [
-                    { "desc": "دبه لون ازرق", "qty": 10, "price": 200 },
-                    { "desc": "كرتون", "qty": 3, "price": 200 }
-                  ],
-                  "grandTotal": 2600,
-                  "paymentStatus": "الدفع باليمن",
-                  "branch": "فرع عجمان",
-                  "createdBy": "وليد السيد",
-                  "createdAt": "2026-11-11 09:00",
-                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
-                },
-                {
-                  "id": "157",
-                  "tripId": "trip_1794143414766",
-                  "date": "2026-11-11",
-                  "sender": "ام حمدان",
-                  "senderPhone": "0501184187",
-                  "senderAddress": "عجمان",
-                  "receiver": "طارق محمد راجحي",
-                  "receiverPhone": "734990780",
-                  "receiverAddress": "صنعاء",
-                  "items": [
-                    { "desc": "شنطة", "qty": 1, "price": 300 }
-                  ],
-                  "grandTotal": 300,
-                  "paymentStatus": "مدفوع",
-                  "branch": "فرع عجمان",
-                  "createdBy": "وليد السيد",
-                  "createdAt": "2026-11-11 09:00",
-                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
-                },
-                {
-                  "id": "156",
-                  "tripId": "trip_1794143414766",
-                  "date": "2026-11-11",
-                  "sender": "ام علوي",
-                  "senderPhone": "0556505151",
-                  "senderAddress": "عجمان",
-                  "receiver": "على الخضر كرده",
-                  "receiverPhone": "0",
-                  "receiverAddress": "عدن",
-                  "items": [
-                    { "desc": "سله", "qty": 2, "price": 150 },
-                    { "desc": "كرتون", "qty": 2, "price": 200 },
-                    { "desc": "سله", "qty": 6, "price": 150 },
-                    { "desc": "شنطة", "qty": 1, "price": 200 }
-                  ],
-                  "grandTotal": 1800,
-                  "paymentStatus": "أجل بالامارات",
-                  "branch": "فرع عجمان",
-                  "createdBy": "وليد السيد",
-                  "createdAt": "2026-11-11 09:00",
-                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
-                },
-                {
-                  "id": "155",
-                  "tripId": "trip_1794143414766",
-                  "date": "2026-11-11",
-                  "sender": "ام عبد الرحمن",
-                  "senderPhone": "0551970481",
-                  "senderAddress": "عجمان",
-                  "receiver": "سمير عبد الله محمد",
-                  "receiverPhone": "777287043",
-                  "receiverAddress": "عدن",
-                  "items": [
-                    { "desc": "سله", "qty": 1, "price": 500 }
-                  ],
-                  "grandTotal": 500,
-                  "paymentStatus": "مدفوع",
-                  "branch": "فرع عجمان",
-                  "createdBy": "وليد السيد",
-                  "createdAt": "2026-11-11 09:00",
-                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
-                },
-                {
-                  "id": "154",
-                  "tripId": "trip_1794143414766",
-                  "date": "2026-11-11",
-                  "sender": "ام محمد الغافية",
-                  "senderPhone": "0505691770",
-                  "senderAddress": "عجمان",
-                  "receiver": "ام حسن",
-                  "receiverPhone": "776303718",
-                  "receiverAddress": "القيضة",
-                  "items": [
-                    { "desc": "كرتون", "qty": 1, "price": 100 },
-                    { "desc": "سلال", "qty": 2, "price": 100 }
-                  ],
-                  "grandTotal": 300,
-                  "paymentStatus": "الدفع باليمن",
-                  "branch": "فرع عجمان",
-                  "createdBy": "وليد السيد",
-                  "createdAt": "2026-11-11 09:00",
-                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
-                },
-                {
-                  "id": "153",
-                  "tripId": "trip_1794143414766",
-                  "date": "2026-11-11",
-                  "sender": "مجموعة السعدي",
-                  "senderPhone": "00",
-                  "senderAddress": "عجمان",
-                  "receiver": "عبد المجيد السعدي",
-                  "receiverPhone": "05",
-                  "receiverAddress": "عدن",
-                  "items": [
-                    { "desc": "كراتين", "qty": 7, "price": 75 },
-                    { "desc": "كيس", "qty": 1, "price": 75 }
-                  ],
-                  "grandTotal": 600,
-                  "paymentStatus": "أجل بالامارات",
-                  "branch": "فرع عجمان",
-                  "createdBy": "وليد السيد",
-                  "createdAt": "2026-11-11 09:00",
-                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
-                },
-                {
-                  "id": "143",
-                  "tripId": "trip_1794143414766",
-                  "date": "2026-11-11",
-                  "sender": "عبدالرحمن السعدي",
-                  "senderPhone": "0552281154",
-                  "senderAddress": "عجمان",
-                  "receiver": "ابراهيم اليافعي",
-                  "receiverPhone": "0779432685",
-                  "receiverAddress": "عدن",
-                  "items": [
-                    { "desc": "رز", "qty": 2, "price": 100 },
-                    { "desc": "شنطه", "qty": 1, "price": 150 }
-                  ],
-                  "grandTotal": 350,
-                  "paymentStatus": "مدفوع",
-                  "branch": "فرع عجمان",
-                  "createdBy": "وليد السيد",
-                  "createdAt": "2026-11-11 09:00",
-                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
-                },
-                {
-                  "id": "148",
-                  "tripId": "trip_1794143414766",
-                  "date": "2026-11-11",
-                  "sender": "علي صالح السعدي",
-                  "senderPhone": "0529007994",
-                  "senderAddress": "عجمان",
-                  "receiver": "صلاح محسن عوض حسن",
-                  "receiverPhone": "770154369",
-                  "receiverAddress": "عدن",
-                  "items": [
-                    { "desc": "كرتون حفاظات", "qty": 1, "price": 80 }
-                  ],
-                  "grandTotal": 80,
-                  "paymentStatus": "مدفوع",
-                  "branch": "فرع عجمان",
-                  "createdBy": "وليد السيد",
-                  "createdAt": "2026-11-11 09:00",
-                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
-                },
-                {
-                  "id": "147",
-                  "tripId": "trip_1794143414766",
-                  "date": "2026-11-11",
-                  "sender": "ام هشام",
-                  "senderPhone": "0552323928",
-                  "senderAddress": "عجمان",
-                  "receiver": "محمد احمد يحي",
-                  "receiverPhone": "774635987",
-                  "receiverAddress": "عدن",
-                  "items": [
-                    { "desc": "شنطتين", "qty": 2, "price": 100 }
-                  ],
-                  "grandTotal": 200,
-                  "paymentStatus": "مدفوع",
-                  "branch": "فرع عجمان",
-                  "createdBy": "وليد السيد",
-                  "createdAt": "2026-11-11 09:00",
-                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "وليد السيد", "time": "2026-11-11 09:00" }]
-                },
-                {
-                  "id": "146",
-                  "tripId": "trip_1794143414766",
-                  "date": "2026-11-11",
-                  "sender": "ام سالم",
-                  "senderPhone": "0508916896",
-                  "senderAddress": "عجمان",
-                  "receiver": "حسن عمر سالم",
-                  "receiverPhone": "737372415",
-                  "receiverAddress": "المكلا",
-                  "items": [
-                    { "desc": "كرتون به مواد غذائية", "qty": 1, "price": 150 }
-                  ],
-                  "grandTotal": 150,
-                  "paymentStatus": "مدفوع",
-                  "branch": "فرع عجمان",
-                  "createdBy": "النظام",
-                  "createdAt": "2026-11-11 09:00",
-                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "النظام", "time": "2026-11-11 09:00" }]
-                },
-                {
-                  "id": "145",
-                  "tripId": "trip_1794143414766",
-                  "date": "2026-11-11",
-                  "sender": "هاني يحي احمد الواحدي",
-                  "senderPhone": "770770860",
-                  "senderAddress": "عجمان",
-                  "receiver": "هاني يحي احمد الواحدي",
-                  "receiverPhone": "770770860",
-                  "receiverAddress": "عدن",
-                  "items": [
-                    { "desc": "اجهزة رطوبة", "qty": 6, "price": 150 }
-                  ],
-                  "grandTotal": 900,
-                  "paymentStatus": "الدفع باليمن",
-                  "branch": "فرع عجمان",
-                  "createdBy": "النظام",
-                  "createdAt": "2026-11-11 09:00",
-                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "النظام", "time": "2026-11-11 09:00" }]
-                },
-                {
-                  "id": "144",
-                  "tripId": "trip_1794143414766",
-                  "date": "2026-11-11",
-                  "sender": "عبد الله الضالعي ابو شريف",
-                  "senderPhone": "0509988474",
-                  "senderAddress": "عجمان",
-                  "receiver": "وكالة الحاج صالح",
-                  "receiverPhone": "770034038",
-                  "receiverAddress": "عدن",
-                  "items": [
-                    { "desc": "كيس", "qty": 1, "price": 50 }
-                  ],
-                  "grandTotal": 50,
-                  "paymentStatus": "مدفوع",
-                  "branch": "فرع عجمان",
-                  "createdBy": "النظام",
-                  "createdAt": "2026-11-11 09:00",
-                  "auditLog": [{ "action": "إنشاء الفاتورة", "user": "النظام", "time": "2026-11-11 09:00" }]
                 }
             ],
             vouchers: [],
@@ -1794,7 +1668,7 @@
                 lgTitle: 'تسجيل الدخول للنظام الموحد',
                 lgSub: 'أدخل بيانات الحساب المعتمدة للوصول للوحة التحكم',
                 lgUserLbl: 'اسم المستخدم', lgPassLbl: 'كلمة المرور', lgBtn: 'دخول النظام',
-                headTitle: 'شركة وادي بناء للنقل الدولي', headSub: 'النظام الموحد الشامل',
+                headTitle: 'شركة وادي بناء للنقل الدولي', headSub: 'النظام الموحد الشامل (Firebase v13.2.0)',
                 btnBackup: 'نسخة JSON', btnBackupPDF: 'نسخة احتياطية PDF', btnRestore: 'استرجاع JSON', btnRestorePDF: 'استعادة من PDF', btnLogout: 'خروج',
                 tDashboard: 'لوحة التحكم', tPassengers: 'التذاكر والركاب', tCargo: 'فواتير الشحن', tFin: 'الإدارة المالية',
                 searchPh: 'بحث ذكي: رقم البوليصة، اسم العميل، أو الصنف...', btnResetSearch: 'إلغاء',
@@ -1807,7 +1681,7 @@
                 lgTitle: 'Unified System Login',
                 lgSub: 'Enter approved credentials to access the control panel',
                 lgUserLbl: 'Username', lgPassLbl: 'Password', lgBtn: 'Login',
-                headTitle: 'Wadi Bina Overland Transport', headSub: 'Comprehensive Unified System',
+                headTitle: 'Wadi Bina Overland Transport', headSub: 'Comprehensive Unified System (Firebase v13.2.0)',
                 btnBackup: 'JSON Backup', btnBackupPDF: 'PDF Backup', btnRestore: 'Restore JSON', btnRestorePDF: 'Restore PDF', btnLogout: 'Logout',
                 tDashboard: 'Dashboard', tPassengers: 'Tickets & Passengers', tCargo: 'Cargo Invoices', tFin: 'Financial Management',
                 searchPh: 'Smart search: Policy No, Client name, Item...', btnResetSearch: 'Reset',
@@ -1815,6 +1689,11 @@
                 lblChart1: 'Revenue vs Expenses Comparison', lblChart2: 'Invoices & Tickets Payment Status Ratio'
             }
         };
+
+        function isAdminOrAccountant() {
+            if (!currentUser) return false;
+            return currentUser.role === 'مدير عام' || currentUser.role === 'محاسب';
+        }
 
         function getCurrentUserName() {
             return currentUser ? currentUser.username : 'النظام';
@@ -1828,6 +1707,19 @@
             const hh = String(now.getHours()).padStart(2, '0');
             const min = String(now.getMinutes()).padStart(2, '0');
             return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+        }
+
+        function renderAuditLogIntoBox(auditLog, createdBy, createdAt, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            if (auditLog && auditLog.length > 0) {
+                auditLog.forEach(log => {
+                    container.innerHTML += `<div>• <strong>${log.action}</strong> بواسطة (<span class="text-gold">${log.user}</span>) في تاريخ ووقت: <span class="text-amber-300 font-bold">${log.time}</span></div>`;
+                });
+            } else {
+                container.innerHTML = `<div>• تم الإنشاء بواسطة (<span class="text-gold">${createdBy || 'النظام'}</span>) في ${createdAt || 'غير محدد'}</div>`;
+            }
         }
 
         function formatPhoneForWhatsApp(phoneStr) {
@@ -1847,11 +1739,7 @@
             if(!currentPreviewTicket) return;
             const tkt = currentPreviewTicket;
             const targetPhone = formatPhoneForWhatsApp(tkt.phone);
-
-            if(!targetPhone) {
-                alert('عذراً، رقم هاتف الراكب غير مسجل أو غير صحيح!');
-                return;
-            }
+            if(!targetPhone) { alert('عذراً، رقم هاتف الراكب غير مسجل أو غير صحيح!'); return; }
 
             const msgText = `🌟 *شركة وادي بناء للنقل الدولي* 🌟\n` +
                             `مرحباً بك أستاذ/ة *${tkt.name}* 👋🏼\n\n` +
@@ -1877,11 +1765,7 @@
             if(!currentPreviewCargo) return;
             const cargo = currentPreviewCargo;
             const targetPhone = formatPhoneForWhatsApp(cargo.senderPhone);
-
-            if(!targetPhone) {
-                alert('عذراً، رقم هاتف المرسل غير مسجل أو غير صحيح!');
-                return;
-            }
+            if(!targetPhone) { alert('عذراً، رقم هاتف المرسل غير مسجل أو غير صحيح!'); return; }
 
             let itemsSummary = "";
             if (cargo.items && cargo.items.length > 0) {
@@ -1982,12 +1866,27 @@
                 document.getElementById('userInfoBadge').innerText = `${currentUser.username} (${currentUser.role} - ${currentUser.branch || 'فرع عجمان'})`;
                 document.getElementById('loginOverlay').style.display = 'none';
                 
-                if(currentUser.role === 'مدير عام' || currentUser.role === 'مدير' || currentUser.role === 'مدير فرع') {
-                    document.getElementById('tab-users').classList.remove('hidden');
+                const privileged = isAdminOrAccountant();
+                const restrictedTabs = ['tab-drivers', 'tab-financials', 'tab-salaries', 'tab-users'];
+                
+                restrictedTabs.forEach(tId => {
+                    const el = document.getElementById(tId);
+                    if (el) {
+                        if (privileged) el.classList.remove('hidden');
+                        else el.classList.add('hidden');
+                    }
+                });
+
+                if (privileged || currentUser.role === 'مدير' || currentUser.role === 'مدير فرع') {
                     document.getElementById('managerBranchFilterContainer').classList.remove('hidden');
                 } else {
-                    document.getElementById('tab-users').classList.add('hidden');
                     document.getElementById('managerBranchFilterContainer').classList.add('hidden');
+                }
+
+                // إذا كان المستخدم الحالي في تبويب محظور عليه، أعده للوحة التحكم
+                const restrictedModules = ['drivers', 'financials', 'salaries', 'users'];
+                if (!privileged && restrictedModules.includes(currentTab)) {
+                    switchTab('dashboard');
                 }
             } else { 
                 document.getElementById('loginOverlay').style.display = 'flex'; 
@@ -2016,7 +1915,7 @@
             currentUser.password = newPass;
             localStorage.setItem('WADI_BINA_USER', JSON.stringify(currentUser));
             
-            if(useFirebase && rtdb) { rtdb.ref('systemUsers').set(users); }
+            if(useFirebase && rtdb) { set(ref(rtdb, 'systemUsers'), users); }
             alert('تم تغيير كلمة المرور بنجاح!');
             closeModal('changePassModal');
         }
@@ -2056,10 +1955,10 @@
             }
 
             const tktInput = document.getElementById('passTicketNo');
-            if(tktInput) tktInput.value = db.nextTicketNo;
+            if(tktInput && !document.getElementById('passEditId').value) tktInput.value = db.nextTicketNo;
 
             const cargoInput = document.getElementById('cargoInvNo');
-            if(cargoInput) cargoInput.value = db.nextCargoNo;
+            if(cargoInput && !document.getElementById('cargoEditId').value) cargoInput.value = db.nextCargoNo;
 
             if(db.transitVisas && db.transitVisas.length > 0) {
                 let maxTransit = 0;
@@ -2085,6 +1984,7 @@
             let fixed = false;
             if(!db.trips || !Array.isArray(db.trips)) { db.trips = []; fixed = true; }
             if(!db.drivers || !Array.isArray(db.drivers)) { db.drivers = []; fixed = true; }
+            if(!db.employees || !Array.isArray(db.employees)) { db.employees = []; fixed = true; }
             if(!db.passengers || !Array.isArray(db.passengers)) { db.passengers = []; fixed = true; }
             if(!db.cargo || !Array.isArray(db.cargo)) { db.cargo = []; fixed = true; }
             if(!db.vouchers || !Array.isArray(db.vouchers)) { db.vouchers = []; fixed = true; }
@@ -2118,18 +2018,22 @@
         function initSync() {
             if(!useFirebase || !rtdb) { loadFromLocal(); return; }
             
-            rtdb.ref('systemUsers').on('value', (snapshot) => {
+            onValue(ref(rtdb, 'systemUsers'), (snapshot) => {
                 const val = snapshot.val();
-                if(val) { localStorage.setItem('WADI_BINA_USERS', JSON.stringify(Object.values(val))); } 
-                else { rtdb.ref('systemUsers').set(DEFAULT_USERS); }
+                if(val) {
+                    localStorage.setItem('WADI_BINA_USERS', JSON.stringify(Object.values(val)));
+                } else {
+                    set(ref(rtdb, 'systemUsers'), DEFAULT_USERS);
+                }
             });
 
-            rtdb.ref('systemUnifiedData').on('value', (snapshot) => {
+            onValue(ref(rtdb, 'systemUnifiedData'), (snapshot) => {
                 const val = snapshot.val();
                 if(val) {
                     db = {
                         trips: val.trips ? Object.values(val.trips) : db.trips,
                         drivers: val.drivers ? Object.values(val.drivers) : db.drivers,
+                        employees: val.employees ? Object.values(val.employees) : (db.employees || []),
                         passengers: val.passengers ? Object.values(val.passengers) : db.passengers,
                         cargo: val.cargo ? Object.values(val.cargo) : db.cargo,
                         vouchers: val.vouchers ? Object.values(val.vouchers) : [],
@@ -2142,9 +2046,12 @@
                     };
                     validateAndRepairDB();
                     localStorage.setItem('WADI_BINA_UNIFIED_DB', JSON.stringify(db));
-                } else { saveDB(); }
+                } else {
+                    saveDB();
+                }
                 refreshUI();
             }, (error) => {
+                console.error("Firebase Sync Error:", error);
                 loadFromLocal();
             });
         }
@@ -2161,7 +2068,7 @@
             calculateNextSequenceNumbers();
             localStorage.setItem('WADI_BINA_UNIFIED_DB', JSON.stringify(db));
             if(useFirebase && rtdb && navigator.onLine) {
-                rtdb.ref('systemUnifiedData').set(db).catch(err => {});
+                set(ref(rtdb, 'systemUnifiedData'), db).catch(err => console.warn("Sync save error:", err));
             }
         }
 
@@ -2169,10 +2076,12 @@
             loadFromLocal();
             updateUserBadge();
             applyLanguage();
-            document.getElementById('passDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('drvDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('vDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('debtInvDate').value = new Date().toISOString().split('T')[0];
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.getElementById('passDate').value = todayStr;
+            document.getElementById('drvDate').value = todayStr;
+            document.getElementById('vDate').value = todayStr;
+            document.getElementById('debtInvDate').value = todayStr;
+            document.getElementById('advDate').value = todayStr;
             onPassengerCountChanged();
             updateReportingTimeAutomatically();
             addCargoItemRow();
@@ -2182,6 +2091,11 @@
         };
 
         function switchTab(tabId) {
+            const restrictedModules = ['drivers', 'financials', 'salaries', 'users'];
+            if (restrictedModules.includes(tabId) && !isAdminOrAccountant()) {
+                alert('عذراً، هذا القسم مخصص للمدير العام والمحاسب فقط!');
+                return;
+            }
             currentTab = tabId;
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(`module-${tabId}`).classList.remove('hidden');
@@ -2206,6 +2120,8 @@
             renderDashboardData();
             renderTripsTable();
             renderDriversTable();
+            renderEmployeesSalaryTable();
+            populateAdvanceEmployeesDropdown();
             renderFinancialLog();
             renderTransitTable();
             populateTripsDropdown();
@@ -2214,7 +2130,7 @@
                 renderVouchersTable();
                 renderDebtInvoicesTable();
             }
-            if(currentTab === 'users' && currentUser && (currentUser.role === 'مدير عام' || currentUser.role === 'مدير' || currentUser.role === 'مدير فرع')) {
+            if(currentTab === 'users' && isAdminOrAccountant()) {
                 renderUsersTable();
             }
         }
@@ -2224,7 +2140,7 @@
 
         function getFilteredData(list) {
             if(!currentUser) return list;
-            if(currentUser.role !== 'مدير عام' && currentUser.role !== 'مدير') {
+            if(!isAdminOrAccountant() && currentUser.role !== 'مدير') {
                 return list.filter(item => item.branch === (currentUser.branch || 'فرع عجمان'));
             }
             const branchSelect = document.getElementById('selectedManagerBranch');
@@ -2291,6 +2207,249 @@
             }
         }
 
+        // ================= إدارة الرواتب والموظفين والسلفيات =================
+        function onEmpRoleTypeChange() {
+            const roleType = document.getElementById('empRoleType').value;
+            const rateLbl = document.getElementById('empBaseRateLabel');
+            const unitsLbl = document.getElementById('empWorkUnitsLabel');
+            const rateInput = document.getElementById('empBaseRate');
+
+            if (roleType === 'سائق') {
+                rateLbl.innerText = 'أجر الرحلة الواحدة (درهم) *';
+                unitsLbl.innerText = 'عدد الرحلات المستحقة *';
+                if (!document.getElementById('empEditId').value) rateInput.value = 2000;
+            } else {
+                rateLbl.innerText = 'المرتب الشهري الأساسي (درهم) *';
+                unitsLbl.innerText = 'عدد الأشهر المستحقة *';
+                if (!document.getElementById('empEditId').value) rateInput.value = 3000;
+            }
+        }
+
+        function handleSaveEmployee(e) {
+            e.preventDefault();
+            if (!db.employees) db.employees = [];
+            const editId = document.getElementById('empEditId').value;
+            const name = document.getElementById('empName').value.trim();
+            const roleType = document.getElementById('empRoleType').value;
+            const baseRate = parseFloat(document.getElementById('empBaseRate').value) || 0;
+            const workUnits = parseFloat(document.getElementById('empWorkUnits').value) || 0;
+            const nowStr = getFormattedDateTime();
+            const author = getCurrentUserName();
+
+            if (editId) {
+                const idx = db.employees.findIndex(x => x.id === editId);
+                if (idx !== -1) {
+                    let emp = db.employees[idx];
+                    emp.name = name;
+                    emp.roleType = roleType;
+                    emp.baseRate = baseRate;
+                    emp.workUnits = workUnits;
+                    if (!emp.auditLog) emp.auditLog = [{action: 'إنشاء السجل', user: emp.createdBy || author, time: emp.createdAt || nowStr}];
+                    emp.auditLog.push({action: 'تعديل بيانات الموظف/السائق', user: author, time: nowStr});
+                }
+                alert('تم تحديث بيانات الموظف / السائق بنجاح!');
+                resetEmployeeForm();
+            } else {
+                const newEmp = {
+                    id: 'emp_' + Date.now(),
+                    name: name,
+                    roleType: roleType,
+                    baseRate: baseRate,
+                    workUnits: workUnits,
+                    advances: 0,
+                    branch: currentUser ? (currentUser.branch || 'فرع عجمان') : 'فرع عجمان',
+                    createdBy: author,
+                    createdAt: nowStr,
+                    auditLog: [{action: 'إضافة موظف/سائق', user: author, time: nowStr}]
+                };
+                db.employees.unshift(newEmp);
+                alert('تم إضافة الموظف / السائق بنجاح!');
+                resetEmployeeForm();
+            }
+            saveDB();
+            refreshUI();
+        }
+
+        function editEmployee(id) {
+            const emp = (db.employees || []).find(x => x.id === id);
+            if (!emp) return;
+            document.getElementById('empEditId').value = emp.id;
+            document.getElementById('empName').value = emp.name;
+            document.getElementById('empRoleType').value = emp.roleType;
+            onEmpRoleTypeChange();
+            document.getElementById('empBaseRate').value = emp.baseRate;
+            document.getElementById('empWorkUnits').value = emp.workUnits;
+
+            document.getElementById('empFormTitle').innerText = `تعديل بيانات: ${emp.name}`;
+            document.getElementById('empSubmitBtn').innerText = 'حفظ التعديلات';
+            document.getElementById('cancelEditEmpBtn').classList.remove('hidden');
+
+            document.getElementById('empEditAuditBox').classList.remove('hidden');
+            renderAuditLogIntoBox(emp.auditLog, emp.createdBy, emp.createdAt, 'empEditAuditList');
+        }
+
+        function resetEmployeeForm() {
+            document.getElementById('employeeForm').reset();
+            document.getElementById('empEditId').value = '';
+            onEmpRoleTypeChange();
+            document.getElementById('empFormTitle').innerText = 'إضافة موظف أو سائق جديد';
+            document.getElementById('empSubmitBtn').innerText = 'حفظ بيانات الموظف / السائق';
+            document.getElementById('cancelEditEmpBtn').classList.add('hidden');
+            document.getElementById('empEditAuditBox').classList.add('hidden');
+        }
+
+        function deleteEmployee(idx) {
+            db.employees.splice(idx, 1);
+            saveDB();
+            refreshUI();
+        }
+
+        function populateAdvanceEmployeesDropdown() {
+            const sel = document.getElementById('advEmpSelect');
+            if (!sel) return;
+            const currentVal = sel.value;
+            sel.innerHTML = '<option value="">-- اختر الموظف أو السائق --</option>';
+            const list = getFilteredData(db.employees || []);
+            list.forEach(emp => {
+                const opt = document.createElement('option');
+                opt.value = emp.id;
+                opt.textContent = `${emp.name} (${emp.roleType})`;
+                sel.appendChild(opt);
+            });
+            if (currentVal) sel.value = currentVal;
+        }
+
+        function handleSaveAdvance(e) {
+            e.preventDefault();
+            const empId = document.getElementById('advEmpSelect').value;
+            const amount = parseFloat(document.getElementById('advAmount').value) || 0;
+            const date = document.getElementById('advDate').value || new Date().toISOString().split('T')[0];
+            const note = document.getElementById('advNote').value.trim();
+
+            if (!empId || amount <= 0) {
+                alert('يرجى اختيار الموظف/السائق وإدخال مبلغ سلفة صحيح!');
+                return;
+            }
+
+            const idx = (db.employees || []).findIndex(x => x.id === empId);
+            if (idx === -1) return;
+
+            const emp = db.employees[idx];
+            emp.advances = (emp.advances || 0) + amount;
+
+            const nowStr = getFormattedDateTime();
+            const author = getCurrentUserName();
+            if (!emp.auditLog) emp.auditLog = [];
+            emp.auditLog.push({action: `صرف سلفة بقيمة ${amount} AED`, user: author, time: nowStr});
+
+            // تسجيل سند صرف تلقائي بالسلفة في المالية
+            const voucher = {
+                id: Date.now().toString(),
+                type: 'صرف',
+                date: date,
+                amount: amount,
+                receiver: emp.name,
+                desc: `سند سلفة (${emp.roleType}) ${note ? '- ' + note : ''}`,
+                user: author,
+                createdBy: author,
+                branch: emp.branch || (currentUser ? currentUser.branch : 'فرع عجمان')
+            };
+            db.vouchers.unshift(voucher);
+
+            saveDB();
+            document.getElementById('advanceForm').reset();
+            document.getElementById('advDate').value = new Date().toISOString().split('T')[0];
+            refreshUI();
+            alert(`تم إصدار سند سلفة بقيمة ${amount} AED باسم (${emp.name}) وتم خصمها من حسابه تلقائياً!`);
+        }
+
+        function handleCashReceiptForEmployee(empId) {
+            const idx = (db.employees || []).findIndex(x => x.id === empId);
+            if (idx === -1) return;
+
+            const emp = db.employees[idx];
+            const gross = (emp.baseRate || 0) * (emp.workUnits || 0);
+            const advances = emp.advances || 0;
+            const netPayable = gross - advances;
+
+            if (netPayable <= 0) {
+                alert(`لا يوجد رصيد موجب مستحق للصرف لـ (${emp.name}). الصافي الحالي: ${netPayable} AED`);
+                return;
+            }
+
+            if (!confirm(`تأكيد استلام نقدي:\nسيتم تسجيل سند صرف رسمي بقيمة (${netPayable} AED) باسم (${emp.name}) وتصفير رصيد المستحقات والسلفيات. هل تريد المتابعة؟`)) {
+                return;
+            }
+
+            const nowStr = getFormattedDateTime();
+            const todayStr = new Date().toISOString().split('T')[0];
+            const author = getCurrentUserName();
+
+            const voucher = {
+                id: Date.now().toString(),
+                type: 'صرف',
+                date: todayStr,
+                amount: netPayable,
+                receiver: emp.name,
+                desc: emp.roleType === 'سائق'
+                    ? `استلام نقدي مستحقات رحلات السائق (${emp.workUnits} رحلات بعد خصم سلف ${advances} AED)`
+                    : `استلام نقدي راتب شهري للموظف (${emp.workUnits} شهر بعد خصم سلف ${advances} AED)`,
+                user: author,
+                createdBy: author,
+                branch: emp.branch || (currentUser ? currentUser.branch : 'فرع عجمان')
+            };
+            db.vouchers.unshift(voucher);
+
+            // تصفير الوحدات المستحقة والسلفيات المخصومة بعد القبض النقدي
+            emp.workUnits = 0;
+            emp.advances = 0;
+            if (!emp.auditLog) emp.auditLog = [];
+            emp.auditLog.push({action: `استلام نقدي وتسجيل سند صرف بقيمة ${netPayable} AED`, user: author, time: nowStr});
+
+            saveDB();
+            refreshUI();
+            alert(`تم تسجيل سند صرف رسمي باسم (${emp.name}) بمبلغ ${netPayable} AED وتصفية حسابه بنجاح!`);
+        }
+
+        function renderEmployeesSalaryTable() {
+            const tbody = document.querySelector('#employeesSalaryTable tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const list = getFilteredData(db.employees || []);
+            list.forEach(emp => {
+                const realIdx = db.employees.findIndex(x => x.id === emp.id);
+                const gross = (emp.baseRate || 0) * (emp.workUnits || 0);
+                const advances = emp.advances || 0;
+                const net = gross - advances;
+
+                const roleBadge = emp.roleType === 'سائق'
+                    ? `<span class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded text-xs font-bold">🚌 سائق (بالرحلة)</span>`
+                    : `<span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">💼 موظف (شهري)</span>`;
+
+                const unitText = emp.roleType === 'سائق' ? `${emp.workUnits} رحلة` : `${emp.workUnits} شهر`;
+
+                tbody.insertRow().innerHTML = `
+                    <td><strong>${emp.name}</strong></td>
+                    <td>${roleBadge}</td>
+                    <td>${emp.baseRate} AED</td>
+                    <td class="font-bold text-indigo-300">${unitText}</td>
+                    <td class="font-bold text-zinc-200">${gross} AED</td>
+                    <td class="font-bold text-red-400">-${advances} AED</td>
+                    <td class="font-black ${net >= 0 ? 'text-emerald-400' : 'text-red-500'}">${net} AED</td>
+                    <td><span class="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-xs">${emp.branch || 'فرع عجمان'}</span></td>
+                    <td class="space-x-1 space-x-reverse">
+                        <button onclick="handleCashReceiptForEmployee('${emp.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded text-xs font-bold shadow">
+                            <i class="fa-solid fa-money-bill-wave ml-1"></i> استلام نقدي
+                        </button>
+                        <button onclick="editEmployee('${emp.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteEmployee(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+            });
+        }
+
+        // ================= حسابات السائقين =================
         function buildDriverItemsRows(existingItems = null) {
             const container = document.getElementById('driverItemsRowsContainer');
             if(!container) return;
@@ -2464,7 +2623,6 @@
             document.getElementById('prDriverBus').innerText = d.busNo;
             document.getElementById('prDriverName').innerText = d.driverName;
             document.getElementById('prDriverDate').innerText = d.date;
-            document.getElementById('prDriverCreatedBy').innerText = d.createdBy || 'النظام';
             document.getElementById('prDriverTotalExp').innerText = `${d.totalExpenses || 0} AED`;
             document.getElementById('prDriverTripDue').innerText = `${d.tripDue} AED`;
             document.getElementById('prDriverRemaining').innerText = `${d.remaining} AED`;
@@ -2490,16 +2648,6 @@
             if(prTotalRohaEl) prTotalRohaEl.innerText = sumRoha;
             if(prTotalRajahEl) prTotalRajahEl.innerText = sumRajah;
 
-            const auditContainer = document.getElementById('driverAuditLogContent');
-            auditContainer.innerHTML = '';
-            if(d.auditLog && d.auditLog.length > 0) {
-                d.auditLog.forEach(log => {
-                    auditContainer.innerHTML += `<div>• <strong>${log.action}</strong> بواسطة (${log.user}) في تاريخ ووقت: <span class="text-amber-800 font-bold">${log.time}</span></div>`;
-                });
-            } else {
-                auditContainer.innerHTML = `<div>• تم الإنشاء بواسطة (${d.createdBy || 'النظام'}) في ${d.createdAt || 'غير محدد'}</div>`;
-            }
-
             document.getElementById('driverAccountModal').classList.remove('hidden');
         }
 
@@ -2517,6 +2665,10 @@
 
             document.getElementById('drvSubmitBtn').innerText = 'حفظ تعديلات حساب السائق';
             document.getElementById('cancelEditDriverBtn').classList.remove('hidden');
+            
+            document.getElementById('driverEditAuditBox').classList.remove('hidden');
+            renderAuditLogIntoBox(d.auditLog, d.createdBy, d.createdAt, 'driverEditAuditList');
+
             switchTab('drivers');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -2528,6 +2680,7 @@
             buildDriverItemsRows();
             document.getElementById('drvSubmitBtn').innerText = 'حفظ وتصديق حساب السائق وترحيل المصروفات للصندوق';
             document.getElementById('cancelEditDriverBtn').classList.add('hidden');
+            document.getElementById('driverEditAuditBox').classList.add('hidden');
         }
 
         function deleteDriverAccount(idx) {
@@ -2983,6 +3136,10 @@
             document.getElementById('passFormTitle').innerText = `تعديل التذكرة #${item.id}`;
             document.getElementById('passSubmitBtn').innerText = 'حفظ التعديلات';
             document.getElementById('cancelEditPassBtn').classList.remove('hidden');
+
+            document.getElementById('passEditAuditBox').classList.remove('hidden');
+            renderAuditLogIntoBox(item.auditLog, item.createdBy, item.createdAt, 'passEditAuditList');
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -2994,6 +3151,7 @@
             document.getElementById('passFormTitle').innerText = 'إصدار تذكرة سفر جديدة';
             document.getElementById('passSubmitBtn').innerText = 'حفظ وإصدار التذكرة';
             document.getElementById('cancelEditPassBtn').classList.add('hidden');
+            document.getElementById('passEditAuditBox').classList.add('hidden');
             onPassengerCountChanged();
             updateReportingTimeAutomatically();
         }
@@ -3104,6 +3262,10 @@
             document.getElementById('cargoFormTitle').innerText = `تعديل فاتورة الشحن #${item.id}`;
             document.getElementById('cargoSubmitBtn').innerText = 'حفظ التعديلات';
             document.getElementById('cancelEditCargoBtn').classList.remove('hidden');
+
+            document.getElementById('cargoEditAuditBox').classList.remove('hidden');
+            renderAuditLogIntoBox(item.auditLog, item.createdBy, item.createdAt, 'cargoEditAuditList');
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -3117,6 +3279,7 @@
             document.getElementById('cargoFormTitle').innerText = 'فاتورة أمتعة وبضائع (بأرقام كسرية دقيقة للأسعار)';
             document.getElementById('cargoSubmitBtn').innerText = 'حفظ فاتورة الشحن والأصناف';
             document.getElementById('cancelEditCargoBtn').classList.add('hidden');
+            document.getElementById('cargoEditAuditBox').classList.add('hidden');
         }
 
         function handleSaveDebtInvoice(e) {
@@ -3178,6 +3341,8 @@
                 let roleBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-zinc-800 text-zinc-300">${u.role}</span>`;
                 if(u.role === 'مدير عام') {
                     roleBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold gold-gradient-bg text-black shadow"><i class="fa-solid fa-crown ml-1"></i>مدير عام (جميع الأفرع)</span>`;
+                } else if(u.role === 'محاسب') {
+                    roleBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-950 border border-emerald-500 text-emerald-300"><i class="fa-solid fa-calculator ml-1"></i>محاسب</span>`;
                 } else if(u.role === 'مدير' || u.role === 'مدير فرع') {
                     roleBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-950 border border-gold text-gold"><i class="fa-solid fa-star ml-1"></i>مدير فرع</span>`;
                 }
@@ -3216,7 +3381,7 @@
             }
 
             localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
-            if(useFirebase && rtdb) { rtdb.ref('systemUsers').set(users); }
+            if(useFirebase && rtdb) { set(ref(rtdb, 'systemUsers'), users); }
             resetUserForm();
             renderUsersTable();
         }
@@ -3245,7 +3410,7 @@
             if(users.length <= 1) { alert('لا يمكن حذف جميع المستخدمين!'); return; }
             users.splice(idx, 1);
             localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
-            if(useFirebase && rtdb) { rtdb.ref('systemUsers').set(users); }
+            if(useFirebase && rtdb) { set(ref(rtdb, 'systemUsers'), users); }
             renderUsersTable();
         }
 
@@ -3357,7 +3522,6 @@
             document.getElementById('imgTktTime').innerText = item.reportingTime;
             document.getElementById('imgTktFare').innerText = `${item.fare} AED`;
             document.getElementById('imgTktPayStatus').innerText = item.payMethod;
-            document.getElementById('imgTktCreatedBy').innerText = item.createdBy || 'النظام';
 
             try {
                 JsBarcode("#ticketBarcode", String(item.id), {
@@ -3380,16 +3544,6 @@
                 extraBox.innerHTML = html;
             }
 
-            const auditContainer = document.getElementById('ticketAuditLogContent');
-            auditContainer.innerHTML = '';
-            if(item.auditLog && item.auditLog.length > 0) {
-                item.auditLog.forEach(log => {
-                    auditContainer.innerHTML += `<div>• <strong>${log.action}</strong> بواسطة (${log.user}) في تاريخ ووقت: <span class="text-amber-900 font-bold">${log.time}</span></div>`;
-                });
-            } else {
-                auditContainer.innerHTML = `<div>• تم الإنشاء بواسطة (${item.createdBy || 'النظام'}) في ${item.createdAt || 'غير محدد'}</div>`;
-            }
-
             document.getElementById('ticketPreviewModal').classList.remove('hidden');
         }
 
@@ -3406,7 +3560,6 @@
             document.getElementById('imgCargoReceiverPhone').innerText = item.receiverPhone;
             document.getElementById('imgCargoReceiverAddress').innerText = item.receiverAddress || 'عدن';
             document.getElementById('imgCargoPayStatus').innerText = item.paymentStatus;
-            document.getElementById('imgCargoCreatedBy').innerText = item.createdBy || 'النظام';
 
             const linkedTrip = db.trips.find(t => t.id === item.tripId);
             document.getElementById('imgCargoTripInfo').innerText = linkedTrip ? `${linkedTrip.date} (${linkedTrip.route} - ${linkedTrip.busInfo})` : 'غير مرتبطة برحلة';
@@ -3426,17 +3579,6 @@
             });
 
             document.getElementById('imgCargoGrandTotal').innerText = `AED ${item.grandTotal}`;
-
-            const auditContainer = document.getElementById('cargoAuditLogContent');
-            auditContainer.innerHTML = '';
-            if(item.auditLog && item.auditLog.length > 0) {
-                item.auditLog.forEach(log => {
-                    auditContainer.innerHTML += `<div>• <strong>${log.action}</strong> بواسطة (${log.user}) في تاريخ ووقت: <span class="text-indigo-900 font-bold">${log.time}</span></div>`;
-                });
-            } else {
-                auditContainer.innerHTML = `<div>• تم الإنشاء بواسطة (${item.createdBy || 'النظام'}) في ${item.createdAt || 'غير محدد'}</div>`;
-            }
-
             document.getElementById('cargoPreviewModal').classList.remove('hidden');
         }
 
@@ -3451,17 +3593,6 @@
             document.getElementById('imgDebtSubTotal').innerText = inv.subTotal;
             document.getElementById('imgDebtPaid').innerText = inv.paidAmount;
             document.getElementById('imgDebtNetTotal').innerText = `${inv.netTotal} AED`;
-            document.getElementById('imgDebtCreatedBy').innerText = inv.createdBy || 'النظام';
-
-            const auditContainer = document.getElementById('debtAuditLogContent');
-            auditContainer.innerHTML = '';
-            if(inv.auditLog && inv.auditLog.length > 0) {
-                inv.auditLog.forEach(log => {
-                    auditContainer.innerHTML += `<div>• <strong>${log.action}</strong> بواسطة (${log.user}) في تاريخ ووقت: <span class="text-amber-800 font-bold">${log.time}</span></div>`;
-                });
-            } else {
-                auditContainer.innerHTML = `<div>• تم الإنشاء بواسطة (${inv.createdBy || 'النظام'}) في ${inv.createdAt || 'غير محدد'}</div>`;
-            }
 
             document.getElementById('debtInvPreviewModal').classList.remove('hidden');
         }
@@ -3706,15 +3837,11 @@
             const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
-                    const importedData = JSON.parse(evt.target.result);
-                    if(importedData && importedData.passengers && importedData.cargo) {
-                        db = importedData;
-                        validateAndRepairDB();
-                        saveDB();
-                        alert('تم استرجاع النسخة الاحتياطية بنجاح وتحديث النظام!');
-                        location.reload();
-                    } else { alert('ملف النسخة الاحتياطية غير صالح أو تالف!'); }
-                } catch(err) { alert('خطأ أثناء قراءة ملف النسخة الاحتياطية'); }
+                    const parsed = JSON.parse(evt.target.result);
+                    if(parsed && (parsed.passengers || parsed.cargo)) {
+                        db = parsed; validateAndRepairDB(); saveDB(); refreshUI(); alert('تم استرجاع البيانات بنجاح وإعادة حساب الأرقام التلقائية!');
+                    }
+                } catch(err) { alert('ملف غير صالح!'); }
             };
             reader.readAsText(file);
         }
@@ -3723,213 +3850,145 @@
             const file = e.target.files[0];
             if(!file) return;
 
-            const fileReader = new FileReader();
-            fileReader.onload = async function() {
-                const typedarray = new Uint8Array(this.result);
-                try {
-                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                    let fullText = "";
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let fullText = "";
 
-                    for(let i = 1; i <= pdf.numPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const textContent = await page.getTextContent();
-                        const pageText = textContent.items.map(item => item.str).join(" ");
-                        fullText += pageText + "\n";
-                    }
-
-                    parseAndImportPdfText(fullText);
-                } catch(error) {
-                    alert('تعذر قراءة ملف PDF: قد يكون الملف تالفاً أو محمي برقم سري.');
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join(' ');
+                    fullText += pageText + "\n";
                 }
-            };
-            fileReader.readAsArrayBuffer(file);
-        }
 
-        function parseAndImportPdfText(text) {
-            let recoveredCount = 0;
-            const ticketMatches = text.matchAll(/(?:#|بوليصة|Ticket)\s*(\d+)/gi);
-            for(const match of ticketMatches) {
-                const tId = match[1];
-                if(tId && !db.passengers.some(p => String(p.id) === String(tId))) {
-                    db.passengers.unshift({
-                        id: tId,
-                        tripId: db.trips[0] ? db.trips[0].id : "trip_1794143414766",
-                        agent: "استعادة من PDF",
-                        name: "راكب مستعاد #" + tId,
-                        phone: "0500000000",
-                        passport: "00000000",
-                        passengerCount: 1,
-                        extraPassengers: [],
-                        origin: "عجمان",
-                        destination: "عدن",
-                        date: "-",
-                        reportingTime: "4:00 عصراً",
-                        fare: 350,
-                        payMethod: "مدفوع",
-                        branch: currentUser ? currentUser.branch : "فرع عجمان",
-                        createdBy: getCurrentUserName(),
-                        createdAt: getFormattedDateTime(),
-                        auditLog: [{action: 'استعادة من PDF', user: getCurrentUserName(), time: getFormattedDateTime()}]
-                    });
-                    recoveredCount++;
+                const ticketMatches = fullText.match(/#\d+/g);
+                if (ticketMatches && ticketMatches.length > 0) {
+                    alert(`تم قراءة ملف النسخة الاحتياطية PDF بنجاح!\nتم العثور على (${ticketMatches.length}) سجل داخل التقرير.`);
+                    refreshUI();
+                } else {
+                    alert('تم قراءة الملف بنجاح، ولكن لم يتم التعرف على هيكل بيانات قابل للاستيراد الآلي. يُفضل استعادة الملفات بصيغة JSON لاسترجاع قاعدة البيانات بالكامل.');
                 }
+            } catch (err) {
+                console.error(err);
+                alert('حدث خطأ أثناء قراءة ملف PDF.');
             }
-            validateAndRepairDB();
-            saveDB();
-            refreshUI();
-            alert(`تم فحص ملف PDF واستعادة دمج (${recoveredCount}) سجل بنجاح داخل قاعدة البيانات!`);
         }
 
         function exportExcel(type) {
-            const data = type === 'passengers' ? getFilteredData(db.passengers) : getFilteredData(db.cargo);
+            let data = type === 'passengers' ? getFilteredData(db.passengers) : getFilteredData(db.cargo);
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, type);
-            XLSX.writeFile(wb, `WadiBina_${type}.xlsx`);
+            XLSX.writeFile(wb, `WadiBina_${type}_${Date.now()}.xlsx`);
         }
-    
-        // ================= إدارة تأشيرات العبور =================
+
+        // ================= دوال تأشيرات العبور =================
         function onTransitIdentityChange() {
             const identity = document.getElementById('transitIdentity').value;
             const amountInput = document.getElementById('transitAmount');
-            const amountLabel = document.getElementById('transitAmountLabel');
+            const label = document.getElementById('transitAmountLabel');
 
             if (identity === 'زيارة') {
                 amountInput.min = 150;
                 amountInput.max = 200;
-                if (!document.getElementById('transitEditId').value) {
-                    amountInput.value = 150;
-                }
-                amountLabel.innerText = 'المبلغ (درهم - النطاق المسموح: 150 إلى 200) *';
+                if (!document.getElementById('transitEditId').value) amountInput.value = 150;
+                label.innerText = 'المبلغ (درهم - النطاق المسموح للزيارة: 150 إلى 200) *';
             } else {
                 amountInput.min = 80;
                 amountInput.max = 100;
-                if (!document.getElementById('transitEditId').value) {
-                    amountInput.value = 80;
-                }
-                amountLabel.innerText = 'المبلغ (درهم - النطاق المسموح: 80 إلى 100) *';
+                if (!document.getElementById('transitEditId').value) amountInput.value = 80;
+                label.innerText = 'المبلغ (درهم - النطاق المسموح للمقيم: 80 إلى 100) *';
             }
         }
 
         function handleSaveTransit(e) {
             e.preventDefault();
-            if (!db.transitVisas) db.transitVisas = [];
-
             const editId = document.getElementById('transitEditId').value;
             const invNo = document.getElementById('transitInvNo').value.trim();
+            const agent = document.getElementById('transitAgent').value.trim();
             const name = document.getElementById('transitName').value.trim();
             const passport = document.getElementById('transitPassport').value.trim();
             const identity = document.getElementById('transitIdentity').value;
             const requestNo = document.getElementById('transitRequestNo').value.trim();
-            const amount = parseFloat(document.getElementById('transitAmount').value);
+            const amount = parseFloat(document.getElementById('transitAmount').value) || 0;
 
             if (identity === 'زيارة' && (amount < 150 || amount > 200)) {
-                alert('للهوية (زيارة)، يجب أن يكون المبلغ بين 150 و 200 درهم!');
+                alert('عذراً! المبلغ لهوية (زيارة) يجب أن يكون محصوراً بين 150 و 200 درهم.');
                 return;
             }
             if (identity === 'مقيم' && (amount < 80 || amount > 100)) {
-                alert('للهوية (مقيم)، يجب أن يكون المبلغ بين 80 و 100 درهم!');
+                alert('عذراً! المبلغ لهوية (مقيم) يجب أن يكون محصوراً بين 80 و 100 درهم.');
                 return;
             }
 
             const nowStr = getFormattedDateTime();
             const author = getCurrentUserName();
 
+            if (!db.transitVisas) db.transitVisas = [];
+
             if (editId) {
-                const idx = db.transitVisas.findIndex(t => String(t.uid) === String(editId));
+                const idx = db.transitVisas.findIndex(t => String(t.id) === String(editId));
                 if (idx !== -1) {
-                    db.transitVisas[idx].id = invNo;
-                    db.transitVisas[idx].name = name;
-                    db.transitVisas[idx].passport = passport;
-                    db.transitVisas[idx].identity = identity;
-                    db.transitVisas[idx].requestNo = requestNo;
-                    db.transitVisas[idx].amount = amount;
+                    let item = db.transitVisas[idx];
+                    item.id = invNo;
+                    item.agent = agent;
+                    item.name = name;
+                    item.passport = passport;
+                    item.identity = identity;
+                    item.requestNo = requestNo;
+                    item.amount = amount;
+                    if (!item.auditLog) item.auditLog = [{action: 'إنشاء الفاتورة', user: item.createdBy || author, time: item.createdAt || nowStr}];
+                    item.auditLog.push({action: 'تعديل فاتورة تأشيرة العبور', user: author, time: nowStr});
                 }
                 alert('تم تحديث فاتورة تأشيرة العبور بنجاح!');
                 resetTransitForm();
             } else {
-                const record = {
-                    uid: 'tr_' + Date.now(),
+                const newTransit = {
                     id: invNo,
+                    agent: agent,
                     name: name,
                     passport: passport,
                     identity: identity,
                     requestNo: requestNo,
                     amount: amount,
-                    paymentStatus: 'بانتظار الدفع',
+                    paymentStatus: 'قيد الانتظار',
                     branch: currentUser ? (currentUser.branch || 'فرع عجمان') : 'فرع عجمان',
                     createdBy: author,
-                    createdAt: nowStr
+                    createdAt: nowStr,
+                    auditLog: [{action: 'إنشاء فاتورة تأشيرة العبور', user: author, time: nowStr}]
                 };
-                db.transitVisas.unshift(record);
-                alert('تم إنشاء فاتورة تأشيرة العبور! يمكنك الآن تحديد حالة السداد من الجدول أدناه.');
+                db.transitVisas.unshift(newTransit);
+                alert('تم إنشاء فاتورة تأشيرة العبور بنجاح! يمكنك اختيار حالة السداد مباشرة من الجدول.');
                 resetTransitForm();
             }
+
+            validateAndRepairDB();
             saveDB();
             refreshUI();
         }
 
-        function updateTransitPaymentStatus(uid, newStatus) {
-            const idx = (db.transitVisas || []).findIndex(t => String(t.uid) === String(uid));
+        function updateTransitPaymentStatus(id, newStatus) {
+            if (!db.transitVisas) return;
+            const idx = db.transitVisas.findIndex(t => String(t.id) === String(id));
             if (idx !== -1) {
                 db.transitVisas[idx].paymentStatus = newStatus;
+                const nowStr = getFormattedDateTime();
+                const author = getCurrentUserName();
+                if (!db.transitVisas[idx].auditLog) db.transitVisas[idx].auditLog = [];
+                db.transitVisas[idx].auditLog.push({action: `تغيير حالة السداد إلى (${newStatus})`, user: author, time: nowStr});
                 saveDB();
                 refreshUI();
             }
         }
 
-        function renderTransitTable() {
-            const tbody = document.querySelector('#transitTable tbody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-
-            if (!db.transitVisas) db.transitVisas = [];
-            const list = getFilteredData(db.transitVisas);
-
-            const statusOptions = [
-                'تم الدفع والاصدار',
-                'تم الاصدار وتأجيل المبلغ',
-                'بانتظار الدفع',
-                'بانتظار الموافقة'
-            ];
-
-            list.forEach(item => {
-                const realIdx = db.transitVisas.findIndex(x => x.uid === item.uid);
-                const optionsHtml = statusOptions.map(st =>
-                    `<option value="${st}" ${item.paymentStatus === st ? 'selected' : ''}>${st}</option>`
-                ).join('');
-
-                let statusColor = 'border-amber-500 text-amber-300';
-                if (item.paymentStatus === 'تم الدفع والاصدار') statusColor = 'border-emerald-500 text-emerald-400';
-                else if (item.paymentStatus === 'تم الاصدار وتأجيل المبلغ') statusColor = 'border-indigo-500 text-indigo-300';
-                else if (item.paymentStatus === 'بانتظار الموافقة') statusColor = 'border-red-500 text-red-300';
-
-                tbody.insertRow().innerHTML = `
-                    <td><strong class="text-gold">#${item.id}</strong></td>
-                    <td><strong>${item.name}</strong></td>
-                    <td>${item.passport}</td>
-                    <td><span class="px-2 py-0.5 rounded text-xs font-bold ${item.identity === 'زيارة' ? 'bg-indigo-950 text-indigo-300' : 'bg-emerald-950 text-emerald-300'}">${item.identity}</span></td>
-                    <td>${item.requestNo}</td>
-                    <td class="font-bold text-gold">${item.amount} AED</td>
-                    <td>
-                        <select onchange="updateTransitPaymentStatus('${item.uid}', this.value)" class="bg-darkbg border ${statusColor} rounded-lg px-2 py-1 text-xs font-bold outline-none">
-                            ${optionsHtml}
-                        </select>
-                    </td>
-                    <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${item.createdBy || 'النظام'}</span></td>
-                    <td class="space-x-1 space-x-reverse">
-                        <button onclick="editTransitVisa('${item.uid}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="deleteTransitVisa(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                `;
-            });
-        }
-
-        function editTransitVisa(uid) {
-            const item = (db.transitVisas || []).find(t => t.uid === uid);
+        function editTransit(id) {
+            const item = (db.transitVisas || []).find(x => String(x.id) === String(id));
             if (!item) return;
-            document.getElementById('transitEditId').value = item.uid;
+
+            document.getElementById('transitEditId').value = item.id;
             document.getElementById('transitInvNo').value = item.id;
+            document.getElementById('transitAgent').value = item.agent || '';
             document.getElementById('transitName').value = item.name;
             document.getElementById('transitPassport').value = item.passport;
             document.getElementById('transitIdentity').value = item.identity;
@@ -3940,30 +3999,100 @@
             document.getElementById('transitFormTitle').innerText = `تعديل فاتورة تأشيرة العبور #${item.id}`;
             document.getElementById('transitSubmitBtn').innerText = 'حفظ التعديلات';
             document.getElementById('cancelEditTransitBtn').classList.remove('hidden');
+
+            document.getElementById('transitEditAuditBox').classList.remove('hidden');
+            renderAuditLogIntoBox(item.auditLog, item.createdBy, item.createdAt, 'transitEditAuditList');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function resetTransitForm() {
             document.getElementById('transitForm').reset();
             document.getElementById('transitEditId').value = '';
-            calculateNextSequenceNumbers();
+            document.getElementById('transitAgent').value = 'مباشر';
+            document.getElementById('transitIdentity').value = 'زيارة';
             onTransitIdentityChange();
+            calculateNextSequenceNumbers();
             document.getElementById('transitFormTitle').innerText = 'إنشاء فاتورة تأشيرة عبور جديدة';
             document.getElementById('transitSubmitBtn').innerText = 'حفظ وإنشاء فاتورة تأشيرة العبور';
             document.getElementById('cancelEditTransitBtn').classList.add('hidden');
+            document.getElementById('transitEditAuditBox').classList.add('hidden');
         }
 
-        function deleteTransitVisa(idx) {
+        function deleteTransit(idx) {
             db.transitVisas.splice(idx, 1);
+            validateAndRepairDB();
             saveDB();
             refreshUI();
         }
 
+        function renderTransitTable() {
+            const tbody = document.querySelector('#transitTable tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            let list = getFilteredData(db.transitVisas || []);
+            list.sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
+
+            list.forEach(item => {
+                const realIdx = db.transitVisas.findIndex(x => String(x.id) === String(item.id));
+                const status = item.paymentStatus || 'قيد الانتظار';
+                const statusColor = status === 'تم الدفع والاصدار' ? 'border-emerald-500 text-emerald-400' : (status === 'أجل بالامارات' ? 'border-amber-500 text-amber-400' : 'border-zinc-600 text-zinc-300');
+
+                tbody.insertRow().innerHTML = `
+                    <td><strong class="text-gold">#${item.id}</strong></td>
+                    <td><span class="bg-amber-950/60 text-amber-300 px-2 py-0.5 rounded text-xs font-bold">${item.agent || 'مباشر'}</span></td>
+                    <td><strong>${item.name}</strong></td>
+                    <td>${item.passport}</td>
+                    <td><span class="px-2 py-0.5 rounded text-xs font-bold ${item.identity === 'زيارة' ? 'bg-indigo-950 text-indigo-300' : 'bg-emerald-950 text-emerald-300'}">${item.identity}</span></td>
+                    <td><strong>${item.requestNo}</strong></td>
+                    <td class="font-bold text-gold">${item.amount} AED</td>
+                    <td>
+                        <select onchange="updateTransitPaymentStatus('${item.id}', this.value)" class="bg-darkbg border ${statusColor} rounded-lg px-2 py-1.5 text-xs font-bold outline-none cursor-pointer">
+                            <option value="قيد الانتظار" ${status === 'قيد الانتظار' ? 'selected' : ''}>⏳ قيد الانتظار</option>
+                            <option value="تم الدفع والاصدار" ${status === 'تم الدفع والاصدار' ? 'selected' : ''}>✅ تم الدفع والاصدار</option>
+                            <option value="أجل بالامارات" ${status === 'أجل بالامارات' ? 'selected' : ''}>📝 أجل بالامارات</option>
+                        </select>
+                    </td>
+                    <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${item.createdBy || 'النظام'}</span></td>
+                    <td class="space-x-1 space-x-reverse">
+                        <button onclick="editTransit('${item.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteTransit(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+            });
+        }
+
         function exportTransitExcel() {
-            const ws = XLSX.utils.json_to_sheet(getFilteredData(db.transitVisas || []));
+            const data = getFilteredData(db.transitVisas || []);
+            const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'TransitVisas');
-            XLSX.writeFile(wb, 'WadiBina_TransitVisas.xlsx');
+            XLSX.writeFile(wb, `WadiBina_TransitVisas_${Date.now()}.xlsx`);
         }
+
+        // ربط جميع الدوال بنافذة المتصفح لتعمل مع أحداث HTML (onclick, onsubmit, onchange) داخل ES Module
+        Object.assign(window, {
+            handleLogin, handleLogout, openChangePasswordModal, handleUserChangePassword,
+            toggleLanguage, switchTab, switchFinancialSubTab, refreshUI, closeModal,
+            exportBackupJSON, importBackupJSON, exportSystemBackupPDF, importBackupPDF,
+            exportToPDF, exportMultiPagePDF, downloadCapturedImage,
+            downloadTicketImageWithWhatsAppPrompt, downloadCargoImageWithWhatsAppPrompt,
+            handleGlobalSearch, resetGlobalSearch,
+            calculateDriverNet, handleSaveDriverAccount, previewDriverAccount, editDriverAccount, resetDriverForm, deleteDriverAccount,
+            handleSaveTrip, editTrip, markTripDeparted, resetTripForm, deleteTrip, openManifestForTrip,
+            onTripSelectedForTicket, onTripSelectedForCargo, updateReportingTimeAutomatically, onPassengerCountChanged,
+            handleSavePassenger, editPassenger, resetPassengerForm, deletePassenger, previewTicket,
+            addCargoItemRow, calculateCargoTotal, handleSaveCargo, editCargo, resetCargoForm, deleteCargo, previewCargo,
+            openManifestModal, printManifestPassenger, renderPassengerManifestTable,
+            openCargoManifestModal, printManifestCargo, renderCargoManifestTable,
+            handleSaveVoucher, deleteVoucher, handleSaveDebtInvoice, previewDebtInvoice, deleteDebtInvoice,
+            handleSaveUser, editUser, resetUserForm, deleteUser,
+            onTransitIdentityChange, handleSaveTransit, updateTransitPaymentStatus, editTransit, resetTransitForm, deleteTransit, exportTransitExcel,
+            onEmpRoleTypeChange, handleSaveEmployee, editEmployee, resetEmployeeForm, deleteEmployee,
+            handleSaveAdvance, handleCashReceiptForEmployee,
+            exportExcel
+        });
     </script>
 </body>
 </html>
