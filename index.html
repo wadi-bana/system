@@ -1973,28 +1973,19 @@
             return cleaned;
         }
 
+        function getDirectDownloadLink(type, id) {
+            const baseUrl = window.location.href.split('?')[0].split('#')[0];
+            return `${baseUrl}?dl=${type}&id=${encodeURIComponent(id)}`;
+        }
+
         function sendTicketViaWhatsApp() {
             if(!currentPreviewTicket) return;
             const tkt = currentPreviewTicket;
             const targetPhone = formatPhoneForWhatsApp(tkt.phone);
             if(!targetPhone) { alert('عذراً، رقم هاتف الراكب غير مسجل أو غير صحيح!'); return; }
 
-            const msgText = `🌟 *شركة وادي بناء للنقل الدولي* 🌟\n` +
-                            `مرحباً بك أستاذ/ة *${tkt.name}* 👋🏼\n\n` +
-                            `يسعدنا إبلاغكم بتأكيد حجز بوليصة السفر الخاصة بكم:\n` +
-                            `━━━━━━━━━━━━━━━━━━━━\n` +
-                            `🎫 *رقم البوليصة / التذكرة:* #${tkt.id}\n` +
-                            `👤 *اسم الوكيل / الحاجز:* ${tkt.agent || 'مكتب الشركة'}\n` +
-                            `📍 *خط السير:* ${tkt.origin} ➔ ${tkt.destination}\n` +
-                            `📅 *تاريخ الرحلة:* ${tkt.date || '-'}\n` +
-                            `⏰ *وقت الحضور:* ${tkt.reportingTime}\n` +
-                            `💳 *إجمالي المبلغ:* ${tkt.fare} AED (${tkt.payMethod})\n` +
-                            `━━━━━━━━━━━━━━━━━━━━\n` +
-                            `📞 *أرقام التواصل الرسمية بالمكاتب:* \n` +
-                            `• عجمان (الجرف 2): 0508200749 - 0558675501\n` +
-                            `• بني ياس: 0508200754 - 0558675501\n` +
-                            `• عدن: 0783424999 - 0776363101\n\n` +
-                            `نتمنى لكم رحلة موفقة وآمنة مع وادي بناء! 🚌✨`;
+            const downloadUrl = getDirectDownloadLink('ticket', tkt.id);
+            const msgText = `شركة وادي بنا ترحب بكم\n${downloadUrl}`;
 
             window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msgText)}`, '_blank');
         }
@@ -2005,33 +1996,8 @@
             const targetPhone = formatPhoneForWhatsApp(cargo.senderPhone);
             if(!targetPhone) { alert('عذراً، رقم هاتف المرسل غير مسجل أو غير صحيح!'); return; }
 
-            let itemsSummary = "";
-            if (cargo.items && cargo.items.length > 0) {
-                cargo.items.forEach((it, i) => {
-                    itemsSummary += `\n  ▪️ ${i+1}. ${it.desc} (العدد / الكمية: ${it.qty})`;
-                });
-            }
-
-            const linkedTrip = db.trips.find(t => t.id === cargo.tripId);
-            const tripText = linkedTrip ? `${linkedTrip.route} (${linkedTrip.busInfo})` : 'الرحلة العامة';
-
-            const msgText = `📦 *شركة وادي بناء للنقل الدولي* 📦\n` +
-                            `مرحباً بالمحترم/ة *${cargo.sender}* 👋🏼\n\n` +
-                            `تم تسجيل وإصدار فاتورة الشحن الخاصة بكم بنجاح:\n` +
-                            `━━━━━━━━━━━━━━━━━━━━\n` +
-                            `🧾 *رقم الفاتورة:* #${cargo.id}\n` +
-                            `📅 *تاريخ الإصدار:* ${cargo.date || '-'}\n` +
-                            `👤 *المستلم:* ${cargo.receiver} (${cargo.receiverPhone})\n` +
-                            `📍 *عنوان التسليم:* ${cargo.receiverAddress || 'عدن'}\n` +
-                            `🚌 *الرحلة المرتبطة:* ${tripText}\n` +
-                            `📋 *الأصناف المشحونة:*${itemsSummary}\n` +
-                            `💰 *الإجمالي النهائي:* ${cargo.grandTotal} AED (${cargo.paymentStatus})\n` +
-                            `━━━━━━━━━━━━━━━━━━━━\n` +
-                            `📞 *أرقام التواصل الرسمية بالمكاتب:* \n` +
-                            `• عجمان (الجرف 2): 0508200749 - 0558675501\n` +
-                            `• بني ياس: 0508200754 - 0558675501\n` +
-                            `• عدن: 0783424999 - 0776363101\n\n` +
-                            `شكراً لثقتكم بخدمات الشحن في وادي بناء! 🚛✨`;
+            const downloadUrl = getDirectDownloadLink('cargo', cargo.id);
+            const msgText = `شركة وادي بنا ترحب بكم\n${downloadUrl}`;
 
             window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msgText)}`, '_blank');
         }
@@ -2285,6 +2251,7 @@
             validateAndRepairDB();
             localStorage.setItem('WADI_BINA_UNIFIED_DB', JSON.stringify(db));
             refreshUI();
+            checkAutoDownloadFromUrl();
         }
 
         function forcePullFromFirebase() {
@@ -2418,8 +2385,41 @@
             addCargoItemRow();
             buildDriverItemsRows();
             calculateNextSequenceNumbers();
-            if(currentUser) initSync();
+            const urlParams = new URLSearchParams(window.location.search);
+            if(currentUser || (urlParams.get('dl') && urlParams.get('id'))) initSync();
+            checkAutoDownloadFromUrl();
         };
+
+        let autoDownloadHandled = false;
+        function checkAutoDownloadFromUrl() {
+            if (autoDownloadHandled) return;
+            const params = new URLSearchParams(window.location.search);
+            const dlType = params.get('dl');
+            const dlId = params.get('id');
+            if (!dlType || !dlId) return;
+
+            if (dlType === 'ticket') {
+                const tkt = (db.passengers || []).find(x => String(x.id) === String(dlId));
+                if (tkt) {
+                    autoDownloadHandled = true;
+                    document.getElementById('loginOverlay').style.display = 'none';
+                    previewTicketImage(tkt.id);
+                    setTimeout(() => {
+                        downloadCapturedImage('ticketCaptureArea', 'WadiBina_Ticket_');
+                    }, 700);
+                }
+            } else if (dlType === 'cargo') {
+                const crg = (db.cargo || []).find(x => String(x.id) === String(dlId));
+                if (crg) {
+                    autoDownloadHandled = true;
+                    document.getElementById('loginOverlay').style.display = 'none';
+                    previewCargoImage(crg.id);
+                    setTimeout(() => {
+                        downloadCapturedImage('cargoCaptureArea', 'WadiBina_CargoInvoice_');
+                    }, 700);
+                }
+            }
+        }
 
         function switchTab(tabId) {
             const restrictedModules = ['drivers', 'financials', 'salaries', 'users'];
