@@ -208,6 +208,8 @@
             </div>
             <div class="mt-5 flex gap-2 flex-wrap no-print">
                 <button onclick="downloadTicketImageWithWhatsAppPrompt()" class="flex-1 bg-emerald-600 text-white font-extrabold py-3 rounded-xl text-xs shadow hover:bg-emerald-500 flex items-center justify-center gap-1.5"><i class="fa-brands fa-whatsapp text-base"></i> مشاركة الصورة للواتساب</button>
+                <button onclick="sendTripReminderWhatsApp()" class="bg-amber-600 text-black font-extrabold px-3 py-3 rounded-xl text-xs shadow hover:bg-amber-500 flex items-center justify-center gap-1"><i class="fa-solid fa-bell"></i> تذكير بموعد الرحلة</button>
+                <button onclick="printThermalReceipt('ticket')" class="bg-sky-600 text-white font-extrabold px-3 py-3 rounded-xl text-xs shadow hover:bg-sky-500 flex items-center justify-center gap-1"><i class="fa-solid fa-receipt"></i> إيصال حراري 80mm</button>
                 <button onclick="exportToPDF('ticketCaptureArea', 'WadiBina_Ticket_')" class="bg-red-600 text-white font-extrabold px-4 py-3 rounded-xl text-xs shadow hover:bg-red-500"><i class="fa-solid fa-file-pdf ml-1"></i> PDF</button>
                 <button onclick="downloadCapturedImage('ticketCaptureArea', 'WadiBina_Ticket_')" class="gold-gradient-bg text-black font-extrabold px-4 py-3 rounded-xl text-xs shadow"><i class="fa-solid fa-download ml-1"></i> Image</button>
                 <button onclick="closeModal('ticketPreviewModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
@@ -290,6 +292,8 @@
             </div>
             <div class="mt-5 flex gap-2 flex-wrap no-print">
                 <button onclick="downloadCargoImageWithWhatsAppPrompt()" class="flex-1 bg-emerald-600 text-white font-extrabold py-3 rounded-xl text-xs shadow hover:bg-emerald-500 flex items-center justify-center gap-1.5"><i class="fa-brands fa-whatsapp text-base"></i> مشاركة الصورة للواتساب</button>
+                <button onclick="sendCargoReceiverWhatsApp()" class="bg-teal-600 text-white font-extrabold px-3 py-3 rounded-xl text-xs shadow hover:bg-teal-500 flex items-center justify-center gap-1"><i class="fa-brands fa-whatsapp"></i> إشعار المستلم</button>
+                <button onclick="printThermalReceipt('cargo')" class="bg-sky-600 text-white font-extrabold px-3 py-3 rounded-xl text-xs shadow hover:bg-sky-500 flex items-center justify-center gap-1"><i class="fa-solid fa-receipt"></i> إيصال حراري 80mm</button>
                 <button onclick="exportToPDF('cargoCaptureArea', 'WadiBina_Cargo_')" class="bg-red-600 text-white font-extrabold px-4 py-3 rounded-xl text-xs shadow hover:bg-red-500"><i class="fa-solid fa-file-pdf ml-1"></i> PDF</button>
                 <button onclick="downloadCapturedImage('cargoCaptureArea', 'WadiBina_CargoInvoice_')" class="gold-gradient-bg text-black font-extrabold px-4 py-3 rounded-xl text-xs shadow"><i class="fa-solid fa-download ml-1"></i> Image</button>
                 <button onclick="closeModal('cargoPreviewModal')" class="bg-zinc-800 text-zinc-300 font-bold px-4 py-3 rounded-xl text-xs">إغلاق</button>
@@ -1571,6 +1575,42 @@
                 </div>
             </div>
 
+            <!-- DAILY CASH REGISTER CLOSING & HANDOVER REPORT (إغلاق الصندوق اليومي وتصفية الوردية) -->
+            <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3 flex-wrap gap-2">
+                    <h3 class="text-gold font-bold text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-cash-register text-emerald-400"></i>
+                        <span>تقرير إغلاق الصندوق اليومي وتصفية الوردية (Daily Cash Handover)</span>
+                    </h3>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <input type="date" id="dailyCloseDate" onchange="renderDailyCashClosingReport()" class="bg-darkbg border border-gold text-gold text-xs px-3 py-1.5 rounded-xl font-bold outline-none">
+                        <button onclick="exportDailyClosingPDF()" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow"><i class="fa-solid fa-file-pdf ml-1"></i> تصدير كشف الإغلاق PDF</button>
+                    </div>
+                </div>
+                <div id="dailyClosingCaptureArea" class="grid grid-cols-1 sm:grid-cols-5 gap-3 bg-darkbg p-4 rounded-xl border border-zinc-800 text-xs">
+                    <div class="bg-zinc-900 p-3 rounded-xl border border-zinc-800">
+                        <span class="text-zinc-400 block mb-1">تذاكر اليوم المدفوعة:</span>
+                        <strong id="dcTicketsPaid" class="text-emerald-400 text-base font-black">0 AED</strong>
+                    </div>
+                    <div class="bg-zinc-900 p-3 rounded-xl border border-zinc-800">
+                        <span class="text-zinc-400 block mb-1">شحن اليوم المدفوع:</span>
+                        <strong id="dcCargoPaid" class="text-indigo-400 text-base font-black">0 AED</strong>
+                    </div>
+                    <div class="bg-zinc-900 p-3 rounded-xl border border-zinc-800">
+                        <span class="text-zinc-400 block mb-1">تأشيرات وسندات قبض:</span>
+                        <strong id="dcOtherIn" class="text-amber-300 text-base font-black">0 AED</strong>
+                    </div>
+                    <div class="bg-zinc-900 p-3 rounded-xl border border-zinc-800">
+                        <span class="text-zinc-400 block mb-1">مصروفات وسندات صرف اليوم:</span>
+                        <strong id="dcTotalOut" class="text-red-400 text-base font-black">0 AED</strong>
+                    </div>
+                    <div class="bg-zinc-900 p-3 rounded-xl border border-gold">
+                        <span class="text-gold font-bold block mb-1">صافي النقدية للتسليم اليوم:</span>
+                        <strong id="dcNetCash" class="text-gold text-base font-black">0 AED</strong>
+                    </div>
+                </div>
+            </div>
+
             <!-- DEPARTED TRIPS ACCOUNTS MANAGEMENT -->
             <div class="bg-cardbg border border-bordergold p-5 rounded-2xl shadow-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3 flex-wrap gap-2">
@@ -1593,6 +1633,8 @@
                                 <th>إجمالي المبالغ</th>
                                 <th>المدفوع</th>
                                 <th>المتبقي / الآجل</th>
+                                <th>مصروفات السائق</th>
+                                <th>صافي ربح الرحلة</th>
                                 <th>إدارة وحسابات الرحلة</th>
                             </tr>
                         </thead>
@@ -2380,6 +2422,7 @@
             document.getElementById('vDate').value = todayStr;
             document.getElementById('debtInvDate').value = todayStr;
             document.getElementById('advDate').value = todayStr;
+            if (document.getElementById('dailyCloseDate')) document.getElementById('dailyCloseDate').value = todayStr;
             onPassengerCountChanged();
             updateReportingTimeAutomatically();
             addCargoItemRow();
@@ -4101,7 +4144,8 @@
                     <td class="text-amber-400 font-bold">${inv.netTotal} AED</td>
                     <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${inv.createdBy || 'النظام'}</span></td>
                     <td><span class="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-xs">${inv.branch || 'فرع عجمان'}</span></td>
-                    <td class="space-x-1 space-x-reverse">
+                    <td class="space-x-1 space-x-reverse whitespace-nowrap">
+                        <button onclick="sendDebtReminderWhatsApp('${inv.id}')" title="إرسال تذكير سداد عبر الواتساب" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-brands fa-whatsapp"></i></button>
                         <button onclick="previewDebtInvoice('${inv.id}')" class="bg-gold text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-print"></i></button>
                         <button onclick="deleteDebtInvoice(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
                     </td>
@@ -4128,7 +4172,117 @@
             document.getElementById('finDriverExpSum').innerText = `${driverExp} AED`;
             document.getElementById('finExpensesSum').innerText = `${vExp} AED`;
             document.getElementById('finNetBoxSum').innerText = `${(paidRev + vRec) - (vExp + driverExp)} AED`;
+            renderDailyCashClosingReport();
             renderDepartedTripsFinancialsTable();
+        }
+
+        function renderDailyCashClosingReport() {
+            const dateInput = document.getElementById('dailyCloseDate');
+            if (!dateInput) return;
+            if (!dateInput.value) dateInput.value = new Date().toISOString().split('T')[0];
+            const targetDate = dateInput.value;
+
+            const filteredPass = getFilteredData(db.passengers);
+            const filteredCargo = getFilteredData(db.cargo);
+            const filteredTransit = getFilteredData(db.transitVisas || []);
+            const filteredVouchers = getFilteredData(db.vouchers);
+            const filteredDrivers = getFilteredData(db.drivers);
+
+            const tktPaid = filteredPass.filter(p => p.date === targetDate && p.payMethod === 'مدفوع').reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
+            const crgPaid = filteredCargo.filter(c => c.date === targetDate && c.paymentStatus === 'مدفوع').reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
+            const trsPaid = filteredTransit.filter(t => t.date === targetDate && t.paymentStatus === 'تم الدفع والاصدار').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
+            const vRec = filteredVouchers.filter(v => v.date === targetDate && v.type === 'قبض').reduce((s, v) => s + (parseFloat(v.amount) || 0), 0);
+
+            const vExp = filteredVouchers.filter(v => v.date === targetDate && v.type === 'صرف').reduce((s, v) => s + (parseFloat(v.amount) || 0), 0);
+            const drvExp = filteredDrivers.filter(d => d.date === targetDate).reduce((s, d) => s + (parseFloat(d.totalExpenses) || 0), 0);
+
+            const totalIn = tktPaid + crgPaid + trsPaid + vRec;
+            const totalOut = vExp + drvExp;
+            const netCash = totalIn - totalOut;
+
+            document.getElementById('dcTicketsPaid').innerText = `${tktPaid} AED`;
+            document.getElementById('dcCargoPaid').innerText = `${crgPaid} AED`;
+            document.getElementById('dcOtherIn').innerText = `${trsPaid + vRec} AED`;
+            document.getElementById('dcTotalOut').innerText = `${totalOut} AED`;
+            document.getElementById('dcNetCash').innerText = `${netCash} AED`;
+        }
+
+        function exportDailyClosingPDF() {
+            exportToPDF('dailyClosingCaptureArea', 'WadiBina_DailyClosing_');
+        }
+
+        function sendTripReminderWhatsApp() {
+            if (!currentPreviewTicket) return;
+            const tkt = currentPreviewTicket;
+            const targetPhone = formatPhoneForWhatsApp(tkt.phone);
+            if (!targetPhone) { alert('عذراً، رقم هاتف الراكب غير مسجل أو غير صحيح!'); return; }
+            const msg = `شركة وادي بنا ترحب بكم\nتذكير بموعد رحلتكم (${tkt.origin} ➔ ${tkt.destination})\nالتاريخ: ${tkt.date || '-'}\nوقت الحضور: ${tkt.reportingTime || '-'}\nرقم التذكرة: #${tkt.id}`;
+            window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        function sendCargoReceiverWhatsApp() {
+            if (!currentPreviewCargo) return;
+            const cargo = currentPreviewCargo;
+            const targetPhone = formatPhoneForWhatsApp(cargo.receiverPhone);
+            if (!targetPhone) { alert('عذراً، رقم هاتف المستلم غير مسجل أو غير صحيح!'); return; }
+            const downloadUrl = getDirectDownloadLink('cargo', cargo.id);
+            const msg = `شركة وادي بنا ترحب بكم\nلديكم طرد شحن مرسل من: ${cargo.sender}\nرقم الفاتورة: #${cargo.id}\n${downloadUrl}`;
+            window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        function sendDebtReminderWhatsApp(id) {
+            const inv = (db.debtInvoices || []).find(x => String(x.id) === String(id));
+            if (!inv) return;
+            const targetPhone = formatPhoneForWhatsApp(inv.phone);
+            if (!targetPhone) { alert('عذراً، رقم هاتف العميل غير مسجل أو غير صحيح!'); return; }
+            const msg = `شركة وادي بنا ترحب بكم\nتذكير ودي بخصوص الفاتورة الآجلة رقم #${inv.id}\nالمبلغ المتبقي: ${inv.netTotal} AED\nشاكرين لكم حسن تعاونكم.`;
+            window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        function printThermalReceipt(type) {
+            const win = window.open('', '_blank', 'width=340,height=600');
+            if (!win) { alert('يرجى السماح بالنوافذ المنبثقة لطباعة الإيصال الحراري'); return; }
+            let bodyHtml = '';
+            if (type === 'ticket' && currentPreviewTicket) {
+                const t = currentPreviewTicket;
+                bodyHtml = `
+                    <div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:8px; margin-bottom:8px;">
+                        <h3 style="margin:0; font-size:15px;">شركة وادي بناء للنقل الدولي</h3>
+                        <p style="margin:2px 0; font-size:11px;">إيصال تذكرة سفر #${t.id}</p>
+                    </div>
+                    <div style="font-size:12px; line-height:1.6;">
+                        <div><strong>الراكب:</strong> ${t.name}</div>
+                        <div><strong>الهاتف:</strong> ${t.phone}</div>
+                        <div><strong>المسار:</strong> ${t.origin} ➔ ${t.destination}</div>
+                        <div><strong>التاريخ:</strong> ${t.date || '-'}</div>
+                        <div><strong>الحضور:</strong> ${t.reportingTime || '-'}</div>
+                        <div><strong>عدد الركاب:</strong> ${t.passengerCount || 1}</div>
+                        <div style="border-top:1px dashed #000; margin-top:6px; padding-top:6px; font-size:14px;">
+                            <strong>الإجمالي: ${t.fare || 0} AED (${t.payMethod})</strong>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'cargo' && currentPreviewCargo) {
+                const c = currentPreviewCargo;
+                const itemsHtml = (c.items || []).map(i => `<div>• ${i.desc} (${i.qty}) = ${i.qty * i.price} AED</div>`).join('');
+                bodyHtml = `
+                    <div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:8px; margin-bottom:8px;">
+                        <h3 style="margin:0; font-size:15px;">شركة وادي بناء للنقل الدولي</h3>
+                        <p style="margin:2px 0; font-size:11px;">إيصال شحن بضائع #${c.id}</p>
+                    </div>
+                    <div style="font-size:12px; line-height:1.6;">
+                        <div><strong>المرسل:</strong> ${c.sender} (${c.senderPhone})</div>
+                        <div><strong>المستلم:</strong> ${c.receiver} (${c.receiverPhone})</div>
+                        <div><strong>الوجهة:</strong> ${c.receiverAddress || '-'}</div>
+                        <div style="border-top:1px dashed #000; margin-top:4px; padding-top:4px;"><strong>الأصناف:</strong>${itemsHtml}</div>
+                        <div style="border-top:1px dashed #000; margin-top:6px; padding-top:6px; font-size:14px;">
+                            <strong>الإجمالي: ${c.grandTotal} AED (${c.paymentStatus})</strong>
+                        </div>
+                    </div>
+                `;
+            }
+            win.document.write(`<html dir="rtl"><head><title>إيصال حراري 80mm</title><style>body{font-family:Tahoma,Arial,sans-serif;width:72mm;margin:0 auto;padding:6px;color:#000;}@media print{@page{size:80mm auto;margin:2mm;}}</style></head><body>${bodyHtml}<div style="text-align:center;margin-top:10px;font-size:10px;border-top:1px dashed #000;padding-top:6px;">شكراً لاختياركم وادي بناء</div><script>window.onload=function(){window.print();window.close();}<\/script></body></html>`);
+            win.document.close();
         }
 
         // ================= إدارة حسابات الرحلات التي غادرت (في الإدارة المالية) =================
@@ -4144,7 +4298,7 @@
             departedTrips.sort((a, b) => b.id.localeCompare(a.id));
 
             if (departedTrips.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" class="text-center py-6 text-zinc-400">لا توجد رحلات مغادرة حالياً</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="12" class="text-center py-6 text-zinc-400">لا توجد رحلات مغادرة حالياً</td></tr>';
                 return;
             }
 
@@ -4160,6 +4314,8 @@
                 const cargoPaid = tripCargos.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
                 const totalPaid = tktPaid + cargoPaid;
                 const totalPending = grandTotal - totalPaid;
+                const linkedDriverExp = (db.drivers || []).filter(d => d.date === trip.date).reduce((s, d) => s + (parseFloat(d.totalExpenses) || 0), 0);
+                const tripNetProfit = totalPaid - linkedDriverExp;
 
                 tbody.insertRow().innerHTML = `
                     <td><strong class="text-gold">#${departedTrips.length - idx}</strong></td>
@@ -4171,6 +4327,8 @@
                     <td><strong class="text-zinc-100">${grandTotal} AED</strong></td>
                     <td><strong class="text-emerald-400">${totalPaid} AED</strong></td>
                     <td><strong class="text-red-400">${totalPending} AED</strong></td>
+                    <td><strong class="text-amber-400">${linkedDriverExp} AED</strong></td>
+                    <td><strong class="${tripNetProfit >= 0 ? 'text-emerald-400' : 'text-red-500'} font-black">${tripNetProfit} AED</strong></td>
                     <td class="whitespace-nowrap">
                         <button onclick="openTripDetailsModal('${trip.id}', 'finance')" class="gold-gradient-bg text-black px-3 py-1.5 rounded-xl text-xs font-extrabold shadow hover:opacity-90">
                             <i class="fa-solid fa-file-invoice-dollar ml-1"></i> عرض وإدارة حسابات الرحلة
@@ -5012,6 +5170,12 @@
         window.previewDebtInvoice = previewDebtInvoice;
         window.sendTicketViaWhatsApp = sendTicketViaWhatsApp;
         window.sendCargoViaWhatsApp = sendCargoViaWhatsApp;
+        window.sendTripReminderWhatsApp = sendTripReminderWhatsApp;
+        window.sendCargoReceiverWhatsApp = sendCargoReceiverWhatsApp;
+        window.sendDebtReminderWhatsApp = sendDebtReminderWhatsApp;
+        window.printThermalReceipt = printThermalReceipt;
+        window.renderDailyCashClosingReport = renderDailyCashClosingReport;
+        window.exportDailyClosingPDF = exportDailyClosingPDF;
         window.downloadTicketImageWithWhatsAppPrompt = downloadTicketImageWithWhatsAppPrompt;
         window.downloadCargoImageWithWhatsAppPrompt = downloadCargoImageWithWhatsAppPrompt;
         window.openManifestModal = openManifestModal;
