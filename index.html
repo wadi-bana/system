@@ -475,10 +475,10 @@
                     <thead>
                         <tr class="bg-slate-200 text-slate-800">
                             <th class="border border-slate-300 p-2">م</th>
-                            <th class="border border-slate-300 p-2">البوليصة</th>
-                            <th class="border border-slate-300 p-2">اسم المسافر الرئيسي</th>
-                            <th class="border border-slate-300 p-2">الركاب الإضافيون</th>
-                            <th class="border border-slate-300 p-2">الهاتف</th>
+                            <th class="border border-slate-300 p-2">رقم التذكرة</th>
+                            <th class="border border-slate-300 p-2">اسم المسافر</th>
+                            <th class="border border-slate-300 p-2">صفة الراكب</th>
+                            <th class="border border-slate-300 p-2">الهاتف / الراكب الأساسي</th>
                             <th class="border border-slate-300 p-2">الجواز</th>
                             <th class="border border-slate-300 p-2">المسار</th>
                             <th class="border border-slate-300 p-2 man-price-col">السعر</th>
@@ -1072,7 +1072,7 @@
                     <i class="fa-solid fa-calendar-day text-gold text-lg"></i>
                     <div>
                         <h3 id="lblPassHeader" class="text-xs font-bold text-gold">إدارة رحلات وتذاكر الركاب والركاب الإضافيين (مرتبة تنازلياً برقم التذكرة الأحدث أولاً)</h3>
-                        <p id="lblPassSub" class="text-[11px] text-zinc-400">يبدأ رقم التذكرة تلقائياً من الرقم التالي لأحدث تذكرة مسجلة</p>
+                        <p id="lblPassSub" class="text-[11px] text-zinc-400">يبدأ رقم التذكرة تلقائياً من الرقم التالي لأحدث تذكرة مسجلة (ويُمنح كل راكب إضافي رقم تذكرة مستقل)</p>
                     </div>
                 </div>
                 <button onclick="openManifestModal()" id="btnManifestP" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-2 rounded-xl text-xs shadow"><i class="fa-solid fa-file-lines ml-1"></i> كشف الرحلة حسب التاريخ (Manifest)</button>
@@ -1089,7 +1089,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div>
                                 <label id="lblTktNo" class="block text-xs text-gold mb-1 font-bold">رقم التذكرة (تلقائي) *</label>
-                                <input type="text" id="passTicketNo" required class="w-full bg-zinc-900 border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs outline-none">
+                                <input type="text" id="passTicketNo" oninput="onPassengerCountChanged()" required class="w-full bg-zinc-900 border border-gold font-bold text-gold rounded-xl px-3 py-2 text-xs outline-none">
                             </div>
                             <div>
                                 <label id="lblAgent" class="block text-xs text-gold mb-1 font-bold">ربط برحلة مجدولة *</label>
@@ -1134,7 +1134,7 @@
                         </div>
 
                         <div id="extraPassengersContainer" class="space-y-3 hidden">
-                            <span id="lblExtraPax" class="text-xs font-bold text-amber-400 block"><i class="fa-solid fa-users ml-1"></i> بيانات الركاب الإضافيين</span>
+                            <span id="lblExtraPax" class="text-xs font-bold text-amber-400 block"><i class="fa-solid fa-users ml-1"></i> بيانات الركاب الإضافيين (كل راكب برقم تذكرة مستقل)</span>
                             <div id="extraPassengersRows" class="space-y-2"></div>
                         </div>
 
@@ -1618,7 +1618,7 @@
                         <i class="fa-solid fa-plane-departure text-indigo-400"></i>
                         <span>الرحلات التي غادرت وإدارة حساباتها (إضافة وتعديل التذاكر وفواتير الشحن والمدفوعات)</span>
                     </h3>
-                    <span class="text-[11px] text-zinc-400">الوسيلة الوحيدة لإضافة تذكرة أو فاتورة لرحلة غادرت هي من هنا عبر الإدارة المالية</span>
+                    <span class="text-[11px] text-zinc-400">الوسيلة الوحيدة لعرض وإضافة تذكرة أو فاتورة لرحلة غادرت هي من هنا عبر الإدارة المالية</span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="custom-table" id="finDepartedTripsTable">
@@ -1938,21 +1938,6 @@
             return isMahmoudOrGeneralManager() || currentUser.role === 'محاسب';
         }
 
-        function getTripDestinationBranch(trip) {
-            if (!trip || !trip.route) return '';
-            const r = trip.route;
-            if (r.includes('لليمن') || r.includes('اليمن')) {
-                if (r.startsWith('من اليمن')) {
-                    if (r.includes('عمان')) return 'فرع عمان';
-                    return 'فرع عجمان'; // الإمارات (عجمان / أبوظبي)
-                }
-                return 'فرع اليمن';
-            }
-            if (r.includes('لعمان')) return 'فرع عمان';
-            if (r.includes('للامارات')) return 'فرع عجمان';
-            return '';
-        }
-
         function isUserAtTripDestinationBranch(trip) {
             if (!currentUser || !trip) return false;
             const userBranch = currentUser.branch || '';
@@ -2183,6 +2168,12 @@
                 db.passengers.forEach(p => {
                     let val = parseInt(p.id) || 0;
                     if(val > maxTkt) maxTkt = val;
+                    if (p.extraPassengers && Array.isArray(p.extraPassengers)) {
+                        p.extraPassengers.forEach(ex => {
+                            let exVal = parseInt(ex.ticketNo) || 0;
+                            if (exVal > maxTkt) maxTkt = exVal;
+                        });
+                    }
                 });
                 db.nextTicketNo = maxTkt >= 115 ? maxTkt + 1 : 115;
             } else {
@@ -2251,6 +2242,15 @@
             db.passengers.forEach(p => {
                 if(!p.createdAt) { p.createdAt = p.date ? p.date + ' 09:00' : '2026-11-01 09:00'; fixed = true; }
                 if(!p.auditLog) { p.auditLog = [{action: 'إنشاء التذكرة', user: p.createdBy || 'محمود', time: p.createdAt}]; fixed = true; }
+                if (p.extraPassengers && Array.isArray(p.extraPassengers)) {
+                    let baseNum = parseInt(p.id) || 0;
+                    p.extraPassengers.forEach((ex, i) => {
+                        if (!ex.ticketNo) {
+                            ex.ticketNo = baseNum ? String(baseNum + i + 1) : `${p.id}-${i + 1}`;
+                            fixed = true;
+                        }
+                    });
+                }
             });
 
             db.cargo.forEach(c => {
@@ -2423,11 +2423,11 @@
             document.getElementById('debtInvDate').value = todayStr;
             document.getElementById('advDate').value = todayStr;
             if (document.getElementById('dailyCloseDate')) document.getElementById('dailyCloseDate').value = todayStr;
+            calculateNextSequenceNumbers();
             onPassengerCountChanged();
             updateReportingTimeAutomatically();
             addCargoItemRow();
             buildDriverItemsRows();
-            calculateNextSequenceNumbers();
             const urlParams = new URLSearchParams(window.location.search);
             if(currentUser || (urlParams.get('dl') && urlParams.get('id'))) initSync();
             checkAutoDownloadFromUrl();
@@ -2527,7 +2527,6 @@
             if(!canModifyFinancialsOrAccounts() && currentUser.role !== 'مدير') {
                 const userBranch = currentUser.branch || 'فرع عجمان';
                 return list.filter(item => {
-                    // السماح برؤية سجلات فرع المستخدم، أو سجلات الرحلات المغادرة التي وجهتها فرع المستخدم
                     if (item.tripId) {
                         const trip = (db.trips || []).find(t => String(t.id) === String(item.tripId));
                         if (trip && trip.status === 'غادرت الرحلة' && isUserAtTripDestinationBranch(trip)) {
@@ -3158,7 +3157,7 @@
                 db.trips[idx].status = 'غادرت الرحلة';
                 saveDB();
                 refreshUI();
-                alert('تم تحديث حالة الرحلة إلى: غادرت الرحلة');
+                alert('تم تحديث حالة الرحلة إلى: غادرت الرحلة وتم نقل عرض تذاكرها وفواتيرها إلى قسم الإدارة المالية.');
             }
         }
 
@@ -3178,6 +3177,7 @@
             let tripsList = [...db.trips];
             tripsList.sort((a, b) => b.id.localeCompare(a.id));
             const allowTripModify = isMahmoudOrGeneralManager();
+            const isFinOrAdmin = canModifyFinancialsOrAccounts();
 
             tripsList.forEach((trip, idx) => {
                 const realIdx = db.trips.findIndex(x => x.id === trip.id);
@@ -3191,9 +3191,16 @@
                     statusBadge = '<span class="bg-red-950 text-red-300 px-2 py-1 rounded text-xs font-bold">ملغاة</span>';
                 }
 
-                // تحديد هل يظهر زر عرض الرحلة (إذا كانت مغادرة: يظهر فقط لفرع الوجهة أو الإدارة المالية/محمود/المدير العام)
-                const canViewTrip = trip.status !== 'غادرت الرحلة' || canUserViewDepartedTripRecord(trip);
-                const viewMode = (trip.status === 'غادرت الرحلة' && isUserAtTripDestinationBranch(trip) && !canModifyFinancialsOrAccounts()) ? 'dest_branch' : 'ops';
+                // الرحلات التي غادرت: تُخفى تذاكرها وفواتيرها من هذا الجدول وتظهر في قسم الإدارة المالية للمدير العام والمحاسب ومحمود فقط
+                const isDeparted = trip.status === 'غادرت الرحلة';
+                let viewBtnHtml = '';
+                if (!isDeparted) {
+                    viewBtnHtml = `<button onclick="openTripDetailsModal('${trip.id}', 'ops')" class="bg-sky-600 hover:bg-sky-500 text-white px-2.5 py-1 rounded text-xs font-bold"><i class="fa-solid fa-eye ml-1"></i> عرض الرحلة</button>`;
+                } else if (isFinOrAdmin) {
+                    viewBtnHtml = `<button onclick="switchTab('financials'); openTripDetailsModal('${trip.id}', 'finance');" class="bg-indigo-700 hover:bg-indigo-600 text-white px-2.5 py-1 rounded text-xs font-bold" title="عرض في الإدارة المالية"><i class="fa-solid fa-calculator ml-1"></i> في الإدارة المالية</button>`;
+                } else {
+                    viewBtnHtml = `<span class="text-[11px] text-zinc-500 px-2"><i class="fa-solid fa-lock ml-1"></i> مغادرة (الإدارة المالية)</span>`;
+                }
 
                 tbody.insertRow().innerHTML = `
                     <td><strong>#${tripsList.length - idx}</strong></td>
@@ -3204,7 +3211,7 @@
                     <td><span class="bg-indigo-950 text-indigo-300 px-2.5 py-1 rounded-full text-xs font-bold">${linkedTickets} تذاكر</span></td>
                     <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${trip.createdBy || 'النظام'}</span></td>
                     <td class="space-x-1 space-x-reverse whitespace-nowrap">
-                        ${canViewTrip ? `<button onclick="openTripDetailsModal('${trip.id}', '${viewMode}')" class="bg-sky-600 hover:bg-sky-500 text-white px-2.5 py-1 rounded text-xs font-bold"><i class="fa-solid fa-eye ml-1"></i> عرض الرحلة</button>` : '<span class="text-[11px] text-zinc-500 px-2">مغلقة لفرع الوجهة</span>'}
+                        ${viewBtnHtml}
                         ${allowTripModify && trip.status !== 'غادرت الرحلة' ? `<button onclick="markTripDeparted('${trip.id}')" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs font-bold hover:bg-indigo-500"><i class="fa-solid fa-bus"></i> غادرت الرحلة</button>` : ''}
                         ${allowTripModify ? `<button onclick="editTrip('${trip.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i> تعديل</button>` : ''}
                         <button onclick="openManifestForTrip('${trip.date}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-file-lines"></i> مانفيستو</button>
@@ -3238,7 +3245,6 @@
                     ? `${trip.date !== '-' ? trip.date : 'بدون تاريخ'} (${trip.route}) - ${trip.busInfo} [غادرت الرحلة - الإضافة عبر الإدارة المالية فقط]`
                     : `${trip.date !== '-' ? trip.date : 'بدون تاريخ'} (${trip.route}) - ${trip.busInfo} [${trip.status || 'مجدولة'}]`;
                 
-                // الرحلات المغادرة تبقى مقفلة في القوائم المنسدلة العادية إلا إذا تم فتحها صراحة عبر الإدارة المالية
                 const allowDepartedInSelect = (financeOverrideDepartedTripId && String(financeOverrideDepartedTripId) === String(trip.id)) ||
                                               (editingPassItem && String(editingPassItem.tripId) === String(trip.id)) ||
                                               (editingCargoItem && String(editingCargoItem.tripId) === String(trip.id));
@@ -3410,7 +3416,17 @@
 
         function onPassengerCountChanged() {
             const count = parseInt(document.getElementById('passCount').value) || 1;
-            document.getElementById('passManualTotal').value = count * 350;
+            const isEdit = !!document.getElementById('passEditId').value;
+            if (!isEdit) {
+                document.getElementById('passManualTotal').value = count * 350;
+            }
+            const baseTicketNo = parseInt(document.getElementById('passTicketNo').value) || db.nextTicketNo || 115;
+
+            // الحفاظ على القيم المدخلة مسبقاً إن وجدت عند تغيير رقم التذكرة أو العدد
+            const existingNames = Array.from(document.querySelectorAll('.extra-name')).map(el => el.value);
+            const existingPhones = Array.from(document.querySelectorAll('.extra-phone')).map(el => el.value);
+            const existingPassports = Array.from(document.querySelectorAll('.extra-passport')).map(el => el.value);
+
             const container = document.getElementById('extraPassengersContainer');
             const rowsContainer = document.getElementById('extraPassengersRows');
             rowsContainer.innerHTML = '';
@@ -3418,12 +3434,17 @@
             if (count > 1) {
                 container.classList.remove('hidden');
                 for (let i = 1; i < count; i++) {
+                    const extraTktNo = baseTicketNo + i;
                     const div = document.createElement('div');
-                    div.className = "grid grid-cols-1 sm:grid-cols-3 gap-2 bg-zinc-900 p-2.5 rounded-xl border border-zinc-800";
+                    div.className = "grid grid-cols-1 sm:grid-cols-4 gap-2 bg-zinc-900 p-2.5 rounded-xl border border-zinc-800 items-center";
                     div.innerHTML = `
-                        <input type="text" placeholder="الراكب الإضافي ${i}" class="extra-name bg-darkbg border border-zinc-700 rounded p-1.5 text-xs text-zinc-200" required>
-                        <input type="tel" placeholder="رقم الهاتف" class="extra-phone bg-darkbg border border-zinc-700 rounded p-1.5 text-xs text-zinc-200" required>
-                        <input type="text" placeholder="رقم الجواز" class="extra-passport bg-darkbg border border-zinc-700 rounded p-1.5 text-xs text-zinc-200" required>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[11px] text-gold font-bold whitespace-nowrap">تذكرة #</span>
+                            <input type="text" value="${extraTktNo}" class="extra-ticket-no w-full bg-zinc-950 border border-gold/60 rounded p-1.5 text-xs text-gold font-bold text-center" required>
+                        </div>
+                        <input type="text" value="${existingNames[i-1] || ''}" placeholder="الراكب الإضافي ${i}" class="extra-name bg-darkbg border border-zinc-700 rounded p-1.5 text-xs text-zinc-200" required>
+                        <input type="tel" value="${existingPhones[i-1] || ''}" placeholder="رقم الهاتف (اختياري)" class="extra-phone bg-darkbg border border-zinc-700 rounded p-1.5 text-xs text-zinc-200">
+                        <input type="text" value="${existingPassports[i-1] || ''}" placeholder="رقم الجواز" class="extra-passport bg-darkbg border border-zinc-700 rounded p-1.5 text-xs text-zinc-200" required>
                     `;
                     rowsContainer.appendChild(div);
                 }
@@ -3468,7 +3489,6 @@
             
             const selectedTripForPass = db.trips.find(t => String(t.id) === String(tripId));
             if (selectedTripForPass && selectedTripForPass.status === 'غادرت الرحلة') {
-                // الوسيلة الوحيدة لإضافة تذكرة لرحلة غادرت هي عبر الإدارة المالية
                 if (!editId && (!canModifyFinancialsOrAccounts() || String(financeOverrideDepartedTripId) !== String(tripId))) {
                     alert('عذراً، الوسيلة الوحيدة لإضافة تذكرة لرحلة غادرت هي عن طريق الإدارة المالية!');
                     return;
@@ -3482,14 +3502,27 @@
             const count = parseInt(document.getElementById('passCount').value) || 1;
             const nowStr = getFormattedDateTime();
             const author = getCurrentUserName();
+            const baseNum = parseInt(ticketNo) || 0;
             
             let extraList = [];
+            let maxIssuedTicketNo = baseNum;
             if (count > 1) {
+                const extraTktNos = document.querySelectorAll('.extra-ticket-no');
                 const names = document.querySelectorAll('.extra-name');
                 const phones = document.querySelectorAll('.extra-phone');
                 const passports = document.querySelectorAll('.extra-passport');
                 for (let i = 0; i < names.length; i++) {
-                    extraList.push({ name: names[i].value, phone: phones[i].value, passport: passports[i].value });
+                    const exTkt = (extraTktNos[i] && extraTktNos[i].value.trim())
+                        ? extraTktNos[i].value.trim()
+                        : (baseNum ? String(baseNum + i + 1) : `${ticketNo}-${i + 1}`);
+                    const exNum = parseInt(exTkt) || 0;
+                    if (exNum > maxIssuedTicketNo) maxIssuedTicketNo = exNum;
+                    extraList.push({
+                        ticketNo: exTkt,
+                        name: names[i].value,
+                        phone: phones[i].value,
+                        passport: passports[i].value
+                    });
                 }
             }
 
@@ -3549,12 +3582,14 @@
                     auditLog: [{action: 'إنشاء التذكرة', user: author, time: nowStr}]
                 };
                 db.passengers.unshift(tktData);
-                db.nextTicketNo = parseInt(ticketNo) + 1;
+                db.nextTicketNo = (maxIssuedTicketNo || parseInt(ticketNo)) + 1;
                 financeOverrideDepartedTripId = null;
                 document.getElementById('passengerForm').reset();
                 document.getElementById('passDate').value = new Date().toISOString().split('T')[0];
+                onPassengerCountChanged();
                 updateReportingTimeAutomatically();
-                alert('تم إصدار التذكرة بنجاح برقم تلقائي #' + ticketNo);
+                const extraTktMsg = extraList.length > 0 ? ` وتذاكر الركاب الإضافيين (${extraList.map(e => '#' + e.ticketNo).join('، ')})` : '';
+                alert(`تم إصدار التذكرة بنجاح برقم #${ticketNo}${extraTktMsg}`);
             }
             validateAndRepairDB();
             saveDB();
@@ -3589,10 +3624,12 @@
             document.getElementById('passReportingTime').value = item.reportingTime || '';
 
             if (item.extraPassengers && item.extraPassengers.length > 0) {
+                const extraTktNos = document.querySelectorAll('.extra-ticket-no');
                 const names = document.querySelectorAll('.extra-name');
                 const phones = document.querySelectorAll('.extra-phone');
                 const passports = document.querySelectorAll('.extra-passport');
                 item.extraPassengers.forEach((ex, i) => {
+                    if (extraTktNos[i] && ex.ticketNo) extraTktNos[i].value = ex.ticketNo;
                     if (names[i]) names[i].value = ex.name || '';
                     if (phones[i]) phones[i].value = ex.phone || '';
                     if (passports[i]) passports[i].value = ex.passport || '';
@@ -3632,7 +3669,6 @@
             if (tripId) {
                 const selectedTripForCargo = db.trips.find(t => String(t.id) === String(tripId));
                 if (selectedTripForCargo && selectedTripForCargo.status === 'غادرت الرحلة') {
-                    // الوسيلة الوحيدة لإضافة فاتورة لرحلة غادرت هي عبر الإدارة المالية
                     if (!editId && (!canModifyFinancialsOrAccounts() || String(financeOverrideDepartedTripId) !== String(tripId))) {
                         alert('عذراً، الوسيلة الوحيدة لإضافة فاتورة شحن لرحلة غادرت هي عن طريق الإدارة المالية!');
                         return;
@@ -3776,207 +3812,47 @@
             document.getElementById('cargoEditAuditBox').classList.add('hidden');
         }
 
-        function handleSaveDebtInvoice(e) {
-            e.preventDefault();
-            if (!canModifyFinancialsOrAccounts()) { alert('عذراً، التعديل في الحسابات مسموح فقط لمحمود، المدير العام، أو المحاسب!'); return; }
-            const invNo = document.getElementById('debtInvNo').value.trim();
-            const nowStr = getFormattedDateTime();
-            const author = getCurrentUserName();
-
-            const newInv = {
-                id: invNo,
-                date: document.getElementById('debtInvDate').value || '-',
-                name: document.getElementById('debtInvCustomerName').value,
-                phone: document.getElementById('debtInvCustomerPhone').value,
-                address: document.getElementById('debtInvCustomerAddress').value,
-                subTotal: parseFloat(document.getElementById('debtInvSubTotal').value) || 0,
-                paidAmount: parseFloat(document.getElementById('debtInvPaidAmount').value) || 0,
-                netTotal: parseFloat(document.getElementById('debtInvNetTotal').value) || 0,
-                branch: currentUser.branch || 'فرع عجمان',
-                createdBy: author,
-                createdAt: nowStr,
-                auditLog: [{action: 'إنشاء الفاتورة الآجلة', user: author, time: nowStr}]
-            };
-            db.debtInvoices.unshift(newInv);
-            saveDB();
-            alert('تم حفظ فاتورة الحساب الآجل بنجاح!');
-            document.getElementById('debtInvoiceForm').reset();
-            switchFinancialSubTab('debts');
-            refreshUI();
-        }
-
-        function handleSaveVoucher(e) {
-            e.preventDefault();
-            if (!canModifyFinancialsOrAccounts()) { alert('عذراً، التعديل في الحسابات والسندات مسموح فقط لمحمود، المدير العام، أو المحاسب!'); return; }
-            const v = {
-                id: Date.now().toString(),
-                type: document.getElementById('vType').value,
-                date: document.getElementById('vDate').value || '-',
-                amount: parseFloat(document.getElementById('vAmount').value) || 0,
-                receiver: document.getElementById('vReceiver').value.trim(),
-                desc: document.getElementById('vDesc').value,
-                user: currentUser.username,
-                createdBy: getCurrentUserName(),
-                branch: currentUser.branch || 'فرع عجمان'
-            };
-            db.vouchers.unshift(v);
-            saveDB();
-            document.getElementById('voucherForm').reset();
-            document.getElementById('vDate').value = new Date().toISOString().split('T')[0];
-            refreshUI();
-            alert('تم حفظ السند المالي بنجاح!');
-        }
-
-        function renderUsersTable() {
-            const tbody = document.querySelector('#usersTable tbody');
-            if(!tbody) return;
-            tbody.innerHTML = '';
-            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
-            // إظهار محمود في القائمة إذا كان المستخدم الحالي هو محمود، وإلا إخفاؤه لحماية حسابه
-            if (currentUser && currentUser.username !== 'محمود') {
-                users = users.filter(u => u.username !== 'محمود');
-            }
-            
-            users.forEach((u, idx) => {
-                let roleBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-zinc-800 text-zinc-300">${u.role}</span>`;
-                if(u.role === 'مدير عام' || u.username === 'محمود') {
-                    roleBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold gold-gradient-bg text-black shadow"><i class="fa-solid fa-crown ml-1"></i>مدير عام (جميع الأفرع والصلاحيات)</span>`;
-                } else if(u.role === 'محاسب') {
-                    roleBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-950 border border-emerald-500 text-emerald-300"><i class="fa-solid fa-calculator ml-1"></i>محاسب</span>`;
-                } else if(u.role === 'مدير' || u.role === 'مدير فرع') {
-                    roleBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-950 border border-gold text-gold"><i class="fa-solid fa-star ml-1"></i>مدير فرع</span>`;
-                }
-
-                tbody.insertRow().innerHTML = `
-                    <td><strong>${u.username}</strong></td>
-                    <td><span class="text-gold font-bold">${u.password}</span></td>
-                    <td>${roleBadge}</td>
-                    <td><span class="text-indigo-300 font-bold">${u.branch || 'فرع عجمان'}</span></td>
-                    <td class="space-x-1 space-x-reverse">
-                        <button onclick="editUser('${u.username}')" class="bg-amber-600 text-black px-2.5 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i> تعديل</button>
-                        ${(u.username !== 'وليد السيد' && u.username !== 'محمود') ? `<button onclick="deleteUser('${u.username}')" class="bg-red-900 text-white px-2.5 py-1 rounded text-xs font-bold"><i class="fa-solid fa-trash"></i></button>` : '<span class="text-[11px] text-zinc-500">محمي</span>'}
-                    </td>
-                `;
-            });
-        }
-
-        function handleSaveUser(e) {
-            e.preventDefault();
-            if (!canModifyFinancialsOrAccounts()) { alert('عذراً، إدارة المستخدمين مخصصة لمحمود، المدير العام، أو المحاسب!'); return; }
-            const origName = document.getElementById('userEditOriginalName').value;
-            const uName = document.getElementById('manageUsername').value.trim();
-            const uPass = document.getElementById('managePassword').value.trim();
-            const uRole = document.getElementById('manageRole').value;
-            const uBranch = document.getElementById('manageBranch').value;
-
-            if ((origName === 'محمود' || uName === 'محمود') && currentUser.username !== 'محمود') {
-                alert('عذراً، حساب المستخدم محمود يمتلك صلاحيات عليا ولا يمكن تعديله إلا من قِبل محمود نفسه!');
-                return;
-            }
-
-            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
-            if(origName) {
-                const idx = users.findIndex(x => x.username === origName);
-                if(idx !== -1) {
-                    users[idx].username = uName;
-                    users[idx].password = uPass;
-                    users[idx].role = (uName === 'محمود') ? 'مدير عام' : uRole;
-                    users[idx].branch = uBranch;
-                }
-                alert('تم تحديث بيانات المستخدم بنجاح!');
-            } else {
-                if(users.some(x => x.username === uName)) { alert('اسم المستخدم موجود بالفعل!'); return; }
-                users.push({ username: uName, password: uPass, role: (uName === 'محمود') ? 'مدير عام' : uRole, branch: uBranch });
-                alert('تم إضافة المستخدم الجديد بنجاح!');
-            }
-
-            localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
-            if(useFirebase && rtdb) { set(ref(rtdb, 'systemUsers'), users); }
-            resetUserForm();
-            renderUsersTable();
-        }
-
-        function editUser(username) {
-            if (!canModifyFinancialsOrAccounts()) { alert('غير مصرح لك بتعديل المستخدمين!'); return; }
-            if (username === 'محمود' && currentUser.username !== 'محمود') {
-                alert('عذراً، لا يمكن تعديل حساب المستخدم محمود إلا من قبله شخصياً!');
-                return;
-            }
-            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
-            const u = users.find(x => x.username === username);
-            if(!u) return;
-            document.getElementById('userEditOriginalName').value = u.username;
-            document.getElementById('manageUsername').value = u.username;
-            document.getElementById('managePassword').value = u.password;
-            document.getElementById('manageRole').value = u.role === 'مدير' ? 'مدير فرع' : u.role;
-            document.getElementById('manageBranch').value = u.branch || 'فرع عجمان';
-            document.getElementById('userSubmitBtn').innerText = 'حفظ التعديلات';
-        }
-
-        function deleteUser(username) {
-            if (!canModifyFinancialsOrAccounts()) { alert('غير مصرح لك بحذف المستخدمين!'); return; }
-            if (username === 'محمود' || username === 'وليد السيد') {
-                alert('لا يمكن حذف هذا الحساب المحمي!');
-                return;
-            }
-            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
-            users = users.filter(x => x.username !== username);
-            localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
-            if(useFirebase && rtdb) { set(ref(rtdb, 'systemUsers'), users); }
-            renderUsersTable();
-        }
-
-        function resetUserForm() {
-            document.getElementById('userForm').reset();
-            document.getElementById('userEditOriginalName').value = '';
-            document.getElementById('userSubmitBtn').innerText = 'إضافة مستخدم جديد';
-        }
-
         function handleGlobalSearch() {
-            const q = document.getElementById('globalSearchInput').value.trim().toLowerCase();
+            const q = document.getElementById('globalSearchInput').value.toLowerCase().trim();
             const typeFilter = document.getElementById('globalSearchType').value;
             const payFilter = document.getElementById('advFilterPayment').value;
             const originFilter = document.getElementById('advFilterOrigin').value;
             const destFilter = document.getElementById('advFilterDestination').value;
 
             let passList = getFilteredData(db.passengers);
-            passList.sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
+            let cargoList = getFilteredData(db.cargo);
 
-            const filteredP = typeFilter === 'cargo' ? [] : passList.filter(p => {
-                // في حال غادرت الرحلة لا تظهر التذاكر إلا لفرع الوجهة أو الإدارة المالية/محمود/المدير العام
-                if (p.tripId) {
-                    const trip = db.trips.find(t => String(t.id) === String(p.tripId));
-                    if (trip && trip.status === 'غادرت الرحلة' && !canUserViewDepartedTripRecord(trip)) {
-                        return false;
-                    }
-                }
-                const matchText = !q || (p.id && p.id.toLowerCase().includes(q)) || (p.name && p.name.toLowerCase().includes(q)) || (p.phone && p.phone.includes(q));
+            // إخفاء تذاكر وفواتير الرحلات التي غادرت من العرض العام (تظهر فقط في الإدارة المالية في عرض الرحلة للمدير العام والمحاسب ومحمود)
+            passList = passList.filter(p => {
+                if (!p.tripId) return true;
+                const trip = (db.trips || []).find(t => String(t.id) === String(p.tripId));
+                return !(trip && trip.status === 'غادرت الرحلة');
+            });
+
+            cargoList = cargoList.filter(c => {
+                if (!c.tripId) return true;
+                const trip = (db.trips || []).find(t => String(t.id) === String(c.tripId));
+                return !(trip && trip.status === 'غادرت الرحلة');
+            });
+
+            passList = passList.filter(p => {
+                const matchText = !q || String(p.id).toLowerCase().includes(q) || (p.name && p.name.toLowerCase().includes(q)) || (p.phone && p.phone.includes(q)) || (p.extraPassengers && p.extraPassengers.some(ex => (ex.name && ex.name.toLowerCase().includes(q)) || (ex.ticketNo && String(ex.ticketNo).toLowerCase().includes(q))));
                 const matchPay = payFilter === 'all' || p.payMethod === payFilter;
                 const matchOrigin = originFilter === 'all' || p.origin === originFilter;
                 const matchDest = destFilter === 'all' || p.destination === destFilter;
                 return matchText && matchPay && matchOrigin && matchDest;
             });
-            renderPassengersTable(filteredP);
 
-            let cargoList = getFilteredData(db.cargo);
-            cargoList.sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
-
-            const filteredC = typeFilter === 'ticket' ? [] : cargoList.filter(c => {
-                // في حال غادرت الرحلة لا تظهر الفواتير إلا لفرع الوجهة أو الإدارة المالية/محمود/المدير العام
-                if (c.tripId) {
-                    const trip = db.trips.find(t => String(t.id) === String(c.tripId));
-                    if (trip && trip.status === 'غادرت الرحلة' && !canUserViewDepartedTripRecord(trip)) {
-                        return false;
-                    }
-                }
-                const itemDesc = c.items ? c.items.map(i => i.desc).join(' ') : '';
-                const matchText = !q || (c.id && c.id.toLowerCase().includes(q)) || (c.sender && c.sender.toLowerCase().includes(q)) || (c.receiver && c.receiver.toLowerCase().includes(q)) || itemDesc.toLowerCase().includes(q);
+            cargoList = cargoList.filter(c => {
+                const matchText = !q || String(c.id).toLowerCase().includes(q) || (c.sender && c.sender.toLowerCase().includes(q)) || (c.receiver && c.receiver.toLowerCase().includes(q)) || (c.items && c.items.some(it => it.desc.toLowerCase().includes(q)));
                 const matchPay = payFilter === 'all' || c.paymentStatus === payFilter;
                 const matchOrigin = originFilter === 'all' || (c.senderAddress && c.senderAddress.includes(originFilter));
                 const matchDest = destFilter === 'all' || (c.receiverAddress && c.receiverAddress.includes(destFilter));
                 return matchText && matchPay && matchOrigin && matchDest;
             });
-            renderCargoTable(filteredC);
+
+            renderPassengersTable(typeFilter === 'cargo' ? [] : passList);
+            renderCargoTable(typeFilter === 'ticket' ? [] : cargoList);
         }
 
         function resetGlobalSearch() {
@@ -3988,712 +3864,137 @@
             handleGlobalSearch();
         }
 
-        function renderPassengersTable(list) {
+        function updatePassengerPaymentStatus(id, newStatus) {
+            const idx = db.passengers.findIndex(x => String(x.id) === String(id));
+            if (idx !== -1) {
+                const nowStr = getFormattedDateTime();
+                const author = getCurrentUserName();
+                let item = db.passengers[idx];
+                if (item.tripId) {
+                    const trip = db.trips.find(t => String(t.id) === String(item.tripId));
+                    if (trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
+                        alert('عذراً، بعد مغادرة الرحلة لا يمكن تعديل السداد إلا من الإدارة المالية!');
+                        refreshUI();
+                        return;
+                    }
+                }
+                item.payMethod = newStatus;
+                if(!item.auditLog) item.auditLog = [{action: 'إنشاء', user: item.createdBy || author, time: item.createdAt || nowStr}];
+                item.auditLog.push({action: `تغيير حالة السداد إلى (${newStatus})`, user: author, time: nowStr});
+                saveDB();
+                refreshUI();
+            }
+        }
+
+        function renderPassengersTable(list = getFilteredData(db.passengers)) {
             const tbody = document.querySelector('#passengersTable tbody');
             if(!tbody) return;
             tbody.innerHTML = '';
-            const data = list || getFilteredData(db.passengers);
-            const isFinOrAdmin = canModifyFinancialsOrAccounts();
 
-            data.forEach(p => {
-                const realIndex = db.passengers.findIndex(item => item.id === p.id);
-                let extraNames = '-';
-                if (p.extraPassengers && p.extraPassengers.length > 0) {
-                    extraNames = p.extraPassengers.map(ex => `<div class="text-[11px] text-amber-300">• ${ex.name}</div>`).join('');
-                }
-                const trip = p.tripId ? db.trips.find(t => String(t.id) === String(p.tripId)) : null;
+            let sortedList = [...list].sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
+
+            let totalRev = 0;
+            sortedList.forEach((p) => {
+                const realIdx = db.passengers.findIndex(x => String(x.id) === String(p.id));
+                totalRev += (p.fare || 0);
+                const extraNames = (p.extraPassengers && p.extraPassengers.length > 0)
+                    ? p.extraPassengers.map(ex => `<span class="text-amber-300 font-bold">#${ex.ticketNo || '-'}</span> ${ex.name}`).join('، ')
+                    : '-';
+                const trip = (db.trips || []).find(t => String(t.id) === String(p.tripId));
                 const isDeparted = trip && trip.status === 'غادرت الرحلة';
-                const atDestBranch = trip && isUserAtTripDestinationBranch(trip);
-
-                // بعد مغادرة الرحلة: لا يمكن تعديل أي شيء سوى تغيير حالة السداد لفرع الوجهة، أو التعديل الكامل للإدارة المالية
-                let payStatusCell = `
-                    <select onchange="updatePassengerStatus(${realIndex}, this.value)" class="bg-zinc-900 border border-zinc-700 rounded p-1 text-xs text-gold">
-                        <option value="مدفوع" ${p.payMethod==='مدفوع'?'selected':''}>مدفوع</option>
-                        <option value="الدفع عند الباص" ${p.payMethod==='الدفع عند الباص'?'selected':''}>الدفع عند الباص</option>
-                        <option value="مؤجل باليمن" ${p.payMethod==='مؤجل باليمن'?'selected':''}>مؤجل باليمن</option>
-                    </select>
-                `;
-                if (isDeparted && !isFinOrAdmin && atDestBranch) {
-                    payStatusCell = `
-                        <select onchange="updatePassengerStatus(${realIndex}, this.value)" class="bg-zinc-900 border border-emerald-500 rounded p-1 text-xs text-emerald-300 font-bold">
-                            <option value="${p.payMethod}" ${p.payMethod!=='مدفوع' && p.payMethod!=='مؤجل باليمن'?'selected':''}>${p.payMethod}</option>
-                            <option value="مدفوع" ${p.payMethod==='مدفوع'?'selected':''}>مدفوع</option>
-                            <option value="مؤجل باليمن" ${p.payMethod==='مؤجل باليمن'?'selected':''}>مؤجل باليمن</option>
-                        </select>
-                    `;
-                } else if (isDeparted && !isFinOrAdmin) {
-                    payStatusCell = `<span class="text-xs font-bold text-zinc-400">${p.payMethod}</span>`;
-                }
-
-                const canFullEdit = !isDeparted || isFinOrAdmin;
+                const canEditThis = !isDeparted || canModifyFinancialsOrAccounts();
 
                 tbody.insertRow().innerHTML = `
-                    <td><strong class="text-gold">#${p.id}</strong></td>
-                    <td><span class="text-amber-300 font-bold">${p.agent || '-'}</span></td>
+                    <td><strong>#${p.id}</strong></td>
+                    <td>${p.agent || '-'}</td>
                     <td><strong>${p.name}</strong></td>
-                    <td>${extraNames}</td>
+                    <td><span class="text-[11px] text-zinc-300">${extraNames}</span></td>
                     <td>${p.phone}</td>
-                    <td>${p.origin} ➔ ${p.destination}</td>
-                    <td><strong class="text-amber-400">${p.date || '-'}</strong></td>
-                    <td><strong class="text-gold">${p.fare || 350} AED</strong></td>
+                    <td>${p.origin} → ${p.destination}</td>
+                    <td><strong class="text-gold">${p.date || '-'}</strong></td>
+                    <td><strong>${p.fare} AED</strong></td>
                     <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${p.createdBy || 'النظام'}</span></td>
-                    <td>${payStatusCell}</td>
+                    <td>
+                        <select ${!canEditThis ? 'disabled' : ''} onchange="updatePassengerPaymentStatus('${p.id}', this.value)" class="bg-zinc-900 border ${p.payMethod === 'مدفوع' ? 'border-emerald-500 text-emerald-400' : 'border-amber-500 text-amber-300'} rounded-lg px-2 py-1 text-xs font-bold outline-none ${!canEditThis ? 'opacity-60 cursor-not-allowed' : ''}">
+                            <option value="مدفوع" ${p.payMethod === 'مدفوع' ? 'selected' : ''}>مدفوع</option>
+                            <option value="الدفع عند الباص" ${p.payMethod === 'الدفع عند الباص' ? 'selected' : ''}>الدفع عند الباص</option>
+                            <option value="مؤجل باليمن" ${p.payMethod === 'مؤجل باليمن' ? 'selected' : ''}>مؤجل باليمن</option>
+                        </select>
+                    </td>
                     <td><span class="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-xs">${p.branch || 'فرع عجمان'}</span></td>
                     <td class="space-x-1 space-x-reverse">
-                        <button onclick="previewTicketImage('${p.id}')" class="bg-gold text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-print"></i></button>
-                        ${canFullEdit ? `<button onclick="editPassenger('${p.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>` : '<span class="text-[10px] text-zinc-500 px-1" title="مغادرة - تعديل السداد فقط"><i class="fa-solid fa-lock"></i></span>'}
-                        ${canFullEdit ? `<button onclick="deletePassenger(${realIndex})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        <button onclick="previewTicketImage('${p.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-image"></i> بوليصة</button>
+                        ${canEditThis ? `<button onclick="editPassenger('${p.id}')" class="bg-sky-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>` : ''}
+                        ${canEditThis ? `<button onclick="deletePassenger(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </td>
                 `;
             });
-            document.getElementById('statTicketCount').innerText = data.length;
-            document.getElementById('statTicketRevenue').innerText = `${data.filter(x=>x.payMethod==='مدفوع').reduce((s,x)=>s+(x.fare||0),0)} AED`;
+            document.getElementById('statTicketCount').innerText = sortedList.length;
+            document.getElementById('statTicketRevenue').innerText = `${totalRev} AED`;
         }
 
-        function renderCargoTable(list) {
+        function updateCargoPaymentStatus(id, newStatus) {
+            const idx = db.cargo.findIndex(x => String(x.id) === String(id));
+            if (idx !== -1) {
+                const nowStr = getFormattedDateTime();
+                const author = getCurrentUserName();
+                let item = db.cargo[idx];
+                if (item.tripId) {
+                    const trip = db.trips.find(t => String(t.id) === String(item.tripId));
+                    if (trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
+                        alert('عذراً، بعد مغادرة الرحلة لا يمكن تعديل السداد إلا من الإدارة المالية!');
+                        refreshUI();
+                        return;
+                    }
+                }
+                item.paymentStatus = newStatus;
+                if(!item.auditLog) item.auditLog = [{action: 'إنشاء', user: item.createdBy || author, time: item.createdAt || nowStr}];
+                item.auditLog.push({action: `تغيير حالة السداد إلى (${newStatus})`, user: author, time: nowStr});
+                saveDB();
+                refreshUI();
+            }
+        }
+
+        function renderCargoTable(list = getFilteredData(db.cargo)) {
             const tbody = document.querySelector('#cargoTable tbody');
             if(!tbody) return;
             tbody.innerHTML = '';
-            const data = list || getFilteredData(db.cargo);
-            const isFinOrAdmin = canModifyFinancialsOrAccounts();
 
-            data.forEach(c => {
-                const realIndex = db.cargo.findIndex(item => item.id === c.id);
-                const linkedTrip = db.trips.find(t => t.id === c.tripId);
-                const tripBadge = linkedTrip ? `<span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${linkedTrip.route} (${linkedTrip.date})</span>` : `<span class="text-zinc-500 text-xs">عامة</span>`;
-                
-                const isDeparted = linkedTrip && linkedTrip.status === 'غادرت الرحلة';
-                const atDestBranch = linkedTrip && isUserAtTripDestinationBranch(linkedTrip);
+            let sortedList = [...list].sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
 
-                let payStatusCell = `
-                    <select onchange="updateCargoStatus(${realIndex}, this.value)" class="bg-zinc-900 border border-zinc-700 rounded p-1 text-xs text-gold">
-                        <option value="مدفوع" ${c.paymentStatus==='مدفوع'?'selected':''}>مدفوع</option>
-                        <option value="أجل بالامارات" ${c.paymentStatus==='أجل بالامارات'?'selected':''}>أجل بالامارات</option>
-                        <option value="الدفع باليمن" ${c.paymentStatus==='الدفع باليمن'?'selected':''}>الدفع باليمن</option>
-                        <option value="مؤجل باليمن" ${c.paymentStatus==='مؤجل باليمن'?'selected':''}>مؤجل باليمن</option>
-                    </select>
-                `;
-                if (isDeparted && !isFinOrAdmin && atDestBranch) {
-                    payStatusCell = `
-                        <select onchange="updateCargoStatus(${realIndex}, this.value)" class="bg-zinc-900 border border-emerald-500 rounded p-1 text-xs text-emerald-300 font-bold">
-                            <option value="${c.paymentStatus}" ${c.paymentStatus!=='مدفوع' && c.paymentStatus!=='مؤجل باليمن'?'selected':''}>${c.paymentStatus}</option>
-                            <option value="مدفوع" ${c.paymentStatus==='مدفوع'?'selected':''}>مدفوع</option>
-                            <option value="مؤجل باليمن" ${c.paymentStatus==='مؤجل باليمن'?'selected':''}>مؤجل باليمن</option>
-                        </select>
-                    `;
-                } else if (isDeparted && !isFinOrAdmin) {
-                    payStatusCell = `<span class="text-xs font-bold text-zinc-400">${c.paymentStatus}</span>`;
-                }
-
-                const canFullEdit = !isDeparted || isFinOrAdmin;
+            sortedList.forEach((c) => {
+                const realIdx = db.cargo.findIndex(x => String(x.id) === String(c.id));
+                const itemsCount = c.items ? c.items.length : 1;
+                const trip = (db.trips || []).find(t => String(t.id) === String(c.tripId));
+                const tripInfoText = trip ? `${trip.date !== '-' ? trip.date : ''} (${trip.route})` : '-';
+                const isDeparted = trip && trip.status === 'غادرت الرحلة';
+                const canEditThis = !isDeparted || canModifyFinancialsOrAccounts();
 
                 tbody.insertRow().innerHTML = `
-                    <td><strong class="text-gold">#${c.id}</strong></td>
-                    <td>${c.date || '-'}</td>
+                    <td><strong>#${c.id}</strong></td>
+                    <td><strong class="text-gold">${c.date || '-'}</strong></td>
                     <td><strong>${c.sender}</strong></td>
-                    <td>${c.receiver} <div class="text-[11px] text-amber-400">${c.receiverAddress || ''}</div></td>
-                    <td>${tripBadge}</td>
-                    <td>${c.items ? c.items.length : 1}</td>
-                    <td><strong class="text-gold">${c.grandTotal} AED</strong></td>
+                    <td><strong>${c.receiver}</strong> <span class="text-zinc-400 text-[11px]">(${c.receiverAddress || 'عدن'})</span></td>
+                    <td><span class="text-[11px] text-indigo-300 font-bold">${tripInfoText}</span></td>
+                    <td><span class="bg-zinc-800 px-2 py-0.5 rounded text-xs font-bold text-gold">${itemsCount} أصناف</span></td>
+                    <td><strong>${c.grandTotal} AED</strong></td>
                     <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${c.createdBy || 'النظام'}</span></td>
-                    <td>${payStatusCell}</td>
+                    <td>
+                        <select ${!canEditThis ? 'disabled' : ''} onchange="updateCargoPaymentStatus('${c.id}', this.value)" class="bg-zinc-900 border ${c.paymentStatus === 'مدفوع' ? 'border-emerald-500 text-emerald-400' : 'border-amber-500 text-amber-300'} rounded-lg px-2 py-1 text-xs font-bold outline-none ${!canEditThis ? 'opacity-60 cursor-not-allowed' : ''}">
+                            <option value="مدفوع" ${c.paymentStatus === 'مدفوع' ? 'selected' : ''}>مدفوع</option>
+                            <option value="أجل بالامارات" ${c.paymentStatus === 'أجل بالامارات' ? 'selected' : ''}>أجل بالامارات</option>
+                            <option value="الدفع باليمن" ${c.paymentStatus === 'الدفع باليمن' ? 'selected' : ''}>الدفع باليمن</option>
+                            <option value="مؤجل باليمن" ${c.paymentStatus === 'مؤجل باليمن' ? 'selected' : ''}>مؤجل باليمن</option>
+                        </select>
+                    </td>
                     <td><span class="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-xs">${c.branch || 'فرع عجمان'}</span></td>
                     <td class="space-x-1 space-x-reverse">
-                        <button onclick="previewCargoImage('${c.id}')" class="bg-gold text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-print"></i></button>
-                        ${canFullEdit ? `<button onclick="editCargo('${c.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>` : '<span class="text-[10px] text-zinc-500 px-1" title="مغادرة - تعديل السداد فقط"><i class="fa-solid fa-lock"></i></span>'}
-                        ${canFullEdit ? `<button onclick="deleteCargo(${realIndex})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        <button onclick="previewCargoImage('${c.id}')" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-file-invoice"></i> فاتورة</button>
+                        ${canEditThis ? `<button onclick="editCargo('${c.id}')" class="bg-sky-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>` : ''}
+                        ${canEditThis ? `<button onclick="deleteCargo(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </td>
                 `;
             });
-        }
-
-        function renderVouchersTable() {
-            const tbody = document.querySelector('#vouchersTable tbody');
-            if(!tbody) return;
-            tbody.innerHTML = '';
-            const filteredV = getFilteredData(db.vouchers);
-            filteredV.forEach(v => {
-                const realIdx = db.vouchers.findIndex(item => item.id === v.id);
-                tbody.insertRow().innerHTML = `
-                    <td><span class="px-2 py-0.5 rounded text-xs font-bold ${v.type==='قبض'?'bg-emerald-950 text-emerald-400':'bg-red-950 text-red-400'}">${v.type}</span></td>
-                    <td>${v.date || '-'}</td>
-                    <td><strong class="text-amber-300">${v.receiver || '-'}</strong></td>
-                    <td>${v.desc}</td>
-                    <td><strong>${v.amount} AED</strong></td>
-                    <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${v.createdBy || v.user || 'النظام'}</span></td>
-                    <td><span class="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-xs">${v.branch || 'فرع عجمان'}</span></td>
-                    <td><button onclick="deleteVoucher(${realIdx})" class="text-red-400 text-xs"><i class="fa-solid fa-trash"></i></button></td>
-                `;
-            });
-        }
-
-        function renderDebtInvoicesTable() {
-            const tbody = document.querySelector('#debtInvoicesTable tbody');
-            if(!tbody) return;
-            tbody.innerHTML = '';
-            const filteredDebts = getFilteredData(db.debtInvoices);
-            filteredDebts.forEach(inv => {
-                const realIdx = db.debtInvoices.findIndex(item => item.id === inv.id);
-                tbody.insertRow().innerHTML = `
-                    <td><strong class="text-gold">#${inv.id}</strong></td>
-                    <td>${inv.date || '-'}</td>
-                    <td><strong>${inv.name}</strong></td>
-                    <td>${inv.phone}</td>
-                    <td>${inv.subTotal} AED</td>
-                    <td class="text-emerald-400 font-bold">${inv.paidAmount} AED</td>
-                    <td class="text-amber-400 font-bold">${inv.netTotal} AED</td>
-                    <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${inv.createdBy || 'النظام'}</span></td>
-                    <td><span class="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-xs">${inv.branch || 'فرع عجمان'}</span></td>
-                    <td class="space-x-1 space-x-reverse whitespace-nowrap">
-                        <button onclick="sendDebtReminderWhatsApp('${inv.id}')" title="إرسال تذكير سداد عبر الواتساب" class="bg-emerald-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-brands fa-whatsapp"></i></button>
-                        <button onclick="previewDebtInvoice('${inv.id}')" class="bg-gold text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-print"></i></button>
-                        <button onclick="deleteDebtInvoice(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                `;
-            });
-        }
-
-        function renderFinancials() {
-            const filteredPass = getFilteredData(db.passengers);
-            const filteredCargo = getFilteredData(db.cargo);
-            const filteredVouchers = getFilteredData(db.vouchers);
-            const filteredDrivers = getFilteredData(db.drivers);
-
-            const tktRev = filteredPass.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (p.fare || 0), 0);
-            const crgRev = filteredCargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + c.grandTotal, 0);
-            const trsRev = getFilteredData(db.transitVisas || []).filter(t => t.paymentStatus === 'تم الدفع والاصدار').reduce((s, t) => s + (t.amount || 0), 0);
-            const paidRev = tktRev + crgRev + trsRev;
-            
-            const vRec = filteredVouchers.filter(v => v.type === 'قبض').reduce((s, v) => s + v.amount, 0);
-            const vExp = filteredVouchers.filter(v => v.type === 'صرف').reduce((s, v) => s + v.amount, 0);
-            const driverExp = filteredDrivers.reduce((s, d) => s + (d.totalExpenses || 0), 0);
-
-            document.getElementById('finRevSum').innerText = `${paidRev} AED`;
-            document.getElementById('finDriverExpSum').innerText = `${driverExp} AED`;
-            document.getElementById('finExpensesSum').innerText = `${vExp} AED`;
-            document.getElementById('finNetBoxSum').innerText = `${(paidRev + vRec) - (vExp + driverExp)} AED`;
-            renderDailyCashClosingReport();
-            renderDepartedTripsFinancialsTable();
-        }
-
-        function renderDailyCashClosingReport() {
-            const dateInput = document.getElementById('dailyCloseDate');
-            if (!dateInput) return;
-            if (!dateInput.value) dateInput.value = new Date().toISOString().split('T')[0];
-            const targetDate = dateInput.value;
-
-            const filteredPass = getFilteredData(db.passengers);
-            const filteredCargo = getFilteredData(db.cargo);
-            const filteredTransit = getFilteredData(db.transitVisas || []);
-            const filteredVouchers = getFilteredData(db.vouchers);
-            const filteredDrivers = getFilteredData(db.drivers);
-
-            const tktPaid = filteredPass.filter(p => p.date === targetDate && p.payMethod === 'مدفوع').reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
-            const crgPaid = filteredCargo.filter(c => c.date === targetDate && c.paymentStatus === 'مدفوع').reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
-            const trsPaid = filteredTransit.filter(t => t.date === targetDate && t.paymentStatus === 'تم الدفع والاصدار').reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
-            const vRec = filteredVouchers.filter(v => v.date === targetDate && v.type === 'قبض').reduce((s, v) => s + (parseFloat(v.amount) || 0), 0);
-
-            const vExp = filteredVouchers.filter(v => v.date === targetDate && v.type === 'صرف').reduce((s, v) => s + (parseFloat(v.amount) || 0), 0);
-            const drvExp = filteredDrivers.filter(d => d.date === targetDate).reduce((s, d) => s + (parseFloat(d.totalExpenses) || 0), 0);
-
-            const totalIn = tktPaid + crgPaid + trsPaid + vRec;
-            const totalOut = vExp + drvExp;
-            const netCash = totalIn - totalOut;
-
-            document.getElementById('dcTicketsPaid').innerText = `${tktPaid} AED`;
-            document.getElementById('dcCargoPaid').innerText = `${crgPaid} AED`;
-            document.getElementById('dcOtherIn').innerText = `${trsPaid + vRec} AED`;
-            document.getElementById('dcTotalOut').innerText = `${totalOut} AED`;
-            document.getElementById('dcNetCash').innerText = `${netCash} AED`;
-        }
-
-        function exportDailyClosingPDF() {
-            exportToPDF('dailyClosingCaptureArea', 'WadiBina_DailyClosing_');
-        }
-
-        function sendTripReminderWhatsApp() {
-            if (!currentPreviewTicket) return;
-            const tkt = currentPreviewTicket;
-            const targetPhone = formatPhoneForWhatsApp(tkt.phone);
-            if (!targetPhone) { alert('عذراً، رقم هاتف الراكب غير مسجل أو غير صحيح!'); return; }
-            const msg = `شركة وادي بنا ترحب بكم\nتذكير بموعد رحلتكم (${tkt.origin} ➔ ${tkt.destination})\nالتاريخ: ${tkt.date || '-'}\nوقت الحضور: ${tkt.reportingTime || '-'}\nرقم التذكرة: #${tkt.id}`;
-            window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
-
-        function sendCargoReceiverWhatsApp() {
-            if (!currentPreviewCargo) return;
-            const cargo = currentPreviewCargo;
-            const targetPhone = formatPhoneForWhatsApp(cargo.receiverPhone);
-            if (!targetPhone) { alert('عذراً، رقم هاتف المستلم غير مسجل أو غير صحيح!'); return; }
-            const downloadUrl = getDirectDownloadLink('cargo', cargo.id);
-            const msg = `شركة وادي بنا ترحب بكم\nلديكم طرد شحن مرسل من: ${cargo.sender}\nرقم الفاتورة: #${cargo.id}\n${downloadUrl}`;
-            window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
-
-        function sendDebtReminderWhatsApp(id) {
-            const inv = (db.debtInvoices || []).find(x => String(x.id) === String(id));
-            if (!inv) return;
-            const targetPhone = formatPhoneForWhatsApp(inv.phone);
-            if (!targetPhone) { alert('عذراً، رقم هاتف العميل غير مسجل أو غير صحيح!'); return; }
-            const msg = `شركة وادي بنا ترحب بكم\nتذكير ودي بخصوص الفاتورة الآجلة رقم #${inv.id}\nالمبلغ المتبقي: ${inv.netTotal} AED\nشاكرين لكم حسن تعاونكم.`;
-            window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
-
-        function printThermalReceipt(type) {
-            const win = window.open('', '_blank', 'width=340,height=600');
-            if (!win) { alert('يرجى السماح بالنوافذ المنبثقة لطباعة الإيصال الحراري'); return; }
-            let bodyHtml = '';
-            if (type === 'ticket' && currentPreviewTicket) {
-                const t = currentPreviewTicket;
-                bodyHtml = `
-                    <div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:8px; margin-bottom:8px;">
-                        <h3 style="margin:0; font-size:15px;">شركة وادي بناء للنقل الدولي</h3>
-                        <p style="margin:2px 0; font-size:11px;">إيصال تذكرة سفر #${t.id}</p>
-                    </div>
-                    <div style="font-size:12px; line-height:1.6;">
-                        <div><strong>الراكب:</strong> ${t.name}</div>
-                        <div><strong>الهاتف:</strong> ${t.phone}</div>
-                        <div><strong>المسار:</strong> ${t.origin} ➔ ${t.destination}</div>
-                        <div><strong>التاريخ:</strong> ${t.date || '-'}</div>
-                        <div><strong>الحضور:</strong> ${t.reportingTime || '-'}</div>
-                        <div><strong>عدد الركاب:</strong> ${t.passengerCount || 1}</div>
-                        <div style="border-top:1px dashed #000; margin-top:6px; padding-top:6px; font-size:14px;">
-                            <strong>الإجمالي: ${t.fare || 0} AED (${t.payMethod})</strong>
-                        </div>
-                    </div>
-                `;
-            } else if (type === 'cargo' && currentPreviewCargo) {
-                const c = currentPreviewCargo;
-                const itemsHtml = (c.items || []).map(i => `<div>• ${i.desc} (${i.qty}) = ${i.qty * i.price} AED</div>`).join('');
-                bodyHtml = `
-                    <div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:8px; margin-bottom:8px;">
-                        <h3 style="margin:0; font-size:15px;">شركة وادي بناء للنقل الدولي</h3>
-                        <p style="margin:2px 0; font-size:11px;">إيصال شحن بضائع #${c.id}</p>
-                    </div>
-                    <div style="font-size:12px; line-height:1.6;">
-                        <div><strong>المرسل:</strong> ${c.sender} (${c.senderPhone})</div>
-                        <div><strong>المستلم:</strong> ${c.receiver} (${c.receiverPhone})</div>
-                        <div><strong>الوجهة:</strong> ${c.receiverAddress || '-'}</div>
-                        <div style="border-top:1px dashed #000; margin-top:4px; padding-top:4px;"><strong>الأصناف:</strong>${itemsHtml}</div>
-                        <div style="border-top:1px dashed #000; margin-top:6px; padding-top:6px; font-size:14px;">
-                            <strong>الإجمالي: ${c.grandTotal} AED (${c.paymentStatus})</strong>
-                        </div>
-                    </div>
-                `;
-            }
-            win.document.write(`<html dir="rtl"><head><title>إيصال حراري 80mm</title><style>body{font-family:Tahoma,Arial,sans-serif;width:72mm;margin:0 auto;padding:6px;color:#000;}@media print{@page{size:80mm auto;margin:2mm;}}</style></head><body>${bodyHtml}<div style="text-align:center;margin-top:10px;font-size:10px;border-top:1px dashed #000;padding-top:6px;">شكراً لاختياركم وادي بناء</div><script>window.onload=function(){window.print();window.close();}<\/script></body></html>`);
-            win.document.close();
-        }
-
-        // ================= إدارة حسابات الرحلات التي غادرت (في الإدارة المالية) =================
-        let activeTripDetailsId = null;
-        let activeTripDetailsMode = 'ops';
-
-        function renderDepartedTripsFinancialsTable() {
-            const tbody = document.querySelector('#finDepartedTripsTable tbody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-
-            const departedTrips = (db.trips || []).filter(t => t.status === 'غادرت الرحلة');
-            departedTrips.sort((a, b) => b.id.localeCompare(a.id));
-
-            if (departedTrips.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12" class="text-center py-6 text-zinc-400">لا توجد رحلات مغادرة حالياً</td></tr>';
-                return;
-            }
-
-            departedTrips.forEach((trip, idx) => {
-                const tripTickets = (db.passengers || []).filter(p => String(p.tripId) === String(trip.id));
-                const tripCargos = (db.cargo || []).filter(c => String(c.tripId) === String(trip.id));
-
-                const tktTotal = tripTickets.reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
-                const cargoTotal = tripCargos.reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
-                const grandTotal = tktTotal + cargoTotal;
-
-                const tktPaid = tripTickets.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
-                const cargoPaid = tripCargos.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
-                const totalPaid = tktPaid + cargoPaid;
-                const totalPending = grandTotal - totalPaid;
-                const linkedDriverExp = (db.drivers || []).filter(d => d.date === trip.date).reduce((s, d) => s + (parseFloat(d.totalExpenses) || 0), 0);
-                const tripNetProfit = totalPaid - linkedDriverExp;
-
-                tbody.insertRow().innerHTML = `
-                    <td><strong class="text-gold">#${departedTrips.length - idx}</strong></td>
-                    <td><strong class="text-amber-400">${trip.date || '-'}</strong></td>
-                    <td>${trip.route}</td>
-                    <td>${trip.busInfo}</td>
-                    <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded-full text-xs font-bold">${tripTickets.length} تذاكر</span></td>
-                    <td><span class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded-full text-xs font-bold">${tripCargos.length} فواتير</span></td>
-                    <td><strong class="text-zinc-100">${grandTotal} AED</strong></td>
-                    <td><strong class="text-emerald-400">${totalPaid} AED</strong></td>
-                    <td><strong class="text-red-400">${totalPending} AED</strong></td>
-                    <td><strong class="text-amber-400">${linkedDriverExp} AED</strong></td>
-                    <td><strong class="${tripNetProfit >= 0 ? 'text-emerald-400' : 'text-red-500'} font-black">${tripNetProfit} AED</strong></td>
-                    <td class="whitespace-nowrap">
-                        <button onclick="openTripDetailsModal('${trip.id}', 'finance')" class="gold-gradient-bg text-black px-3 py-1.5 rounded-xl text-xs font-extrabold shadow hover:opacity-90">
-                            <i class="fa-solid fa-file-invoice-dollar ml-1"></i> عرض وإدارة حسابات الرحلة
-                        </button>
-                    </td>
-                `;
-            });
-        }
-
-        function openTripDetailsModal(tripId, mode = 'ops') {
-            const trip = (db.trips || []).find(t => String(t.id) === String(tripId));
-            if (!trip) return;
-
-            if (trip.status === 'غادرت الرحلة' && !canUserViewDepartedTripRecord(trip)) {
-                alert('عذراً، بعد مغادرة الرحلة لا تظهر بياناتها إلا لفرع الوجهة أو الإدارة المالية!');
-                return;
-            }
-
-            activeTripDetailsId = tripId;
-            activeTripDetailsMode = mode;
-
-            document.getElementById('tripDetailsModalTitle').innerText = mode === 'finance'
-                ? `إدارة حسابات الرحلة المغادرة: ${trip.route}`
-                : (mode === 'dest_branch' ? `فواتير وتذاكر الرحلة الواردة (فرع الوجهة): ${trip.route}` : `تفاصيل الرحلة: ${trip.route}`);
-            document.getElementById('tripDetailsModalSub').innerText = `تاريخ الرحلة: ${trip.date || '-'} | الباص والسائق: ${trip.busInfo} | الحالة: ${trip.status || 'مجدولة'}`;
-
-            // إظهار أزرار إضافة تذكرة/فاتورة لرحلة غادرت حصرياً عند الدخول من الإدارة المالية
-            const addBar = document.getElementById('departedTripFinanceAddBar');
-            if (addBar) {
-                if (mode === 'finance' && trip.status === 'غادرت الرحلة' && canModifyFinancialsOrAccounts()) {
-                    addBar.classList.remove('hidden');
-                } else {
-                    addBar.classList.add('hidden');
-                }
-            }
-
-            const finBar = document.getElementById('tripFinancialSummaryBar');
-            if (mode === 'finance') {
-                finBar.classList.remove('hidden');
-            } else {
-                finBar.classList.add('hidden');
-            }
-
-            renderTripDetailsTables();
-            switchTripDetailsBranch('tickets');
-            document.getElementById('tripDetailsModal').classList.remove('hidden');
-        }
-
-        function openAddTicketForDepartedTrip() {
-            if (!activeTripDetailsId || !canModifyFinancialsOrAccounts()) return;
-            const targetId = activeTripDetailsId;
-            closeModal('tripDetailsModal');
-            financeOverrideDepartedTripId = targetId;
-            switchTab('passengers');
-            populateTripsDropdown();
-            const sel = document.getElementById('passTripSelect');
-            if (sel) {
-                sel.value = targetId;
-                onTripSelectedForTicket();
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function openAddCargoForDepartedTrip() {
-            if (!activeTripDetailsId || !canModifyFinancialsOrAccounts()) return;
-            const targetId = activeTripDetailsId;
-            closeModal('tripDetailsModal');
-            financeOverrideDepartedTripId = targetId;
-            switchTab('cargo');
-            populateTripsDropdown();
-            const sel = document.getElementById('cargoTripSelect');
-            if (sel) {
-                sel.value = targetId;
-                onTripSelectedForCargo();
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function switchTripDetailsBranch(branch) {
-            const btnTkt = document.getElementById('btnTripSubTickets');
-            const btnCrg = document.getElementById('btnTripSubCargo');
-            const boxTkt = document.getElementById('tripBranchTicketsContainer');
-            const boxCrg = document.getElementById('tripBranchCargoContainer');
-
-            if (branch === 'tickets') {
-                btnTkt.className = 'py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition gold-gradient-bg text-black shadow';
-                btnCrg.className = 'py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition bg-zinc-800 text-zinc-300 hover:text-gold border border-zinc-700';
-                boxTkt.classList.remove('hidden');
-                boxCrg.classList.add('hidden');
-            } else {
-                btnCrg.className = 'py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition gold-gradient-bg text-black shadow';
-                btnTkt.className = 'py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition bg-zinc-800 text-zinc-300 hover:text-gold border border-zinc-700';
-                boxCrg.classList.remove('hidden');
-                boxTkt.classList.add('hidden');
-            }
-        }
-
-        function renderTripDetailsTables() {
-            if (!activeTripDetailsId) return;
-            const trip = (db.trips || []).find(t => String(t.id) === String(activeTripDetailsId));
-            const isDeparted = trip && trip.status === 'غادرت الرحلة';
-            const isFin = activeTripDetailsMode === 'finance' && canModifyFinancialsOrAccounts();
-            const isDestBranchOnly = isDeparted && !canModifyFinancialsOrAccounts() && trip && isUserAtTripDestinationBranch(trip);
-
-            const tripTickets = (db.passengers || []).filter(p => String(p.tripId) === String(activeTripDetailsId));
-            const tripCargos = (db.cargo || []).filter(c => String(c.tripId) === String(activeTripDetailsId));
-
-            document.getElementById('tripBranchTktCount').innerText = tripTickets.length;
-            document.getElementById('tripBranchCargoCount').innerText = tripCargos.length;
-
-            if (isFin) {
-                const tktTotal = tripTickets.reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
-                const cargoTotal = tripCargos.reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
-                const tktPaid = tripTickets.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
-                const cargoPaid = tripCargos.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
-                document.getElementById('tripFinTktTotal').innerText = `${tktTotal} AED`;
-                document.getElementById('tripFinCargoTotal').innerText = `${cargoTotal} AED`;
-                document.getElementById('tripFinGrandTotal').innerText = `${tktPaid + cargoPaid} / ${tktTotal + cargoTotal} AED`;
-            }
-
-            // 1. جدول التذاكر
-            const tktHead = document.getElementById('tripBranchTicketsHead');
-            const tktBody = document.getElementById('tripBranchTicketsBody');
-            tktHead.innerHTML = `
-                <tr>
-                    <th>رقم التذكرة</th>
-                    <th>الوكيل</th>
-                    <th>اسم الراكب</th>
-                    <th>رقم الهاتف</th>
-                    <th>المسار</th>
-                    <th>${isFin ? 'السعر (تعديل مباشر)' : 'السعر'}</th>
-                    <th>حالة السداد</th>
-                    <th>إجراءات</th>
-                </tr>
-            `;
-            tktBody.innerHTML = '';
-            if (tripTickets.length === 0) {
-                tktBody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-zinc-400">لا توجد تذاكر مرتبطة بهذه الرحلة</td></tr>';
-            } else {
-                tripTickets.forEach(p => {
-                    const realIdx = db.passengers.findIndex(item => String(item.id) === String(p.id));
-                    const fareCell = isFin
-                        ? `<input type="number" step="any" value="${p.fare || 0}" onchange="updateTicketFareFromFinance('${p.id}', this.value)" class="w-24 bg-zinc-900 border border-gold rounded px-2 py-1 text-xs text-gold font-bold text-center">`
-                        : `<strong class="text-gold">${p.fare || 0} AED</strong>`;
-                    
-                    let paySelectHtml = `
-                        <select onchange="updatePassengerStatusAndRefreshTrip(${realIdx}, this.value)" class="bg-zinc-900 border border-zinc-700 rounded p-1 text-xs text-gold">
-                            <option value="مدفوع" ${p.payMethod==='مدفوع'?'selected':''}>مدفوع</option>
-                            <option value="الدفع عند الباص" ${p.payMethod==='الدفع عند الباص'?'selected':''}>الدفع عند الباص</option>
-                            <option value="مؤجل باليمن" ${p.payMethod==='مؤجل باليمن'?'selected':''}>مؤجل باليمن</option>
-                        </select>
-                    `;
-                    if (isDestBranchOnly) {
-                        paySelectHtml = `
-                            <select onchange="updatePassengerStatusAndRefreshTrip(${realIdx}, this.value)" class="bg-zinc-900 border border-emerald-500 rounded p-1 text-xs text-emerald-300 font-bold">
-                                <option value="${p.payMethod}" ${p.payMethod!=='مدفوع' && p.payMethod!=='مؤجل باليمن'?'selected':''}>${p.payMethod}</option>
-                                <option value="مدفوع" ${p.payMethod==='مدفوع'?'selected':''}>مدفوع</option>
-                                <option value="مؤجل باليمن" ${p.payMethod==='مؤجل باليمن'?'selected':''}>مؤجل باليمن</option>
-                            </select>
-                        `;
-                    }
-
-                    const showEditBtns = !isDeparted || isFin;
-
-                    tktBody.insertRow().innerHTML = `
-                        <td><strong class="text-gold">#${p.id}</strong></td>
-                        <td>${p.agent || '-'}</td>
-                        <td><strong>${p.name}</strong></td>
-                        <td>${p.phone}</td>
-                        <td>${p.origin} ➔ ${p.destination}</td>
-                        <td>${fareCell}</td>
-                        <td>${paySelectHtml}</td>
-                        <td class="space-x-1 space-x-reverse whitespace-nowrap">
-                            <button onclick="previewTicketImage('${p.id}')" class="bg-gold text-black px-2 py-1 rounded text-xs font-bold" title="طباعة"><i class="fa-solid fa-print"></i></button>
-                            ${showEditBtns ? `<button onclick="closeModal('tripDetailsModal'); switchTab('passengers'); editPassenger('${p.id}');" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold" title="تعديل كامل"><i class="fa-solid fa-pen"></i></button>` : '<span class="text-[10px] text-zinc-500 px-1"><i class="fa-solid fa-lock"></i></span>'}
-                            ${showEditBtns ? `<button onclick="deleteTicketFromTripModal(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs" title="حذف"><i class="fa-solid fa-trash"></i></button>` : ''}
-                        </td>
-                    `;
-                });
-            }
-
-            // 2. جدول فواتير الشحن
-            const crgHead = document.getElementById('tripBranchCargoHead');
-            const crgBody = document.getElementById('tripBranchCargoBody');
-            crgHead.innerHTML = `
-                <tr>
-                    <th>رقم الفاتورة</th>
-                    <th>المرسل</th>
-                    <th>المستلم وعنوانه</th>
-                    <th>الأصناف</th>
-                    <th>${isFin ? 'الإجمالي (تعديل مباشر)' : 'الإجمالي'}</th>
-                    <th>حالة السداد</th>
-                    <th>إجراءات</th>
-                </tr>
-            `;
-            crgBody.innerHTML = '';
-            if (tripCargos.length === 0) {
-                crgBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-zinc-400">لا توجد فواتير شحن مرتبطة بهذه الرحلة</td></tr>';
-            } else {
-                tripCargos.forEach(c => {
-                    const realIdx = db.cargo.findIndex(item => String(item.id) === String(c.id));
-                    const itemsDesc = c.items ? c.items.map(i => `${i.desc} (${i.qty})`).join('، ') : '-';
-                    const totalCell = isFin
-                        ? `<input type="number" step="any" value="${c.grandTotal || 0}" onchange="updateCargoTotalFromFinance('${c.id}', this.value)" class="w-24 bg-zinc-900 border border-gold rounded px-2 py-1 text-xs text-gold font-bold text-center">`
-                        : `<strong class="text-gold">${c.grandTotal || 0} AED</strong>`;
-
-                    let paySelectHtml = `
-                        <select onchange="updateCargoStatusAndRefreshTrip(${realIdx}, this.value)" class="bg-zinc-900 border border-zinc-700 rounded p-1 text-xs text-gold">
-                            <option value="مدفوع" ${c.paymentStatus==='مدفوع'?'selected':''}>مدفوع</option>
-                            <option value="أجل بالامارات" ${c.paymentStatus==='أجل بالامارات'?'selected':''}>أجل بالامارات</option>
-                            <option value="الدفع باليمن" ${c.paymentStatus==='الدفع باليمن'?'selected':''}>الدفع باليمن</option>
-                            <option value="مؤجل باليمن" ${c.paymentStatus==='مؤجل باليمن'?'selected':''}>مؤجل باليمن</option>
-                        </select>
-                    `;
-                    if (isDestBranchOnly) {
-                        paySelectHtml = `
-                            <select onchange="updateCargoStatusAndRefreshTrip(${realIdx}, this.value)" class="bg-zinc-900 border border-emerald-500 rounded p-1 text-xs text-emerald-300 font-bold">
-                                <option value="${c.paymentStatus}" ${c.paymentStatus!=='مدفوع' && c.paymentStatus!=='مؤجل باليمن'?'selected':''}>${c.paymentStatus}</option>
-                                <option value="مدفوع" ${c.paymentStatus==='مدفوع'?'selected':''}>مدفوع</option>
-                                <option value="مؤجل باليمن" ${c.paymentStatus==='مؤجل باليمن'?'selected':''}>مؤجل باليمن</option>
-                            </select>
-                        `;
-                    }
-
-                    const showEditBtns = !isDeparted || isFin;
-
-                    crgBody.insertRow().innerHTML = `
-                        <td><strong class="text-gold">#${c.id}</strong></td>
-                        <td><strong>${c.sender}</strong></td>
-                        <td>${c.receiver} <div class="text-[11px] text-amber-400">${c.receiverAddress || ''}</div></td>
-                        <td class="text-xs max-w-[200px] truncate" title="${itemsDesc}">${itemsDesc}</td>
-                        <td>${totalCell}</td>
-                        <td>${paySelectHtml}</td>
-                        <td class="space-x-1 space-x-reverse whitespace-nowrap">
-                            <button onclick="previewCargoImage('${c.id}')" class="bg-gold text-black px-2 py-1 rounded text-xs font-bold" title="طباعة"><i class="fa-solid fa-print"></i></button>
-                            ${showEditBtns ? `<button onclick="closeModal('tripDetailsModal'); switchTab('cargo'); editCargo('${c.id}');" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold" title="تعديل كامل"><i class="fa-solid fa-pen"></i></button>` : '<span class="text-[10px] text-zinc-500 px-1"><i class="fa-solid fa-lock"></i></span>'}
-                            ${showEditBtns ? `<button onclick="deleteCargoFromTripModal(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs" title="حذف"><i class="fa-solid fa-trash"></i></button>` : ''}
-                        </td>
-                    `;
-                });
-            }
-        }
-
-        function updateTicketFareFromFinance(id, newFare) {
-            if (!canModifyFinancialsOrAccounts()) { alert('غير مصرح لك بتعديل الأسعار!'); return; }
-            const item = db.passengers.find(p => String(p.id) === String(id));
-            if (!item) return;
-            item.fare = parseFloat(newFare) || 0;
-            if (!item.auditLog) item.auditLog = [];
-            item.auditLog.push({ action: `تعديل سعر التذكرة من الإدارة المالية إلى ${item.fare} AED`, user: getCurrentUserName(), time: getFormattedDateTime() });
-            saveDB();
-            refreshUI();
-            renderTripDetailsTables();
-        }
-
-        function updateCargoTotalFromFinance(id, newTotal) {
-            if (!canModifyFinancialsOrAccounts()) { alert('غير مصرح لك بتعديل الأسعار!'); return; }
-            const item = db.cargo.find(c => String(c.id) === String(id));
-            if (!item) return;
-            item.grandTotal = parseFloat(newTotal) || 0;
-            if (!item.auditLog) item.auditLog = [];
-            item.auditLog.push({ action: `تعديل إجمالي الفاتورة من الإدارة المالية إلى ${item.grandTotal} AED`, user: getCurrentUserName(), time: getFormattedDateTime() });
-            saveDB();
-            refreshUI();
-            renderTripDetailsTables();
-        }
-
-        function updatePassengerStatusAndRefreshTrip(idx, val) {
-            updatePassengerStatus(idx, val);
-            renderTripDetailsTables();
-        }
-
-        function updateCargoStatusAndRefreshTrip(idx, val) {
-            updateCargoStatus(idx, val);
-            renderTripDetailsTables();
-        }
-
-        function deleteTicketFromTripModal(idx) {
-            if (!canModifyFinancialsOrAccounts()) { alert('غير مصرح لك بالحذف!'); return; }
-            deletePassenger(idx);
-            renderTripDetailsTables();
-        }
-
-        function deleteCargoFromTripModal(idx) {
-            if (!canModifyFinancialsOrAccounts()) { alert('غير مصرح لك بالحذف!'); return; }
-            deleteCargo(idx);
-            renderTripDetailsTables();
-        }
-
-        function updatePassengerStatus(idx, val) {
-            const item = db.passengers[idx];
-            if (!item) return;
-            const trip = item.tripId ? db.trips.find(t => String(t.id) === String(item.tripId)) : null;
-            if (trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
-                if (!isUserAtTripDestinationBranch(trip) || (val !== 'مدفوع' && val !== 'مؤجل باليمن')) {
-                    alert('عذراً، بعد مغادرة الرحلة لا يسمح بتغيير حالة السداد إلا إلى (مدفوع) أو (مؤجل باليمن) من فرع الوجهة!');
-                    refreshUI();
-                    return;
-                }
-            }
-            db.passengers[idx].payMethod = val;
-            if (!db.passengers[idx].auditLog) db.passengers[idx].auditLog = [];
-            db.passengers[idx].auditLog.push({ action: `تغيير حالة السداد إلى (${val})`, user: getCurrentUserName(), time: getFormattedDateTime() });
-            saveDB();
-            refreshUI();
-        }
-
-        function deletePassenger(idx) {
-            const item = db.passengers[idx];
-            if (item && item.tripId) {
-                const trip = db.trips.find(t => String(t.id) === String(item.tripId));
-                if (trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
-                    alert('عذراً، بعد مغادرة الرحلة لا يمكن حذف التذكرة إلا من الإدارة المالية!');
-                    return;
-                }
-            }
-            db.passengers.splice(idx, 1);
-            saveDB();
-            refreshUI();
-        }
-
-        function updateCargoStatus(idx, val) {
-            const item = db.cargo[idx];
-            if (!item) return;
-            const trip = item.tripId ? db.trips.find(t => String(t.id) === String(item.tripId)) : null;
-            if (trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
-                if (!isUserAtTripDestinationBranch(trip) || (val !== 'مدفوع' && val !== 'مؤجل باليمن')) {
-                    alert('عذراً، بعد مغادرة الرحلة لا يسمح بتغيير حالة السداد إلا إلى (مدفوع) أو (مؤجل باليمن) من فرع الوجهة!');
-                    refreshUI();
-                    return;
-                }
-            }
-            db.cargo[idx].paymentStatus = val;
-            if (!db.cargo[idx].auditLog) db.cargo[idx].auditLog = [];
-            db.cargo[idx].auditLog.push({ action: `تغيير حالة السداد إلى (${val})`, user: getCurrentUserName(), time: getFormattedDateTime() });
-            saveDB();
-            refreshUI();
-        }
-
-        function deleteCargo(idx) {
-            const item = db.cargo[idx];
-            if (item && item.tripId) {
-                const trip = db.trips.find(t => String(t.id) === String(item.tripId));
-                if (trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
-                    alert('عذراً، بعد مغادرة الرحلة لا يمكن حذف الفاتورة إلا من الإدارة المالية!');
-                    return;
-                }
-            }
-            db.cargo.splice(idx, 1);
-            saveDB();
-            refreshUI();
-        }
-
-        function deleteVoucher(idx) {
-            if (!canModifyFinancialsOrAccounts()) { alert('غير مصرح لك بالحذف!'); return; }
-            db.vouchers.splice(idx, 1);
-            saveDB();
-            refreshUI();
-        }
-
-        function deleteDebtInvoice(idx) {
-            if (!canModifyFinancialsOrAccounts()) { alert('غير مصرح لك بالحذف!'); return; }
-            db.debtInvoices.splice(idx, 1);
-            saveDB();
-            refreshUI();
         }
 
         // ================= تأشيرات العبور =================
@@ -4724,14 +4025,14 @@
             const passport = document.getElementById('transitPassport').value.trim();
             const identity = document.getElementById('transitIdentity').value;
             const requestNo = document.getElementById('transitRequestNo').value.trim();
-            const amount = parseFloat(document.getElementById('transitAmount').value);
+            const amount = parseFloat(document.getElementById('transitAmount').value) || 0;
 
             if (identity === 'زيارة' && (amount < 150 || amount > 200)) {
-                alert('عذراً! مبلغ تأشيرة العبور لفئة (زيارة) يجب أن يكون بين 150 و 200 درهم.');
+                alert('عذراً، مبلغ الزيارة يجب أن يكون بين 150 و 200 درهم!');
                 return;
             }
             if (identity === 'مقيم' && (amount < 80 || amount > 100)) {
-                alert('عذراً! مبلغ تأشيرة العبور لفئة (مقيم) يجب أن يكون بين 80 و 100 درهم.');
+                alert('عذراً، مبلغ المقيم يجب أن يكون بين 80 و 100 درهم!');
                 return;
             }
 
@@ -4739,7 +4040,7 @@
             const author = getCurrentUserName();
 
             if (editId) {
-                const idx = db.transitVisas.findIndex(t => String(t.id) === String(editId));
+                const idx = db.transitVisas.findIndex(x => String(x.id) === String(editId));
                 if (idx !== -1) {
                     let item = db.transitVisas[idx];
                     item.id = invNo;
@@ -4749,17 +4050,13 @@
                     item.identity = identity;
                     item.requestNo = requestNo;
                     item.amount = amount;
-                    if (!item.auditLog) item.auditLog = [{action: 'إنشاء فاتورة تأشيرة العبور', user: item.createdBy || author, time: item.createdAt || nowStr}];
-                    item.auditLog.push({action: 'تعديل فاتورة تأشيرة العبور', user: author, time: nowStr});
+                    if (!item.auditLog) item.auditLog = [{action: 'إنشاء فاتورة تأشيرة', user: item.createdBy || author, time: item.createdAt || nowStr}];
+                    item.auditLog.push({action: 'تعديل فاتورة تأشيرة عبور', user: author, time: nowStr});
                 }
-                alert('تم تحديث فاتورة تأشيرة العبور بنجاح!');
+                alert('تم تعديل فاتورة تأشيرة العبور بنجاح!');
                 resetTransitForm();
             } else {
-                if (db.transitVisas.some(t => String(t.id) === String(invNo))) {
-                    alert('رقم الفاتورة مسجل مسبقاً، يرجى اختيار رقم فاتورة آخر.');
-                    return;
-                }
-                const record = {
+                const newItem = {
                     id: invNo,
                     agent: agent,
                     name: name,
@@ -4768,33 +4065,36 @@
                     requestNo: requestNo,
                     amount: amount,
                     paymentStatus: 'غير مدفوع',
-                    date: new Date().toISOString().split('T')[0],
                     branch: currentUser ? (currentUser.branch || 'فرع عجمان') : 'فرع عجمان',
                     createdBy: author,
                     createdAt: nowStr,
-                    auditLog: [{action: 'إنشاء فاتورة تأشيرة العبور', user: author, time: nowStr}]
+                    auditLog: [{action: 'إنشاء فاتورة تأشيرة عبور', user: author, time: nowStr}]
                 };
-                db.transitVisas.unshift(record);
-                alert('تم إنشاء فاتورة تأشيرة العبور بنجاح! يمكنك الآن اختيار حالة السداد من الجدول.');
+                db.transitVisas.unshift(newItem);
+                alert(`تم تسجيل فاتورة تأشيرة العبور برقم #${invNo} بنجاح! يمكنك الآن اختيار حالة السداد من الجدول.`);
                 resetTransitForm();
             }
 
+            validateAndRepairDB();
             saveDB();
             refreshUI();
         }
 
-        function updateTransitStatus(idx, val) {
-            if (!db.transitVisas || !db.transitVisas[idx]) return;
-            db.transitVisas[idx].paymentStatus = val;
-            const nowStr = getFormattedDateTime();
-            const author = getCurrentUserName();
-            if (!db.transitVisas[idx].auditLog) db.transitVisas[idx].auditLog = [];
-            db.transitVisas[idx].auditLog.push({action: `تغيير حالة السداد إلى: ${val}`, user: author, time: nowStr});
-            saveDB();
-            refreshUI();
+        function updateTransitPaymentStatus(id, newStatus) {
+            const idx = (db.transitVisas || []).findIndex(x => String(x.id) === String(id));
+            if (idx !== -1) {
+                const nowStr = getFormattedDateTime();
+                const author = getCurrentUserName();
+                let item = db.transitVisas[idx];
+                item.paymentStatus = newStatus;
+                if (!item.auditLog) item.auditLog = [];
+                item.auditLog.push({action: `تغيير حالة السداد إلى (${newStatus})`, user: author, time: nowStr});
+                saveDB();
+                refreshUI();
+            }
         }
 
-        function editTransit(id) {
+        function editTransitVisa(id) {
             const item = (db.transitVisas || []).find(x => String(x.id) === String(id));
             if (!item) return;
             document.getElementById('transitEditId').value = item.id;
@@ -4807,19 +4107,19 @@
             document.getElementById('transitRequestNo').value = item.requestNo || '';
             document.getElementById('transitAmount').value = item.amount || 150;
 
-            document.getElementById('transitFormTitle').innerText = `تعديل فاتورة تأشيرة العبور #${item.id}`;
+            document.getElementById('transitFormTitle').innerText = `تعديل فاتورة تأشيرة عبور #${item.id}`;
             document.getElementById('transitSubmitBtn').innerText = 'حفظ التعديلات';
             document.getElementById('cancelEditTransitBtn').classList.remove('hidden');
 
             document.getElementById('transitEditAuditBox').classList.remove('hidden');
             renderAuditLogIntoBox(item.auditLog, item.createdBy, item.createdAt, 'transitEditAuditList');
-
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function resetTransitForm() {
             document.getElementById('transitForm').reset();
             document.getElementById('transitEditId').value = '';
+            document.getElementById('transitAgent').value = 'مباشر';
             document.getElementById('transitIdentity').value = 'زيارة';
             onTransitIdentityChange();
             calculateNextSequenceNumbers();
@@ -4829,7 +4129,7 @@
             document.getElementById('transitEditAuditBox').classList.add('hidden');
         }
 
-        function deleteTransit(idx) {
+        function deleteTransitVisa(idx) {
             db.transitVisas.splice(idx, 1);
             saveDB();
             refreshUI();
@@ -4840,127 +4140,310 @@
             if (!tbody) return;
             tbody.innerHTML = '';
 
-            let data = getFilteredData(db.transitVisas || []);
-            data.sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
+            let list = getFilteredData(db.transitVisas || []);
+            list.sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
 
-            data.forEach(t => {
-                const realIdx = db.transitVisas.findIndex(item => String(item.id) === String(t.id));
-                const statusColor = t.paymentStatus === 'تم الدفع والاصدار'
-                    ? 'border-emerald-500 text-emerald-400 font-bold'
-                    : (t.paymentStatus === 'اجل' ? 'border-amber-500 text-amber-400 font-bold' : 'border-red-500 text-red-400 font-bold');
-
+            list.forEach(t => {
+                const realIdx = db.transitVisas.findIndex(x => String(x.id) === String(t.id));
+                const isPaid = t.paymentStatus === 'تم الدفع والاصدار';
                 tbody.insertRow().innerHTML = `
                     <td><strong class="text-gold">#${t.id}</strong></td>
-                    <td><span class="text-amber-300 font-bold">${t.agent || '-'}</span></td>
+                    <td>${t.agent || '-'}</td>
                     <td><strong>${t.name}</strong></td>
                     <td>${t.passport}</td>
-                    <td><span class="px-2 py-0.5 rounded text-xs font-bold ${t.identity === 'زيارة' ? 'bg-indigo-950 text-indigo-300' : 'bg-emerald-950 text-emerald-300'}">${t.identity}</span></td>
+                    <td><span class="bg-zinc-800 px-2 py-0.5 rounded text-xs font-bold ${t.identity === 'زيارة' ? 'text-amber-300' : 'text-indigo-300'}">${t.identity}</span></td>
                     <td><strong class="text-zinc-200">${t.requestNo}</strong></td>
-                    <td><strong class="text-gold">${t.amount} AED</strong></td>
+                    <td><strong class="text-emerald-400">${t.amount} AED</strong></td>
                     <td>
-                        <select onchange="updateTransitStatus(${realIdx}, this.value)" class="bg-zinc-900 border ${statusColor} rounded-lg px-2.5 py-1.5 text-xs outline-none">
-                            <option value="تم الدفع والاصدار" ${t.paymentStatus === 'تم الدفع والاصدار' ? 'selected' : ''}>✅ تم الدفع والاصدار</option>
-                            <option value="اجل" ${t.paymentStatus === 'اجل' ? 'selected' : ''}>⏳ اجل</option>
-                            <option value="غير مدفوع" ${(!t.paymentStatus || t.paymentStatus === 'غير مدفوع') ? 'selected' : ''}>❌ غير مدفوع</option>
+                        <select onchange="updateTransitPaymentStatus('${t.id}', this.value)" class="bg-zinc-900 border ${isPaid ? 'border-emerald-500 text-emerald-400' : 'border-red-500 text-red-400'} rounded-lg px-2.5 py-1 text-xs font-bold outline-none">
+                            <option value="غير مدفوع" ${t.paymentStatus === 'غير مدفوع' ? 'selected' : ''}>غير مدفوع</option>
+                            <option value="تم الدفع والاصدار" ${t.paymentStatus === 'تم الدفع والاصدار' ? 'selected' : ''}>تم الدفع والاصدار</option>
                         </select>
                     </td>
                     <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${t.createdBy || 'النظام'}</span></td>
                     <td class="space-x-1 space-x-reverse">
-                        <button onclick="editTransit('${t.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="deleteTransit(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="editTransitVisa('${t.id}')" class="bg-sky-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteTransitVisa(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 `;
             });
         }
 
         function exportTransitExcel() {
-            const data = getFilteredData(db.transitVisas || []);
+            const list = getFilteredData(db.transitVisas || []).map(t => ({
+                'رقم الفاتورة': t.id,
+                'الوكيل': t.agent,
+                'الاسم': t.name,
+                'رقم الجواز': t.passport,
+                'الهوية': t.identity,
+                'رقم الطلب': t.requestNo,
+                'المبلغ': t.amount,
+                'حالة السداد': t.paymentStatus,
+                'منفذ الإجراء': t.createdBy || 'النظام'
+            }));
+            const ws = XLSX.utils.json_to_sheet(list);
             const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.json_to_sheet(data);
-            XLSX.utils.book_append_sheet(wb, ws, 'Transit_Visas');
+            XLSX.utils.book_append_sheet(wb, ws, 'تأشيرات_العبور');
             XLSX.writeFile(wb, `WadiBina_TransitVisas_${Date.now()}.xlsx`);
         }
 
-        function previewTicketImage(id) {
-            const item = db.passengers.find(x => String(x.id) === String(id));
-            if(!item) return;
-            currentPreviewTicket = item;
-            document.getElementById('imgTicketCode').innerText = `#${item.id}`;
-            document.getElementById('imgTktName').innerText = item.name;
-            document.getElementById('imgTktPhone').innerText = item.phone;
-            document.getElementById('imgTktPassport').innerText = item.passport || '-';
-            document.getElementById('imgTktRoute').innerText = `${item.origin} ➔ ${item.destination}`;
-            document.getElementById('imgTktDate').innerText = item.date || '-';
-            document.getElementById('imgTktTime').innerText = item.reportingTime || '-';
-            document.getElementById('imgTktFare').innerText = `${item.fare || 350} AED`;
-            document.getElementById('imgTktPayStatus').innerText = item.payMethod;
+        function renderFinancials() {
+            if (!canModifyFinancialsOrAccounts()) return;
+            const filteredPass = getFilteredData(db.passengers);
+            const filteredCargo = getFilteredData(db.cargo);
+            const filteredVouchers = getFilteredData(db.vouchers);
+            const filteredDrivers = getFilteredData(db.drivers);
 
+            const tRev = filteredPass.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (p.fare || 0), 0);
+            const cRev = filteredCargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + c.grandTotal, 0);
+            const transitRev = getFilteredData(db.transitVisas || []).filter(t => t.paymentStatus === 'تم الدفع والاصدار').reduce((s, t) => s + (t.amount || 0), 0);
+            
+            const driversExp = filteredDrivers.reduce((s, d) => s + (d.totalExpenses || 0), 0);
+            const vouchersExp = filteredVouchers.filter(v => v.type === 'صرف').reduce((s, v) => s + v.amount, 0);
+            const totalExp = driversExp + vouchersExp;
+            
+            const rec = filteredVouchers.filter(v => v.type === 'قبض').reduce((s, v) => s + v.amount, 0);
+            const netBox = (tRev + cRev + transitRev + rec) - totalExp;
+
+            document.getElementById('finRevSum').innerText = `${tRev + cRev + transitRev} AED`;
+            document.getElementById('finDriverExpSum').innerText = `${driversExp} AED`;
+            document.getElementById('finExpensesSum').innerText = `${vouchersExp} AED`;
+            document.getElementById('finNetBoxSum').innerText = `${netBox} AED`;
+
+            renderFinancialDepartedTripsTable();
+        }
+
+        function renderFinancialDepartedTripsTable() {
+            const tbody = document.querySelector('#finDepartedTripsTable tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            let departedTrips = (db.trips || []).filter(t => t.status === 'غادرت الرحلة');
+            departedTrips.sort((a, b) => b.id.localeCompare(a.id));
+
+            if (departedTrips.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="12" class="text-center text-zinc-400 py-5">لا توجد رحلات مغادرة مسجلة حالياً</td></tr>`;
+                return;
+            }
+
+            departedTrips.forEach((trip, idx) => {
+                const tripTickets = (db.passengers || []).filter(p => String(p.tripId) === String(trip.id));
+                const tripCargo = (db.cargo || []).filter(c => String(c.tripId) === String(trip.id));
+
+                const tktTotal = tripTickets.reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
+                const tktPaid = tripTickets.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
+
+                const cargoTotal = tripCargo.reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
+                const cargoPaid = tripCargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
+
+                const grandTotal = tktTotal + cargoTotal;
+                const grandPaid = tktPaid + cargoPaid;
+                const grandRemaining = grandTotal - grandPaid;
+
+                const matchingDriverAccs = (db.drivers || []).filter(d => d.date === trip.date);
+                const drvExp = matchingDriverAccs.reduce((s, d) => s + (parseFloat(d.totalExpenses) || 0), 0);
+                const netTripProfit = grandPaid - drvExp;
+
+                tbody.insertRow().innerHTML = `
+                    <td><strong class="text-gold">#${departedTrips.length - idx}</strong></td>
+                    <td><strong class="text-gold">${trip.date}</strong></td>
+                    <td>${trip.route}</td>
+                    <td>${trip.busInfo}</td>
+                    <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded-full text-xs font-bold">${tripTickets.length} تذاكر</span></td>
+                    <td><span class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded-full text-xs font-bold">${tripCargo.length} فواتير</span></td>
+                    <td><strong>${grandTotal} AED</strong></td>
+                    <td class="text-emerald-400 font-bold">${grandPaid} AED</td>
+                    <td class="text-amber-400 font-bold">${grandRemaining} AED</td>
+                    <td class="text-red-400 font-bold">${drvExp} AED</td>
+                    <td class="font-black ${netTripProfit >= 0 ? 'text-emerald-400' : 'text-red-500'}">${netTripProfit} AED</td>
+                    <td class="whitespace-nowrap">
+                        <button onclick="openTripDetailsModal('${trip.id}', 'finance')" class="bg-gold text-black px-3 py-1.5 rounded-lg text-xs font-extrabold shadow hover:bg-gold-400">
+                            <i class="fa-solid fa-folder-open ml-1"></i> عرض وإدارة حسابات الرحلة
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        function handleSaveVoucher(e) {
+            e.preventDefault();
+            if (!canModifyFinancialsOrAccounts()) { alert('غير مصرح لك بإضافة سندات مالية!'); return; }
+            const vData = {
+                id: Date.now().toString(),
+                type: document.getElementById('vType').value,
+                date: document.getElementById('vDate').value || new Date().toISOString().split('T')[0],
+                amount: parseFloat(document.getElementById('vAmount').value) || 0,
+                receiver: document.getElementById('vReceiver').value || '-',
+                desc: document.getElementById('vDesc').value,
+                user: getCurrentUserName(),
+                createdBy: getCurrentUserName(),
+                branch: currentUser.branch || 'فرع عجمان'
+            };
+            db.vouchers.unshift(vData);
+            saveDB();
+            document.getElementById('voucherForm').reset();
+            refreshUI();
+        }
+
+        function renderVouchersTable() {
+            const tbody = document.querySelector('#vouchersTable tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            const filteredVouchers = getFilteredData(db.vouchers);
+            filteredVouchers.forEach((v) => {
+                const realIdx = db.vouchers.findIndex(x => x.id === v.id);
+                tbody.insertRow().innerHTML = `
+                    <td><span class="${v.type === 'قبض' ? 'text-emerald-400' : 'text-red-400'} font-bold">${v.type}</span></td>
+                    <td>${v.date}</td>
+                    <td><strong class="text-amber-300">${v.receiver || '-'}</strong></td>
+                    <td>${v.desc}</td>
+                    <td><strong>${v.amount} AED</strong></td>
+                    <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${v.createdBy || v.user || 'النظام'}</span></td>
+                    <td>${v.branch || 'فرع عجمان'}</td>
+                    <td><button onclick="deleteVoucher(${realIdx})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button></td>
+                `;
+            });
+        }
+
+        function handleSaveDebtInvoice(e) {
+            e.preventDefault();
+            if (!canModifyFinancialsOrAccounts()) { alert('غير مصرح لك بإنشاء فواتير آجلة!'); return; }
+            const subTotal = parseFloat(document.getElementById('debtInvSubTotal').value) || 0;
+            const paidAmount = parseFloat(document.getElementById('debtInvPaidAmount').value) || 0;
+            const netTotal = parseFloat(document.getElementById('debtInvNetTotal').value) || (subTotal - paidAmount);
+            const nowStr = getFormattedDateTime();
+            const author = getCurrentUserName();
+
+            const debtData = {
+                id: document.getElementById('debtInvNo').value,
+                date: document.getElementById('debtInvDate').value || new Date().toISOString().split('T')[0],
+                customerName: document.getElementById('debtInvCustomerName').value,
+                customerPhone: document.getElementById('debtInvCustomerPhone').value,
+                customerAddress: document.getElementById('debtInvCustomerAddress').value,
+                subTotal: subTotal,
+                paidAmount: paidAmount,
+                netTotal: netTotal,
+                branch: currentUser.branch || 'فرع عجمان',
+                createdBy: author,
+                createdAt: nowStr,
+                auditLog: [{action: 'إنشاء فاتورة آجل', user: author, time: nowStr}]
+            };
+            db.debtInvoices.unshift(debtData);
+            validateAndRepairDB();
+            saveDB();
+            document.getElementById('debtInvoiceForm').reset();
+            switchFinancialSubTab('debts');
+            renderDebtInvoicesTable();
+            alert('تم إصدار الفاتورة الآجلة بنجاح!');
+        }
+
+        function renderDebtInvoicesTable() {
+            const tbody = document.querySelector('#debtInvoicesTable tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            let sortedDebts = [...getFilteredData(db.debtInvoices)].sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
+
+            sortedDebts.forEach((d) => {
+                const realIdx = db.debtInvoices.findIndex(x => String(x.id) === String(d.id));
+                tbody.insertRow().innerHTML = `
+                    <td><strong>#${d.id}</strong></td>
+                    <td>${d.date}</td>
+                    <td><strong>${d.customerName}</strong></td>
+                    <td>${d.customerPhone}</td>
+                    <td>${d.subTotal} AED</td>
+                    <td class="text-emerald-400">${d.paidAmount} AED</td>
+                    <td class="text-gold font-bold">${d.netTotal} AED</td>
+                    <td class="no-print"><span class="text-indigo-300 font-bold text-xs">${d.createdBy || 'النظام'}</span></td>
+                    <td>${d.branch || 'فرع عجمان'}</td>
+                    <td class="space-x-1 space-x-reverse">
+                        <button onclick="previewDebtInvImage('${d.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                        <button onclick="deleteDebtInv(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+            });
+        }
+
+        function previewTicketImage(id) {
+            const tkt = db.passengers.find(x => String(x.id) === String(id));
+            if(!tkt) return;
+            currentPreviewTicket = tkt;
+            document.getElementById('imgTicketCode').innerText = `#${tkt.id}`;
             try {
-                JsBarcode("#ticketBarcode", String(item.id), { format: "CODE128", lineColor: "#0f172a", width: 2, height: 35, displayValue: false });
-            } catch(e) {}
+                JsBarcode("#ticketBarcode", String(tkt.id), { format: "CODE128", width: 2, height: 35, displayValue: false });
+            } catch (err) {}
+
+            document.getElementById('imgTktName').innerText = tkt.name;
+            document.getElementById('imgTktPhone').innerText = tkt.phone;
+            document.getElementById('imgTktPassport').innerText = tkt.passport || '-';
+            document.getElementById('imgTktRoute').innerText = `${tkt.origin} → ${tkt.destination}`;
+            document.getElementById('imgTktDate').innerText = tkt.date || '-';
+            document.getElementById('imgTktTime').innerText = tkt.reportingTime || '4:00 عصراً';
+            document.getElementById('imgTktFare').innerText = `${tkt.fare} AED`;
+            document.getElementById('imgTktPayStatus').innerText = tkt.payMethod || 'مدفوع';
 
             const extraBox = document.getElementById('imgTicketExtraBox');
-            extraBox.innerHTML = '';
-            if (item.extraPassengers && item.extraPassengers.length > 0) {
-                let html = '<div class="bg-amber-50 p-3 rounded-lg border border-amber-200 text-xs mb-4 space-y-1"><strong class="text-amber-800 block mb-1">الركاب الإضافيون:</strong>';
-                item.extraPassengers.forEach((ex, i) => {
-                    html += `<div>${i + 1}. <strong>${ex.name}</strong> (${ex.phone} - جواز: ${ex.passport})</div>`;
+            if(tkt.extraPassengers && tkt.extraPassengers.length > 0) {
+                let html = '<div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs mb-4 space-y-1"><strong class="text-indigo-900 block">الركاب الإضافيون (بأرقام تذاكر مستقلة):</strong>';
+                tkt.extraPassengers.forEach((ex, i) => {
+                    html += `<div>• تذكرة <strong class="text-amber-700">#${ex.ticketNo || '-'}</strong> | ${i+1}. ${ex.name} (جواز: ${ex.passport || '-'})</div>`;
                 });
                 html += '</div>';
                 extraBox.innerHTML = html;
-            }
+            } else { extraBox.innerHTML = ''; }
+
             document.getElementById('ticketPreviewModal').classList.remove('hidden');
         }
 
         function previewCargoImage(id) {
-            const item = db.cargo.find(x => String(x.id) === String(id));
-            if(!item) return;
-            currentPreviewCargo = item;
-            document.getElementById('imgCargoCode').innerText = `#${item.id}`;
-            document.getElementById('imgCargoSenderName').innerText = item.sender;
-            document.getElementById('imgCargoSenderPhone').innerText = item.senderPhone;
-            document.getElementById('imgCargoSenderAddress').innerText = item.senderAddress || 'عجمان';
-            document.getElementById('imgCargoReceiverName').innerText = item.receiver;
-            document.getElementById('imgCargoReceiverPhone').innerText = item.receiverPhone;
-            document.getElementById('imgCargoReceiverAddress').innerText = item.receiverAddress || 'عدن';
-            document.getElementById('imgCargoGrandTotal').innerText = `${item.grandTotal} AED`;
-            document.getElementById('imgCargoPayStatus').innerText = item.paymentStatus;
+            const cargo = db.cargo.find(x => String(x.id) === String(id));
+            if(!cargo) return;
+            currentPreviewCargo = cargo;
+            document.getElementById('imgCargoCode').innerText = `#${cargo.id}`;
+            document.getElementById('imgCargoSenderName').innerText = cargo.sender;
+            document.getElementById('imgCargoSenderPhone').innerText = cargo.senderPhone;
+            document.getElementById('imgCargoSenderAddress').innerText = cargo.senderAddress || 'عجمان';
+            document.getElementById('imgCargoReceiverName').innerText = cargo.receiver;
+            document.getElementById('imgCargoReceiverPhone').innerText = cargo.receiverPhone;
+            document.getElementById('imgCargoReceiverAddress').innerText = cargo.receiverAddress || 'عدن';
+            document.getElementById('imgCargoGrandTotal').innerText = `${cargo.grandTotal} AED`;
+            document.getElementById('imgCargoPayStatus').innerText = cargo.paymentStatus || 'مدفوع';
 
-            const linkedTrip = db.trips.find(t => t.id === item.tripId);
-            document.getElementById('imgCargoTripInfo').innerText = linkedTrip ? `${linkedTrip.route} (${linkedTrip.date}) - ${linkedTrip.busInfo}` : 'الرحلة العامة';
+            const trip = (db.trips || []).find(t => String(t.id) === String(cargo.tripId));
+            document.getElementById('imgCargoTripInfo').innerText = trip ? `${trip.date !== '-' ? trip.date : ''} (${trip.route}) - ${trip.busInfo}` : 'شحن عام';
 
             const tbody = document.getElementById('imgCargoItemsTableBody');
             tbody.innerHTML = '';
-            if (item.items && item.items.length > 0) {
-                item.items.forEach((it, idx) => {
+            if (cargo.items && cargo.items.length > 0) {
+                cargo.items.forEach((it, idx) => {
+                    let rowTotal = (parseFloat(it.qty) || 1) * (parseFloat(it.price) || 0);
                     tbody.insertRow().innerHTML = `
                         <td class="border border-slate-300 p-2 text-center">${idx + 1}</td>
                         <td class="border border-slate-300 p-2 font-bold">${it.desc}</td>
                         <td class="border border-slate-300 p-2 text-center">${it.qty}</td>
-                        <td class="border border-slate-300 p-2 text-left font-bold">${it.qty * it.price} AED</td>
+                        <td class="border border-slate-300 p-2 text-left font-bold">${rowTotal} AED</td>
                     `;
                 });
             }
             document.getElementById('cargoPreviewModal').classList.remove('hidden');
         }
 
-        function previewDebtInvoice(id) {
-            const item = db.debtInvoices.find(x => String(x.id) === String(id));
-            if(!item) return;
-            document.getElementById('imgDebtInvCode').innerText = `#${item.id}`;
-            document.getElementById('imgDebtName').innerText = item.name;
-            document.getElementById('imgDebtPhone').innerText = item.phone;
-            document.getElementById('imgDebtAddress').innerText = item.address;
-            document.getElementById('imgDebtDate').innerText = item.date || '-';
-            document.getElementById('imgDebtSubTotal').innerText = item.subTotal;
-            document.getElementById('imgDebtPaid').innerText = item.paidAmount;
-            document.getElementById('imgDebtNetTotal').innerText = `${item.netTotal} AED`;
+        function previewDebtInvImage(id) {
+            const d = db.debtInvoices.find(x => String(x.id) === String(id));
+            if(!d) return;
+            document.getElementById('imgDebtInvCode').innerText = `#${d.id}`;
+            document.getElementById('imgDebtName').innerText = d.customerName;
+            document.getElementById('imgDebtPhone').innerText = d.customerPhone;
+            document.getElementById('imgDebtAddress').innerText = d.customerAddress;
+            document.getElementById('imgDebtDate').innerText = d.date;
+            document.getElementById('imgDebtSubTotal').innerText = d.subTotal;
+            document.getElementById('imgDebtPaid').innerText = d.paidAmount;
+            document.getElementById('imgDebtNetTotal').innerText = `${d.netTotal} AED`;
             document.getElementById('debtInvPreviewModal').classList.remove('hidden');
         }
 
         function openManifestModal() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('manifestFilterDate').value = today;
+            document.getElementById('manifestFilterDate').value = new Date().toISOString().split('T')[0];
             renderPassengerManifestTable();
             document.getElementById('manifestModal').classList.remove('hidden');
         }
@@ -4969,51 +4452,73 @@
             const filterDate = document.getElementById('manifestFilterDate').value;
             document.getElementById('manifestActiveDateBadge').innerText = filterDate || 'الكل';
             document.getElementById('manifestIssueDate').innerText = new Date().toLocaleDateString('ar-EG');
+            
+            const filteredPass = getFilteredData(db.passengers);
+            const list = filterDate ? filteredPass.filter(p => p.date === filterDate) : filteredPass;
 
-            let list = getFilteredData(db.passengers);
-            if(filterDate) { list = list.filter(p => p.date === filterDate); }
-
-            let totalPax = 0;
             const tbody = document.getElementById('manifestTableBody');
             tbody.innerHTML = '';
+            let totalPax = 0;
+            let rowCounter = 0;
 
-            list.forEach((p, idx) => {
-                totalPax += (p.passengerCount || 1);
-                let extras = p.extraPassengers && p.extraPassengers.length > 0 ? p.extraPassengers.map(e => `${e.name}`).join('، ') : '-';
+            list.forEach((p) => {
+                totalPax += parseInt(p.passengerCount || 1);
+                rowCounter++;
+
+                // 1. عرض الراكب الرئيسي في صف مستقل
                 tbody.insertRow().innerHTML = `
-                    <td class="border border-slate-300 p-1.5 text-center">${idx + 1}</td>
+                    <td class="border border-slate-300 p-1.5 text-center">${rowCounter}</td>
                     <td class="border border-slate-300 p-1.5 font-bold">#${p.id}</td>
                     <td class="border border-slate-300 p-1.5 font-bold">${p.name}</td>
-                    <td class="border border-slate-300 p-1.5 text-[11px]">${extras}</td>
-                    <td class="border border-slate-300 p-1.5">${p.phone}</td>
-                    <td class="border border-slate-300 p-1.5">${p.passport}</td>
-                    <td class="border border-slate-300 p-1.5">${p.origin} ➔ ${p.destination}</td>
-                    <td class="border border-slate-300 p-1.5 font-bold man-price-col">${p.fare || 350} AED</td>
+                    <td class="border border-slate-300 p-1.5 text-center"><span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[11px]">راكب أساسي</span></td>
+                    <td class="border border-slate-300 p-1.5 font-bold">${p.phone || '-'}</td>
+                    <td class="border border-slate-300 p-1.5">${p.passport || '-'}</td>
+                    <td class="border border-slate-300 p-1.5">${p.origin} → ${p.destination}</td>
+                    <td class="border border-slate-300 p-1.5 font-bold man-price-col">${p.fare} AED</td>
                     <td class="border border-slate-300 p-1.5 no-print">${p.createdBy || 'النظام'}</td>
-                    <td class="border border-slate-300 p-1.5">${p.payMethod}</td>
+                    <td class="border border-slate-300 p-1.5 font-bold">${p.payMethod}</td>
                 `;
+
+                // 2. عرض كل راكب إضافي في صف منفصل برقم تذكرته المستقل واسم الراكب الأساسي مكان رقم الهاتف
+                if (p.extraPassengers && p.extraPassengers.length > 0) {
+                    p.extraPassengers.forEach((ex, exIdx) => {
+                        rowCounter++;
+                        const exTicketNo = ex.ticketNo || `${p.id}-${exIdx + 1}`;
+                        tbody.insertRow().innerHTML = `
+                            <td class="border border-slate-300 p-1.5 text-center bg-amber-50/60">${rowCounter}</td>
+                            <td class="border border-slate-300 p-1.5 font-bold text-amber-800 bg-amber-50/60">#${exTicketNo}</td>
+                            <td class="border border-slate-300 p-1.5 font-bold bg-amber-50/60">${ex.name}</td>
+                            <td class="border border-slate-300 p-1.5 text-center bg-amber-50/60"><span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold text-[11px]">راكب إضافي</span></td>
+                            <td class="border border-slate-300 p-1.5 font-bold text-indigo-900 bg-amber-50/60">الراكب الأساسي: ${p.name}</td>
+                            <td class="border border-slate-300 p-1.5 bg-amber-50/60">${ex.passport || '-'}</td>
+                            <td class="border border-slate-300 p-1.5 bg-amber-50/60">${p.origin} → ${p.destination}</td>
+                            <td class="border border-slate-300 p-1.5 text-slate-500 man-price-col bg-amber-50/60">ضمن التذكرة #${p.id}</td>
+                            <td class="border border-slate-300 p-1.5 no-print bg-amber-50/60">${p.createdBy || 'النظام'}</td>
+                            <td class="border border-slate-300 p-1.5 font-bold bg-amber-50/60">${p.payMethod}</td>
+                        `;
+                    });
+                }
             });
             document.getElementById('manifestTotalBookings').innerText = list.length;
             document.getElementById('manifestTotalPassengers').innerText = totalPax;
         }
 
         function printManifestPassenger(mode) {
-            const priceCols = document.querySelectorAll('.man-price-col');
+            const priceCols = document.querySelectorAll('#manifestPrintArea .man-price-col');
             const sub = document.getElementById('manifestTypeSubtitle');
             if(mode === 'driver') {
                 priceCols.forEach(c => c.style.display = 'none');
-                sub.innerText = 'كشف ركاب الرحلة الرسمي - نسخة السائق (بدون أسعار)';
+                sub.innerText = 'كشف ركاب الرحلة الرسمي (نسخة السائق - بدون أسعار)';
             } else {
                 priceCols.forEach(c => c.style.display = '');
-                sub.innerText = 'كشف ركاب الرحلة الرسمي - نسخة الإدارة المالية (شاملة الأسعار)';
+                sub.innerText = 'كشف ركاب الرحلة الرسمي (نسخة الإدارة المالية والمدراء)';
             }
             window.print();
-            setTimeout(() => { priceCols.forEach(c => c.style.display = ''); }, 500);
+            setTimeout(() => { priceCols.forEach(c => c.style.display = ''); }, 800);
         }
 
         function openCargoManifestModal() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('cargoManifestFilterDate').value = today;
+            document.getElementById('cargoManifestFilterDate').value = new Date().toISOString().split('T')[0];
             renderCargoManifestTable();
             document.getElementById('cargoManifestModal').classList.remove('hidden');
         }
@@ -5022,29 +4527,30 @@
             const filterDate = document.getElementById('cargoManifestFilterDate').value;
             document.getElementById('cargoManifestActiveDateBadge').innerText = filterDate || 'الكل';
             document.getElementById('cargoManifestIssueDate').innerText = new Date().toLocaleDateString('ar-EG');
+            
+            const filteredCargo = getFilteredData(db.cargo);
+            const list = filterDate ? filteredCargo.filter(c => c.date === filterDate) : filteredCargo;
 
-            let list = getFilteredData(db.cargo);
-            if(filterDate) { list = list.filter(c => c.date === filterDate); }
-
-            let totalRev = 0;
             const tbody = document.getElementById('cargoManifestTableBody');
             tbody.innerHTML = '';
+            let totalRev = 0;
 
             list.forEach((c, idx) => {
-                totalRev += c.grandTotal;
-                let itemsSummary = c.items ? c.items.map(i => `${i.desc} (${i.qty})`).join('، ') : '-';
-                const linkedTrip = db.trips.find(t => t.id === c.tripId);
-                const tripLabel = linkedTrip ? `${linkedTrip.route}` : 'عامة';
+                totalRev += (c.grandTotal || 0);
+                const itemsDesc = c.items ? c.items.map(it => `${it.desc} (${it.qty})`).join('، ') : '-';
+                const trip = (db.trips || []).find(t => String(t.id) === String(c.tripId));
+                const tripText = trip ? `${trip.date !== '-' ? trip.date : ''} (${trip.route})` : '-';
+
                 tbody.insertRow().innerHTML = `
                     <td class="border border-slate-300 p-1.5 text-center">${idx + 1}</td>
                     <td class="border border-slate-300 p-1.5 font-bold">#${c.id}</td>
-                    <td class="border border-slate-300 p-1.5 font-bold">${c.sender}</td>
-                    <td class="border border-slate-300 p-1.5">${c.receiver} (${c.receiverAddress || ''})</td>
-                    <td class="border border-slate-300 p-1.5 font-bold text-indigo-800">${tripLabel}</td>
-                    <td class="border border-slate-300 p-1.5">${itemsSummary}</td>
+                    <td class="border border-slate-300 p-1.5">${c.sender} (${c.senderPhone})</td>
+                    <td class="border border-slate-300 p-1.5 font-bold">${c.receiver} - <span class="text-slate-600 font-normal">${c.receiverAddress || 'عدن'}</span></td>
+                    <td class="border border-slate-300 p-1.5 text-xs text-indigo-800">${tripText}</td>
+                    <td class="border border-slate-300 p-1.5 text-xs">${itemsDesc}</td>
                     <td class="border border-slate-300 p-1.5 font-bold cargo-price-col">${c.grandTotal} AED</td>
                     <td class="border border-slate-300 p-1.5 no-print">${c.createdBy || 'النظام'}</td>
-                    <td class="border border-slate-300 p-1.5">${c.paymentStatus}</td>
+                    <td class="border border-slate-300 p-1.5 font-bold">${c.paymentStatus}</td>
                 `;
             });
             document.getElementById('cargoManifestTotalInvoices').innerText = list.length;
@@ -5052,44 +4558,390 @@
         }
 
         function printManifestCargo(mode) {
-            const priceCols = document.querySelectorAll('.cargo-price-col');
+            const priceCols = document.querySelectorAll('#cargoManifestPrintArea .cargo-price-col');
             const revBox = document.getElementById('cargoManifestRevBox');
             const sub = document.getElementById('cargoManifestTypeSubtitle');
             if(mode === 'driver') {
                 priceCols.forEach(c => c.style.display = 'none');
-                revBox.style.display = 'none';
-                sub.innerText = 'كشف مانفيستو الشحن - نسخة السائق (بدون أسعار)';
+                if(revBox) revBox.style.display = 'none';
+                sub.innerText = 'كشف مانفيستو الشحن الرسمي (نسخة السائق - بدون أسعار)';
             } else {
                 priceCols.forEach(c => c.style.display = '');
-                revBox.style.display = '';
-                sub.innerText = 'كشف مانفيستو الشحن - نسخة الإدارة المالية (شاملة الأسعار)';
+                if(revBox) revBox.style.display = '';
+                sub.innerText = 'كشف مانفيستو الشحن الرسمي (نسخة الإدارة المالية)';
             }
             window.print();
-            setTimeout(() => { priceCols.forEach(c => c.style.display = ''); revBox.style.display = ''; }, 500);
+            setTimeout(() => {
+                priceCols.forEach(c => c.style.display = '');
+                if(revBox) revBox.style.display = '';
+            }, 800);
         }
 
+        // ================= عرض تفاصيل الرحلة (التذاكر / فواتير الشحن + الإدارة المالية للرحلات المغادرة) =================
+        let currentModalTripId = null;
+        let currentModalTripMode = 'ops';
+
+        function openTripDetailsModal(tripId, mode = 'ops') {
+            const trip = (db.trips || []).find(t => String(t.id) === String(tripId));
+            if (!trip) return;
+
+            const isDeparted = trip.status === 'غادرت الرحلة';
+
+            // الرحلات التي غادرت: تُعرض تذاكرها وفواتيرها في قسم الإدارة المالية للمدير العام والمحاسب ومحمود فقط
+            if (isDeparted && !canModifyFinancialsOrAccounts()) {
+                alert('عذراً، تذاكر وفواتير الرحلات التي غادرت متاحة للعرض في قسم الإدارة المالية للمدير العام والمحاسب ومحمود فقط!');
+                return;
+            }
+
+            currentModalTripId = trip.id;
+            currentModalTripMode = isDeparted ? 'finance' : mode;
+
+            document.getElementById('tripDetailsModalTitle').innerText = `تفاصيل الرحلة: ${trip.route} (${trip.date !== '-' ? trip.date : 'بدون تاريخ'})`;
+            document.getElementById('tripDetailsModalSub').innerText = `معلومات الباص والسائق: ${trip.busInfo} | الحالة: ${trip.status || 'مجدولة'}`;
+
+            const departedFinanceBar = document.getElementById('departedTripFinanceAddBar');
+            if (departedFinanceBar) {
+                if (isDeparted && canModifyFinancialsOrAccounts()) {
+                    departedFinanceBar.classList.remove('hidden');
+                } else {
+                    departedFinanceBar.classList.add('hidden');
+                }
+            }
+
+            const tripTickets = (db.passengers || []).filter(p => String(p.tripId) === String(trip.id));
+            const tripCargo = (db.cargo || []).filter(c => String(c.tripId) === String(trip.id));
+
+            document.getElementById('tripBranchTktCount').innerText = tripTickets.length;
+            document.getElementById('tripBranchCargoCount').innerText = tripCargo.length;
+
+            const finBar = document.getElementById('tripFinancialSummaryBar');
+            if (currentModalTripMode === 'finance') {
+                finBar.classList.remove('hidden');
+                const tktSum = tripTickets.reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
+                const cargoSum = tripCargo.reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
+                const paidTkt = tripTickets.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
+                const paidCargo = tripCargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
+                document.getElementById('tripFinTktTotal').innerText = `${tktSum} AED (مدفوع: ${paidTkt} AED)`;
+                document.getElementById('tripFinCargoTotal').innerText = `${cargoSum} AED (مدفوع: ${paidCargo} AED)`;
+                document.getElementById('tripFinGrandTotal').innerText = `${paidTkt + paidCargo} AED / ${tktSum + cargoSum} AED`;
+            } else {
+                finBar.classList.add('hidden');
+            }
+
+            renderTripBranchTables(trip, tripTickets, tripCargo, currentModalTripMode);
+            switchTripDetailsBranch('tickets');
+            document.getElementById('tripDetailsModal').classList.remove('hidden');
+        }
+
+        function openAddTicketForDepartedTrip() {
+            if (!canModifyFinancialsOrAccounts() || !currentModalTripId) return;
+            const tripId = currentModalTripId;
+            closeModal('tripDetailsModal');
+            resetPassengerForm();
+            financeOverrideDepartedTripId = tripId;
+            switchTab('passengers');
+            populateTripsDropdown();
+            document.getElementById('passTripSelect').value = tripId;
+            onTripSelectedForTicket();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openAddCargoForDepartedTrip() {
+            if (!canModifyFinancialsOrAccounts() || !currentModalTripId) return;
+            const tripId = currentModalTripId;
+            closeModal('tripDetailsModal');
+            resetCargoForm();
+            financeOverrideDepartedTripId = tripId;
+            switchTab('cargo');
+            populateTripsDropdown();
+            document.getElementById('cargoTripSelect').value = tripId;
+            onTripSelectedForCargo();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function switchTripDetailsBranch(branch) {
+            const btnTkt = document.getElementById('btnTripSubTickets');
+            const btnCrg = document.getElementById('btnTripSubCargo');
+            const boxTkt = document.getElementById('tripBranchTicketsContainer');
+            const boxCrg = document.getElementById('tripBranchCargoContainer');
+
+            if (branch === 'tickets') {
+                btnTkt.className = "py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition gold-gradient-bg text-black shadow";
+                btnCrg.className = "py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition bg-zinc-800 text-zinc-300 hover:text-gold border border-zinc-700";
+                boxTkt.classList.remove('hidden');
+                boxCrg.classList.add('hidden');
+            } else {
+                btnCrg.className = "py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition gold-gradient-bg text-black shadow";
+                btnTkt.className = "py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition bg-zinc-800 text-zinc-300 hover:text-gold border border-zinc-700";
+                boxCrg.classList.remove('hidden');
+                boxTkt.classList.add('hidden');
+            }
+        }
+
+        function renderTripBranchTables(trip, tripTickets, tripCargo, mode) {
+            const isFinance = (mode === 'finance');
+            const canEditFinance = isFinance && canModifyFinancialsOrAccounts();
+
+            const tHead = document.getElementById('tripBranchTicketsHead');
+            const tBody = document.getElementById('tripBranchTicketsBody');
+            tHead.innerHTML = `
+                <tr>
+                    <th>رقم التذكرة</th>
+                    <th>الراكب الرئيسي</th>
+                    <th>الركاب الإضافيون</th>
+                    <th>الهاتف</th>
+                    <th>الجواز</th>
+                    <th>المسار</th>
+                    ${isFinance ? '<th>المبلغ</th>' : ''}
+                    <th>حالة السداد</th>
+                    <th>إجراءات</th>
+                </tr>
+            `;
+            tBody.innerHTML = '';
+
+            if (tripTickets.length === 0) {
+                tBody.innerHTML = `<tr><td colspan="${isFinance ? 9 : 8}" class="text-center text-zinc-400 py-5">لا توجد تذاكر مسجلة في هذه الرحلة</td></tr>`;
+            } else {
+                tripTickets.forEach(p => {
+                    const extraNames = (p.extraPassengers && p.extraPassengers.length > 0)
+                        ? p.extraPassengers.map(ex => `<span class="text-amber-300 font-bold">#${ex.ticketNo || '-'}</span> ${ex.name}`).join('، ')
+                        : '-';
+                    tBody.insertRow().innerHTML = `
+                        <td><strong class="text-gold">#${p.id}</strong></td>
+                        <td><strong>${p.name}</strong></td>
+                        <td><span class="text-[11px] text-zinc-300">${extraNames}</span></td>
+                        <td>${p.phone || '-'}</td>
+                        <td>${p.passport || '-'}</td>
+                        <td>${p.origin} → ${p.destination}</td>
+                        ${isFinance ? `<td><strong class="text-emerald-400">${p.fare} AED</strong></td>` : ''}
+                        <td>
+                            ${canEditFinance ? `
+                                <select onchange="updatePassengerPaymentStatusFromModal('${p.id}', this.value)" class="bg-zinc-900 border ${p.payMethod === 'مدفوع' ? 'border-emerald-500 text-emerald-400' : 'border-amber-500 text-amber-300'} rounded-lg px-2 py-1 text-xs font-bold outline-none">
+                                    <option value="مدفوع" ${p.payMethod === 'مدفوع' ? 'selected' : ''}>مدفوع</option>
+                                    <option value="الدفع عند الباص" ${p.payMethod === 'الدفع عند الباص' ? 'selected' : ''}>الدفع عند الباص</option>
+                                    <option value="مؤجل باليمن" ${p.payMethod === 'مؤجل باليمن' ? 'selected' : ''}>مؤجل باليمن</option>
+                                </select>
+                            ` : `<span class="px-2 py-0.5 rounded text-xs font-bold ${p.payMethod === 'مدفوع' ? 'bg-emerald-950 text-emerald-300' : 'bg-amber-950 text-amber-300'}">${p.payMethod}</span>`}
+                        </td>
+                        <td class="space-x-1 space-x-reverse whitespace-nowrap">
+                            <button onclick="previewTicketImage('${p.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-ticket"></i> معاينة</button>
+                            ${canEditFinance ? `<button onclick="closeModal('tripDetailsModal'); switchTab('passengers'); editPassenger('${p.id}');" class="bg-sky-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i> تعديل</button>` : ''}
+                        </td>
+                    `;
+                });
+            }
+
+            const cHead = document.getElementById('tripBranchCargoHead');
+            const cBody = document.getElementById('tripBranchCargoBody');
+            cHead.innerHTML = `
+                <tr>
+                    <th>رقم الفاتورة</th>
+                    <th>المرسل</th>
+                    <th>المستلم وهاتفه</th>
+                    <th>العنوان</th>
+                    <th>الأصناف والعدد</th>
+                    ${isFinance ? '<th>الإجمالي</th>' : ''}
+                    <th>حالة السداد</th>
+                    <th>إجراءات</th>
+                </tr>
+            `;
+            cBody.innerHTML = '';
+
+            if (tripCargo.length === 0) {
+                cBody.innerHTML = `<tr><td colspan="${isFinance ? 8 : 7}" class="text-center text-zinc-400 py-5">لا توجد فواتير شحن مرتبطة بهذه الرحلة</td></tr>`;
+            } else {
+                tripCargo.forEach(c => {
+                    const itemsDesc = c.items ? c.items.map(it => `${it.desc} (${it.qty})`).join('، ') : '-';
+                    cBody.insertRow().innerHTML = `
+                        <td><strong class="text-gold">#${c.id}</strong></td>
+                        <td><strong>${c.sender}</strong> <span class="text-[11px] text-zinc-400">(${c.senderPhone})</span></td>
+                        <td><strong>${c.receiver}</strong> <span class="text-[11px] text-zinc-400">(${c.receiverPhone})</span></td>
+                        <td>${c.receiverAddress || 'عدن'}</td>
+                        <td><span class="text-xs text-zinc-200">${itemsDesc}</span></td>
+                        ${isFinance ? `<td><strong class="text-indigo-300">${c.grandTotal} AED</strong></td>` : ''}
+                        <td>
+                            ${canEditFinance ? `
+                                <select onchange="updateCargoPaymentStatusFromModal('${c.id}', this.value)" class="bg-zinc-900 border ${c.paymentStatus === 'مدفوع' ? 'border-emerald-500 text-emerald-400' : 'border-amber-500 text-amber-300'} rounded-lg px-2 py-1 text-xs font-bold outline-none">
+                                    <option value="مدفوع" ${c.paymentStatus === 'مدفوع' ? 'selected' : ''}>مدفوع</option>
+                                    <option value="أجل بالامارات" ${c.paymentStatus === 'أجل بالامارات' ? 'selected' : ''}>أجل بالامارات</option>
+                                    <option value="الدفع باليمن" ${c.paymentStatus === 'الدفع باليمن' ? 'selected' : ''}>الدفع باليمن</option>
+                                    <option value="مؤجل باليمن" ${c.paymentStatus === 'مؤجل باليمن' ? 'selected' : ''}>مؤجل باليمن</option>
+                                </select>
+                            ` : `<span class="px-2 py-0.5 rounded text-xs font-bold ${c.paymentStatus === 'مدفوع' ? 'bg-emerald-950 text-emerald-300' : 'bg-amber-950 text-amber-300'}">${c.paymentStatus}</span>`}
+                        </td>
+                        <td class="space-x-1 space-x-reverse whitespace-nowrap">
+                            <button onclick="previewCargoImage('${c.id}')" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-file-invoice"></i> معاينة</button>
+                            ${canEditFinance ? `<button onclick="closeModal('tripDetailsModal'); switchTab('cargo'); editCargo('${c.id}');" class="bg-sky-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i> تعديل</button>` : ''}
+                        </td>
+                    `;
+                });
+            }
+        }
+
+        function updatePassengerPaymentStatusFromModal(tktId, newStatus) {
+            updatePassengerPaymentStatus(tktId, newStatus);
+            if (currentModalTripId) openTripDetailsModal(currentModalTripId, currentModalTripMode);
+        }
+
+        function updateCargoPaymentStatusFromModal(cargoId, newStatus) {
+            updateCargoPaymentStatus(cargoId, newStatus);
+            if (currentModalTripId) openTripDetailsModal(currentModalTripId, currentModalTripMode);
+        }
+
+        // ================= إدارة المستخدمين =================
+        function renderUsersTable() {
+            const tbody = document.querySelector('#usersTable tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            const users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            users.forEach((u, idx) => {
+                let roleLabel = '';
+                if (u.role === 'مدير عام' || u.username === 'محمود') roleLabel = '<span class="text-gold font-bold">👑 مدير عام (كل الأفرع والصلاحيات)</span>';
+                else if (u.role === 'محاسب') roleLabel = '<span class="text-emerald-400 font-bold">🧮 محاسب (المالية والرواتب والسائقين)</span>';
+                else if (u.role === 'مدير فرع') roleLabel = '<span class="text-amber-300 font-bold">⭐ مدير فرع</span>';
+                else roleLabel = '<span class="text-zinc-300">👤 موظف</span>';
+
+                tbody.insertRow().innerHTML = `
+                    <td><strong>${u.username}</strong></td>
+                    <td><code class="text-amber-400 bg-zinc-900 px-2 py-0.5 rounded">${u.password}</code></td>
+                    <td>${roleLabel}</td>
+                    <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${u.branch || 'فرع عجمان'}</span></td>
+                    <td class="space-x-1 space-x-reverse">
+                        <button onclick="editUser('${u.username}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i> تعديل</button>
+                        ${u.username !== 'محمود' ? `<button onclick="deleteUser(${idx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}
+                    </td>
+                `;
+            });
+        }
+
+        function handleSaveUser(e) {
+            e.preventDefault();
+            if (!canModifyFinancialsOrAccounts()) { alert('غير مصرح لك بإدارة المستخدمين!'); return; }
+            const origName = document.getElementById('userEditOriginalName').value;
+            const username = document.getElementById('manageUsername').value.trim();
+            const password = document.getElementById('managePassword').value.trim();
+            const role = document.getElementById('manageRole').value;
+            const branch = document.getElementById('manageBranch').value;
+
+            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            if (origName) {
+                const idx = users.findIndex(u => u.username === origName);
+                if (idx !== -1) {
+                    users[idx].username = username;
+                    users[idx].password = password;
+                    users[idx].role = role;
+                    users[idx].branch = branch;
+                }
+            } else {
+                users.push({ username, password, role, branch });
+            }
+            localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
+            if(useFirebase && rtdb) { set(ref(rtdb, 'systemUsers'), users); }
+            resetUserForm();
+            renderUsersTable();
+            alert('تم حفظ بيانات المستخدم والصلاحيات بنجاح!');
+        }
+
+        function editUser(username) {
+            if (!canModifyFinancialsOrAccounts()) return;
+            const users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            const u = users.find(x => x.username === username);
+            if(!u) return;
+            document.getElementById('userEditOriginalName').value = u.username;
+            document.getElementById('manageUsername').value = u.username;
+            document.getElementById('managePassword').value = u.password;
+            document.getElementById('manageRole').value = u.role || 'موظف';
+            document.getElementById('manageBranch').value = u.branch || 'فرع عجمان';
+            document.getElementById('userSubmitBtn').innerText = 'حفظ تعديلات المستخدم';
+        }
+
+        function resetUserForm() {
+            document.getElementById('userForm').reset();
+            document.getElementById('userEditOriginalName').value = '';
+            document.getElementById('userSubmitBtn').innerText = 'إضافة مستخدم جديد';
+        }
+
+        function deleteUser(idx) {
+            if (!canModifyFinancialsOrAccounts()) return;
+            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            users.splice(idx, 1);
+            localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
+            if(useFirebase && rtdb) { set(ref(rtdb, 'systemUsers'), users); }
+            renderUsersTable();
+        }
+
+        function deletePassenger(idx) {
+            const item = db.passengers[idx];
+            if (item && item.tripId) {
+                const trip = db.trips.find(t => String(t.id) === String(item.tripId));
+                if (trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
+                    alert('عذراً، بعد مغادرة الرحلة لا يمكن حذف التذكرة إلا من الإدارة المالية!');
+                    return;
+                }
+            }
+            db.passengers.splice(idx, 1);
+            validateAndRepairDB();
+            saveDB();
+            refreshUI();
+        }
+
+        function deleteCargo(idx) {
+            const item = db.cargo[idx];
+            if (item && item.tripId) {
+                const trip = db.trips.find(t => String(t.id) === String(item.tripId));
+                if (trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
+                    alert('عذراً، بعد مغادرة الرحلة لا يمكن حذف الفاتورة إلا من الإدارة المالية!');
+                    return;
+                }
+            }
+            db.cargo.splice(idx, 1);
+            validateAndRepairDB();
+            saveDB();
+            refreshUI();
+        }
+
+        function deleteVoucher(idx) {
+            if (!canModifyFinancialsOrAccounts()) return;
+            db.vouchers.splice(idx, 1);
+            saveDB();
+            refreshUI();
+        }
+
+        function deleteDebtInv(idx) {
+            if (!canModifyFinancialsOrAccounts()) return;
+            db.debtInvoices.splice(idx, 1);
+            validateAndRepairDB();
+            saveDB();
+            renderDebtInvoicesTable();
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
         function exportBackupJSON() {
-            const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
             const a = document.createElement('a');
-            a.href = url;
-            a.download = `WadiBina_Backup_${Date.now()}.json`;
+            a.setAttribute("href", dataStr);
+            a.setAttribute("download", `WadiBina_Backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(a);
             a.click();
+            a.remove();
         }
 
         function importBackupJSON(e) {
             const file = e.target.files[0];
-            if(!file) return;
+            if (!file) return;
             const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
                     const parsed = JSON.parse(evt.target.result);
-                    db = parsed;
-                    validateAndRepairDB();
-                    saveDB();
-                    refreshUI();
-                    alert('تم استرجاع النسخة الاحتياطية بنجاح!');
-                } catch(err) { alert('ملف JSON غير صالح.'); }
+                    if (parsed) {
+                        db = parsed;
+                        validateAndRepairDB();
+                        saveDB();
+                        refreshUI();
+                        alert('تم استرجاع النسخة الاحتياطية JSON بنجاح!');
+                    }
+                } catch (err) { alert('ملف غير صالح!'); }
             };
             reader.readAsText(file);
         }
@@ -5097,123 +4949,171 @@
         async function importBackupPDF(e) {
             const file = e.target.files[0];
             if(!file) return;
-            const reader = new FileReader();
-            reader.onload = async function(evt) {
-                try {
-                    const typedarray = new Uint8Array(evt.target.result);
-                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                    let fullText = '';
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const textContent = await page.getTextContent();
-                        fullText += textContent.items.map(item => item.str).join(' ') + '\n';
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let fullText = '';
+                for(let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
+                    const textContent = await page.getTextContent();
+                    fullText += textContent.items.map(it => it.str).join(' ') + '\n';
+                }
+
+                let addedCount = 0;
+                const lines = fullText.split(/#(?=\d+)/);
+                lines.forEach(segment => {
+                    const match = segment.match(/^(\d+)\s+([^\d]+?)\s+(\d{7,15})/);
+                    if(match) {
+                        const id = match[1];
+                        const name = match[2].trim();
+                        const phone = match[3];
+                        if(!db.passengers.some(p => String(p.id) === String(id))) {
+                            db.passengers.push({
+                                id: id, agent: 'مستعاد من PDF', name: name, phone: phone, passport: '-', passengerCount: 1, extraPassengers: [],
+                                origin: 'عجمان', destination: 'عدن', date: new Date().toISOString().split('T')[0], reportingTime: '4:00 عصراً', fare: 350, payMethod: 'مدفوع', branch: 'فرع عجمان', createdBy: 'مستعاد من PDF'
+                            });
+                            addedCount++;
+                        }
                     }
-                    const jsonMatch = fullText.match(/\{[\s\S]*"passengers"[\s\S]*\}/);
-                    if (jsonMatch) {
-                        db = JSON.parse(jsonMatch[0]);
-                        validateAndRepairDB();
-                        saveDB();
-                        refreshUI();
-                        alert('تمت استعادة البيانات من ملف PDF بنجاح!');
-                    } else {
-                        alert('تمت قراءة نص التقرير من PDF بنجاح، ولكن هذا الملف تقرير للطباعة ولا يحتوي على كود JSON مدمج للاسترجاع التلقائي.');
-                    }
-                } catch(err) { alert('حدث خطأ أثناء قراءة ملف PDF.'); }
-            };
-            reader.readAsArrayBuffer(file);
+                });
+
+                if(addedCount > 0) {
+                    validateAndRepairDB();
+                    saveDB();
+                    refreshUI();
+                    alert(`تم استعادة ودمج ${addedCount} سجل بنجاح!`);
+                } else { alert('تم مسح الملف بنجاح. لم يتم العثور على سجلات جديدة مفقودة.'); }
+            } catch(err) { alert('حدث خطأ أثناء قراءة ملف PDF.'); }
         }
 
         function exportExcel(type) {
+            let data = type === 'passengers' ? getFilteredData(db.passengers) : getFilteredData(db.cargo);
+            const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.json_to_sheet(db[type]);
-            XLSX.utils.book_append_sheet(wb, ws, type.toUpperCase());
+            XLSX.utils.book_append_sheet(wb, ws, type);
             XLSX.writeFile(wb, `WadiBina_${type}_${Date.now()}.xlsx`);
         }
 
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        // ================= إشعارات واتساب متقدمة وطباعة حرارية وإغلاق الصندوق =================
+        function sendTripReminderWhatsApp() {
+            if (!currentPreviewTicket) return;
+            const t = currentPreviewTicket;
+            const phone = formatPhoneForWhatsApp(t.phone);
+            if (!phone) { alert('رقم هاتف الراكب غير صالح!'); return; }
+            const msg = `مرحباً أ/ ${t.name}\nتذكير بموعد رحلتكم مع *شركة وادي بناء للنقل الدولي*:\n- رقم البوليصة: #${t.id}\n- المسار: من ${t.origin} إلى ${t.destination}\n- تاريخ الرحلة: ${t.date}\n- وقت الحضور: ${t.reportingTime}\nنتمنى لكم رحلة سعيدة وآمنة.`;
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
 
+        function sendCargoReceiverWhatsApp() {
+            if (!currentPreviewCargo) return;
+            const c = currentPreviewCargo;
+            const phone = formatPhoneForWhatsApp(c.receiverPhone);
+            if (!phone) { alert('رقم هاتف المستلم غير صالح!'); return; }
+            const itemsSummary = (c.items || []).map(i => `${i.desc} (${i.qty})`).join('، ');
+            const msg = `مرحباً أ/ ${c.receiver}\nإشعار شحنة صادرة باسمكم عبر *شركة وادي بناء للنقل الدولي*:\n- رقم الفاتورة: #${c.id}\n- المرسل: ${c.sender}\n- الوجهة: ${c.receiverAddress}\n- المحتويات: ${itemsSummary}\n- حالة السداد: ${c.paymentStatus}\nسنتواصل معكم فور وصول الشحنة.`;
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        function printThermalReceipt(type) {
+            let receiptHtml = '';
+            if (type === 'ticket' && currentPreviewTicket) {
+                const t = currentPreviewTicket;
+                const extraStr = (t.extraPassengers && t.extraPassengers.length > 0)
+                    ? `<hr style="border-top:1px dashed #000"><div><b>الركاب الإضافيون:</b></div>` + t.extraPassengers.map(ex => `<div>• #${ex.ticketNo || '-'} - ${ex.name}</div>`).join('')
+                    : '';
+                receiptHtml = `
+                    <div style="text-align:center;font-weight:bold;font-size:15px;">شركة وادي بناء للنقل الدولي</div>
+                    <div style="text-align:center;font-size:11px;margin-bottom:6px;">إيصال تذكرة سفر ركاب</div>
+                    <hr style="border-top:1px dashed #000">
+                    <div><b>رقم التذكرة:</b> #${t.id}</div>
+                    <div><b>الراكب:</b> ${t.name}</div>
+                    <div><b>الهاتف:</b> ${t.phone}</div>
+                    <div><b>الجواز:</b> ${t.passport || '-'}</div>
+                    <div><b>المسار:</b> ${t.origin} ➔ ${t.destination}</div>
+                    <div><b>التاريخ:</b> ${t.date}</div>
+                    <div><b>الحضور:</b> ${t.reportingTime}</div>
+                    ${extraStr}
+                    <hr style="border-top:1px dashed #000">
+                    <div style="font-size:14px;"><b>المبلغ:</b> ${t.fare} AED</div>
+                    <div><b>حالة السداد:</b> ${t.payMethod}</div>
+                    <hr style="border-top:1px dashed #000">
+                    <div style="text-align:center;font-size:10px;">عجمان: 0508200749 | عدن: 0783424999</div>
+                `;
+            } else if (type === 'cargo' && currentPreviewCargo) {
+                const c = currentPreviewCargo;
+                const itemsHtml = (c.items || []).map(it => `<div>• ${it.desc} × ${it.qty} = ${(it.qty * it.price)} AED</div>`).join('');
+                receiptHtml = `
+                    <div style="text-align:center;font-weight:bold;font-size:15px;">شركة وادي بناء للنقل الدولي</div>
+                    <div style="text-align:center;font-size:11px;margin-bottom:6px;">إيصال استلام أمتعة وبضائع</div>
+                    <hr style="border-top:1px dashed #000">
+                    <div><b>رقم الفاتورة:</b> #${c.id}</div>
+                    <div><b>التاريخ:</b> ${c.date}</div>
+                    <div><b>المرسل:</b> ${c.sender} (${c.senderPhone})</div>
+                    <div><b>المستلم:</b> ${c.receiver} (${c.receiverPhone})</div>
+                    <div><b>الوجهة:</b> ${c.receiverAddress}</div>
+                    <hr style="border-top:1px dashed #000">
+                    <div><b>الأصناف:</b></div>
+                    ${itemsHtml}
+                    <hr style="border-top:1px dashed #000">
+                    <div style="font-size:14px;"><b>الإجمالي:</b> ${c.grandTotal} AED</div>
+                    <div><b>السداد:</b> ${c.paymentStatus}</div>
+                    <hr style="border-top:1px dashed #000">
+                    <div style="text-align:center;font-size:10px;">شكراً لاختياركم وادي بناء للنقل الدولي</div>
+                `;
+            } else return;
+
+            const win = window.open('', '_blank', 'width=340,height=600');
+            win.document.write(`<html dir="rtl"><head><title>إيصال حراري 80mm</title><style>body{font-family:Tahoma,Arial,sans-serif;width:74mm;margin:0 auto;padding:6px;font-size:12px;line-height:1.5;color:#000;}@media print{@page{size:80mm auto;margin:2mm;}}</style></head><body>${receiptHtml}<script>window.onload=function(){window.print();setTimeout(()=>window.close(),500);}<\/script></body></html>`);
+            win.document.close();
+        }
+
+        function renderDailyCashClosingReport() {
+            const dateInput = document.getElementById('dailyCloseDate');
+            if (!dateInput) return;
+            const targetDate = dateInput.value || new Date().toISOString().split('T')[0];
+
+            const passList = getFilteredData(db.passengers || []).filter(p => p.date === targetDate && p.payMethod === 'مدفوع');
+            const cargoList = getFilteredData(db.cargo || []).filter(c => c.date === targetDate && c.paymentStatus === 'مدفوع');
+            const transitList = getFilteredData(db.transitVisas || []).filter(t => (t.createdAt || '').startsWith(targetDate) && t.paymentStatus === 'تم الدفع والاصدار');
+            const vouchersIn = getFilteredData(db.vouchers || []).filter(v => v.date === targetDate && v.type === 'قبض');
+            const vouchersOut = getFilteredData(db.vouchers || []).filter(v => v.date === targetDate && v.type === 'صرف');
+            const driversOut = getFilteredData(db.drivers || []).filter(d => d.date === targetDate);
+
+            const tktSum = passList.reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
+            const crgSum = cargoList.reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
+            const otherInSum = transitList.reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) + vouchersIn.reduce((s, v) => s + (parseFloat(v.amount) || 0), 0);
+            const totalOutSum = vouchersOut.reduce((s, v) => s + (parseFloat(v.amount) || 0), 0) + driversOut.reduce((s, d) => s + (parseFloat(d.totalExpenses) || 0), 0);
+            const netCash = (tktSum + crgSum + otherInSum) - totalOutSum;
+
+            if (document.getElementById('dcTicketsPaid')) document.getElementById('dcTicketsPaid').innerText = `${tktSum} AED`;
+            if (document.getElementById('dcCargoPaid')) document.getElementById('dcCargoPaid').innerText = `${crgSum} AED`;
+            if (document.getElementById('dcOtherIn')) document.getElementById('dcOtherIn').innerText = `${otherInSum} AED`;
+            if (document.getElementById('dcTotalOut')) document.getElementById('dcTotalOut').innerText = `${totalOutSum} AED`;
+            if (document.getElementById('dcNetCash')) document.getElementById('dcNetCash').innerText = `${netCash} AED`;
+        }
+
+        function exportDailyClosingPDF() {
+            const targetDate = (document.getElementById('dailyCloseDate') || {}).value || new Date().toISOString().split('T')[0];
+            exportToPDF('dailyClosingCaptureArea', `WadiBina_DailyClosing_${targetDate}_`);
+        }
+
+        const _origRenderFinancials = renderFinancials;
+        renderFinancials = function() {
+            _origRenderFinancials();
+            renderDailyCashClosingReport();
+        };
+
+        // ربط الدوال بالـ window للعمل مع onclick
         window.handleLogin = handleLogin;
         window.handleLogout = handleLogout;
         window.toggleLanguage = toggleLanguage;
-        window.toggleDeviceLayoutMode = toggleDeviceLayoutMode;
-        window.toggleSidebar = toggleSidebar;
         window.openChangePasswordModal = openChangePasswordModal;
         window.handleUserChangePassword = handleUserChangePassword;
         window.switchTab = switchTab;
         window.switchFinancialSubTab = switchFinancialSubTab;
+        window.refreshUI = refreshUI;
         window.handleGlobalSearch = handleGlobalSearch;
         window.resetGlobalSearch = resetGlobalSearch;
-        window.onPassengerCountChanged = onPassengerCountChanged;
-        window.updateReportingTimeAutomatically = updateReportingTimeAutomatically;
-        window.handleSavePassenger = handleSavePassenger;
-        window.editPassenger = editPassenger;
-        window.resetPassengerForm = resetPassengerForm;
-        window.updatePassengerStatus = updatePassengerStatus;
-        window.deletePassenger = deletePassenger;
-        window.addCargoItemRow = addCargoItemRow;
-        window.calculateCargoTotal = calculateCargoTotal;
-        window.handleSaveCargo = handleSaveCargo;
-        window.editCargo = editCargo;
-        window.resetCargoForm = resetCargoForm;
-        window.updateCargoStatus = updateCargoStatus;
-        window.deleteCargo = deleteCargo;
-        window.handleSaveDebtInvoice = handleSaveDebtInvoice;
-        window.deleteDebtInvoice = deleteDebtInvoice;
-        window.handleSaveVoucher = handleSaveVoucher;
-        window.deleteVoucher = deleteVoucher;
-        window.handleSaveUser = handleSaveUser;
-        window.editUser = editUser;
-        window.deleteUser = deleteUser;
-        window.resetUserForm = resetUserForm;
-        window.previewTicketImage = previewTicketImage;
-        window.previewCargoImage = previewCargoImage;
-        window.previewDebtInvoice = previewDebtInvoice;
-        window.sendTicketViaWhatsApp = sendTicketViaWhatsApp;
-        window.sendCargoViaWhatsApp = sendCargoViaWhatsApp;
-        window.sendTripReminderWhatsApp = sendTripReminderWhatsApp;
-        window.sendCargoReceiverWhatsApp = sendCargoReceiverWhatsApp;
-        window.sendDebtReminderWhatsApp = sendDebtReminderWhatsApp;
-        window.printThermalReceipt = printThermalReceipt;
-        window.renderDailyCashClosingReport = renderDailyCashClosingReport;
-        window.exportDailyClosingPDF = exportDailyClosingPDF;
-        window.downloadTicketImageWithWhatsAppPrompt = downloadTicketImageWithWhatsAppPrompt;
-        window.downloadCargoImageWithWhatsAppPrompt = downloadCargoImageWithWhatsAppPrompt;
-        window.openManifestModal = openManifestModal;
-        window.renderPassengerManifestTable = renderPassengerManifestTable;
-        window.printManifestPassenger = printManifestPassenger;
-        window.openCargoManifestModal = openCargoManifestModal;
-        window.renderCargoManifestTable = renderCargoManifestTable;
-        window.printManifestCargo = printManifestCargo;
-        window.exportToPDF = exportToPDF;
-        window.exportMultiPagePDF = exportMultiPagePDF;
-        window.exportSystemBackupPDF = exportSystemBackupPDF;
-        window.downloadCapturedImage = downloadCapturedImage;
-        window.exportBackupJSON = exportBackupJSON;
-        window.importBackupJSON = importBackupJSON;
-        window.importBackupPDF = importBackupPDF;
-        window.exportExcel = exportExcel;
-        window.closeModal = closeModal;
-        window.refreshUI = refreshUI;
-        
-        window.handleSaveTrip = handleSaveTrip;
-        window.editTrip = editTrip;
-        window.markTripDeparted = markTripDeparted;
-        window.resetTripForm = resetTripForm;
-        window.deleteTrip = deleteTrip;
-        window.openTripDetailsModal = openTripDetailsModal;
-        window.switchTripDetailsBranch = switchTripDetailsBranch;
-        window.openAddTicketForDepartedTrip = openAddTicketForDepartedTrip;
-        window.openAddCargoForDepartedTrip = openAddCargoForDepartedTrip;
-        window.updateTicketFareFromFinance = updateTicketFareFromFinance;
-        window.updateCargoTotalFromFinance = updateCargoTotalFromFinance;
-        window.updatePassengerStatusAndRefreshTrip = updatePassengerStatusAndRefreshTrip;
-        window.updateCargoStatusAndRefreshTrip = updateCargoStatusAndRefreshTrip;
-        window.deleteTicketFromTripModal = deleteTicketFromTripModal;
-        window.deleteCargoFromTripModal = deleteCargoFromTripModal;
-        window.onTripSelectedForTicket = onTripSelectedForTicket;
-        window.onTripSelectedForCargo = onTripSelectedForCargo;
-        window.openManifestForTrip = openManifestForTrip;
-
         window.onEmpRoleTypeChange = onEmpRoleTypeChange;
         window.handleSaveEmployee = handleSaveEmployee;
         window.editEmployee = editEmployee;
@@ -5221,21 +5121,82 @@
         window.deleteEmployee = deleteEmployee;
         window.handleSaveAdvance = handleSaveAdvance;
         window.handleCashReceiptForEmployee = handleCashReceiptForEmployee;
-
-        window.onTransitIdentityChange = onTransitIdentityChange;
-        window.handleSaveTransit = handleSaveTransit;
-        window.updateTransitStatus = updateTransitStatus;
-        window.editTransit = editTransit;
-        window.resetTransitForm = resetTransitForm;
-        window.deleteTransit = deleteTransit;
-        window.exportTransitExcel = exportTransitExcel;
-
         window.calculateDriverNet = calculateDriverNet;
         window.handleSaveDriverAccount = handleSaveDriverAccount;
         window.previewDriverAccount = previewDriverAccount;
         window.editDriverAccount = editDriverAccount;
         window.resetDriverForm = resetDriverForm;
         window.deleteDriverAccount = deleteDriverAccount;
+        window.handleSaveTrip = handleSaveTrip;
+        window.editTrip = editTrip;
+        window.markTripDeparted = markTripDeparted;
+        window.resetTripForm = resetTripForm;
+        window.openManifestForTrip = openManifestForTrip;
+        window.deleteTrip = deleteTrip;
+        window.openTripDetailsModal = openTripDetailsModal;
+        window.switchTripDetailsBranch = switchTripDetailsBranch;
+        window.openAddTicketForDepartedTrip = openAddTicketForDepartedTrip;
+        window.openAddCargoForDepartedTrip = openAddCargoForDepartedTrip;
+        window.updatePassengerPaymentStatusFromModal = updatePassengerPaymentStatusFromModal;
+        window.updateCargoPaymentStatusFromModal = updateCargoPaymentStatusFromModal;
+        window.onTripSelectedForTicket = onTripSelectedForTicket;
+        window.onTripSelectedForCargo = onTripSelectedForCargo;
+        window.updateReportingTimeAutomatically = updateReportingTimeAutomatically;
+        window.onPassengerCountChanged = onPassengerCountChanged;
+        window.handleSavePassenger = handleSavePassenger;
+        window.editPassenger = editPassenger;
+        window.resetPassengerForm = resetPassengerForm;
+        window.updatePassengerPaymentStatus = updatePassengerPaymentStatus;
+        window.deletePassenger = deletePassenger;
+        window.previewTicketImage = previewTicketImage;
+        window.addCargoItemRow = addCargoItemRow;
+        window.calculateCargoTotal = calculateCargoTotal;
+        window.handleSaveCargo = handleSaveCargo;
+        window.editCargo = editCargo;
+        window.resetCargoForm = resetCargoForm;
+        window.updateCargoPaymentStatus = updateCargoPaymentStatus;
+        window.deleteCargo = deleteCargo;
+        window.previewCargoImage = previewCargoImage;
+        window.onTransitIdentityChange = onTransitIdentityChange;
+        window.handleSaveTransit = handleSaveTransit;
+        window.updateTransitPaymentStatus = updateTransitPaymentStatus;
+        window.editTransitVisa = editTransitVisa;
+        window.resetTransitForm = resetTransitForm;
+        window.deleteTransitVisa = deleteTransitVisa;
+        window.exportTransitExcel = exportTransitExcel;
+        window.handleSaveVoucher = handleSaveVoucher;
+        window.deleteVoucher = deleteVoucher;
+        window.handleSaveDebtInvoice = handleSaveDebtInvoice;
+        window.previewDebtInvImage = previewDebtInvImage;
+        window.deleteDebtInv = deleteDebtInv;
+        window.openManifestModal = openManifestModal;
+        window.renderPassengerManifestTable = renderPassengerManifestTable;
+        window.printManifestPassenger = printManifestPassenger;
+        window.openCargoManifestModal = openCargoManifestModal;
+        window.renderCargoManifestTable = renderCargoManifestTable;
+        window.printManifestCargo = printManifestCargo;
+        window.handleSaveUser = handleSaveUser;
+        window.editUser = editUser;
+        window.resetUserForm = resetUserForm;
+        window.deleteUser = deleteUser;
+        window.closeModal = closeModal;
+        window.exportToPDF = exportToPDF;
+        window.exportMultiPagePDF = exportMultiPagePDF;
+        window.exportSystemBackupPDF = exportSystemBackupPDF;
+        window.downloadCapturedImage = downloadCapturedImage;
+        window.downloadTicketImageWithWhatsAppPrompt = downloadTicketImageWithWhatsAppPrompt;
+        window.downloadCargoImageWithWhatsAppPrompt = downloadCargoImageWithWhatsAppPrompt;
+        window.exportBackupJSON = exportBackupJSON;
+        window.importBackupJSON = importBackupJSON;
+        window.importBackupPDF = importBackupPDF;
+        window.exportExcel = exportExcel;
+        window.toggleDeviceLayoutMode = toggleDeviceLayoutMode;
+        window.toggleSidebar = toggleSidebar;
+        window.sendTripReminderWhatsApp = sendTripReminderWhatsApp;
+        window.sendCargoReceiverWhatsApp = sendCargoReceiverWhatsApp;
+        window.printThermalReceipt = printThermalReceipt;
+        window.renderDailyCashClosingReport = renderDailyCashClosingReport;
+        window.exportDailyClosingPDF = exportDailyClosingPDF;
     </script>
 </body>
 </html>
