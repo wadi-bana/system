@@ -1816,7 +1816,7 @@
     <!-- FIREBASE MODULAR SDK v13.2.0 & APP LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-database.js";
+        import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-database.js";
 
         const { jsPDF } = window.jspdf;
 
@@ -2273,59 +2273,130 @@
         }
 
         let isSyncListenerAttached = false;
+        let isFirebaseInitialized = false;
+        let hasPendingOfflineWrites = false;
+        let isApplyingRemote = false;
+
+        function sanitizeForFirebase(obj) {
+            return JSON.parse(JSON.stringify(obj, (key, value) => value === undefined ? null : value));
+        }
+
+        function normalizeArray(val) {
+            if (!val) return [];
+            if (Array.isArray(val)) return val.filter(item => item !== null && item !== undefined);
+            if (typeof val === 'object') return Object.values(val).filter(item => item !== null && item !== undefined);
+            return [];
+        }
 
         function applyRemoteSnapshot(val) {
-            if (!val) return;
-            db = {
-                trips: val.trips ? Object.values(val.trips) : [],
-                drivers: val.drivers ? Object.values(val.drivers) : [],
-                employees: val.employees ? Object.values(val.employees) : [],
-                passengers: val.passengers ? Object.values(val.passengers) : [],
-                cargo: val.cargo ? Object.values(val.cargo) : [],
-                vouchers: val.vouchers ? Object.values(val.vouchers) : [],
-                debtInvoices: val.debtInvoices ? Object.values(val.debtInvoices) : [],
-                transitVisas: val.transitVisas ? Object.values(val.transitVisas) : [],
-                nextTicketNo: val.nextTicketNo || 141,
-                nextCargoNo: val.nextCargoNo || 158,
-                nextDebtInvNo: val.nextDebtInvNo || 2,
-                nextTransitNo: val.nextTransitNo || 1
-            };
-            validateAndRepairDB();
-            localStorage.setItem('WADI_BINA_UNIFIED_DB', JSON.stringify(db));
-            refreshUI();
-            checkAutoDownloadFromUrl();
+            if (!val || isApplyingRemote) return;
+            isApplyingRemote = true;
+            try {
+                db = {
+                    trips: normalizeArray(val.trips),
+                    drivers: normalizeArray(val.drivers),
+                    employees: normalizeArray(val.employees),
+                    passengers: normalizeArray(val.passengers),
+                    cargo: normalizeArray(val.cargo),
+                    vouchers: normalizeArray(val.vouchers),
+                    debtInvoices: normalizeArray(val.debtInvoices),
+                    transitVisas: normalizeArray(val.transitVisas),
+                    nextTicketNo: val.nextTicketNo || 141,
+                    nextCargoNo: val.nextCargoNo || 158,
+                    nextDebtInvNo: val.nextDebtInvNo || 2,
+                    nextTransitNo: val.nextTransitNo || 1,
+                    _lastUpdated: val._lastUpdated || Date.now()
+                };
+                validateAndRepairDB();
+                localStorage.setItem('WADI_BINA_UNIFIED_DB', JSON.stringify(db));
+                refreshUI();
+                checkAutoDownloadFromUrl();
+            } finally {
+                isApplyingRemote = false;
+            }
+        }
+
+        function pushLocalToFirebase() {
+            if (!useFirebase || !rtdb || !navigator.onLine) {
+                hasPendingOfflineWrites = true;
+                return Promise.resolve(false);
+            }
+            const cleanPayload = sanitizeForFirebase(db);
+            return set(ref(rtdb, 'systemUnifiedData'), cleanPayload)
+                .then(() => {
+                    hasPendingOfflineWrites = false;
+                    return true;
+                })
+                .catch(err => {
+                    console.error("Sync push error:", err);
+                    hasPendingOfflineWrites = true;
+                    return false;
+                });
         }
 
         function forcePullFromFirebase() {
             if (!useFirebase || !rtdb || !navigator.onLine) return;
-            import("https://www.gstatic.com/firebasejs/13.2.0/firebase-database.js").then(({ get }) => {
-                get(ref(rtdb, 'systemUnifiedData')).then((snapshot) => {
-                    if (snapshot.exists()) {
-                        applyRemoteSnapshot(snapshot.val());
+            if (hasPendingOfflineWrites) {
+                pushLocalToFirebase();
+                return;
+            }
+            get(ref(rtdb, 'systemUnifiedData')).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const remoteVal = snapshot.val();
+                    const remoteTs = remoteVal._lastUpdated || 0;
+                    const localTs = db._lastUpdated || 0;
+                    if (remoteTs >= localTs || !localTs) {
+                        applyRemoteSnapshot(remoteVal);
+                    } else {
+                        pushLocalToFirebase();
                     }
-                }).catch(err => console.warn("Force pull error:", err));
-            });
+                }
+            }).catch(err => console.warn("Force pull error:", err));
         }
 
         function initSync() {
-            if(!useFirebase || !rtdb) { loadFromLocal(); return; }
-            
+            if (!useFirebase || !rtdb) {
+                loadFromLocal();
+                return;
+            }
+            if (isFirebaseInitialized) {
+                forcePullFromFirebase();
+                return;
+            }
+            isFirebaseInitialized = true;
+
+            onValue(ref(rtdb, '.info/connected'), (snap) => {
+                if (snap.val() === true) {
+                    if (hasPendingOfflineWrites) {
+                        pushLocalToFirebase();
+                    } else {
+                        forcePullFromFirebase();
+                    }
+                }
+            });
+
             onValue(ref(rtdb, 'systemUsers'), (snapshot) => {
                 const val = snapshot.val();
-                if(val) {
-                    localStorage.setItem('WADI_BINA_USERS', JSON.stringify(Object.values(val)));
+                if (val) {
+                    localStorage.setItem('WADI_BINA_USERS', JSON.stringify(normalizeArray(val)));
                     if (currentTab === 'users' && canModifyFinancialsOrAccounts()) renderUsersTable();
                 } else {
-                    set(ref(rtdb, 'systemUsers'), DEFAULT_USERS);
+                    set(ref(rtdb, 'systemUsers'), sanitizeForFirebase(DEFAULT_USERS));
                 }
+            }, (error) => {
+                console.warn("Users sync error:", error);
             });
 
             onValue(ref(rtdb, 'systemUnifiedData'), (snapshot) => {
                 const val = snapshot.val();
-                if(val) {
-                    applyRemoteSnapshot(val);
+                if (val) {
+                    if (hasPendingOfflineWrites) {
+                        pushLocalToFirebase();
+                    } else {
+                        applyRemoteSnapshot(val);
+                    }
                 } else {
-                    saveDB();
+                    pushLocalToFirebase();
                     refreshUI();
                 }
             }, (error) => {
@@ -2335,12 +2406,23 @@
 
             if (!isSyncListenerAttached) {
                 isSyncListenerAttached = true;
-                document.addEventListener("visibilitychange", () => { if (!document.hidden) forcePullFromFirebase(); });
+                document.addEventListener("visibilitychange", () => {
+                    if (!document.hidden) forcePullFromFirebase();
+                });
                 window.addEventListener("focus", () => forcePullFromFirebase());
-                window.addEventListener("online", () => { saveDB(); forcePullFromFirebase(); });
+                window.addEventListener("online", () => {
+                    if (hasPendingOfflineWrites) {
+                        pushLocalToFirebase();
+                    } else {
+                        forcePullFromFirebase();
+                    }
+                });
                 window.addEventListener("storage", (e) => {
                     if (e.key === 'WADI_BINA_UNIFIED_DB' && e.newValue) {
-                        try { db = JSON.parse(e.newValue); refreshUI(); } catch (err) {}
+                        try {
+                            db = JSON.parse(e.newValue);
+                            refreshUI();
+                        } catch (err) {}
                     }
                 });
             }
@@ -2348,19 +2430,23 @@
 
         function loadFromLocal() {
             const local = localStorage.getItem('WADI_BINA_UNIFIED_DB');
-            if(local) {
-                try { db = JSON.parse(local); validateAndRepairDB(); } catch(e) {}
-            } else { validateAndRepairDB(); }
+            if (local) {
+                try {
+                    db = JSON.parse(local);
+                    validateAndRepairDB();
+                } catch (e) {}
+            } else {
+                validateAndRepairDB();
+            }
             refreshUI();
         }
 
         function saveDB() {
+            if (isApplyingRemote) return;
             calculateNextSequenceNumbers();
             db._lastUpdated = Date.now();
             localStorage.setItem('WADI_BINA_UNIFIED_DB', JSON.stringify(db));
-            if(useFirebase && rtdb && navigator.onLine) {
-                set(ref(rtdb, 'systemUnifiedData'), db).catch(err => console.error("Sync save error:", err));
-            }
+            pushLocalToFirebase();
         }
 
         let forcedDeviceMode = localStorage.getItem('WADI_BINA_DEVICE_MODE') || 'auto';
