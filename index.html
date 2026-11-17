@@ -90,7 +90,7 @@
         }
 
         @media print {
-            @page { size: A4 portrait; margin: 8mm; }
+            @page { size: A4 landscape; margin: 6mm; }
             body { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             header, nav, .no-print, button, .modal-overlay { display: none !important; }
             .print-only { display: block !important; }
@@ -185,6 +185,9 @@
                 </div>
 
                 <div id="imgTicketExtraBox"></div>
+                <div id="imgTicketNotesBox" class="hidden bg-amber-50 p-2.5 rounded-lg border border-amber-200 text-xs mb-4 text-slate-800">
+                    <strong>ملاحظات التذكرة:</strong> <span id="imgTktNotes"></span>
+                </div>
 
                 <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm font-black mb-6">
                     <div class="flex items-center gap-2">
@@ -269,6 +272,9 @@
                     </thead>
                     <tbody id="imgCargoItemsTableBody"></tbody>
                 </table>
+                <div id="imgCargoNotesBox" class="hidden bg-amber-50 p-2.5 rounded-lg border border-amber-200 text-xs mb-4 text-slate-800">
+                    <strong>ملاحظات الفاتورة:</strong> <span id="imgCargoNotes"></span>
+                </div>
 
                 <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm font-black mb-6">
                     <div class="flex items-center gap-2">
@@ -366,6 +372,7 @@
                 <div class="flex gap-2">
                     <button onclick="window.print()" class="bg-amber-600 text-black font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-print ml-1"></i> طباعة</button>
                     <button onclick="exportToPDF('driverAccountPrintArea', 'WadiBina_DriverAccount_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> PDF</button>
+                    <button onclick="downloadCapturedImage('driverAccountPrintArea', 'WadiBina_DriverAccount_')" class="gold-gradient-bg text-black font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-image ml-1"></i> حفظ كصورة</button>
                     <button onclick="closeModal('driverAccountModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
             </div>
@@ -435,7 +442,7 @@
 
     <!-- MANIFEST MODAL (PASSENGERS) -->
     <div class="modal-overlay hidden" id="manifestModal">
-        <div class="modal-card" style="max-width: 950px;">
+        <div class="modal-card" style="max-width: 1200px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
                 <div class="flex items-center gap-3">
                     <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> <span id="manPTitle">كشف رحلة ركاب حسب تاريخ الرحلة</span></h3>
@@ -444,6 +451,7 @@
                     <button onclick="printManifestPassenger('driver')" class="bg-amber-600 text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow"><i class="fa-solid fa-id-card ml-1"></i> طباعة للسائق (بدون أسعار)</button>
                     <button onclick="printManifestPassenger('management')" class="bg-gold text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow"><i class="fa-solid fa-chart-line ml-1"></i> طباعة للإدارة (بالأسعار)</button>
                     <button onclick="exportMultiPagePDF('manifestPrintArea', 'WadiBina_Manifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> PDF (تصدير كامل)</button>
+                    <button onclick="downloadCapturedImage('manifestPrintArea', 'WadiBina_Manifest_')" class="gold-gradient-bg text-black font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-image ml-1"></i> حفظ كصورة</button>
                     <button onclick="closeModal('manifestModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
             </div>
@@ -482,6 +490,7 @@
                             <th class="border border-slate-300 p-2">الجواز</th>
                             <th class="border border-slate-300 p-2">المسار</th>
                             <th class="border border-slate-300 p-2 man-price-col">السعر</th>
+                            <th class="border border-slate-300 p-2">ملاحظات</th>
                             <th class="border border-slate-300 p-2 no-print">منفذ الإجراء</th>
                             <th class="border border-slate-300 p-2">حالة السداد</th>
                         </tr>
@@ -498,13 +507,14 @@
 
     <!-- CARGO MANIFEST MODAL -->
     <div class="modal-overlay hidden" id="cargoManifestModal">
-        <div class="modal-card" style="max-width: 1000px;">
+        <div class="modal-card" style="max-width: 1280px;">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4 no-print">
                 <h3 class="text-gold font-bold text-sm"><i class="fa-solid fa-file-lines ml-1"></i> <span id="manCTitle">كشف مانفيستو فواتير الشحن حسب تاريخ الرحلة</span></h3>
                 <div class="flex gap-2 items-center flex-wrap">
                     <button onclick="printManifestCargo('driver')" class="bg-amber-600 text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow"><i class="fa-solid fa-id-card ml-1"></i> طباعة للسائق (بدون أسعار)</button>
                     <button onclick="printManifestCargo('management')" class="bg-gold text-black font-bold px-3 py-1.5 rounded-xl text-xs shadow"><i class="fa-solid fa-chart-line ml-1"></i> طباعة للإدارة (بالأسعار)</button>
                     <button onclick="exportMultiPagePDF('cargoManifestPrintArea', 'WadiBina_CargoManifest_')" class="bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-file-pdf ml-1"></i> PDF (تصدير كامل)</button>
+                    <button onclick="downloadCapturedImage('cargoManifestPrintArea', 'WadiBina_CargoManifest_')" class="gold-gradient-bg text-black font-bold px-3 py-1.5 rounded-xl text-xs"><i class="fa-solid fa-image ml-1"></i> حفظ كصورة</button>
                     <button onclick="closeModal('cargoManifestModal')" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
             </div>
@@ -536,14 +546,16 @@
                     <thead>
                         <tr class="bg-slate-200 text-slate-800">
                             <th class="border border-slate-300 p-2">م</th>
-                            <th class="border border-slate-300 p-2">الفاتورة</th>
-                            <th class="border border-slate-300 p-2">المرسل</th>
-                            <th class="border border-slate-300 p-2">المستلم وعنوانه</th>
-                            <th class="border border-slate-300 p-2">الرحلة المرتبطة</th>
-                            <th class="border border-slate-300 p-2">وصف الأصناف والعدد</th>
-                            <th class="border border-slate-300 p-2 cargo-price-col">الإجمالي</th>
+                            <th class="border border-slate-300 p-2">رقم الشحنة</th>
+                            <th class="border border-slate-300 p-2">اسم المرسل</th>
+                            <th class="border border-slate-300 p-2">رقم هاتف المرسل</th>
+                            <th class="border border-slate-300 p-2">اسم المستلم</th>
+                            <th class="border border-slate-300 p-2">رقم هاتف المستلم</th>
+                            <th class="border border-slate-300 p-2">عنوان المستلم</th>
+                            <th class="border border-slate-300 p-2">وصف الأصناف وعددها</th>
+                            <th class="border border-slate-300 p-2 cargo-price-col">السعر</th>
+                            <th class="border border-slate-300 p-2">مكان الدفع</th>
                             <th class="border border-slate-300 p-2 no-print">منفذ الإجراء</th>
-                            <th class="border border-slate-300 p-2">حالة السداد</th>
                         </tr>
                     </thead>
                     <tbody id="cargoManifestTableBody"></tbody>
@@ -1174,9 +1186,15 @@
                                 </select>
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-xs text-amber-400 mb-1 font-bold">وقت الحضور (تلقائي حسب مدينة الانطلاق والتاريخ) *</label>
-                            <input type="text" id="passReportingTime" required class="w-full bg-darkbg border border-amber-500/80 font-bold text-amber-300 rounded-xl px-3 py-2 text-xs outline-none" value="4:00 عصراً">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs text-amber-400 mb-1 font-bold">وقت الحضور (تلقائي حسب مدينة الانطلاق والتاريخ) *</label>
+                                <input type="text" id="passReportingTime" required class="w-full bg-darkbg border border-amber-500/80 font-bold text-amber-300 rounded-xl px-3 py-2 text-xs outline-none" value="4:00 عصراً">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-zinc-300 mb-1 font-bold">ملاحظات التذكرة (اختياري)</label>
+                                <input type="text" id="passNotes" placeholder="أضف أي ملاحظات خاصة بالتذكرة..." class="w-full bg-darkbg border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-200 outline-none">
+                            </div>
                         </div>
                         <button type="submit" id="passSubmitBtn" class="w-full gold-gradient-bg text-black font-black py-3 rounded-xl shadow-lg">حفظ وإصدار التذكرة</button>
 
@@ -1219,6 +1237,7 @@
                                 <th id="thP8">المبلغ</th>
                                 <th class="no-print">منفذ الإجراء</th>
                                 <th id="thP9">السداد</th>
+                                <th>ملاحظات</th>
                                 <th id="thP10">الفرع</th>
                                 <th id="thP11">إجراءات / طباعة</th>
                             </tr>
@@ -1310,6 +1329,11 @@
                         </div>
                     </div>
 
+                    <div>
+                        <label class="block text-xs text-zinc-300 mb-1 font-bold">ملاحظات فاتورة الشحن (اختياري)</label>
+                        <input type="text" id="cargoNotes" placeholder="أضف أي ملاحظات خاصة بالشحنة أو التسليم..." class="w-full bg-darkbg border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-200 outline-none">
+                    </div>
+
                     <div class="flex justify-between items-center bg-zinc-900 p-4 rounded-xl border border-gold">
                         <span id="lblTotalCalc" class="text-xs font-bold text-zinc-300">الإجمالي النهائي المحسوب للأصناف:</span>
                         <span id="cargoCalculatedTotal" class="text-lg font-black text-gold">0 AED</span>
@@ -1345,6 +1369,7 @@
                                 <th id="thC6">الإجمالي</th>
                                 <th class="no-print">منفذ الإجراء</th>
                                 <th id="thC7">الحالة</th>
+                                <th>ملاحظات</th>
                                 <th id="thC8">الفرع</th>
                                 <th id="thC9">إجراءات / طباعة</th>
                             </tr>
@@ -3396,12 +3421,22 @@
 
         function exportToPDF(elementId, filePrefix) {
             const element = document.getElementById(elementId);
+            const isLandscapeReport = ['manifestPrintArea', 'cargoManifestPrintArea', 'driverAccountPrintArea', 'dailyClosingCaptureArea'].includes(elementId);
+            const orientation = isLandscapeReport ? 'landscape' : 'portrait';
+            const pageWidth = isLandscapeReport ? 297 : 210;
+            const pageHeight = isLandscapeReport ? 210 : 297;
             html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
-                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-                const imgWidth = 210;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                pdf.addImage(imgData, 'PNG', 0, 10, imgWidth, imgHeight);
+                const pdf = new jsPDF({ orientation: orientation, unit: 'mm', format: 'a4' });
+                let imgWidth = pageWidth - 10;
+                let imgHeight = (canvas.height * imgWidth) / canvas.width;
+                if (isLandscapeReport && imgHeight > (pageHeight - 10)) {
+                    const ratio = (pageHeight - 10) / imgHeight;
+                    imgHeight = pageHeight - 10;
+                    imgWidth = imgWidth * ratio;
+                }
+                const xOffset = (pageWidth - imgWidth) / 2;
+                pdf.addImage(imgData, 'PNG', xOffset, 5, imgWidth, imgHeight);
                 pdf.save(`${filePrefix}${Date.now()}.pdf`);
             });
         }
@@ -3410,17 +3445,17 @@
             const element = document.getElementById(elementId);
             html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
-                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-                const pageWidth = 210, pageHeight = 295, imgWidth = pageWidth;
+                const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+                const pageWidth = 297, pageHeight = 210, imgWidth = pageWidth - 8;
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                let heightLeft = imgHeight, position = 0;
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
+                let heightLeft = imgHeight, position = 4;
+                pdf.addImage(imgData, 'PNG', 4, position, imgWidth, imgHeight);
+                heightLeft -= (pageHeight - 8);
                 while (heightLeft > 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
+                    position = heightLeft - imgHeight + 4;
+                    pdf.addPage('a4', 'landscape');
+                    pdf.addImage(imgData, 'PNG', 4, position, imgWidth, imgHeight);
+                    heightLeft -= (pageHeight - 8);
                 }
                 pdf.save(`${filePrefix}${Date.now()}.pdf`);
             });
@@ -3620,6 +3655,7 @@
             const destVal = document.getElementById('passDestination').value;
             const dateVal = document.getElementById('passDate').value || '-';
             const repTimeVal = document.getElementById('passReportingTime').value;
+            const notesVal = document.getElementById('passNotes').value.trim();
             const fareVal = parseFloat(document.getElementById('passManualTotal').value) || (count * 350);
             const payVal = document.getElementById('passPayMethod').value;
 
@@ -3638,6 +3674,7 @@
                     item.destination = destVal;
                     item.date = dateVal;
                     item.reportingTime = repTimeVal;
+                    item.notes = notesVal;
                     item.fare = fareVal;
                     item.payMethod = payVal;
 
@@ -3660,6 +3697,7 @@
                     destination: destVal,
                     date: dateVal,
                     reportingTime: repTimeVal,
+                    notes: notesVal,
                     fare: fareVal,
                     payMethod: payVal,
                     branch: currentUser.branch || 'فرع عجمان',
@@ -3708,6 +3746,7 @@
             document.getElementById('passDestination').value = item.destination || 'عدن';
             document.getElementById('passPayMethod').value = item.payMethod || 'مدفوع';
             document.getElementById('passReportingTime').value = item.reportingTime || '';
+            document.getElementById('passNotes').value = item.notes || '';
 
             if (item.extraPassengers && item.extraPassengers.length > 0) {
                 const extraTktNos = document.querySelectorAll('.extra-ticket-no');
@@ -3788,6 +3827,7 @@
             const rAddr = document.getElementById('cargoReceiverAddress').value || 'عدن';
             const gTotal = parseFloat(document.getElementById('cargoManualTotal').value) || 0;
             const pStatus = document.getElementById('cargoPaymentStatus').value;
+            const cNotes = document.getElementById('cargoNotes').value.trim();
 
             if (editId) {
                 const idx = db.cargo.findIndex(c => String(c.id) === String(editId));
@@ -3804,6 +3844,7 @@
                     item.items = itemsList;
                     item.grandTotal = gTotal;
                     item.paymentStatus = pStatus;
+                    item.notes = cNotes;
 
                     if(!item.auditLog) item.auditLog = [{action: 'إنشاء الفاتورة', user: item.createdBy || author, time: item.createdAt || nowStr}];
                     item.auditLog.push({action: 'تعديل فاتورة الشحن', user: author, time: nowStr});
@@ -3824,6 +3865,7 @@
                     items: itemsList,
                     grandTotal: gTotal,
                     paymentStatus: pStatus,
+                    notes: cNotes,
                     branch: currentUser.branch || 'فرع عجمان',
                     createdBy: author,
                     createdAt: nowStr,
@@ -3864,6 +3906,7 @@
             document.getElementById('cargoReceiverName').value = item.receiver || '';
             document.getElementById('cargoReceiverPhone').value = item.receiverPhone || '';
             document.getElementById('cargoReceiverAddress').value = item.receiverAddress || 'عدن';
+            document.getElementById('cargoNotes').value = item.notes || '';
 
             const tbody = document.getElementById('cargoItemsRowsContainer');
             tbody.innerHTML = '';
@@ -4007,6 +4050,7 @@
                             <option value="مؤجل باليمن" ${p.payMethod === 'مؤجل باليمن' ? 'selected' : ''}>مؤجل باليمن</option>
                         </select>
                     </td>
+                    <td><span class="text-xs text-amber-300">${p.notes || '-'}</span></td>
                     <td><span class="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-xs">${p.branch || 'فرع عجمان'}</span></td>
                     <td class="space-x-1 space-x-reverse">
                         <button onclick="previewTicketImage('${p.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-image"></i> بوليصة</button>
@@ -4073,6 +4117,7 @@
                             <option value="مؤجل باليمن" ${c.paymentStatus === 'مؤجل باليمن' ? 'selected' : ''}>مؤجل باليمن</option>
                         </select>
                     </td>
+                    <td><span class="text-xs text-amber-300">${c.notes || '-'}</span></td>
                     <td><span class="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-xs">${c.branch || 'فرع عجمان'}</span></td>
                     <td class="space-x-1 space-x-reverse">
                         <button onclick="previewCargoImage('${c.id}')" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-file-invoice"></i> فاتورة</button>
@@ -4478,6 +4523,14 @@
                 extraBox.innerHTML = html;
             } else { extraBox.innerHTML = ''; }
 
+            const notesBox = document.getElementById('imgTicketNotesBox');
+            if (tkt.notes && tkt.notes.trim()) {
+                document.getElementById('imgTktNotes').innerText = tkt.notes;
+                notesBox.classList.remove('hidden');
+            } else {
+                notesBox.classList.add('hidden');
+            }
+
             document.getElementById('ticketPreviewModal').classList.remove('hidden');
         }
 
@@ -4510,6 +4563,13 @@
                         <td class="border border-slate-300 p-2 text-left font-bold">${rowTotal} AED</td>
                     `;
                 });
+            }
+            const cNotesBox = document.getElementById('imgCargoNotesBox');
+            if (cargo.notes && cargo.notes.trim()) {
+                document.getElementById('imgCargoNotes').innerText = cargo.notes;
+                cNotesBox.classList.remove('hidden');
+            } else {
+                cNotesBox.classList.add('hidden');
             }
             document.getElementById('cargoPreviewModal').classList.remove('hidden');
         }
@@ -4561,6 +4621,7 @@
                     <td class="border border-slate-300 p-1.5">${p.passport || '-'}</td>
                     <td class="border border-slate-300 p-1.5">${p.origin} → ${p.destination}</td>
                     <td class="border border-slate-300 p-1.5 font-bold man-price-col">${p.fare} AED</td>
+                    <td class="border border-slate-300 p-1.5 text-xs">${p.notes || '-'}</td>
                     <td class="border border-slate-300 p-1.5 no-print">${p.createdBy || 'النظام'}</td>
                     <td class="border border-slate-300 p-1.5 font-bold">${p.payMethod}</td>
                 `;
@@ -4579,6 +4640,7 @@
                             <td class="border border-slate-300 p-1.5 bg-amber-50/60">${ex.passport || '-'}</td>
                             <td class="border border-slate-300 p-1.5 bg-amber-50/60">${p.origin} → ${p.destination}</td>
                             <td class="border border-slate-300 p-1.5 text-slate-500 man-price-col bg-amber-50/60">ضمن التذكرة #${p.id}</td>
+                            <td class="border border-slate-300 p-1.5 text-xs bg-amber-50/60">${p.notes || '-'}</td>
                             <td class="border border-slate-300 p-1.5 no-print bg-amber-50/60">${p.createdBy || 'النظام'}</td>
                             <td class="border border-slate-300 p-1.5 font-bold bg-amber-50/60">${p.payMethod}</td>
                         `;
@@ -4624,19 +4686,19 @@
             list.forEach((c, idx) => {
                 totalRev += (c.grandTotal || 0);
                 const itemsDesc = c.items ? c.items.map(it => `${it.desc} (${it.qty})`).join('، ') : '-';
-                const trip = (db.trips || []).find(t => String(t.id) === String(c.tripId));
-                const tripText = trip ? `${trip.date !== '-' ? trip.date : ''} (${trip.route})` : '-';
 
                 tbody.insertRow().innerHTML = `
                     <td class="border border-slate-300 p-1.5 text-center">${idx + 1}</td>
                     <td class="border border-slate-300 p-1.5 font-bold">#${c.id}</td>
-                    <td class="border border-slate-300 p-1.5">${c.sender} (${c.senderPhone})</td>
-                    <td class="border border-slate-300 p-1.5 font-bold">${c.receiver} - <span class="text-slate-600 font-normal">${c.receiverAddress || 'عدن'}</span></td>
-                    <td class="border border-slate-300 p-1.5 text-xs text-indigo-800">${tripText}</td>
+                    <td class="border border-slate-300 p-1.5 font-bold">${c.sender || '-'}</td>
+                    <td class="border border-slate-300 p-1.5" dir="ltr">${c.senderPhone || '-'}</td>
+                    <td class="border border-slate-300 p-1.5 font-bold">${c.receiver || '-'}</td>
+                    <td class="border border-slate-300 p-1.5" dir="ltr">${c.receiverPhone || '-'}</td>
+                    <td class="border border-slate-300 p-1.5">${c.receiverAddress || 'عدن'}</td>
                     <td class="border border-slate-300 p-1.5 text-xs">${itemsDesc}</td>
                     <td class="border border-slate-300 p-1.5 font-bold cargo-price-col">${c.grandTotal} AED</td>
+                    <td class="border border-slate-300 p-1.5 font-bold">${c.paymentStatus || '-'}</td>
                     <td class="border border-slate-300 p-1.5 no-print">${c.createdBy || 'النظام'}</td>
-                    <td class="border border-slate-300 p-1.5 font-bold">${c.paymentStatus}</td>
                 `;
             });
             document.getElementById('cargoManifestTotalInvoices').innerText = list.length;
