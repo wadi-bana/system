@@ -2048,7 +2048,7 @@
 
         function downloadTicketImageWithWhatsAppPrompt() {
             if(!currentPreviewTicket) return;
-            downloadCapturedImage('ticketCaptureArea', 'WadiBina_Ticket_');
+            downloadCapturedImage('ticketCaptureArea', '', `تذكرة ${currentPreviewTicket.id}`);
             setTimeout(() => {
                 if(confirm('تم تحميل صورة التذكرة بنجاح.\nهل تريد فتح الواتساب لإرسالها للراكب الآن؟')) {
                     sendTicketViaWhatsApp();
@@ -2058,7 +2058,7 @@
 
         function downloadCargoImageWithWhatsAppPrompt() {
             if(!currentPreviewCargo) return;
-            downloadCapturedImage('cargoCaptureArea', 'WadiBina_CargoInvoice_');
+            downloadCapturedImage('cargoCaptureArea', '', `فاتورة ${currentPreviewCargo.id}`);
             setTimeout(() => {
                 if(confirm('تم تحميل صورة فاتورة الشحن بنجاح.\nهل تريد فتح الواتساب لإرسالها للمرسل الآن؟')) {
                     sendCargoViaWhatsApp();
@@ -2551,7 +2551,7 @@
                     document.getElementById('loginOverlay').style.display = 'none';
                     previewTicketImage(tkt.id);
                     setTimeout(() => {
-                        downloadCapturedImage('ticketCaptureArea', 'WadiBina_Ticket_');
+                        downloadCapturedImage('ticketCaptureArea', '', `تذكرة ${currentPreviewTicket.id}`);
                     }, 700);
                 }
             } else if (dlType === 'cargo') {
@@ -2561,7 +2561,7 @@
                     document.getElementById('loginOverlay').style.display = 'none';
                     previewCargoImage(crg.id);
                     setTimeout(() => {
-                        downloadCapturedImage('cargoCaptureArea', 'WadiBina_CargoInvoice_');
+                        downloadCapturedImage('cargoCaptureArea', '', `فاتورة ${currentPreviewCargo.id}`);
                     }, 700);
                 }
             }
@@ -3488,16 +3488,46 @@
             });
         }
 
-        function downloadCapturedImage(areaId, prefix) {
+        function downloadCapturedImage(areaId, prefix, exactFileName = null) {
             const el = document.getElementById(areaId);
             el.classList.add('capturing-hide-executor');
             html2canvas(el, { scale: 2, useCORS: true }).then(canvas => {
                 el.classList.remove('capturing-hide-executor');
                 const link = document.createElement('a');
-                link.download = `${prefix}${Date.now()}.jpg`;
+                let finalFileName = exactFileName;
+                if (!finalFileName) {
+                    if (areaId === 'ticketCaptureArea' && currentPreviewTicket) {
+                        finalFileName = `تذكرة ${currentPreviewTicket.id}`;
+                    } else if (areaId === 'cargoCaptureArea' && currentPreviewCargo) {
+                        finalFileName = `فاتورة ${currentPreviewCargo.id}`;
+                    } else {
+                        finalFileName = `${prefix}${Date.now()}`;
+                    }
+                }
+                link.download = `${finalFileName}.jpg`;
                 link.href = canvas.toDataURL('image/jpeg', 0.95);
                 link.click();
             }).catch(() => el.classList.remove('capturing-hide-executor'));
+        }
+
+        function triggerDirectTicketImageDownload(ticketId, autoCloseAfter = false) {
+            previewTicketImage(ticketId);
+            setTimeout(() => {
+                downloadCapturedImage('ticketCaptureArea', '', `تذكرة ${ticketId}`);
+                if (autoCloseAfter) {
+                    setTimeout(() => closeModal('ticketPreviewModal'), 700);
+                }
+            }, 350);
+        }
+
+        function triggerDirectCargoImageDownload(cargoId, autoCloseAfter = false) {
+            previewCargoImage(cargoId);
+            setTimeout(() => {
+                downloadCapturedImage('cargoCaptureArea', '', `فاتورة ${cargoId}`);
+                if (autoCloseAfter) {
+                    setTimeout(() => closeModal('cargoPreviewModal'), 700);
+                }
+            }, 350);
         }
 
         function updateReportingTimeAutomatically() {
@@ -3673,8 +3703,13 @@
                     if(!item.auditLog) item.auditLog = [{action: 'إنشاء التذكرة', user: item.createdBy || author, time: item.createdAt || nowStr}];
                     item.auditLog.push({action: 'تعديل بيانات التذكرة', user: author, time: nowStr});
                 }
-                alert('تم تحديث التذكرة بنجاح!');
+                const savedEditTicketId = ticketNo;
                 resetPassengerForm();
+                validateAndRepairDB();
+                saveDB();
+                refreshUI();
+                triggerDirectTicketImageDownload(savedEditTicketId, false);
+                return;
             } else {
                 const tktData = {
                     id: ticketNo,
@@ -3704,12 +3739,12 @@
                 document.getElementById('passDate').value = new Date().toISOString().split('T')[0];
                 onPassengerCountChanged();
                 updateReportingTimeAutomatically();
-                const extraTktMsg = extraList.length > 0 ? ` وتذاكر الركاب الإضافيين (${extraList.map(e => '#' + e.ticketNo).join('، ')})` : '';
-                alert(`تم إصدار التذكرة بنجاح برقم #${ticketNo}${extraTktMsg}`);
+                validateAndRepairDB();
+                saveDB();
+                refreshUI();
+                triggerDirectTicketImageDownload(ticketNo, false);
+                return;
             }
-            validateAndRepairDB();
-            saveDB();
-            refreshUI();
         }
 
         function editPassenger(id) {
@@ -3841,8 +3876,13 @@
                     if(!item.auditLog) item.auditLog = [{action: 'إنشاء الفاتورة', user: item.createdBy || author, time: item.createdAt || nowStr}];
                     item.auditLog.push({action: 'تعديل فاتورة الشحن', user: author, time: nowStr});
                 }
-                alert('تم تحديث فاتورة الشحن بنجاح!');
+                const savedEditCargoId = invNo;
                 resetCargoForm();
+                validateAndRepairDB();
+                saveDB();
+                refreshUI();
+                triggerDirectCargoImageDownload(savedEditCargoId, false);
+                return;
             } else {
                 const cargoData = {
                     id: invNo,
@@ -3869,11 +3909,12 @@
                 document.getElementById('cargoItemsRowsContainer').innerHTML = '';
                 addCargoItemRow();
                 calculateNextSequenceNumbers();
-                alert('تم حفظ فاتورة الشحن بنجاح!');
+                validateAndRepairDB();
+                saveDB();
+                refreshUI();
+                triggerDirectCargoImageDownload(invNo, false);
+                return;
             }
-            validateAndRepairDB();
-            saveDB();
-            refreshUI();
         }
 
         function editCargo(id) {
@@ -5319,6 +5360,8 @@
         window.exportMultiPagePDF = exportMultiPagePDF;
         window.exportSystemBackupPDF = exportSystemBackupPDF;
         window.downloadCapturedImage = downloadCapturedImage;
+        window.triggerDirectTicketImageDownload = triggerDirectTicketImageDownload;
+        window.triggerDirectCargoImageDownload = triggerDirectCargoImageDownload;
         window.downloadTicketImageWithWhatsAppPrompt = downloadTicketImageWithWhatsAppPrompt;
         window.downloadCargoImageWithWhatsAppPrompt = downloadCargoImageWithWhatsAppPrompt;
         window.exportBackupJSON = exportBackupJSON;
