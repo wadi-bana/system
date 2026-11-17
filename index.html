@@ -1840,7 +1840,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyCX0AnjNnffeRCFGDugKeOI8k8adJC1aqs",
             authDomain: "wadi-bana-b585b.firebaseapp.com",
-            databaseURL: "https://wadi-bana-b585b-default-rtdb.firebaseio.com",
+            databaseURL: "https://wadi-bana-b585b-default-rtdb.firebaseio.com/",
             projectId: "wadi-bana-b585b",
             storageBucket: "wadi-bana-b585b.firebasestorage.app",
             messagingSenderId: "57806694102",
@@ -1945,9 +1945,14 @@
         };
 
         // ================= دوال التحقق من الصلاحيات =================
+        function isMahmoud() {
+            if (!currentUser) return false;
+            return String(currentUser.username || '').trim() === 'محمود';
+        }
+
         function isMahmoudOrGeneralManager() {
             if (!currentUser) return false;
-            return currentUser.username === 'محمود' || currentUser.role === 'مدير عام';
+            return isMahmoud() || currentUser.role === 'مدير عام';
         }
 
         function canModifyFinancialsOrAccounts() {
@@ -2048,7 +2053,7 @@
 
         function downloadTicketImageWithWhatsAppPrompt() {
             if(!currentPreviewTicket) return;
-            downloadCapturedImage('ticketCaptureArea', '', `تذكرة ${currentPreviewTicket.id}`);
+            downloadCapturedImage('ticketCaptureArea', 'WadiBina_Ticket_');
             setTimeout(() => {
                 if(confirm('تم تحميل صورة التذكرة بنجاح.\nهل تريد فتح الواتساب لإرسالها للراكب الآن؟')) {
                     sendTicketViaWhatsApp();
@@ -2058,7 +2063,7 @@
 
         function downloadCargoImageWithWhatsAppPrompt() {
             if(!currentPreviewCargo) return;
-            downloadCapturedImage('cargoCaptureArea', '', `فاتورة ${currentPreviewCargo.id}`);
+            downloadCapturedImage('cargoCaptureArea', 'WadiBina_CargoInvoice_');
             setTimeout(() => {
                 if(confirm('تم تحميل صورة فاتورة الشحن بنجاح.\nهل تريد فتح الواتساب لإرسالها للمرسل الآن؟')) {
                     sendCargoViaWhatsApp();
@@ -2458,11 +2463,15 @@
             refreshUI();
         }
 
-        function saveDB() {
-            if (isApplyingRemote) return;
+        function saveDB(forceImmediate = false) {
+            if (isApplyingRemote && !forceImmediate && !isMahmoud()) return;
             calculateNextSequenceNumbers();
             db._lastUpdated = Date.now();
+            if (isMahmoud()) {
+                db._lastMahmoudOverride = Date.now();
+            }
             localStorage.setItem('WADI_BINA_UNIFIED_DB', JSON.stringify(db));
+            hasPendingOfflineWrites = true;
             pushLocalToFirebase();
         }
 
@@ -2551,7 +2560,7 @@
                     document.getElementById('loginOverlay').style.display = 'none';
                     previewTicketImage(tkt.id);
                     setTimeout(() => {
-                        downloadCapturedImage('ticketCaptureArea', '', `تذكرة ${currentPreviewTicket.id}`);
+                        downloadCapturedImage('ticketCaptureArea', 'WadiBina_Ticket_');
                     }, 700);
                 }
             } else if (dlType === 'cargo') {
@@ -2561,7 +2570,7 @@
                     document.getElementById('loginOverlay').style.display = 'none';
                     previewCargoImage(crg.id);
                     setTimeout(() => {
-                        downloadCapturedImage('cargoCaptureArea', '', `فاتورة ${currentPreviewCargo.id}`);
+                        downloadCapturedImage('cargoCaptureArea', 'WadiBina_CargoInvoice_');
                     }, 700);
                 }
             }
@@ -3488,46 +3497,16 @@
             });
         }
 
-        function downloadCapturedImage(areaId, prefix, exactFileName = null) {
+        function downloadCapturedImage(areaId, prefix) {
             const el = document.getElementById(areaId);
             el.classList.add('capturing-hide-executor');
             html2canvas(el, { scale: 2, useCORS: true }).then(canvas => {
                 el.classList.remove('capturing-hide-executor');
                 const link = document.createElement('a');
-                let finalFileName = exactFileName;
-                if (!finalFileName) {
-                    if (areaId === 'ticketCaptureArea' && currentPreviewTicket) {
-                        finalFileName = `تذكرة ${currentPreviewTicket.id}`;
-                    } else if (areaId === 'cargoCaptureArea' && currentPreviewCargo) {
-                        finalFileName = `فاتورة ${currentPreviewCargo.id}`;
-                    } else {
-                        finalFileName = `${prefix}${Date.now()}`;
-                    }
-                }
-                link.download = `${finalFileName}.jpg`;
+                link.download = `${prefix}${Date.now()}.jpg`;
                 link.href = canvas.toDataURL('image/jpeg', 0.95);
                 link.click();
             }).catch(() => el.classList.remove('capturing-hide-executor'));
-        }
-
-        function triggerDirectTicketImageDownload(ticketId, autoCloseAfter = false) {
-            previewTicketImage(ticketId);
-            setTimeout(() => {
-                downloadCapturedImage('ticketCaptureArea', '', `تذكرة ${ticketId}`);
-                if (autoCloseAfter) {
-                    setTimeout(() => closeModal('ticketPreviewModal'), 700);
-                }
-            }, 350);
-        }
-
-        function triggerDirectCargoImageDownload(cargoId, autoCloseAfter = false) {
-            previewCargoImage(cargoId);
-            setTimeout(() => {
-                downloadCapturedImage('cargoCaptureArea', '', `فاتورة ${cargoId}`);
-                if (autoCloseAfter) {
-                    setTimeout(() => closeModal('cargoPreviewModal'), 700);
-                }
-            }, 350);
         }
 
         function updateReportingTimeAutomatically() {
@@ -3631,7 +3610,7 @@
             if(!tripId) { alert('الرجاء اختيار الرحلة المرتبطة أولاً!'); return; }
             
             const selectedTripForPass = db.trips.find(t => String(t.id) === String(tripId));
-            if (selectedTripForPass && selectedTripForPass.status === 'غادرت الرحلة') {
+            if (!isMahmoud() && selectedTripForPass && selectedTripForPass.status === 'غادرت الرحلة') {
                 if (!editId && (!canModifyFinancialsOrAccounts() || String(financeOverrideDepartedTripId) !== String(tripId))) {
                     alert('عذراً، الوسيلة الوحيدة لإضافة تذكرة لرحلة غادرت هي عن طريق الإدارة المالية!');
                     return;
@@ -3685,6 +3664,11 @@
                 const idx = db.passengers.findIndex(p => String(p.id) === String(editId));
                 if (idx !== -1) {
                     let item = db.passengers[idx];
+                    const oldTicketId = String(item.id);
+                    const idChanged = ticketNo && ticketNo !== oldTicketId;
+                    if (idChanged) {
+                        item.id = ticketNo;
+                    }
                     item.tripId = tripId;
                     item.agent = agentVal;
                     item.name = nameVal;
@@ -3701,15 +3685,15 @@
                     item.payMethod = payVal;
 
                     if(!item.auditLog) item.auditLog = [{action: 'إنشاء التذكرة', user: item.createdBy || author, time: item.createdAt || nowStr}];
-                    item.auditLog.push({action: 'تعديل بيانات التذكرة', user: author, time: nowStr});
+                    item.auditLog.push({
+                        action: idChanged ? `تعديل بيانات التذكرة وتغيير رقمها من #${oldTicketId} إلى #${ticketNo}` : 'تعديل بيانات التذكرة',
+                        user: author,
+                        time: nowStr
+                    });
                 }
-                const savedEditTicketId = ticketNo;
+                saveDB(true);
+                alert(ticketNo !== String(editId) ? `تم قبول التعديل وتغيير رقم التذكرة إلى #${ticketNo} وحفظه فوراً!` : 'تم تحديث التذكرة وحفظها فوراً بنجاح!');
                 resetPassengerForm();
-                validateAndRepairDB();
-                saveDB();
-                refreshUI();
-                triggerDirectTicketImageDownload(savedEditTicketId, false);
-                return;
             } else {
                 const tktData = {
                     id: ticketNo,
@@ -3739,12 +3723,12 @@
                 document.getElementById('passDate').value = new Date().toISOString().split('T')[0];
                 onPassengerCountChanged();
                 updateReportingTimeAutomatically();
-                validateAndRepairDB();
-                saveDB();
-                refreshUI();
-                triggerDirectTicketImageDownload(ticketNo, false);
-                return;
+                const extraTktMsg = extraList.length > 0 ? ` وتذاكر الركاب الإضافيين (${extraList.map(e => '#' + e.ticketNo).join('، ')})` : '';
+                alert(`تم إصدار التذكرة بنجاح برقم #${ticketNo}${extraTktMsg}`);
             }
+            validateAndRepairDB();
+            saveDB(true);
+            refreshUI();
         }
 
         function editPassenger(id) {
@@ -3752,7 +3736,7 @@
             if(!item) return;
             if (item.tripId) {
                 const trip = db.trips.find(t => String(t.id) === String(item.tripId));
-                if (trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
+                if (!isMahmoud() && trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
                     alert('عذراً، بعد مغادرة الرحلة لا يمكن تعديل التذكرة إلا من الإدارة المالية!');
                     return;
                 }
@@ -3818,7 +3802,7 @@
             const invNo = document.getElementById('cargoInvNo').value.trim();
             const tripId = document.getElementById('cargoTripSelect').value || '';
             
-            if (tripId) {
+            if (!isMahmoud() && tripId) {
                 const selectedTripForCargo = db.trips.find(t => String(t.id) === String(tripId));
                 if (selectedTripForCargo && selectedTripForCargo.status === 'غادرت الرحلة') {
                     if (!editId && (!canModifyFinancialsOrAccounts() || String(financeOverrideDepartedTripId) !== String(tripId))) {
@@ -3860,6 +3844,11 @@
                 const idx = db.cargo.findIndex(c => String(c.id) === String(editId));
                 if (idx !== -1) {
                     let item = db.cargo[idx];
+                    const oldCargoId = String(item.id);
+                    const idChanged = invNo && invNo !== oldCargoId;
+                    if (idChanged) {
+                        item.id = invNo;
+                    }
                     item.tripId = tripId;
                     item.date = dateVal;
                     item.sender = sName;
@@ -3874,15 +3863,15 @@
                     item.notes = cNotes;
 
                     if(!item.auditLog) item.auditLog = [{action: 'إنشاء الفاتورة', user: item.createdBy || author, time: item.createdAt || nowStr}];
-                    item.auditLog.push({action: 'تعديل فاتورة الشحن', user: author, time: nowStr});
+                    item.auditLog.push({
+                        action: idChanged ? `تعديل فاتورة الشحن وتغيير رقمها من #${oldCargoId} إلى #${invNo}` : 'تعديل فاتورة الشحن',
+                        user: author,
+                        time: nowStr
+                    });
                 }
-                const savedEditCargoId = invNo;
+                saveDB(true);
+                alert(invNo !== String(editId) ? `تم قبول التعديل وتغيير رقم الفاتورة إلى #${invNo} وحفظه فوراً!` : 'تم تحديث فاتورة الشحن وحفظها فوراً بنجاح!');
                 resetCargoForm();
-                validateAndRepairDB();
-                saveDB();
-                refreshUI();
-                triggerDirectCargoImageDownload(savedEditCargoId, false);
-                return;
             } else {
                 const cargoData = {
                     id: invNo,
@@ -3909,12 +3898,11 @@
                 document.getElementById('cargoItemsRowsContainer').innerHTML = '';
                 addCargoItemRow();
                 calculateNextSequenceNumbers();
-                validateAndRepairDB();
-                saveDB();
-                refreshUI();
-                triggerDirectCargoImageDownload(invNo, false);
-                return;
+                alert('تم حفظ فاتورة الشحن بنجاح!');
             }
+            validateAndRepairDB();
+            saveDB(true);
+            refreshUI();
         }
 
         function editCargo(id) {
@@ -3922,7 +3910,7 @@
             if(!item) return;
             if (item.tripId) {
                 const trip = db.trips.find(t => String(t.id) === String(item.tripId));
-                if (trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
+                if (!isMahmoud() && trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
                     alert('عذراً، بعد مغادرة الرحلة لا يمكن تعديل الفاتورة إلا من الإدارة المالية!');
                     return;
                 }
@@ -4034,7 +4022,7 @@
                 let item = db.passengers[idx];
                 if (item.tripId) {
                     const trip = db.trips.find(t => String(t.id) === String(item.tripId));
-                    if (trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
+                    if (!isMahmoud() && trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
                         alert('عذراً، بعد مغادرة الرحلة لا يمكن تعديل السداد إلا من الإدارة المالية!');
                         refreshUI();
                         return;
@@ -4103,7 +4091,7 @@
                 let item = db.cargo[idx];
                 if (item.tripId) {
                     const trip = db.trips.find(t => String(t.id) === String(item.tripId));
-                    if (trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
+                    if (!isMahmoud() && trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
                         alert('عذراً، بعد مغادرة الرحلة لا يمكن تعديل السداد إلا من الإدارة المالية!');
                         refreshUI();
                         return;
@@ -4189,13 +4177,15 @@
             const requestNo = document.getElementById('transitRequestNo').value.trim();
             const amount = parseFloat(document.getElementById('transitAmount').value) || 0;
 
-            if (identity === 'زيارة' && (amount < 150 || amount > 200)) {
-                alert('عذراً، مبلغ الزيارة يجب أن يكون بين 150 و 200 درهم!');
-                return;
-            }
-            if (identity === 'مقيم' && (amount < 80 || amount > 100)) {
-                alert('عذراً، مبلغ المقيم يجب أن يكون بين 80 و 100 درهم!');
-                return;
+            if (!isMahmoud()) {
+                if (identity === 'زيارة' && (amount < 150 || amount > 200)) {
+                    alert('عذراً، مبلغ الزيارة يجب أن يكون بين 150 و 200 درهم!');
+                    return;
+                }
+                if (identity === 'مقيم' && (amount < 80 || amount > 100)) {
+                    alert('عذراً، مبلغ المقيم يجب أن يكون بين 80 و 100 درهم!');
+                    return;
+                }
             }
 
             const nowStr = getFormattedDateTime();
@@ -4238,7 +4228,7 @@
             }
 
             validateAndRepairDB();
-            saveDB();
+            saveDB(true);
             refreshUI();
         }
 
@@ -5048,14 +5038,14 @@
             const item = db.passengers[idx];
             if (item && item.tripId) {
                 const trip = db.trips.find(t => String(t.id) === String(item.tripId));
-                if (trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
+                if (!isMahmoud() && trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
                     alert('عذراً، بعد مغادرة الرحلة لا يمكن حذف التذكرة إلا من الإدارة المالية!');
                     return;
                 }
             }
             db.passengers.splice(idx, 1);
             validateAndRepairDB();
-            saveDB();
+            saveDB(true);
             refreshUI();
         }
 
@@ -5063,14 +5053,14 @@
             const item = db.cargo[idx];
             if (item && item.tripId) {
                 const trip = db.trips.find(t => String(t.id) === String(item.tripId));
-                if (trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
+                if (!isMahmoud() && trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
                     alert('عذراً، بعد مغادرة الرحلة لا يمكن حذف الفاتورة إلا من الإدارة المالية!');
                     return;
                 }
             }
             db.cargo.splice(idx, 1);
             validateAndRepairDB();
-            saveDB();
+            saveDB(true);
             refreshUI();
         }
 
@@ -5360,8 +5350,6 @@
         window.exportMultiPagePDF = exportMultiPagePDF;
         window.exportSystemBackupPDF = exportSystemBackupPDF;
         window.downloadCapturedImage = downloadCapturedImage;
-        window.triggerDirectTicketImageDownload = triggerDirectTicketImageDownload;
-        window.triggerDirectCargoImageDownload = triggerDirectCargoImageDownload;
         window.downloadTicketImageWithWhatsAppPrompt = downloadTicketImageWithWhatsAppPrompt;
         window.downloadCargoImageWithWhatsAppPrompt = downloadCargoImageWithWhatsAppPrompt;
         window.exportBackupJSON = exportBackupJSON;
