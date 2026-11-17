@@ -1081,7 +1081,7 @@
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-calendar-day text-gold text-lg"></i>
                     <div>
-                        <h3 id="lblPassHeader" class="text-xs font-bold text-gold">إدارة رحلات وتذاكر الركاب والركاب الإضافيين (مرتبة تنازلياً برقم التذكرة الأحدث أولاً)</h3>
+                        <h3 id="lblPassHeader" class="text-xs font-bold text-gold">إدارة رحلات وتذاكر الركاب والركاب الإضافيين (مرتبة تنازلياً برقم التذكرة الأكبر أولاً)</h3>
                         <p id="lblPassSub" class="text-[11px] text-zinc-400">يبدأ رقم التذكرة تلقائياً من الرقم التالي لأحدث تذكرة مسجلة (ويُمنح كل راكب إضافي رقم تذكرة مستقل)</p>
                     </div>
                 </div>
@@ -1218,7 +1218,7 @@
 
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
-                    <span id="lblPassLog" class="font-bold text-gold text-xs">سجل جميع التذاكر والركاب الإضافيين (ترتيب تنازلي)</span>
+                    <span id="lblPassLog" class="font-bold text-gold text-xs">سجل جميع التذاكر والركاب الإضافيين (ترتيب من الأكبر للأصغر)</span>
                     <button onclick="exportExcel('passengers')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-file-excel"></i> Excel</button>
                 </div>
                 <div class="overflow-x-auto">
@@ -1251,7 +1251,7 @@
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-boxes-packing text-gold text-lg"></i>
                     <div>
-                        <h3 id="lblCargoHeader" class="text-xs font-bold text-gold">إدارة فواتير الشحن والأصناف (مرتبة تنازلياً برقم الفاتورة الأحدث أولاً)</h3>
+                        <h3 id="lblCargoHeader" class="text-xs font-bold text-gold">إدارة فواتير الشحن والأصناف (مرتبة من الأكبر للأصغر برقم الفاتورة تلقائياً)</h3>
                         <p id="lblCargoSub" class="text-[11px] text-zinc-400">يبدأ رقم الفاتورة تلقائياً من الرقم التالي لأحدث فاتورة مسجلة</p>
                     </div>
                 </div>
@@ -1350,7 +1350,7 @@
 
             <div class="bg-cardbg border border-bordergold rounded-2xl overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-zinc-800 flex justify-between items-center">
-                    <span id="lblCargoLog" class="font-bold text-gold text-xs">سجل فواتير الشحن والأصناف (ترتيب تنازلي)</span>
+                    <span id="lblCargoLog" class="font-bold text-gold text-xs">سجل فواتير الشحن والأصناف (ترتيب من الأكبر للأصغر)</span>
                     <button onclick="exportExcel('cargo')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold"><i class="fa-solid fa-file-excel"></i> Excel</button>
                 </div>
                 <div class="overflow-x-auto">
@@ -1732,7 +1732,7 @@
                                     <th id="thD5">المجموع</th>
                                     <th id="thD6">المدفوع</th>
                                     <th id="thD7">المتبقي</th>
-                                        <th id="thD8">الفرع</th>
+                                    <th id="thD8">الفرع</th>
                                     <th id="thD9">إجراءات / PDF</th>
                                 </tr>
                             </thead>
@@ -1863,6 +1863,18 @@
         let currentPreviewTicket = null;
         let currentPreviewCargo = null;
         let financeOverrideDepartedTripId = null;
+
+        // دالة موحدة لترتيب أرقام الفواتير والتذاكر تنازلياً (من الأكبر للأصغر) مع دعم الأرقام والحروف أبجدياً
+        function compareInvoiceIdsDesc(a, b) {
+            const idA = String(a && a.id !== undefined ? a.id : (a || '')).trim();
+            const idB = String(b && b.id !== undefined ? b.id : (b || '')).trim();
+            const numA = Number(idA);
+            const numB = Number(idB);
+            if (!isNaN(numA) && !isNaN(numB) && idA !== '' && idB !== '') {
+                return numB - numA;
+            }
+            return idB.localeCompare(idA, ['ar', 'en'], { numeric: true, sensitivity: 'base' });
+        }
 
         const DEFAULT_USERS = [
             { username: 'محمود', password: '102030', role: 'مدير عام', branch: 'فرع عجمان' },
@@ -2289,6 +2301,12 @@
                 if(!dr.createdAt) { dr.createdAt = dr.date ? dr.date + ' 09:00' : '2026-11-01 09:00'; fixed = true; }
                 if(!dr.auditLog) { dr.auditLog = [{action: 'إنشاء حساب السائق', user: dr.createdBy || 'محمود', time: dr.createdAt}]; fixed = true; }
             });
+
+            // ترتيب الفواتير والتذاكر تلقائياً في قاعدة البيانات من الأكبر للأصغر
+            db.passengers.sort(compareInvoiceIdsDesc);
+            db.cargo.sort(compareInvoiceIdsDesc);
+            db.debtInvoices.sort(compareInvoiceIdsDesc);
+            db.transitVisas.sort(compareInvoiceIdsDesc);
 
             calculateNextSequenceNumbers();
             if(fixed) { saveDB(); }
@@ -3117,7 +3135,7 @@
                             <td>${d.date}</td>
                             <td>باص: ${d.busNo} | ملاحظات: ${it.note} (الروحة: ${it.roha}, الرجعة: ${it.rajah})</td>
                             <td class="text-red-400 font-bold">${itemTotal} AED</td>
-                                    <td>${d.branch}</td>
+                            <td>${d.branch}</td>
                         `;
                     }
                 });
@@ -3464,9 +3482,9 @@
             document.getElementById('reportDateBadge').innerText = new Date().toLocaleDateString('ar-EG');
             document.getElementById('reportUserBadge').innerText = currentUser ? currentUser.username : 'النظام';
             
-            const filteredPass = getFilteredData(db.passengers);
-            const filteredCargo = getFilteredData(db.cargo);
-            const filteredDebts = getFilteredData(db.debtInvoices);
+            const filteredPass = [...getFilteredData(db.passengers)].sort(compareInvoiceIdsDesc);
+            const filteredCargo = [...getFilteredData(db.cargo)].sort(compareInvoiceIdsDesc);
+            const filteredDebts = [...getFilteredData(db.debtInvoices)].sort(compareInvoiceIdsDesc);
 
             document.getElementById('repTotalTkt').innerText = filteredPass.length;
             document.getElementById('repTotalCargo').innerText = filteredCargo.length;
@@ -3810,7 +3828,7 @@
                         return;
                     }
                     if (editId && !canModifyFinancialsOrAccounts()) {
-                        alert('عذراً، بعد مغادرة الرحلة لا يمكن تعديل الفاتورة إلا من الإدارة المالية!');
+                        alert('عذراً، بعد مغادرة الرحلة لا يمكن تعديل فاتورة الشحن إلا من الإدارة المالية!');
                         return;
                     }
                 }
@@ -3819,26 +3837,28 @@
             const nowStr = getFormattedDateTime();
             const author = getCurrentUserName();
 
-            let itemsList = [];
-            const rows = document.querySelectorAll('#cargoItemsRowsContainer tr');
-            rows.forEach(tr => {
-                itemsList.push({
-                    desc: tr.querySelector('.cargo-item-desc').value,
-                    qty: parseFloat(tr.querySelector('.cargo-item-qty').value) || 1,
-                    price: parseFloat(tr.querySelector('.cargo-item-price').value) || 0
-                });
+            const itemRows = document.querySelectorAll('#cargoItemsRowsContainer tr');
+            if(itemRows.length === 0) { alert('الرجاء إضافة صنف واحد على الأقل للفاتورة!'); return; }
+
+            let items = [];
+            let grandTotal = 0;
+            itemRows.forEach(tr => {
+                const desc = tr.querySelector('.cargo-item-desc').value;
+                const qty = parseFloat(tr.querySelector('.cargo-item-qty').value) || 0;
+                const price = parseFloat(tr.querySelector('.cargo-item-price').value) || 0;
+                grandTotal += (qty * price);
+                items.push({ desc: desc, qty: qty, price: price });
             });
 
             const dateVal = document.getElementById('cargoDate').value || '-';
-            const sName = document.getElementById('cargoSenderName').value;
-            const sPhone = document.getElementById('cargoSenderPhone').value;
-            const sAddr = document.getElementById('cargoSenderAddress').value || 'عجمان';
-            const rName = document.getElementById('cargoReceiverName').value;
-            const rPhone = document.getElementById('cargoReceiverPhone').value;
-            const rAddr = document.getElementById('cargoReceiverAddress').value || 'عدن';
-            const gTotal = parseFloat(document.getElementById('cargoManualTotal').value) || 0;
-            const pStatus = document.getElementById('cargoPaymentStatus').value;
-            const cNotes = document.getElementById('cargoNotes') ? document.getElementById('cargoNotes').value.trim() : '';
+            const sndName = document.getElementById('cargoSenderName').value;
+            const sndPhone = document.getElementById('cargoSenderPhone').value;
+            const sndAddr = document.getElementById('cargoSenderAddress').value;
+            const rcvName = document.getElementById('cargoReceiverName').value;
+            const rcvPhone = document.getElementById('cargoReceiverPhone').value;
+            const rcvAddr = document.getElementById('cargoReceiverAddress').value;
+            const payStat = document.getElementById('cargoPaymentStatus').value;
+            const cargoNotesVal = document.getElementById('cargoNotes') ? document.getElementById('cargoNotes').value.trim() : '';
 
             if (editId) {
                 const idx = db.cargo.findIndex(c => String(c.id) === String(editId));
@@ -3851,20 +3871,20 @@
                     }
                     item.tripId = tripId;
                     item.date = dateVal;
-                    item.sender = sName;
-                    item.senderPhone = sPhone;
-                    item.senderAddress = sAddr;
-                    item.receiver = rName;
-                    item.receiverPhone = rPhone;
-                    item.receiverAddress = rAddr;
-                    item.items = itemsList;
-                    item.grandTotal = gTotal;
-                    item.paymentStatus = pStatus;
-                    item.notes = cNotes;
+                    item.sender = sndName;
+                    item.senderPhone = sndPhone;
+                    item.senderAddress = sndAddr;
+                    item.receiver = rcvName;
+                    item.receiverPhone = rcvPhone;
+                    item.receiverAddress = rcvAddr;
+                    item.items = items;
+                    item.grandTotal = grandTotal;
+                    item.paymentStatus = payStat;
+                    item.notes = cargoNotesVal;
 
                     if(!item.auditLog) item.auditLog = [{action: 'إنشاء الفاتورة', user: item.createdBy || author, time: item.createdAt || nowStr}];
                     item.auditLog.push({
-                        action: idChanged ? `تعديل فاتورة الشحن وتغيير رقمها من #${oldCargoId} إلى #${invNo}` : 'تعديل فاتورة الشحن',
+                        action: idChanged ? `تعديل بيانات فاتورة الشحن وتغيير رقمها من #${oldCargoId} إلى #${invNo}` : 'تعديل بيانات فاتورة الشحن',
                         user: author,
                         time: nowStr
                     });
@@ -3877,28 +3897,28 @@
                     id: invNo,
                     tripId: tripId,
                     date: dateVal,
-                    sender: sName,
-                    senderPhone: sPhone,
-                    senderAddress: sAddr,
-                    receiver: rName,
-                    receiverPhone: rPhone,
-                    receiverAddress: rAddr,
-                    items: itemsList,
-                    grandTotal: gTotal,
-                    paymentStatus: pStatus,
-                    notes: cNotes,
+                    sender: sndName,
+                    senderPhone: sndPhone,
+                    senderAddress: sndAddr,
+                    receiver: rcvName,
+                    receiverPhone: rcvPhone,
+                    receiverAddress: rcvAddr,
+                    items: items,
+                    grandTotal: grandTotal,
+                    paymentStatus: payStat,
+                    notes: cargoNotesVal,
                     branch: currentUser.branch || 'فرع عجمان',
                     createdBy: author,
                     createdAt: nowStr,
                     auditLog: [{action: 'إنشاء الفاتورة', user: author, time: nowStr}]
                 };
                 db.cargo.unshift(cargoData);
+                db.nextCargoNo = parseInt(invNo) + 1;
                 financeOverrideDepartedTripId = null;
                 document.getElementById('cargoForm').reset();
                 document.getElementById('cargoItemsRowsContainer').innerHTML = '';
                 addCargoItemRow();
-                calculateNextSequenceNumbers();
-                alert('تم حفظ فاتورة الشحن بنجاح!');
+                alert('تم حفظ فاتورة الشحن بنجاح برقم #' + invNo);
             }
             validateAndRepairDB();
             saveDB(true);
@@ -3911,7 +3931,7 @@
             if (item.tripId) {
                 const trip = db.trips.find(t => String(t.id) === String(item.tripId));
                 if (!isMahmoud() && trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
-                    alert('عذراً، بعد مغادرة الرحلة لا يمكن تعديل الفاتورة إلا من الإدارة المالية!');
+                    alert('عذراً، بعد مغادرة الرحلة لا يمكن تعديل فاتورة الشحن إلا من الإدارة المالية!');
                     return;
                 }
             }
@@ -3923,18 +3943,17 @@
             document.getElementById('cargoPaymentStatus').value = item.paymentStatus || 'مدفوع';
             document.getElementById('cargoSenderName').value = item.sender || '';
             document.getElementById('cargoSenderPhone').value = item.senderPhone || '';
-            document.getElementById('cargoSenderAddress').value = item.senderAddress || 'عجمان';
+            document.getElementById('cargoSenderAddress').value = item.senderAddress || '';
             document.getElementById('cargoReceiverName').value = item.receiver || '';
             document.getElementById('cargoReceiverPhone').value = item.receiverPhone || '';
-            document.getElementById('cargoReceiverAddress').value = item.receiverAddress || 'عدن';
+            document.getElementById('cargoReceiverAddress').value = item.receiverAddress || '';
             if (document.getElementById('cargoNotes')) document.getElementById('cargoNotes').value = item.notes || '';
 
-            const tbody = document.getElementById('cargoItemsRowsContainer');
-            tbody.innerHTML = '';
-            if (item.items && item.items.length > 0) {
-                item.items.forEach(it => { addCargoItemRow(it.desc, it.qty, it.price); });
+            document.getElementById('cargoItemsRowsContainer').innerHTML = '';
+            if(item.items && item.items.length > 0) {
+                item.items.forEach(it => addCargoItemRow(it.desc, it.qty, it.price));
             } else {
-                addCargoItemRow('أمتعة متنوعة', 1, item.grandTotal || 100);
+                addCargoItemRow();
             }
 
             document.getElementById('cargoFormTitle').innerText = `تعديل فاتورة الشحن #${item.id}`;
@@ -3953,7 +3972,6 @@
             financeOverrideDepartedTripId = null;
             populateTripsDropdown();
             calculateNextSequenceNumbers();
-            document.getElementById('cargoTripSelect').value = '';
             document.getElementById('cargoItemsRowsContainer').innerHTML = '';
             addCargoItemRow();
             document.getElementById('cargoFormTitle').innerText = 'فاتورة أمتعة وبضائع (بأرقام كسرية دقيقة للأسعار)';
@@ -3962,192 +3980,7 @@
             document.getElementById('cargoEditAuditBox').classList.add('hidden');
         }
 
-        function handleGlobalSearch() {
-            const q = document.getElementById('globalSearchInput').value.toLowerCase().trim();
-            const typeFilter = document.getElementById('globalSearchType').value;
-            const payFilter = document.getElementById('advFilterPayment').value;
-            const originFilter = document.getElementById('advFilterOrigin').value;
-            const destFilter = document.getElementById('advFilterDestination').value;
-
-            let passList = getFilteredData(db.passengers);
-            let cargoList = getFilteredData(db.cargo);
-
-            // إخفاء تذاكر وفواتير الرحلات التي غادرت من العرض العام (تظهر فقط في الإدارة المالية في عرض الرحلة للمدير العام والمحاسب ومحمود)
-            passList = passList.filter(p => {
-                if (!p.tripId) return true;
-                const trip = (db.trips || []).find(t => String(t.id) === String(p.tripId));
-                return !(trip && trip.status === 'غادرت الرحلة');
-            });
-
-            cargoList = cargoList.filter(c => {
-                if (!c.tripId) return true;
-                const trip = (db.trips || []).find(t => String(t.id) === String(c.tripId));
-                return !(trip && trip.status === 'غادرت الرحلة');
-            });
-
-            passList = passList.filter(p => {
-                const matchText = !q || String(p.id).toLowerCase().includes(q) || (p.name && p.name.toLowerCase().includes(q)) || (p.phone && p.phone.includes(q)) || (p.extraPassengers && p.extraPassengers.some(ex => (ex.name && ex.name.toLowerCase().includes(q)) || (ex.ticketNo && String(ex.ticketNo).toLowerCase().includes(q))));
-                const matchPay = payFilter === 'all' || p.payMethod === payFilter;
-                const matchOrigin = originFilter === 'all' || p.origin === originFilter;
-                const matchDest = destFilter === 'all' || p.destination === destFilter;
-                return matchText && matchPay && matchOrigin && matchDest;
-            });
-
-            cargoList = cargoList.filter(c => {
-                const matchText = !q || String(c.id).toLowerCase().includes(q) || (c.sender && c.sender.toLowerCase().includes(q)) || (c.receiver && c.receiver.toLowerCase().includes(q)) || (c.items && c.items.some(it => it.desc.toLowerCase().includes(q)));
-                const matchPay = payFilter === 'all' || c.paymentStatus === payFilter;
-                const matchOrigin = originFilter === 'all' || (c.senderAddress && c.senderAddress.includes(originFilter));
-                const matchDest = destFilter === 'all' || (c.receiverAddress && c.receiverAddress.includes(destFilter));
-                return matchText && matchPay && matchOrigin && matchDest;
-            });
-
-            renderPassengersTable(typeFilter === 'cargo' ? [] : passList);
-            renderCargoTable(typeFilter === 'ticket' ? [] : cargoList);
-        }
-
-        function resetGlobalSearch() {
-            document.getElementById('globalSearchInput').value = '';
-            document.getElementById('globalSearchType').value = 'all';
-            document.getElementById('advFilterPayment').value = 'all';
-            document.getElementById('advFilterOrigin').value = 'all';
-            document.getElementById('advFilterDestination').value = 'all';
-            handleGlobalSearch();
-        }
-
-        function updatePassengerPaymentStatus(id, newStatus) {
-            const idx = db.passengers.findIndex(x => String(x.id) === String(id));
-            if (idx !== -1) {
-                const nowStr = getFormattedDateTime();
-                const author = getCurrentUserName();
-                let item = db.passengers[idx];
-                if (item.tripId) {
-                    const trip = db.trips.find(t => String(t.id) === String(item.tripId));
-                    if (!isMahmoud() && trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
-                        alert('عذراً، بعد مغادرة الرحلة لا يمكن تعديل السداد إلا من الإدارة المالية!');
-                        refreshUI();
-                        return;
-                    }
-                }
-                item.payMethod = newStatus;
-                if(!item.auditLog) item.auditLog = [{action: 'إنشاء', user: item.createdBy || author, time: item.createdAt || nowStr}];
-                item.auditLog.push({action: `تغيير حالة السداد إلى (${newStatus})`, user: author, time: nowStr});
-                saveDB();
-                refreshUI();
-            }
-        }
-
-        function renderPassengersTable(list = getFilteredData(db.passengers)) {
-            const tbody = document.querySelector('#passengersTable tbody');
-            if(!tbody) return;
-            tbody.innerHTML = '';
-
-            let sortedList = [...list].sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
-
-            let totalRev = 0;
-            sortedList.forEach((p) => {
-                const realIdx = db.passengers.findIndex(x => String(x.id) === String(p.id));
-                totalRev += (p.fare || 0);
-                const extraNames = (p.extraPassengers && p.extraPassengers.length > 0)
-                    ? p.extraPassengers.map(ex => `<span class="text-amber-300 font-bold">#${ex.ticketNo || '-'}</span> ${ex.name}`).join('، ')
-                    : '-';
-                const trip = (db.trips || []).find(t => String(t.id) === String(p.tripId));
-                const isDeparted = trip && trip.status === 'غادرت الرحلة';
-                const canEditThis = !isDeparted || canModifyFinancialsOrAccounts();
-
-                tbody.insertRow().innerHTML = `
-                    <td><strong>#${p.id}</strong></td>
-                    <td>${p.agent || '-'}</td>
-                    <td><strong>${p.name}</strong></td>
-                    <td><span class="text-[11px] text-zinc-300">${extraNames}</span></td>
-                    <td>${p.phone}</td>
-                    <td>${p.origin} → ${p.destination}</td>
-                    <td><strong class="text-gold">${p.date || '-'}</strong></td>
-                    <td><strong>${p.fare} AED</strong></td>
-                    <td><span class="text-[11px] text-amber-300">${p.notes || '-'}</span></td>
-                    <td>
-                        <select ${!canEditThis ? 'disabled' : ''} onchange="updatePassengerPaymentStatus('${p.id}', this.value)" class="bg-zinc-900 border ${p.payMethod === 'مدفوع' ? 'border-emerald-500 text-emerald-400' : 'border-amber-500 text-amber-300'} rounded-lg px-2 py-1 text-xs font-bold outline-none ${!canEditThis ? 'opacity-60 cursor-not-allowed' : ''}">
-                            <option value="مدفوع" ${p.payMethod === 'مدفوع' ? 'selected' : ''}>مدفوع</option>
-                            <option value="الدفع عند الباص" ${p.payMethod === 'الدفع عند الباص' ? 'selected' : ''}>الدفع عند الباص</option>
-                            <option value="مؤجل باليمن" ${p.payMethod === 'مؤجل باليمن' ? 'selected' : ''}>مؤجل باليمن</option>
-                        </select>
-                    </td>
-                    <td><span class="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-xs">${p.branch || 'فرع عجمان'}</span></td>
-                    <td class="space-x-1 space-x-reverse">
-                        <button onclick="previewTicketImage('${p.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-image"></i> بوليصة</button>
-                        ${canEditThis ? `<button onclick="editPassenger('${p.id}')" class="bg-sky-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>` : ''}
-                        ${canEditThis ? `<button onclick="deletePassenger(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}
-                    </td>
-                `;
-            });
-            document.getElementById('statTicketCount').innerText = sortedList.length;
-            document.getElementById('statTicketRevenue').innerText = `${totalRev} AED`;
-        }
-
-        function updateCargoPaymentStatus(id, newStatus) {
-            const idx = db.cargo.findIndex(x => String(x.id) === String(id));
-            if (idx !== -1) {
-                const nowStr = getFormattedDateTime();
-                const author = getCurrentUserName();
-                let item = db.cargo[idx];
-                if (item.tripId) {
-                    const trip = db.trips.find(t => String(t.id) === String(item.tripId));
-                    if (!isMahmoud() && trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
-                        alert('عذراً، بعد مغادرة الرحلة لا يمكن تعديل السداد إلا من الإدارة المالية!');
-                        refreshUI();
-                        return;
-                    }
-                }
-                item.paymentStatus = newStatus;
-                if(!item.auditLog) item.auditLog = [{action: 'إنشاء', user: item.createdBy || author, time: item.createdAt || nowStr}];
-                item.auditLog.push({action: `تغيير حالة السداد إلى (${newStatus})`, user: author, time: nowStr});
-                saveDB();
-                refreshUI();
-            }
-        }
-
-        function renderCargoTable(list = getFilteredData(db.cargo)) {
-            const tbody = document.querySelector('#cargoTable tbody');
-            if(!tbody) return;
-            tbody.innerHTML = '';
-
-            let sortedList = [...list].sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
-
-            sortedList.forEach((c) => {
-                const realIdx = db.cargo.findIndex(x => String(x.id) === String(c.id));
-                const itemsCount = c.items ? c.items.length : 1;
-                const trip = (db.trips || []).find(t => String(t.id) === String(c.tripId));
-                const tripInfoText = trip ? `${trip.date !== '-' ? trip.date : ''} (${trip.route})` : '-';
-                const isDeparted = trip && trip.status === 'غادرت الرحلة';
-                const canEditThis = !isDeparted || canModifyFinancialsOrAccounts();
-
-                tbody.insertRow().innerHTML = `
-                    <td><strong>#${c.id}</strong></td>
-                    <td><strong class="text-gold">${c.date || '-'}</strong></td>
-                    <td><strong>${c.sender}</strong></td>
-                    <td><strong>${c.receiver}</strong> <span class="text-zinc-400 text-[11px]">(${c.receiverAddress || 'عدن'})</span></td>
-                    <td><span class="text-[11px] text-indigo-300 font-bold">${tripInfoText}</span></td>
-                    <td><span class="bg-zinc-800 px-2 py-0.5 rounded text-xs font-bold text-gold">${itemsCount} أصناف</span></td>
-                    <td><strong>${c.grandTotal} AED</strong></td>
-                    <td><span class="text-[11px] text-amber-300">${c.notes || '-'}</span></td>
-                    <td>
-                        <select ${!canEditThis ? 'disabled' : ''} onchange="updateCargoPaymentStatus('${c.id}', this.value)" class="bg-zinc-900 border ${c.paymentStatus === 'مدفوع' ? 'border-emerald-500 text-emerald-400' : 'border-amber-500 text-amber-300'} rounded-lg px-2 py-1 text-xs font-bold outline-none ${!canEditThis ? 'opacity-60 cursor-not-allowed' : ''}">
-                            <option value="مدفوع" ${c.paymentStatus === 'مدفوع' ? 'selected' : ''}>مدفوع</option>
-                            <option value="أجل بالامارات" ${c.paymentStatus === 'أجل بالامارات' ? 'selected' : ''}>أجل بالامارات</option>
-                            <option value="الدفع باليمن" ${c.paymentStatus === 'الدفع باليمن' ? 'selected' : ''}>الدفع باليمن</option>
-                            <option value="مؤجل باليمن" ${c.paymentStatus === 'مؤجل باليمن' ? 'selected' : ''}>مؤجل باليمن</option>
-                        </select>
-                    </td>
-                    <td><span class="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-xs">${c.branch || 'فرع عجمان'}</span></td>
-                    <td class="space-x-1 space-x-reverse">
-                        <button onclick="previewCargoImage('${c.id}')" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-file-invoice"></i> فاتورة</button>
-                        ${canEditThis ? `<button onclick="editCargo('${c.id}')" class="bg-sky-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>` : ''}
-                        ${canEditThis ? `<button onclick="deleteCargo(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}
-                    </td>
-                `;
-            });
-        }
-
-        // ================= تأشيرات العبور =================
+        // ================= نظام تأشيرات العبور =================
         function onTransitIdentityChange() {
             const identity = document.getElementById('transitIdentity').value;
             const amountInput = document.getElementById('transitAmount');
@@ -4155,12 +3988,16 @@
             if (identity === 'زيارة') {
                 amountInput.min = 150;
                 amountInput.max = 200;
-                if (!document.getElementById('transitEditId').value) amountInput.value = 150;
+                if (!document.getElementById('transitEditId').value) {
+                    amountInput.value = 150;
+                }
                 label.innerText = 'المبلغ (درهم - النطاق المسموح: 150 إلى 200) *';
             } else {
                 amountInput.min = 80;
                 amountInput.max = 100;
-                if (!document.getElementById('transitEditId').value) amountInput.value = 80;
+                if (!document.getElementById('transitEditId').value) {
+                    amountInput.value = 80;
+                }
                 label.innerText = 'المبلغ (درهم - النطاق المسموح: 80 إلى 100) *';
             }
         }
@@ -4175,40 +4012,49 @@
             const passport = document.getElementById('transitPassport').value.trim();
             const identity = document.getElementById('transitIdentity').value;
             const requestNo = document.getElementById('transitRequestNo').value.trim();
-            const amount = parseFloat(document.getElementById('transitAmount').value) || 0;
+            const amount = parseFloat(document.getElementById('transitAmount').value);
 
-            if (!isMahmoud()) {
-                if (identity === 'زيارة' && (amount < 150 || amount > 200)) {
-                    alert('عذراً، مبلغ الزيارة يجب أن يكون بين 150 و 200 درهم!');
-                    return;
-                }
-                if (identity === 'مقيم' && (amount < 80 || amount > 100)) {
-                    alert('عذراً، مبلغ المقيم يجب أن يكون بين 80 و 100 درهم!');
-                    return;
-                }
+            if (identity === 'زيارة' && (amount < 150 || amount > 200)) {
+                alert('عذراً، لهوية (زيارة) يجب أن يكون المبلغ بين 150 و 200 درهم!');
+                return;
+            }
+            if (identity === 'مقيم' && (amount < 80 || amount > 100)) {
+                alert('عذراً، لهوية (مقيم) يجب أن يكون المبلغ بين 80 و 100 درهم!');
+                return;
             }
 
             const nowStr = getFormattedDateTime();
             const author = getCurrentUserName();
 
             if (editId) {
-                const idx = db.transitVisas.findIndex(x => String(x.id) === String(editId));
+                const idx = db.transitVisas.findIndex(t => String(t.id) === String(editId));
                 if (idx !== -1) {
                     let item = db.transitVisas[idx];
-                    item.id = invNo;
+                    const oldId = String(item.id);
+                    const idChanged = invNo && invNo !== oldId;
+                    if (idChanged) item.id = invNo;
                     item.agent = agent;
                     item.name = name;
                     item.passport = passport;
                     item.identity = identity;
                     item.requestNo = requestNo;
                     item.amount = amount;
-                    if (!item.auditLog) item.auditLog = [{action: 'إنشاء فاتورة تأشيرة', user: item.createdBy || author, time: item.createdAt || nowStr}];
-                    item.auditLog.push({action: 'تعديل فاتورة تأشيرة عبور', user: author, time: nowStr});
+                    if (!item.auditLog) item.auditLog = [];
+                    item.auditLog.push({
+                        action: idChanged ? `تعديل فاتورة تأشيرة وتغيير رقمها من #${oldId} إلى #${invNo}` : 'تعديل فاتورة تأشيرة العبور',
+                        user: author,
+                        time: nowStr
+                    });
                 }
-                alert('تم تعديل فاتورة تأشيرة العبور بنجاح!');
+                alert('تم تحديث فاتورة تأشيرة العبور بنجاح!');
                 resetTransitForm();
             } else {
-                const newItem = {
+                const duplicate = db.transitVisas.find(t => String(t.id) === String(invNo));
+                if (duplicate) {
+                    alert(`رقم الفاتورة #${invNo} مستخدم مسبقاً، يرجى اختيار رقم آخر!`);
+                    return;
+                }
+                const transitItem = {
                     id: invNo,
                     agent: agent,
                     name: name,
@@ -4216,38 +4062,42 @@
                     identity: identity,
                     requestNo: requestNo,
                     amount: amount,
-                    paymentStatus: 'غير مدفوع',
+                    paymentStatus: '',
                     branch: currentUser ? (currentUser.branch || 'فرع عجمان') : 'فرع عجمان',
                     createdBy: author,
                     createdAt: nowStr,
-                    auditLog: [{action: 'إنشاء فاتورة تأشيرة عبور', user: author, time: nowStr}]
+                    auditLog: [{ action: 'إنشاء فاتورة تأشيرة عبور', user: author, time: nowStr }]
                 };
-                db.transitVisas.unshift(newItem);
-                alert(`تم تسجيل فاتورة تأشيرة العبور برقم #${invNo} بنجاح! يمكنك الآن اختيار حالة السداد من الجدول.`);
-                resetTransitForm();
+                db.transitVisas.unshift(transitItem);
+                db.nextTransitNo = (parseInt(invNo) || db.nextTransitNo || 1) + 1;
+                document.getElementById('transitForm').reset();
+                onTransitIdentityChange();
+                calculateNextSequenceNumbers();
+                alert(`تم إنشاء فاتورة تأشيرة العبور رقم #${invNo} بنجاح! يمكنك الآن اختيار حالة السداد من الجدول أدناه.`);
             }
-
             validateAndRepairDB();
             saveDB(true);
             refreshUI();
         }
 
         function updateTransitPaymentStatus(id, newStatus) {
-            const idx = (db.transitVisas || []).findIndex(x => String(x.id) === String(id));
-            if (idx !== -1) {
-                const nowStr = getFormattedDateTime();
-                const author = getCurrentUserName();
-                let item = db.transitVisas[idx];
-                item.paymentStatus = newStatus;
-                if (!item.auditLog) item.auditLog = [];
-                item.auditLog.push({action: `تغيير حالة السداد إلى (${newStatus})`, user: author, time: nowStr});
-                saveDB();
-                refreshUI();
-            }
+            const idx = (db.transitVisas || []).findIndex(t => String(t.id) === String(id));
+            if (idx === -1) return;
+            const nowStr = getFormattedDateTime();
+            const author = getCurrentUserName();
+            db.transitVisas[idx].paymentStatus = newStatus;
+            if (!db.transitVisas[idx].auditLog) db.transitVisas[idx].auditLog = [];
+            db.transitVisas[idx].auditLog.push({
+                action: `تغيير حالة السداد إلى: ${newStatus || 'قيد الانتظار'}`,
+                user: author,
+                time: nowStr
+            });
+            saveDB(true);
+            refreshUI();
         }
 
-        function editTransitVisa(id) {
-            const item = (db.transitVisas || []).find(x => String(x.id) === String(id));
+        function editTransit(id) {
+            const item = (db.transitVisas || []).find(t => String(t.id) === String(id));
             if (!item) return;
             document.getElementById('transitEditId').value = item.id;
             document.getElementById('transitInvNo').value = item.id;
@@ -4259,7 +4109,7 @@
             document.getElementById('transitRequestNo').value = item.requestNo || '';
             document.getElementById('transitAmount').value = item.amount || 150;
 
-            document.getElementById('transitFormTitle').innerText = `تعديل فاتورة تأشيرة عبور #${item.id}`;
+            document.getElementById('transitFormTitle').innerText = `تعديل فاتورة تأشيرة العبور #${item.id}`;
             document.getElementById('transitSubmitBtn').innerText = 'حفظ التعديلات';
             document.getElementById('cancelEditTransitBtn').classList.remove('hidden');
 
@@ -4271,8 +4121,6 @@
         function resetTransitForm() {
             document.getElementById('transitForm').reset();
             document.getElementById('transitEditId').value = '';
-            document.getElementById('transitAgent').value = 'مباشر';
-            document.getElementById('transitIdentity').value = 'زيارة';
             onTransitIdentityChange();
             calculateNextSequenceNumbers();
             document.getElementById('transitFormTitle').innerText = 'إنشاء فاتورة تأشيرة عبور جديدة';
@@ -4281,9 +4129,14 @@
             document.getElementById('transitEditAuditBox').classList.add('hidden');
         }
 
-        function deleteTransitVisa(idx) {
+        function deleteTransit(idx) {
+            if (!canModifyFinancialsOrAccounts() && !isMahmoud()) {
+                alert('غير مصرح لك بالحذف!');
+                return;
+            }
+            if (!confirm('هل أنت متأكد من حذف فاتورة تأشيرة العبور هذه؟')) return;
             db.transitVisas.splice(idx, 1);
-            saveDB();
+            saveDB(true);
             refreshUI();
         }
 
@@ -4291,288 +4144,258 @@
             const tbody = document.querySelector('#transitTable tbody');
             if (!tbody) return;
             tbody.innerHTML = '';
-
-            let list = getFilteredData(db.transitVisas || []);
-            list.sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
-
+            const list = [...getFilteredData(db.transitVisas || [])].sort(compareInvoiceIdsDesc);
             list.forEach(t => {
-                const realIdx = db.transitVisas.findIndex(x => String(x.id) === String(t.id));
-                const isPaid = t.paymentStatus === 'تم الدفع والاصدار';
+                const realIdx = (db.transitVisas || []).findIndex(x => String(x.id) === String(t.id));
+                const identityBadge = t.identity === 'زيارة'
+                    ? `<span class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded text-xs font-bold">زيارة</span>`
+                    : `<span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">مقيم</span>`;
+
+                let selectBorder = 'border-zinc-700 text-zinc-300';
+                if (t.paymentStatus === 'تم الدفع والاصدار') selectBorder = 'border-emerald-500 text-emerald-400 bg-emerald-950/40';
+                else if (t.paymentStatus === 'آجل في الامارات') selectBorder = 'border-amber-500 text-amber-300 bg-amber-950/40';
+                else if (t.paymentStatus === 'الدفع في اليمن') selectBorder = 'border-sky-500 text-sky-300 bg-sky-950/40';
+
                 tbody.insertRow().innerHTML = `
                     <td><strong class="text-gold">#${t.id}</strong></td>
                     <td>${t.agent || '-'}</td>
                     <td><strong>${t.name}</strong></td>
                     <td>${t.passport}</td>
-                    <td><span class="bg-zinc-800 px-2 py-0.5 rounded text-xs font-bold ${t.identity === 'زيارة' ? 'text-amber-300' : 'text-indigo-300'}">${t.identity}</span></td>
-                    <td><strong class="text-zinc-200">${t.requestNo}</strong></td>
-                    <td><strong class="text-emerald-400">${t.amount} AED</strong></td>
+                    <td>${identityBadge}</td>
+                    <td><span class="font-bold text-zinc-200">${t.requestNo}</span></td>
+                    <td class="text-emerald-400 font-black">${t.amount} AED</td>
                     <td>
-                        <select onchange="updateTransitPaymentStatus('${t.id}', this.value)" class="bg-zinc-900 border ${isPaid ? 'border-emerald-500 text-emerald-400' : 'border-red-500 text-red-400'} rounded-lg px-2.5 py-1 text-xs font-bold outline-none">
-                            <option value="غير مدفوع" ${t.paymentStatus === 'غير مدفوع' ? 'selected' : ''}>غير مدفوع</option>
-                            <option value="تم الدفع والاصدار" ${t.paymentStatus === 'تم الدفع والاصدار' ? 'selected' : ''}>تم الدفع والاصدار</option>
+                        <select onchange="updateTransitPaymentStatus('${t.id}', this.value)" class="bg-darkbg border ${selectBorder} rounded-lg px-2.5 py-1.5 text-xs font-bold outline-none cursor-pointer">
+                            <option value="" ${!t.paymentStatus ? 'selected' : ''}>-- اختر حالة السداد --</option>
+                            <option value="تم الدفع والاصدار" ${t.paymentStatus === 'تم الدفع والاصدار' ? 'selected' : ''}>✅ تم الدفع والاصدار</option>
+                            <option value="آجل في الامارات" ${t.paymentStatus === 'آجل في الامارات' ? 'selected' : ''}>⏳ آجل في الامارات</option>
+                            <option value="الدفع في اليمن" ${t.paymentStatus === 'الدفع في اليمن' ? 'selected' : ''}>🇾🇪 الدفع في اليمن</option>
                         </select>
                     </td>
                     <td class="space-x-1 space-x-reverse">
-                        <button onclick="editTransitVisa('${t.id}')" class="bg-sky-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="deleteTransitVisa(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="editTransit('${t.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteTransit(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 `;
             });
         }
 
         function exportTransitExcel() {
-            const list = getFilteredData(db.transitVisas || []).map(t => ({
+            const sortedTransit = [...getFilteredData(db.transitVisas || [])].sort(compareInvoiceIdsDesc);
+            const data = sortedTransit.map(t => ({
                 'رقم الفاتورة': t.id,
                 'الوكيل': t.agent,
                 'الاسم': t.name,
                 'رقم الجواز': t.passport,
                 'الهوية': t.identity,
                 'رقم الطلب': t.requestNo,
-                'المبلغ': t.amount,
-                'حالة السداد': t.paymentStatus,
-                'منفذ الإجراء': t.createdBy || 'النظام'
+                'المبلغ (درهم)': t.amount,
+                'حالة السداد': t.paymentStatus || 'غير محدد'
             }));
-            const ws = XLSX.utils.json_to_sheet(list);
+            const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'تأشيرات_العبور');
+            XLSX.utils.book_append_sheet(wb, ws, 'تأشيرات العبور');
             XLSX.writeFile(wb, `WadiBina_TransitVisas_${Date.now()}.xlsx`);
         }
 
-        function renderFinancials() {
-            if (!canModifyFinancialsOrAccounts()) return;
-            const filteredPass = getFilteredData(db.passengers);
-            const filteredCargo = getFilteredData(db.cargo);
-            const filteredVouchers = getFilteredData(db.vouchers);
-            const filteredDrivers = getFilteredData(db.drivers);
+        function handleGlobalSearch() {
+            const query = document.getElementById('globalSearchInput').value.toLowerCase().trim();
+            const typeFilter = document.getElementById('globalSearchType').value;
+            const payFilter = document.getElementById('advFilterPayment').value;
+            const originFilter = document.getElementById('advFilterOrigin').value;
+            const destFilter = document.getElementById('advFilterDestination').value;
 
-            const tRev = filteredPass.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (p.fare || 0), 0);
-            const cRev = filteredCargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + c.grandTotal, 0);
-            const transitRev = getFilteredData(db.transitVisas || []).filter(t => t.paymentStatus === 'تم الدفع والاصدار').reduce((s, t) => s + (t.amount || 0), 0);
-            
-            const driversExp = filteredDrivers.reduce((s, d) => s + (d.totalExpenses || 0), 0);
-            const vouchersExp = filteredVouchers.filter(v => v.type === 'صرف').reduce((s, v) => s + v.amount, 0);
-            const totalExp = driversExp + vouchersExp;
-            
-            const rec = filteredVouchers.filter(v => v.type === 'قبض').reduce((s, v) => s + v.amount, 0);
-            const netBox = (tRev + cRev + transitRev + rec) - totalExp;
+            const isFinOrAdmin = canModifyFinancialsOrAccounts();
+            const isDepartedBlocked = (item) => {
+                if (!item || !item.tripId) return false;
+                const trip = (db.trips || []).find(t => String(t.id) === String(item.tripId));
+                if (!trip || trip.status !== 'غادرت الرحلة') return false;
+                return !canUserViewDepartedTripRecord(trip);
+            };
 
-            document.getElementById('finRevSum').innerText = `${tRev + cRev + transitRev} AED`;
-            document.getElementById('finDriverExpSum').innerText = `${driversExp} AED`;
-            document.getElementById('finExpensesSum').innerText = `${vouchersExp} AED`;
-            document.getElementById('finNetBoxSum').innerText = `${netBox} AED`;
+            const pTbody = document.querySelector('#passengersTable tbody');
+            if(pTbody) {
+                pTbody.innerHTML = '';
+                if (typeFilter === 'all' || typeFilter === 'ticket') {
+                    let filteredPass = getFilteredData(db.passengers).filter(p => !isDepartedBlocked(p));
+                    // ترتيب التذاكر تنازلياً من الأكبر للأصغر تلقائياً
+                    filteredPass.sort(compareInvoiceIdsDesc);
 
-            renderFinancialDepartedTripsTable();
-        }
+                    filteredPass.forEach((p) => {
+                        const realIdx = db.passengers.findIndex(x => String(x.id) === String(p.id));
+                        let extraNames = (p.extraPassengers || []).map(x => `${x.name}${x.ticketNo ? ' (#' + x.ticketNo + ')' : ''}`).join('، ') || '-';
+                        let searchStr = `${p.id} ${p.agent} ${p.name} ${extraNames} ${p.phone} ${p.origin} ${p.destination} ${p.date} ${p.notes || ''} ${p.branch}`.toLowerCase();
+                        
+                        let matchQuery = !query || searchStr.includes(query);
+                        let matchPay = (payFilter === 'all') || (p.payMethod && p.payMethod.includes(payFilter));
+                        let matchOrigin = (originFilter === 'all') || (p.origin === originFilter);
+                        let matchDest = (destFilter === 'all') || (p.destination === destFilter);
 
-        function renderFinancialDepartedTripsTable() {
-            const tbody = document.querySelector('#finDepartedTripsTable tbody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
+                        if (matchQuery && matchPay && matchOrigin && matchDest) {
+                            const payClass = p.payMethod === 'مدفوع' ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-400';
+                            const tripObj = db.trips.find(t => String(t.id) === String(p.tripId));
+                            const tripDeparted = tripObj && tripObj.status === 'غادرت الرحلة';
+                            const canModifyThis = isMahmoud() || !tripDeparted || isFinOrAdmin;
 
-            let departedTrips = (db.trips || []).filter(t => t.status === 'غادرت الرحلة');
-            departedTrips.sort((a, b) => b.id.localeCompare(a.id));
-
-            if (departedTrips.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="12" class="text-center text-zinc-400 py-5">لا توجد رحلات مغادرة مسجلة حالياً</td></tr>`;
-                return;
+                            pTbody.insertRow().innerHTML = `
+                                <td><strong class="text-gold">#${p.id}</strong></td>
+                                <td><span class="text-amber-300 font-bold">${p.agent || '-'}</span></td>
+                                <td><strong>${p.name}</strong></td>
+                                <td class="text-zinc-400 text-[11px]">${extraNames}</td>
+                                <td>${p.phone}</td>
+                                <td>${p.origin} → ${p.destination}</td>
+                                <td><strong class="text-amber-300">${p.date || '-'}</strong></td>
+                                <td class="text-gold font-bold">${p.fare || 0} AED</td>
+                                <td class="text-zinc-300 text-[11px] max-w-[140px] truncate" title="${p.notes || ''}">${p.notes || '-'}</td>
+                                <td><span class="${payClass} px-2 py-0.5 rounded text-xs font-bold">${p.payMethod}</span></td>
+                                <td><span class="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-xs">${p.branch || 'فرع عجمان'}</span></td>
+                                <td class="space-x-1 space-x-reverse">
+                                    <button onclick="previewTicketImage('${p.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-eye"></i></button>
+                                    ${canModifyThis ? `<button onclick="editPassenger('${p.id}')" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-pen"></i></button>` : ''}
+                                    ${canModifyThis ? `<button onclick="deleteItem('passengers', ${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}
+                                </td>
+                            `;
+                        }
+                    });
+                }
             }
 
-            departedTrips.forEach((trip, idx) => {
-                const tripTickets = (db.passengers || []).filter(p => String(p.tripId) === String(trip.id));
-                const tripCargo = (db.cargo || []).filter(c => String(c.tripId) === String(trip.id));
+            const cTbody = document.querySelector('#cargoTable tbody');
+            if(cTbody) {
+                cTbody.innerHTML = '';
+                if (typeFilter === 'all' || typeFilter === 'cargo') {
+                    let filteredCargo = getFilteredData(db.cargo).filter(c => !isDepartedBlocked(c));
+                    // ترتيب فواتير الشحن تنازلياً من الأكبر للأصغر تلقائياً
+                    filteredCargo.sort(compareInvoiceIdsDesc);
 
-                const tktTotal = tripTickets.reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
-                const tktPaid = tripTickets.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
+                    filteredCargo.forEach((c) => {
+                        const realIdx = db.cargo.findIndex(x => String(x.id) === String(c.id));
+                        let itemsSummary = (c.items || []).map(it => `${it.desc} (${it.qty})`).join('، ') || 'أمتعة';
+                        let searchStr = `${c.id} ${c.sender} ${c.senderPhone} ${c.receiver} ${c.receiverPhone} ${c.receiverAddress} ${itemsSummary} ${c.notes || ''} ${c.date} ${c.branch}`.toLowerCase();
+                        
+                        let matchQuery = !query || searchStr.includes(query);
+                        let matchPay = (payFilter === 'all') || (c.paymentStatus && c.paymentStatus.includes(payFilter));
+                        let matchOrigin = (originFilter === 'all') || (c.senderAddress && c.senderAddress.includes(originFilter));
+                        let matchDest = (destFilter === 'all') || (c.receiverAddress && c.receiverAddress.includes(destFilter));
 
-                const cargoTotal = tripCargo.reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
-                const cargoPaid = tripCargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
-
-                const grandTotal = tktTotal + cargoTotal;
-                const grandPaid = tktPaid + cargoPaid;
-                const grandRemaining = grandTotal - grandPaid;
-
-                const matchingDriverAccs = (db.drivers || []).filter(d => d.date === trip.date);
-                const drvExp = matchingDriverAccs.reduce((s, d) => s + (parseFloat(d.totalExpenses) || 0), 0);
-                const netTripProfit = grandPaid - drvExp;
-
-                tbody.insertRow().innerHTML = `
-                    <td><strong class="text-gold">#${departedTrips.length - idx}</strong></td>
-                    <td><strong class="text-gold">${trip.date}</strong></td>
-                    <td>${trip.route}</td>
-                    <td>${trip.busInfo}</td>
-                    <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded-full text-xs font-bold">${tripTickets.length} تذاكر</span></td>
-                    <td><span class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded-full text-xs font-bold">${tripCargo.length} فواتير</span></td>
-                    <td><strong>${grandTotal} AED</strong></td>
-                    <td class="text-emerald-400 font-bold">${grandPaid} AED</td>
-                    <td class="text-amber-400 font-bold">${grandRemaining} AED</td>
-                    <td class="text-red-400 font-bold">${drvExp} AED</td>
-                    <td class="font-black ${netTripProfit >= 0 ? 'text-emerald-400' : 'text-red-500'}">${netTripProfit} AED</td>
-                    <td class="whitespace-nowrap">
-                        <button onclick="openTripDetailsModal('${trip.id}', 'finance')" class="bg-gold text-black px-3 py-1.5 rounded-lg text-xs font-extrabold shadow hover:bg-gold-400">
-                            <i class="fa-solid fa-folder-open ml-1"></i> عرض وإدارة حسابات الرحلة
-                        </button>
-                    </td>
-                `;
-            });
+                        if (matchQuery && matchPay && matchOrigin && matchDest) {
+                            const payClass = c.paymentStatus === 'مدفوع' ? 'bg-emerald-950 text-emerald-400' : 'bg-indigo-950 text-indigo-300';
+                            let tripLabel = '-';
+                            let tripDeparted = false;
+                            if(c.tripId) {
+                                const tr = db.trips.find(t => String(t.id) === String(c.tripId));
+                                if(tr) {
+                                    tripLabel = `${tr.date} (${tr.route})`;
+                                    tripDeparted = tr.status === 'غادرت الرحلة';
+                                }
+                            }
+                            const canModifyThisCargo = isMahmoud() || !tripDeparted || isFinOrAdmin;
+                            cTbody.insertRow().innerHTML = `
+                                <td><strong class="text-indigo-400">#${c.id}</strong></td>
+                                <td>${c.date || '-'}</td>
+                                <td><strong>${c.sender}</strong></td>
+                                <td>${c.receiver} (${c.receiverAddress})</td>
+                                <td class="text-xs text-amber-300 font-bold">${tripLabel}</td>
+                                <td class="text-zinc-300 text-xs">${itemsSummary}</td>
+                                <td class="text-gold font-bold">${c.grandTotal} AED</td>
+                                <td class="text-zinc-300 text-[11px] max-w-[140px] truncate" title="${c.notes || ''}">${c.notes || '-'}</td>
+                                <td><span class="${payClass} px-2 py-0.5 rounded text-xs font-bold">${c.paymentStatus}</span></td>
+                                <td><span class="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-xs">${c.branch || 'فرع عجمان'}</span></td>
+                                <td class="space-x-1 space-x-reverse">
+                                    <button onclick="previewCargoImage('${c.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-eye"></i></button>
+                                    ${canModifyThisCargo ? `<button onclick="editCargo('${c.id}')" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-pen"></i></button>` : ''}
+                                    ${canModifyThisCargo ? `<button onclick="deleteItem('cargo', ${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}
+                                </td>
+                            `;
+                        }
+                    });
+                }
+            }
         }
 
-        function handleSaveVoucher(e) {
-            e.preventDefault();
-            if (!canModifyFinancialsOrAccounts()) { alert('غير مصرح لك بإضافة سندات مالية!'); return; }
-            const vData = {
-                id: Date.now().toString(),
-                type: document.getElementById('vType').value,
-                date: document.getElementById('vDate').value || new Date().toISOString().split('T')[0],
-                amount: parseFloat(document.getElementById('vAmount').value) || 0,
-                receiver: document.getElementById('vReceiver').value || '-',
-                desc: document.getElementById('vDesc').value,
-                user: getCurrentUserName(),
-                createdBy: getCurrentUserName(),
-                branch: currentUser.branch || 'فرع عجمان'
-            };
-            db.vouchers.unshift(vData);
-            saveDB();
-            document.getElementById('voucherForm').reset();
-            refreshUI();
-        }
-
-        function renderVouchersTable() {
-            const tbody = document.querySelector('#vouchersTable tbody');
-            if(!tbody) return;
-            tbody.innerHTML = '';
-            const filteredVouchers = getFilteredData(db.vouchers);
-            filteredVouchers.forEach((v) => {
-                const realIdx = db.vouchers.findIndex(x => x.id === v.id);
-                tbody.insertRow().innerHTML = `
-                    <td><span class="${v.type === 'قبض' ? 'text-emerald-400' : 'text-red-400'} font-bold">${v.type}</span></td>
-                    <td>${v.date}</td>
-                    <td><strong class="text-amber-300">${v.receiver || '-'}</strong></td>
-                    <td>${v.desc}</td>
-                    <td><strong>${v.amount} AED</strong></td>
-                    <td>${v.branch || 'فرع عجمان'}</td>
-                    <td><button onclick="deleteVoucher(${realIdx})" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button></td>
-                `;
-            });
-        }
-
-        function handleSaveDebtInvoice(e) {
-            e.preventDefault();
-            if (!canModifyFinancialsOrAccounts()) { alert('غير مصرح لك بإنشاء فواتير آجلة!'); return; }
-            const subTotal = parseFloat(document.getElementById('debtInvSubTotal').value) || 0;
-            const paidAmount = parseFloat(document.getElementById('debtInvPaidAmount').value) || 0;
-            const netTotal = parseFloat(document.getElementById('debtInvNetTotal').value) || (subTotal - paidAmount);
-            const nowStr = getFormattedDateTime();
-            const author = getCurrentUserName();
-
-            const debtData = {
-                id: document.getElementById('debtInvNo').value,
-                date: document.getElementById('debtInvDate').value || new Date().toISOString().split('T')[0],
-                customerName: document.getElementById('debtInvCustomerName').value,
-                customerPhone: document.getElementById('debtInvCustomerPhone').value,
-                customerAddress: document.getElementById('debtInvCustomerAddress').value,
-                subTotal: subTotal,
-                paidAmount: paidAmount,
-                netTotal: netTotal,
-                branch: currentUser.branch || 'فرع عجمان',
-                createdBy: author,
-                createdAt: nowStr,
-                auditLog: [{action: 'إنشاء فاتورة آجل', user: author, time: nowStr}]
-            };
-            db.debtInvoices.unshift(debtData);
-            validateAndRepairDB();
-            saveDB();
-            document.getElementById('debtInvoiceForm').reset();
-            switchFinancialSubTab('debts');
-            renderDebtInvoicesTable();
-            alert('تم إصدار الفاتورة الآجلة بنجاح!');
-        }
-
-        function renderDebtInvoicesTable() {
-            const tbody = document.querySelector('#debtInvoicesTable tbody');
-            if(!tbody) return;
-            tbody.innerHTML = '';
-
-            let sortedDebts = [...getFilteredData(db.debtInvoices)].sort((a, b) => (parseInt(b.id) || 0) - (parseInt(a.id) || 0));
-
-            sortedDebts.forEach((d) => {
-                const realIdx = db.debtInvoices.findIndex(x => String(x.id) === String(d.id));
-                tbody.insertRow().innerHTML = `
-                    <td><strong>#${d.id}</strong></td>
-                    <td>${d.date}</td>
-                    <td><strong>${d.customerName}</strong></td>
-                    <td>${d.customerPhone}</td>
-                    <td>${d.subTotal} AED</td>
-                    <td class="text-emerald-400">${d.paidAmount} AED</td>
-                    <td class="text-gold font-bold">${d.netTotal} AED</td>
-                    <td>${d.branch || 'فرع عجمان'}</td>
-                    <td class="space-x-1 space-x-reverse">
-                        <button onclick="previewDebtInvImage('${d.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-file-pdf"></i> PDF</button>
-                        <button onclick="deleteDebtInv(${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                `;
-            });
+        function resetGlobalSearch() {
+            document.getElementById('globalSearchInput').value = '';
+            document.getElementById('globalSearchType').value = 'all';
+            document.getElementById('advFilterPayment').value = 'all';
+            document.getElementById('advFilterOrigin').value = 'all';
+            document.getElementById('advFilterDestination').value = 'all';
+            handleGlobalSearch();
         }
 
         function previewTicketImage(id) {
-            const tkt = db.passengers.find(x => String(x.id) === String(id));
-            if(!tkt) return;
-            currentPreviewTicket = tkt;
-            document.getElementById('imgTicketCode').innerText = `#${tkt.id}`;
-            try {
-                JsBarcode("#ticketBarcode", String(tkt.id), { format: "CODE128", width: 2, height: 35, displayValue: false });
-            } catch (err) {}
+            const p = db.passengers.find(x => String(x.id) === String(id));
+            if(!p) return;
+            currentPreviewTicket = p;
+            document.getElementById('imgTicketCode').innerText = `#${p.id}`;
+            document.getElementById('imgTktName').innerText = p.name;
+            document.getElementById('imgTktPhone').innerText = p.phone;
+            document.getElementById('imgTktPassport').innerText = p.passport;
+            document.getElementById('imgTktRoute').innerText = `${p.origin} → ${p.destination}`;
+            document.getElementById('imgTktDate').innerText = p.date || '-';
+            document.getElementById('imgTktTime').innerText = p.reportingTime || '4:00 عصراً';
+            document.getElementById('imgTktFare').innerText = `${p.fare || 0} AED`;
+            document.getElementById('imgTktPayStatus').innerText = p.payMethod || 'مدفوع';
 
-            document.getElementById('imgTktName').innerText = tkt.name;
-            document.getElementById('imgTktPhone').innerText = tkt.phone;
-            document.getElementById('imgTktPassport').innerText = tkt.passport || '-';
-            document.getElementById('imgTktRoute').innerText = `${tkt.origin} → ${tkt.destination}`;
-            document.getElementById('imgTktDate').innerText = tkt.date || '-';
-            document.getElementById('imgTktTime').innerText = tkt.reportingTime || '4:00 عصراً';
-            document.getElementById('imgTktFare').innerText = `${tkt.fare} AED`;
-            document.getElementById('imgTktPayStatus').innerText = tkt.payMethod || 'مدفوع';
             const tktNotesBox = document.getElementById('imgTicketNotesBox');
-            if (tktNotesBox) {
-                if (tkt.notes && tkt.notes.trim() !== '') {
-                    document.getElementById('imgTktNotes').innerText = tkt.notes;
+            const tktNotesEl = document.getElementById('imgTktNotes');
+            if (tktNotesBox && tktNotesEl) {
+                if (p.notes && p.notes.trim() !== '') {
+                    tktNotesEl.innerText = p.notes;
                     tktNotesBox.classList.remove('hidden');
                 } else {
                     tktNotesBox.classList.add('hidden');
                 }
             }
 
-            const extraBox = document.getElementById('imgTicketExtraBox');
-            if(tkt.extraPassengers && tkt.extraPassengers.length > 0) {
-                let html = '<div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs mb-4 space-y-1"><strong class="text-indigo-900 block">الركاب الإضافيون (بأرقام تذاكر مستقلة):</strong>';
-                tkt.extraPassengers.forEach((ex, i) => {
-                    html += `<div>• تذكرة <strong class="text-amber-700">#${ex.ticketNo || '-'}</strong> | ${i+1}. ${ex.name} (جواز: ${ex.passport || '-'})</div>`;
+            try {
+                JsBarcode("#ticketBarcode", `WB-${p.id}`, {
+                    format: "CODE128",
+                    width: 1.5,
+                    height: 30,
+                    displayValue: false,
+                    margin: 0
                 });
-                html += '</div>';
-                extraBox.innerHTML = html;
-            } else { extraBox.innerHTML = ''; }
+            } catch(e) {}
 
+            let extraHtml = '';
+            if (p.extraPassengers && p.extraPassengers.length > 0) {
+                extraHtml = `<div class="bg-amber-50 p-2.5 rounded-lg border border-amber-200 text-xs mb-4">
+                    <strong class="text-amber-800 block mb-1">الركاب المرافقون (${p.extraPassengers.length}):</strong>
+                    <ul class="list-disc pr-4 space-y-0.5 text-slate-800">
+                        ${p.extraPassengers.map((ex, idx) => `<li><strong>تذكرة #${ex.ticketNo || ((parseInt(p.id) || 0) + idx + 1)}:</strong> ${ex.name} ${ex.phone ? '- هاتف: ' + ex.phone : ''} - جواز: ${ex.passport}</li>`).join('')}
+                    </ul>
+                </div>`;
+            }
+            document.getElementById('imgTicketExtraBox').innerHTML = extraHtml;
             document.getElementById('ticketPreviewModal').classList.remove('hidden');
         }
 
         function previewCargoImage(id) {
-            const cargo = db.cargo.find(x => String(x.id) === String(id));
-            if(!cargo) return;
-            currentPreviewCargo = cargo;
-            document.getElementById('imgCargoCode').innerText = `#${cargo.id}`;
-            document.getElementById('imgCargoSenderName').innerText = cargo.sender;
-            document.getElementById('imgCargoSenderPhone').innerText = cargo.senderPhone;
-            document.getElementById('imgCargoSenderAddress').innerText = cargo.senderAddress || 'عجمان';
-            document.getElementById('imgCargoReceiverName').innerText = cargo.receiver;
-            document.getElementById('imgCargoReceiverPhone').innerText = cargo.receiverPhone;
-            document.getElementById('imgCargoReceiverAddress').innerText = cargo.receiverAddress || 'عدن';
-            document.getElementById('imgCargoGrandTotal').innerText = `${cargo.grandTotal} AED`;
-            document.getElementById('imgCargoPayStatus').innerText = cargo.paymentStatus || 'مدفوع';
+            const c = db.cargo.find(x => String(x.id) === String(id));
+            if(!c) return;
+            currentPreviewCargo = c;
+            document.getElementById('imgCargoCode').innerText = `#${c.id}`;
+            document.getElementById('imgCargoSenderName').innerText = c.sender;
+            document.getElementById('imgCargoSenderPhone').innerText = c.senderPhone;
+            document.getElementById('imgCargoSenderAddress').innerText = c.senderAddress;
+            document.getElementById('imgCargoReceiverName').innerText = c.receiver;
+            document.getElementById('imgCargoReceiverPhone').innerText = c.receiverPhone;
+            document.getElementById('imgCargoReceiverAddress').innerText = c.receiverAddress;
+            document.getElementById('imgCargoGrandTotal').innerText = `${c.grandTotal} AED`;
+            document.getElementById('imgCargoPayStatus').innerText = c.paymentStatus || 'مدفوع';
 
-            const trip = (db.trips || []).find(t => String(t.id) === String(cargo.tripId));
-            document.getElementById('imgCargoTripInfo').innerText = trip ? `${trip.date !== '-' ? trip.date : ''} (${trip.route}) - ${trip.busInfo}` : 'شحن عام';
+            let tripText = 'غير مرتبطة برحلة محددة';
+            if(c.tripId) {
+                const tr = db.trips.find(t => String(t.id) === String(c.tripId));
+                if(tr) tripText = `${tr.date} | ${tr.route} (${tr.busInfo})`;
+            }
+            document.getElementById('imgCargoTripInfo').innerText = tripText;
+
             const cargoNotesBox = document.getElementById('imgCargoNotesBox');
-            if (cargoNotesBox) {
-                if (cargo.notes && cargo.notes.trim() !== '') {
-                    document.getElementById('imgCargoNotes').innerText = cargo.notes;
+            const cargoNotesEl = document.getElementById('imgCargoNotes');
+            if (cargoNotesBox && cargoNotesEl) {
+                if (c.notes && c.notes.trim() !== '') {
+                    cargoNotesEl.innerText = c.notes;
                     cargoNotesBox.classList.remove('hidden');
                 } else {
                     cargoNotesBox.classList.add('hidden');
@@ -4581,32 +4404,16 @@
 
             const tbody = document.getElementById('imgCargoItemsTableBody');
             tbody.innerHTML = '';
-            if (cargo.items && cargo.items.length > 0) {
-                cargo.items.forEach((it, idx) => {
-                    let rowTotal = (parseFloat(it.qty) || 1) * (parseFloat(it.price) || 0);
-                    tbody.insertRow().innerHTML = `
-                        <td class="border border-slate-300 p-2 text-center">${idx + 1}</td>
-                        <td class="border border-slate-300 p-2 font-bold">${it.desc}</td>
-                        <td class="border border-slate-300 p-2 text-center">${it.qty}</td>
-                        <td class="border border-slate-300 p-2 text-left font-bold">${rowTotal} AED</td>
-                    `;
-                });
-            }
+            (c.items || []).forEach((it, idx) => {
+                let rowTotal = (it.qty * it.price);
+                tbody.insertRow().innerHTML = `
+                    <td class="border border-slate-300 p-2 text-center">${idx + 1}</td>
+                    <td class="border border-slate-300 p-2 font-bold">${it.desc}</td>
+                    <td class="border border-slate-300 p-2 text-center">${it.qty}</td>
+                    <td class="border border-slate-300 p-2 text-left font-bold">${rowTotal} AED</td>
+                `;
+            });
             document.getElementById('cargoPreviewModal').classList.remove('hidden');
-        }
-
-        function previewDebtInvImage(id) {
-            const d = db.debtInvoices.find(x => String(x.id) === String(id));
-            if(!d) return;
-            document.getElementById('imgDebtInvCode').innerText = `#${d.id}`;
-            document.getElementById('imgDebtName').innerText = d.customerName;
-            document.getElementById('imgDebtPhone').innerText = d.customerPhone;
-            document.getElementById('imgDebtAddress').innerText = d.customerAddress;
-            document.getElementById('imgDebtDate').innerText = d.date;
-            document.getElementById('imgDebtSubTotal').innerText = d.subTotal;
-            document.getElementById('imgDebtPaid').innerText = d.paidAmount;
-            document.getElementById('imgDebtNetTotal').innerText = `${d.netTotal} AED`;
-            document.getElementById('debtInvPreviewModal').classList.remove('hidden');
         }
 
         function openManifestModal() {
@@ -4620,66 +4427,67 @@
             document.getElementById('manifestActiveDateBadge').innerText = filterDate || 'الكل';
             document.getElementById('manifestIssueDate').innerText = new Date().toLocaleDateString('ar-EG');
             
-            const filteredPass = getFilteredData(db.passengers);
-            const list = filterDate ? filteredPass.filter(p => p.date === filterDate) : filteredPass;
-
             const tbody = document.getElementById('manifestTableBody');
             tbody.innerHTML = '';
+
+            let filteredPass = getFilteredData(db.passengers);
+            if(filterDate) {
+                filteredPass = filteredPass.filter(p => p.date === filterDate);
+            }
+            // ترتيب التذاكر في كشف المانفيستو تنازلياً من الأكبر للأصغر تلقائياً
+            filteredPass = [...filteredPass].sort(compareInvoiceIdsDesc);
+
             let totalPax = 0;
-            let rowCounter = 0;
-
-            list.forEach((p) => {
-                totalPax += parseInt(p.passengerCount || 1);
-                rowCounter++;
-
-                // 1. عرض الراكب الرئيسي في صف مستقل
+            let rowCounter = 1;
+            filteredPass.forEach((p) => {
+                totalPax += (p.passengerCount || 1);
+                const mainTicketNo = p.id;
                 tbody.insertRow().innerHTML = `
-                    <td class="border border-slate-300 p-1.5 text-center">${rowCounter}</td>
-                    <td class="border border-slate-300 p-1.5 font-bold">#${p.id}</td>
-                    <td class="border border-slate-300 p-1.5 font-bold">${p.name}</td>
-                    <td class="border border-slate-300 p-1.5 text-center"><span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[11px]">راكب أساسي</span></td>
-                    <td class="border border-slate-300 p-1.5 font-bold">${p.phone || '-'}</td>
-                    <td class="border border-slate-300 p-1.5">${p.passport || '-'}</td>
-                    <td class="border border-slate-300 p-1.5">${p.origin} → ${p.destination}</td>
-                    <td class="border border-slate-300 p-1.5 font-bold man-price-col">${p.fare} AED</td>
-                    <td class="border border-slate-300 p-1.5 font-bold">${p.payMethod}</td>
+                    <td class="border border-slate-300 p-2 text-center">${rowCounter++}</td>
+                    <td class="border border-slate-300 p-2 font-bold">#${mainTicketNo}</td>
+                    <td class="border border-slate-300 p-2 font-bold">${p.name}</td>
+                    <td class="border border-slate-300 p-2 text-center"><span class="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-bold text-[11px]">أساسي</span></td>
+                    <td class="border border-slate-300 p-2">${p.phone}</td>
+                    <td class="border border-slate-300 p-2">${p.passport}</td>
+                    <td class="border border-slate-300 p-2">${p.origin} → ${p.destination}</td>
+                    <td class="border border-slate-300 p-2 font-bold man-price-col">${p.fare || 0} AED</td>
+                    <td class="border border-slate-300 p-2 font-bold">${p.payMethod}</td>
                 `;
 
-                // 2. عرض كل راكب إضافي في صف منفصل برقم تذكرته المستقل واسم الراكب الأساسي مكان رقم الهاتف
-                if (p.extraPassengers && p.extraPassengers.length > 0) {
+                if (p.extraPassengers && Array.isArray(p.extraPassengers) && p.extraPassengers.length > 0) {
+                    const baseNum = parseInt(mainTicketNo) || 0;
                     p.extraPassengers.forEach((ex, exIdx) => {
-                        rowCounter++;
-                        const exTicketNo = ex.ticketNo || `${p.id}-${exIdx + 1}`;
+                        const companionTicketNo = ex.ticketNo || (baseNum ? String(baseNum + exIdx + 1) : `${mainTicketNo}-${exIdx + 1}`);
                         tbody.insertRow().innerHTML = `
-                            <td class="border border-slate-300 p-1.5 text-center bg-amber-50/60">${rowCounter}</td>
-                            <td class="border border-slate-300 p-1.5 font-bold text-amber-800 bg-amber-50/60">#${exTicketNo}</td>
-                            <td class="border border-slate-300 p-1.5 font-bold bg-amber-50/60">${ex.name}</td>
-                            <td class="border border-slate-300 p-1.5 text-center bg-amber-50/60"><span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold text-[11px]">راكب إضافي</span></td>
-                            <td class="border border-slate-300 p-1.5 font-bold text-indigo-900 bg-amber-50/60">الراكب الأساسي: ${p.name}</td>
-                            <td class="border border-slate-300 p-1.5 bg-amber-50/60">${ex.passport || '-'}</td>
-                            <td class="border border-slate-300 p-1.5 bg-amber-50/60">${p.origin} → ${p.destination}</td>
-                            <td class="border border-slate-300 p-1.5 text-slate-500 man-price-col bg-amber-50/60">ضمن التذكرة #${p.id}</td>
-                            <td class="border border-slate-300 p-1.5 font-bold bg-amber-50/60">${p.payMethod}</td>
+                            <td class="border border-slate-300 p-2 text-center">${rowCounter++}</td>
+                            <td class="border border-slate-300 p-2 font-bold text-indigo-700">#${companionTicketNo}</td>
+                            <td class="border border-slate-300 p-2 font-bold">${ex.name || '-'}</td>
+                            <td class="border border-slate-300 p-2 text-center"><span class="bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded font-bold text-[11px]">مرافق</span></td>
+                            <td class="border border-slate-300 p-2">${ex.phone ? ex.phone : p.phone} <span class="text-[10px] text-slate-500 block">(مرافق مع: ${p.name})</span></td>
+                            <td class="border border-slate-300 p-2">${ex.passport || '-'}</td>
+                            <td class="border border-slate-300 p-2">${p.origin} → ${p.destination}</td>
+                            <td class="border border-slate-300 p-2 text-slate-500 text-[11px] man-price-col">مشمول بتذكرة #${mainTicketNo}</td>
+                            <td class="border border-slate-300 p-2 font-bold">${p.payMethod}</td>
                         `;
                     });
                 }
             });
-            document.getElementById('manifestTotalBookings').innerText = list.length;
+            document.getElementById('manifestTotalBookings').innerText = filteredPass.length;
             document.getElementById('manifestTotalPassengers').innerText = totalPax;
         }
 
         function printManifestPassenger(mode) {
-            const priceCols = document.querySelectorAll('#manifestPrintArea .man-price-col');
+            const cols = document.querySelectorAll('.man-price-col');
             const sub = document.getElementById('manifestTypeSubtitle');
             if(mode === 'driver') {
-                priceCols.forEach(c => c.style.display = 'none');
-                sub.innerText = 'كشف ركاب الرحلة الرسمي (نسخة السائق - بدون أسعار)';
+                cols.forEach(c => c.style.display = 'none');
+                sub.innerText = 'كشف ركاب الرحلة الرسمي - نسخة السائق (بدون أسعار)';
             } else {
-                priceCols.forEach(c => c.style.display = '');
-                sub.innerText = 'كشف ركاب الرحلة الرسمي (نسخة الإدارة المالية والمدراء)';
+                cols.forEach(c => c.style.display = 'table-cell');
+                sub.innerText = 'كشف ركاب الرحلة الرسمي - نسخة الإدارة المحاسبية';
             }
             window.print();
-            setTimeout(() => { priceCols.forEach(c => c.style.display = ''); }, 800);
+            cols.forEach(c => c.style.display = 'table-cell');
         }
 
         function openCargoManifestModal() {
@@ -4693,143 +4501,113 @@
             document.getElementById('cargoManifestActiveDateBadge').innerText = filterDate || 'الكل';
             document.getElementById('cargoManifestIssueDate').innerText = new Date().toLocaleDateString('ar-EG');
             
-            const filteredCargo = getFilteredData(db.cargo);
-            const list = filterDate ? filteredCargo.filter(c => c.date === filterDate) : filteredCargo;
-
             const tbody = document.getElementById('cargoManifestTableBody');
             tbody.innerHTML = '';
+
+            let filteredCargo = getFilteredData(db.cargo);
+            if(filterDate) {
+                filteredCargo = filteredCargo.filter(c => c.date === filterDate);
+            }
+            // ترتيب فواتير الشحن في كشف المانفيستو تنازلياً من الأكبر للأصغر تلقائياً
+            filteredCargo = [...filteredCargo].sort(compareInvoiceIdsDesc);
+
             let totalRev = 0;
-
-            list.forEach((c, idx) => {
-                totalRev += (c.grandTotal || 0);
-                const itemsDesc = c.items ? c.items.map(it => `${it.desc} (${it.qty})`).join('، ') : '-';
-
+            filteredCargo.forEach((c, i) => {
+                totalRev += c.grandTotal;
+                let itemsText = (c.items || []).map(it => `${it.desc} (${it.qty})`).join('، ');
+                let paymentPlaceText = c.paymentStatus || '-';
+                if (c.paymentStatus === 'مدفوع') {
+                    paymentPlaceText = `مدفوع (${c.senderAddress || c.branch || 'الإمارات'})`;
+                }
                 tbody.insertRow().innerHTML = `
-                    <td class="border border-slate-300 p-1.5 text-center">${idx + 1}</td>
-                    <td class="border border-slate-300 p-1.5 font-bold">#${c.id}</td>
-                    <td class="border border-slate-300 p-1.5 font-bold">${c.sender || '-'}</td>
-                    <td class="border border-slate-300 p-1.5">${c.senderPhone || '-'}</td>
-                    <td class="border border-slate-300 p-1.5 font-bold">${c.receiver || '-'}</td>
-                    <td class="border border-slate-300 p-1.5">${c.receiverPhone || '-'}</td>
-                    <td class="border border-slate-300 p-1.5">${c.receiverAddress || 'عدن'}</td>
-                    <td class="border border-slate-300 p-1.5 text-xs">${itemsDesc}</td>
-                    <td class="border border-slate-300 p-1.5 font-bold cargo-price-col">${c.grandTotal} AED</td>
-                    <td class="border border-slate-300 p-1.5 font-bold">${c.paymentStatus || '-'}</td>
+                    <td class="border border-slate-300 p-2 text-center font-bold">${i + 1}</td>
+                    <td class="border border-slate-300 p-2 font-bold text-indigo-800">#${c.id}</td>
+                    <td class="border border-slate-300 p-2 font-bold">${c.sender || '-'}</td>
+                    <td class="border border-slate-300 p-2" dir="ltr">${c.senderPhone || '-'}</td>
+                    <td class="border border-slate-300 p-2 font-bold">${c.receiver || '-'}</td>
+                    <td class="border border-slate-300 p-2" dir="ltr">${c.receiverPhone || '-'}</td>
+                    <td class="border border-slate-300 p-2">${c.receiverAddress || '-'}</td>
+                    <td class="border border-slate-300 p-2">${itemsText || '-'}</td>
+                    <td class="border border-slate-300 p-2 font-bold cargo-price-col">${c.grandTotal} AED</td>
+                    <td class="border border-slate-300 p-2 font-bold">${paymentPlaceText}</td>
                 `;
             });
-            document.getElementById('cargoManifestTotalInvoices').innerText = list.length;
+            document.getElementById('cargoManifestTotalInvoices').innerText = filteredCargo.length;
             document.getElementById('cargoManifestTotalRevenue').innerText = `${totalRev} AED`;
         }
 
         function printManifestCargo(mode) {
-            const priceCols = document.querySelectorAll('#cargoManifestPrintArea .cargo-price-col');
+            const cols = document.querySelectorAll('.cargo-price-col');
             const revBox = document.getElementById('cargoManifestRevBox');
             const sub = document.getElementById('cargoManifestTypeSubtitle');
             if(mode === 'driver') {
-                priceCols.forEach(c => c.style.display = 'none');
-                if(revBox) revBox.style.display = 'none';
-                sub.innerText = 'كشف مانفيستو الشحن الرسمي (نسخة السائق - بدون أسعار)';
+                cols.forEach(c => c.style.display = 'none');
+                revBox.style.display = 'none';
+                sub.innerText = 'كشف مانفيستو الشحن الرسمي - نسخة السائق (بدون أسعار)';
             } else {
-                priceCols.forEach(c => c.style.display = '');
-                if(revBox) revBox.style.display = '';
-                sub.innerText = 'كشف مانفيستو الشحن الرسمي (نسخة الإدارة المالية)';
+                cols.forEach(c => c.style.display = 'table-cell');
+                revBox.style.display = 'inline';
+                sub.innerText = 'كشف مانفيستو الشحن الرسمي - نسخة الإدارة المحاسبية';
             }
             window.print();
-            setTimeout(() => {
-                priceCols.forEach(c => c.style.display = '');
-                if(revBox) revBox.style.display = '';
-            }, 800);
+            cols.forEach(c => c.style.display = 'table-cell');
+            revBox.style.display = 'inline';
         }
 
-        // ================= عرض تفاصيل الرحلة (التذاكر / فواتير الشحن + الإدارة المالية للرحلات المغادرة) =================
-        let currentModalTripId = null;
-        let currentModalTripMode = 'ops';
+        // ================= عرض تفاصيل الرحلة (متفرع: تذاكر + فواتير شحن) وإدارة حسابات الرحلات المغادرة =================
+        let activeTripDetailsId = null;
+        let activeTripDetailsContext = 'ops'; // 'ops' or 'finance'
 
-        function openTripDetailsModal(tripId, mode = 'ops') {
-            const trip = (db.trips || []).find(t => String(t.id) === String(tripId));
+        function openTripDetailsModal(tripId, contextMode = 'ops') {
+            const trip = db.trips.find(t => String(t.id) === String(tripId));
             if (!trip) return;
 
-            const isDeparted = trip.status === 'غادرت الرحلة';
-
-            // الرحلات التي غادرت: تُعرض تذاكرها وفواتيرها في قسم الإدارة المالية للمدير العام والمحاسب ومحمود فقط
-            if (isDeparted && !canModifyFinancialsOrAccounts()) {
-                alert('عذراً، تذاكر وفواتير الرحلات التي غادرت متاحة للعرض في قسم الإدارة المالية للمدير العام والمحاسب ومحمود فقط!');
-                return;
-            }
-
-            currentModalTripId = trip.id;
-            currentModalTripMode = isDeparted ? 'finance' : mode;
-
-            document.getElementById('tripDetailsModalTitle').innerText = `تفاصيل الرحلة: ${trip.route} (${trip.date !== '-' ? trip.date : 'بدون تاريخ'})`;
-            document.getElementById('tripDetailsModalSub').innerText = `معلومات الباص والسائق: ${trip.busInfo} | الحالة: ${trip.status || 'مجدولة'}`;
-
-            const departedFinanceBar = document.getElementById('departedTripFinanceAddBar');
-            if (departedFinanceBar) {
-                if (isDeparted && canModifyFinancialsOrAccounts()) {
-                    departedFinanceBar.classList.remove('hidden');
+            if (trip.status === 'غادرت الرحلة' && contextMode !== 'finance') {
+                if (canModifyFinancialsOrAccounts()) {
+                    contextMode = 'finance';
                 } else {
-                    departedFinanceBar.classList.add('hidden');
+                    alert('هذه الرحلة غادرت، ويمكن الاطلاع على تذاكرها وفواتيرها فقط عبر قسم الإدارة المالية للمدير العام والمحاسب.');
+                    return;
                 }
             }
 
-            const tripTickets = (db.passengers || []).filter(p => String(p.tripId) === String(trip.id));
-            const tripCargo = (db.cargo || []).filter(c => String(c.tripId) === String(trip.id));
-
-            document.getElementById('tripBranchTktCount').innerText = tripTickets.length;
-            document.getElementById('tripBranchCargoCount').innerText = tripCargo.length;
-
-            const finBar = document.getElementById('tripFinancialSummaryBar');
-            if (currentModalTripMode === 'finance') {
-                finBar.classList.remove('hidden');
-                const tktSum = tripTickets.reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
-                const cargoSum = tripCargo.reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
-                const paidTkt = tripTickets.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
-                const paidCargo = tripCargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
-                document.getElementById('tripFinTktTotal').innerText = `${tktSum} AED (مدفوع: ${paidTkt} AED)`;
-                document.getElementById('tripFinCargoTotal').innerText = `${cargoSum} AED (مدفوع: ${paidCargo} AED)`;
-                document.getElementById('tripFinGrandTotal').innerText = `${paidTkt + paidCargo} AED / ${tktSum + cargoSum} AED`;
-            } else {
-                finBar.classList.add('hidden');
+            if (contextMode === 'finance' && !canModifyFinancialsOrAccounts()) {
+                alert('عذراً، عرض وإدارة حسابات الرحلات المغادرة متاح فقط للمستخدم محمود، المدير العام، والمحاسب!');
+                return;
             }
 
-            renderTripBranchTables(trip, tripTickets, tripCargo, currentModalTripMode);
+            activeTripDetailsId = trip.id;
+            activeTripDetailsContext = contextMode;
+
+            document.getElementById('tripDetailsModalTitle').innerText =
+                contextMode === 'finance'
+                    ? `الإدارة المالية وحسابات الرحلة المغادرة: ${trip.route}`
+                    : `تفاصيل الرحلة المجدولة: ${trip.route}`;
+            document.getElementById('tripDetailsModalSub').innerText =
+                `التاريخ: ${trip.date || '-'} | الباص والسائق: ${trip.busInfo || '-'} | الحالة: ${trip.status || 'مجدولة'}`;
+
+            const addBar = document.getElementById('departedTripFinanceAddBar');
+            const finSummaryBar = document.getElementById('tripFinancialSummaryBar');
+            if (contextMode === 'finance') {
+                addBar.classList.remove('hidden');
+                finSummaryBar.classList.remove('hidden');
+            } else {
+                addBar.classList.add('hidden');
+                finSummaryBar.classList.add('hidden');
+            }
+
+            renderTripDetailsBranches();
             switchTripDetailsBranch('tickets');
             document.getElementById('tripDetailsModal').classList.remove('hidden');
         }
 
-        function openAddTicketForDepartedTrip() {
-            if (!canModifyFinancialsOrAccounts() || !currentModalTripId) return;
-            const tripId = currentModalTripId;
-            closeModal('tripDetailsModal');
-            resetPassengerForm();
-            financeOverrideDepartedTripId = tripId;
-            switchTab('passengers');
-            populateTripsDropdown();
-            document.getElementById('passTripSelect').value = tripId;
-            onTripSelectedForTicket();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function openAddCargoForDepartedTrip() {
-            if (!canModifyFinancialsOrAccounts() || !currentModalTripId) return;
-            const tripId = currentModalTripId;
-            closeModal('tripDetailsModal');
-            resetCargoForm();
-            financeOverrideDepartedTripId = tripId;
-            switchTab('cargo');
-            populateTripsDropdown();
-            document.getElementById('cargoTripSelect').value = tripId;
-            onTripSelectedForCargo();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function switchTripDetailsBranch(branch) {
+        function switchTripDetailsBranch(branchName) {
             const btnTkt = document.getElementById('btnTripSubTickets');
             const btnCrg = document.getElementById('btnTripSubCargo');
             const boxTkt = document.getElementById('tripBranchTicketsContainer');
             const boxCrg = document.getElementById('tripBranchCargoContainer');
 
-            if (branch === 'tickets') {
+            if (branchName === 'tickets') {
                 btnTkt.className = "py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition gold-gradient-bg text-black shadow";
                 btnCrg.className = "py-3 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition bg-zinc-800 text-zinc-300 hover:text-gold border border-zinc-700";
                 boxTkt.classList.remove('hidden');
@@ -4842,136 +4620,562 @@
             }
         }
 
-        function renderTripBranchTables(trip, tripTickets, tripCargo, mode) {
-            const isFinance = (mode === 'finance');
-            const canEditFinance = isFinance && canModifyFinancialsOrAccounts();
+        function renderTripDetailsBranches() {
+            if (!activeTripDetailsId) return;
+            const trip = db.trips.find(t => String(t.id) === String(activeTripDetailsId));
+            if (!trip) return;
 
+            const isFin = activeTripDetailsContext === 'finance';
+            const tripTickets = [...db.passengers.filter(p => String(p.tripId) === String(trip.id))].sort(compareInvoiceIdsDesc);
+            const tripCargos = [...db.cargo.filter(c => String(c.tripId) === String(trip.id))].sort(compareInvoiceIdsDesc);
+
+            document.getElementById('tripBranchTktCount').innerText = tripTickets.length;
+            document.getElementById('tripBranchCargoCount').innerText = tripCargos.length;
+
+            // تحديث الشريط المالي في وضع الإدارة المالية
+            if (isFin) {
+                const tktTotal = tripTickets.reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
+                const tktPaid = tripTickets.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
+                const crgTotal = tripCargos.reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
+                const crgPaid = tripCargos.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
+                document.getElementById('tripFinTktTotal').innerText = `${tktTotal} AED (مدفوع: ${tktPaid})`;
+                document.getElementById('tripFinCargoTotal').innerText = `${crgTotal} AED (مدفوع: ${crgPaid})`;
+                document.getElementById('tripFinGrandTotal').innerText = `${tktPaid + crgPaid} AED / ${tktTotal + crgTotal} AED`;
+            }
+
+            // 1. جدول التذاكر المتفرع
             const tHead = document.getElementById('tripBranchTicketsHead');
             const tBody = document.getElementById('tripBranchTicketsBody');
-            tHead.innerHTML = `
-                <tr>
+            tHead.innerHTML = isFin
+                ? `<tr>
                     <th>رقم التذكرة</th>
-                    <th>الراكب الرئيسي</th>
-                    <th>الركاب الإضافيون</th>
+                    <th>الراكب</th>
                     <th>الهاتف</th>
-                    <th>الجواز</th>
                     <th>المسار</th>
-                    ${isFinance ? '<th>المبلغ</th>' : ''}
-                    <th>حالة السداد</th>
+                    <th>عدد الركاب</th>
+                    <th>المبلغ (تعديل مباشر)</th>
+                    <th>حالة السداد (تعديل مباشر)</th>
                     <th>إجراءات</th>
-                </tr>
-            `;
-            tBody.innerHTML = '';
+                   </tr>`
+                : `<tr>
+                    <th>رقم التذكرة</th>
+                    <th>الوكيل</th>
+                    <th>الراكب</th>
+                    <th>الهاتف</th>
+                    <th>المسار</th>
+                    <th>عدد الركاب</th>
+                    <th>المبلغ</th>
+                    <th>السداد</th>
+                    <th>معاينة</th>
+                   </tr>`;
 
+            tBody.innerHTML = '';
             if (tripTickets.length === 0) {
-                tBody.innerHTML = `<tr><td colspan="${isFinance ? 9 : 8}" class="text-center text-zinc-400 py-5">لا توجد تذاكر مسجلة في هذه الرحلة</td></tr>`;
+                tBody.innerHTML = `<tr><td colspan="9" class="text-center text-zinc-500 py-4">لا توجد تذاكر مسجلة لهذه الرحلة بعد</td></tr>`;
             } else {
                 tripTickets.forEach(p => {
-                    const extraNames = (p.extraPassengers && p.extraPassengers.length > 0)
-                        ? p.extraPassengers.map(ex => `<span class="text-amber-300 font-bold">#${ex.ticketNo || '-'}</span> ${ex.name}`).join('، ')
-                        : '-';
-                    tBody.insertRow().innerHTML = `
-                        <td><strong class="text-gold">#${p.id}</strong></td>
-                        <td><strong>${p.name}</strong></td>
-                        <td><span class="text-[11px] text-zinc-300">${extraNames}</span></td>
-                        <td>${p.phone || '-'}</td>
-                        <td>${p.passport || '-'}</td>
-                        <td>${p.origin} → ${p.destination}</td>
-                        ${isFinance ? `<td><strong class="text-emerald-400">${p.fare} AED</strong></td>` : ''}
-                        <td>
-                            ${canEditFinance ? `
-                                <select onchange="updatePassengerPaymentStatusFromModal('${p.id}', this.value)" class="bg-zinc-900 border ${p.payMethod === 'مدفوع' ? 'border-emerald-500 text-emerald-400' : 'border-amber-500 text-amber-300'} rounded-lg px-2 py-1 text-xs font-bold outline-none">
+                    const realIdx = db.passengers.findIndex(x => String(x.id) === String(p.id));
+                    if (isFin) {
+                        tBody.insertRow().innerHTML = `
+                            <td><strong class="text-gold">#${p.id}</strong></td>
+                            <td><strong>${p.name}</strong></td>
+                            <td>${p.phone || '-'}</td>
+                            <td>${p.origin} → ${p.destination}</td>
+                            <td>${p.passengerCount || 1}</td>
+                            <td>
+                                <input type="number" step="any" value="${p.fare || 0}" onchange="updateTicketFinanceInline('${p.id}', 'fare', this.value)" class="w-24 bg-zinc-900 border border-gold rounded px-2 py-1 text-xs text-gold font-bold">
+                            </td>
+                            <td>
+                                <select onchange="updateTicketFinanceInline('${p.id}', 'payMethod', this.value)" class="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-xs text-zinc-100 font-bold">
                                     <option value="مدفوع" ${p.payMethod === 'مدفوع' ? 'selected' : ''}>مدفوع</option>
                                     <option value="الدفع عند الباص" ${p.payMethod === 'الدفع عند الباص' ? 'selected' : ''}>الدفع عند الباص</option>
                                     <option value="مؤجل باليمن" ${p.payMethod === 'مؤجل باليمن' ? 'selected' : ''}>مؤجل باليمن</option>
                                 </select>
-                            ` : `<span class="px-2 py-0.5 rounded text-xs font-bold ${p.payMethod === 'مدفوع' ? 'bg-emerald-950 text-emerald-300' : 'bg-amber-950 text-amber-300'}">${p.payMethod}</span>`}
-                        </td>
-                        <td class="space-x-1 space-x-reverse whitespace-nowrap">
-                            <button onclick="previewTicketImage('${p.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-ticket"></i> معاينة</button>
-                            ${canEditFinance ? `<button onclick="closeModal('tripDetailsModal'); switchTab('passengers'); editPassenger('${p.id}');" class="bg-sky-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i> تعديل</button>` : ''}
-                        </td>
-                    `;
+                            </td>
+                            <td class="space-x-1 space-x-reverse whitespace-nowrap">
+                                <button onclick="previewTicketImage('${p.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-eye"></i></button>
+                                <button onclick="closeModal('tripDetailsModal'); switchTab('passengers'); editPassenger('${p.id}');" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteItem('passengers', ${realIdx}); renderTripDetailsBranches();" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        `;
+                    } else {
+                        const payClass = p.payMethod === 'مدفوع' ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-400';
+                        tBody.insertRow().innerHTML = `
+                            <td><strong class="text-gold">#${p.id}</strong></td>
+                            <td>${p.agent || '-'}</td>
+                            <td><strong>${p.name}</strong></td>
+                            <td>${p.phone || '-'}</td>
+                            <td>${p.origin} → ${p.destination}</td>
+                            <td>${p.passengerCount || 1}</td>
+                            <td class="text-gold font-bold">${p.fare || 0} AED</td>
+                            <td><span class="${payClass} px-2 py-0.5 rounded text-xs font-bold">${p.payMethod}</span></td>
+                            <td><button onclick="previewTicketImage('${p.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-eye"></i></button></td>
+                        `;
+                    }
                 });
             }
 
+            // 2. جدول فواتير الشحن المتفرع
             const cHead = document.getElementById('tripBranchCargoHead');
             const cBody = document.getElementById('tripBranchCargoBody');
-            cHead.innerHTML = `
-                <tr>
+            cHead.innerHTML = isFin
+                ? `<tr>
                     <th>رقم الفاتورة</th>
                     <th>المرسل</th>
-                    <th>المستلم وهاتفه</th>
-                    <th>العنوان</th>
-                    <th>الأصناف والعدد</th>
-                    ${isFinance ? '<th>الإجمالي</th>' : ''}
-                    <th>حالة السداد</th>
+                    <th>المستلم وعنوانه</th>
+                    <th>الأصناف</th>
+                    <th>الإجمالي (تعديل مباشر)</th>
+                    <th>حالة السداد (تعديل مباشر)</th>
                     <th>إجراءات</th>
-                </tr>
-            `;
-            cBody.innerHTML = '';
+                   </tr>`
+                : `<tr>
+                    <th>رقم الفاتورة</th>
+                    <th>المرسل</th>
+                    <th>المستلم وعنوانه</th>
+                    <th>الأصناف</th>
+                    <th>الإجمالي</th>
+                    <th>حالة السداد</th>
+                    <th>معاينة</th>
+                   </tr>`;
 
-            if (tripCargo.length === 0) {
-                cBody.innerHTML = `<tr><td colspan="${isFinance ? 8 : 7}" class="text-center text-zinc-400 py-5">لا توجد فواتير شحن مرتبطة بهذه الرحلة</td></tr>`;
+            cBody.innerHTML = '';
+            if (tripCargos.length === 0) {
+                cBody.innerHTML = `<tr><td colspan="7" class="text-center text-zinc-500 py-4">لا توجد فواتير شحن مسجلة لهذه الرحلة بعد</td></tr>`;
             } else {
-                tripCargo.forEach(c => {
-                    const itemsDesc = c.items ? c.items.map(it => `${it.desc} (${it.qty})`).join('، ') : '-';
-                    cBody.insertRow().innerHTML = `
-                        <td><strong class="text-gold">#${c.id}</strong></td>
-                        <td><strong>${c.sender}</strong> <span class="text-[11px] text-zinc-400">(${c.senderPhone})</span></td>
-                        <td><strong>${c.receiver}</strong> <span class="text-[11px] text-zinc-400">(${c.receiverPhone})</span></td>
-                        <td>${c.receiverAddress || 'عدن'}</td>
-                        <td><span class="text-xs text-zinc-200">${itemsDesc}</span></td>
-                        ${isFinance ? `<td><strong class="text-indigo-300">${c.grandTotal} AED</strong></td>` : ''}
-                        <td>
-                            ${canEditFinance ? `
-                                <select onchange="updateCargoPaymentStatusFromModal('${c.id}', this.value)" class="bg-zinc-900 border ${c.paymentStatus === 'مدفوع' ? 'border-emerald-500 text-emerald-400' : 'border-amber-500 text-amber-300'} rounded-lg px-2 py-1 text-xs font-bold outline-none">
+                tripCargos.forEach(c => {
+                    const realIdx = db.cargo.findIndex(x => String(x.id) === String(c.id));
+                    const itemsSummary = (c.items || []).map(it => `${it.desc} (${it.qty})`).join('، ') || 'أمتعة';
+                    if (isFin) {
+                        cBody.insertRow().innerHTML = `
+                            <td><strong class="text-indigo-400">#${c.id}</strong></td>
+                            <td><strong>${c.sender}</strong></td>
+                            <td>${c.receiver} (${c.receiverAddress || '-'})</td>
+                            <td class="text-xs text-zinc-300">${itemsSummary}</td>
+                            <td>
+                                <input type="number" step="any" value="${c.grandTotal || 0}" onchange="updateCargoFinanceInline('${c.id}', 'grandTotal', this.value)" class="w-24 bg-zinc-900 border border-gold rounded px-2 py-1 text-xs text-gold font-bold">
+                            </td>
+                            <td>
+                                <select onchange="updateCargoFinanceInline('${c.id}', 'paymentStatus', this.value)" class="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-xs text-zinc-100 font-bold">
                                     <option value="مدفوع" ${c.paymentStatus === 'مدفوع' ? 'selected' : ''}>مدفوع</option>
                                     <option value="أجل بالامارات" ${c.paymentStatus === 'أجل بالامارات' ? 'selected' : ''}>أجل بالامارات</option>
                                     <option value="الدفع باليمن" ${c.paymentStatus === 'الدفع باليمن' ? 'selected' : ''}>الدفع باليمن</option>
                                     <option value="مؤجل باليمن" ${c.paymentStatus === 'مؤجل باليمن' ? 'selected' : ''}>مؤجل باليمن</option>
                                 </select>
-                            ` : `<span class="px-2 py-0.5 rounded text-xs font-bold ${c.paymentStatus === 'مدفوع' ? 'bg-emerald-950 text-emerald-300' : 'bg-amber-950 text-amber-300'}">${c.paymentStatus}</span>`}
-                        </td>
-                        <td class="space-x-1 space-x-reverse whitespace-nowrap">
-                            <button onclick="previewCargoImage('${c.id}')" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-file-invoice"></i> معاينة</button>
-                            ${canEditFinance ? `<button onclick="closeModal('tripDetailsModal'); switchTab('cargo'); editCargo('${c.id}');" class="bg-sky-600 text-white px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i> تعديل</button>` : ''}
-                        </td>
-                    `;
+                            </td>
+                            <td class="space-x-1 space-x-reverse whitespace-nowrap">
+                                <button onclick="previewCargoImage('${c.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-eye"></i></button>
+                                <button onclick="closeModal('tripDetailsModal'); switchTab('cargo'); editCargo('${c.id}');" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteItem('cargo', ${realIdx}); renderTripDetailsBranches();" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        `;
+                    } else {
+                        const payClass = c.paymentStatus === 'مدفوع' ? 'bg-emerald-950 text-emerald-400' : 'bg-indigo-950 text-indigo-300';
+                        cBody.insertRow().innerHTML = `
+                            <td><strong class="text-indigo-400">#${c.id}</strong></td>
+                            <td><strong>${c.sender}</strong></td>
+                            <td>${c.receiver} (${c.receiverAddress || '-'})</td>
+                            <td class="text-xs text-zinc-300">${itemsSummary}</td>
+                            <td class="text-gold font-bold">${c.grandTotal} AED</td>
+                            <td><span class="${payClass} px-2 py-0.5 rounded text-xs font-bold">${c.paymentStatus}</span></td>
+                            <td><button onclick="previewCargoImage('${c.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-eye"></i></button></td>
+                        `;
+                    }
                 });
             }
         }
 
-        function updatePassengerPaymentStatusFromModal(tktId, newStatus) {
-            updatePassengerPaymentStatus(tktId, newStatus);
-            if (currentModalTripId) openTripDetailsModal(currentModalTripId, currentModalTripMode);
+        function updateTicketFinanceInline(ticketId, field, value) {
+            if (!canModifyFinancialsOrAccounts()) return;
+            const idx = db.passengers.findIndex(p => String(p.id) === String(ticketId));
+            if (idx === -1) return;
+            const nowStr = getFormattedDateTime();
+            const author = getCurrentUserName();
+            if (field === 'fare') {
+                db.passengers[idx].fare = parseFloat(value) || 0;
+            } else if (field === 'payMethod') {
+                db.passengers[idx].payMethod = value;
+            }
+            if (!db.passengers[idx].auditLog) db.passengers[idx].auditLog = [];
+            db.passengers[idx].auditLog.push({ action: `تعديل مالي للتذكرة (${field}: ${value})`, user: author, time: nowStr });
+            saveDB(true);
+            refreshUI();
+            renderTripDetailsBranches();
         }
 
-        function updateCargoPaymentStatusFromModal(cargoId, newStatus) {
-            updateCargoPaymentStatus(cargoId, newStatus);
-            if (currentModalTripId) openTripDetailsModal(currentModalTripId, currentModalTripMode);
+        function updateCargoFinanceInline(cargoId, field, value) {
+            if (!canModifyFinancialsOrAccounts()) return;
+            const idx = db.cargo.findIndex(c => String(c.id) === String(cargoId));
+            if (idx === -1) return;
+            const nowStr = getFormattedDateTime();
+            const author = getCurrentUserName();
+            if (field === 'grandTotal') {
+                db.cargo[idx].grandTotal = parseFloat(value) || 0;
+            } else if (field === 'paymentStatus') {
+                db.cargo[idx].paymentStatus = value;
+            }
+            if (!db.cargo[idx].auditLog) db.cargo[idx].auditLog = [];
+            db.cargo[idx].auditLog.push({ action: `تعديل مالي لفاتورة الشحن (${field}: ${value})`, user: author, time: nowStr });
+            saveDB(true);
+            refreshUI();
+            renderTripDetailsBranches();
         }
 
-        // ================= إدارة المستخدمين =================
-        function renderUsersTable() {
-            const tbody = document.querySelector('#usersTable tbody');
-            if(!tbody) return;
+        function openAddTicketForDepartedTrip() {
+            if (!canModifyFinancialsOrAccounts() || !activeTripDetailsId) return;
+            const tripId = activeTripDetailsId;
+            closeModal('tripDetailsModal');
+            resetPassengerForm();
+            financeOverrideDepartedTripId = tripId;
+            switchTab('passengers');
+            populateTripsDropdown();
+            document.getElementById('passTripSelect').value = tripId;
+            onTripSelectedForTicket();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openAddCargoForDepartedTrip() {
+            if (!canModifyFinancialsOrAccounts() || !activeTripDetailsId) return;
+            const tripId = activeTripDetailsId;
+            closeModal('tripDetailsModal');
+            resetCargoForm();
+            financeOverrideDepartedTripId = tripId;
+            switchTab('cargo');
+            populateTripsDropdown();
+            document.getElementById('cargoTripSelect').value = tripId;
+            onTripSelectedForCargo();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderFinDepartedTripsTable() {
+            const tbody = document.querySelector('#finDepartedTripsTable tbody');
+            if (!tbody) return;
             tbody.innerHTML = '';
-            const users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
-            users.forEach((u, idx) => {
-                let roleLabel = '';
-                if (u.role === 'مدير عام' || u.username === 'محمود') roleLabel = '<span class="text-gold font-bold">👑 مدير عام (كل الأفرع والصلاحيات)</span>';
-                else if (u.role === 'محاسب') roleLabel = '<span class="text-emerald-400 font-bold">🧮 محاسب (المالية والرواتب والسائقين)</span>';
-                else if (u.role === 'مدير فرع') roleLabel = '<span class="text-amber-300 font-bold">⭐ مدير فرع</span>';
-                else roleLabel = '<span class="text-zinc-300">👤 موظف</span>';
+
+            let departedTrips = (db.trips || []).filter(t => t.status === 'غادرت الرحلة');
+            departedTrips.sort((a, b) => b.id.localeCompare(a.id));
+
+            if (departedTrips.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="12" class="text-center text-zinc-500 py-4">لا توجد رحلات مغادرة مسجلة حالياً</td></tr>`;
+                return;
+            }
+
+            departedTrips.forEach((trip, idx) => {
+                const tripTickets = db.passengers.filter(p => String(p.tripId) === String(trip.id));
+                const tripCargos = db.cargo.filter(c => String(c.tripId) === String(trip.id));
+
+                const tktTotal = tripTickets.reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
+                const tktPaid = tripTickets.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
+
+                const crgTotal = tripCargos.reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
+                const crgPaid = tripCargos.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
+
+                const allGross = tktTotal + crgTotal;
+                const allPaid = tktPaid + crgPaid;
+                const allUnpaid = allGross - allPaid;
+
+                const matchingDrivers = (db.drivers || []).filter(d => d.date === trip.date);
+                const driverExp = matchingDrivers.reduce((s, d) => s + (parseFloat(d.totalExpenses) || 0), 0);
+                const netProfit = allPaid - driverExp;
 
                 tbody.insertRow().innerHTML = `
+                    <td><strong>#${departedTrips.length - idx}</strong></td>
+                    <td><strong class="text-gold">${trip.date || '-'}</strong></td>
+                    <td>${trip.route}</td>
+                    <td>${trip.busInfo}</td>
+                    <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded-full text-xs font-bold">${tripTickets.length}</span></td>
+                    <td><span class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded-full text-xs font-bold">${tripCargos.length}</span></td>
+                    <td class="font-bold text-zinc-200">${allGross} AED</td>
+                    <td class="font-bold text-emerald-400">${allPaid} AED</td>
+                    <td class="font-bold text-amber-400">${allUnpaid} AED</td>
+                    <td class="font-bold text-red-400">${driverExp} AED</td>
+                    <td class="font-black ${netProfit >= 0 ? 'text-emerald-400' : 'text-red-500'}">${netProfit} AED</td>
+                    <td class="space-x-1 space-x-reverse whitespace-nowrap">
+                        <button onclick="openTripDetailsModal('${trip.id}', 'finance')" class="gold-gradient-bg text-black px-3 py-1 rounded text-xs font-extrabold shadow">
+                            <i class="fa-solid fa-folder-open ml-1"></i> فتح وإدارة الحسابات
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        function renderFinancials() {
+            const filteredPass = getFilteredData(db.passengers);
+            const filteredCargo = getFilteredData(db.cargo);
+            const filteredVouchers = getFilteredData(db.vouchers);
+            const filteredDrivers = getFilteredData(db.drivers);
+
+            const ticketRev = filteredPass.filter(p => p.payMethod === 'مدفوع').reduce((s, p) => s + (p.fare || 0), 0);
+            const cargoRev = filteredCargo.filter(c => c.paymentStatus === 'مدفوع').reduce((s, c) => s + c.grandTotal, 0);
+            const transitRev = getFilteredData(db.transitVisas || []).filter(t => t.paymentStatus === 'تم الدفع والاصدار').reduce((s, t) => s + (t.amount || 0), 0);
+            const voucherRec = filteredVouchers.filter(v => v.type === 'قبض').reduce((s, v) => s + v.amount, 0);
+            
+            const driversExp = filteredDrivers.reduce((s, d) => s + (d.totalExpenses || 0), 0);
+            const voucherExp = filteredVouchers.filter(v => v.type === 'صرف').reduce((s, v) => s + v.amount, 0);
+            const netBox = (ticketRev + cargoRev + transitRev + voucherRec) - (driversExp + voucherExp);
+
+            document.getElementById('finRevSum').innerText = `${ticketRev + cargoRev + transitRev} AED`;
+            document.getElementById('finDriverExpSum').innerText = `${driversExp} AED`;
+            document.getElementById('finExpensesSum').innerText = `${voucherExp} AED`;
+            document.getElementById('finNetBoxSum').innerText = `${netBox} AED`;
+            document.getElementById('statTicketCount').innerText = filteredPass.length;
+            document.getElementById('statTicketRevenue').innerText = `${ticketRev} AED`;
+            renderFinDepartedTripsTable();
+            renderDailyCashClosingReport();
+        }
+
+        function renderDailyCashClosingReport() {
+            const dateInput = document.getElementById('dailyCloseDate');
+            if (!dateInput) return;
+            const targetDate = dateInput.value || new Date().toISOString().split('T')[0];
+
+            const filteredPass = getFilteredData(db.passengers);
+            const filteredCargo = getFilteredData(db.cargo);
+            const filteredVouchers = getFilteredData(db.vouchers);
+            const filteredDrivers = getFilteredData(db.drivers);
+            const filteredTransit = getFilteredData(db.transitVisas || []);
+
+            const tktPaidToday = filteredPass
+                .filter(p => p.payMethod === 'مدفوع' && ((p.date === targetDate) || (p.createdAt && p.createdAt.startsWith(targetDate))))
+                .reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
+
+            const cargoPaidToday = filteredCargo
+                .filter(c => c.paymentStatus === 'مدفوع' && ((c.date === targetDate) || (c.createdAt && c.createdAt.startsWith(targetDate))))
+                .reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
+
+            const transitPaidToday = filteredTransit
+                .filter(t => t.paymentStatus === 'تم الدفع والاصدار' && (t.createdAt && t.createdAt.startsWith(targetDate)))
+                .reduce((s, t) => s + (parseFloat(t.amount) || 0), 0);
+
+            const vouchersRecToday = filteredVouchers
+                .filter(v => v.type === 'قبض' && v.date === targetDate)
+                .reduce((s, v) => s + (parseFloat(v.amount) || 0), 0);
+
+            const vouchersExpToday = filteredVouchers
+                .filter(v => v.type === 'صرف' && v.date === targetDate)
+                .reduce((s, v) => s + (parseFloat(v.amount) || 0), 0);
+
+            const driverExpToday = filteredDrivers
+                .filter(d => d.date === targetDate)
+                .reduce((s, d) => s + (parseFloat(d.totalExpenses) || 0), 0);
+
+            const totalIn = tktPaidToday + cargoPaidToday + transitPaidToday + vouchersRecToday;
+            const totalOut = vouchersExpToday + driverExpToday;
+            const netCashToday = totalIn - totalOut;
+
+            document.getElementById('dcTicketsPaid').innerText = `${tktPaidToday} AED`;
+            document.getElementById('dcCargoPaid').innerText = `${cargoPaidToday} AED`;
+            document.getElementById('dcOtherIn').innerText = `${transitPaidToday + vouchersRecToday} AED`;
+            document.getElementById('dcTotalOut').innerText = `${totalOut} AED`;
+            document.getElementById('dcNetCash').innerText = `${netCashToday} AED`;
+        }
+
+        function exportDailyClosingPDF() {
+            const targetDate = document.getElementById('dailyCloseDate').value || new Date().toISOString().split('T')[0];
+            exportToPDF('dailyClosingCaptureArea', `WadiBina_DailyClosing_${targetDate}_`);
+        }
+
+        function sendTripReminderWhatsApp() {
+            if (!currentPreviewTicket) return;
+            const t = currentPreviewTicket;
+            const phone = formatPhoneForWhatsApp(t.phone);
+            if (!phone) { alert('رقم هاتف الراكب غير متوفر أو غير صحيح!'); return; }
+            const msg = `مرحباً ${t.name}،\nنذكركم بموعد رحلتكم مع شركة وادي بناء للنقل الدولي:\n• رقم التذكرة: #${t.id}\n• المسار: ${t.origin} إلى ${t.destination}\n• التاريخ: ${t.date}\n• وقت الحضور: ${t.reportingTime || '4:00 عصراً'}\nنتمنى لكم رحلة آمنة وموفقة!`;
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        function sendCargoReceiverWhatsApp() {
+            if (!currentPreviewCargo) return;
+            const c = currentPreviewCargo;
+            const phone = formatPhoneForWhatsApp(c.receiverPhone);
+            if (!phone) { alert('رقم هاتف المستلم غير متوفر أو غير صحيح!'); return; }
+            const itemsSummary = (c.items || []).map(it => `${it.desc} (${it.qty})`).join('، ');
+            const msg = `مرحباً ${c.receiver}،\nتم تسجيل شحنة باسمكم لدى شركة وادي بناء للنقل الدولي:\n• رقم الفاتورة: #${c.id}\n• المرسل: ${c.sender}\n• المحتويات: ${itemsSummary}\n• حالة الدفع: ${c.paymentStatus}\nسنتواصل معكم فور وصول الشحنة إلى ${c.receiverAddress}.`;
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        function printThermalReceipt(type) {
+            let contentHtml = '';
+            if (type === 'ticket' && currentPreviewTicket) {
+                const t = currentPreviewTicket;
+                contentHtml = `
+                    <div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:6px; margin-bottom:6px;">
+                        <strong style="font-size:14px;">شركة وادي بناء للنقل الدولي</strong><br>
+                        <span style="font-size:11px;">إيصال تذكرة سفر #${t.id}</span>
+                    </div>
+                    <div style="font-size:11px; line-height:1.6;">
+                        <div><strong>الراكب:</strong> ${t.name}</div>
+                        <div><strong>الهاتف:</strong> ${t.phone}</div>
+                        <div><strong>الجواز:</strong> ${t.passport}</div>
+                        <div><strong>المسار:</strong> ${t.origin} ➔ ${t.destination}</div>
+                        <div><strong>التاريخ:</strong> ${t.date}</div>
+                        <div><strong>وقت الحضور:</strong> ${t.reportingTime || '4:00 عصراً'}</div>
+                        <div style="border-top:1px dashed #000; margin-top:6px; padding-top:4px; font-size:12px;">
+                            <strong>الإجمالي: ${t.fare || 0} AED</strong> (${t.payMethod})
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'cargo' && currentPreviewCargo) {
+                const c = currentPreviewCargo;
+                const itemsRows = (c.items || []).map(it => `<div>• ${it.desc} × ${it.qty} = ${it.qty * it.price} AED</div>`).join('');
+                contentHtml = `
+                    <div style="text-align:center; border-bottom:1px dashed #000; padding-bottom:6px; margin-bottom:6px;">
+                        <strong style="font-size:14px;">شركة وادي بناء للنقل الدولي</strong><br>
+                        <span style="font-size:11px;">إيصال شحن بضائع #${c.id}</span>
+                    </div>
+                    <div style="font-size:11px; line-height:1.6;">
+                        <div><strong>المرسل:</strong> ${c.sender} (${c.senderPhone})</div>
+                        <div><strong>المستلم:</strong> ${c.receiver} (${c.receiverPhone})</div>
+                        <div><strong>الوجهة:</strong> ${c.receiverAddress}</div>
+                        <div style="border-top:1px dashed #000; margin-top:4px; padding-top:4px;"><strong>الأصناف:</strong>${itemsRows}</div>
+                        <div style="border-top:1px dashed #000; margin-top:6px; padding-top:4px; font-size:12px;">
+                            <strong>الإجمالي: ${c.grandTotal} AED</strong> (${c.paymentStatus})
+                        </div>
+                    </div>
+                `;
+            } else {
+                return;
+            }
+
+            const win = window.open('', '_blank', 'width=340,height=600');
+            win.document.write(`
+                <html dir="rtl">
+                <head><title>إيصال حراري 80mm</title>
+                <style>@page { margin: 2mm; size: 80mm auto; } body { font-family: Tahoma, Arial, sans-serif; width: 74mm; margin: 0 auto; color: #000; }</style>
+                </head>
+                <body onload="window.print(); setTimeout(()=>window.close(), 300);">
+                    ${contentHtml}
+                    <div style="text-align:center; border-top:1px dashed #000; margin-top:8px; padding-top:6px; font-size:10px;">
+                        شكراً لاختياركم وادي بناء للنقل الدولي
+                    </div>
+                </body></html>
+            `);
+            win.document.close();
+        }
+
+        function handleSaveVoucher(e) {
+            e.preventDefault();
+            if (!canModifyFinancialsOrAccounts()) { alert('عذراً، تسجيل السندات متاح فقط لمحمود، المدير العام، أو المحاسب!'); return; }
+            const vData = {
+                id: Date.now().toString(),
+                type: document.getElementById('vType').value,
+                date: document.getElementById('vDate').value || new Date().toISOString().split('T')[0],
+                amount: parseFloat(document.getElementById('vAmount').value),
+                receiver: document.getElementById('vReceiver').value,
+                desc: document.getElementById('vDesc').value,
+                user: currentUser.username,
+                createdBy: currentUser.username,
+                branch: currentUser.branch || 'فرع عجمان'
+            };
+            db.vouchers.unshift(vData);
+            saveDB();
+            document.getElementById('voucherForm').reset();
+            refreshUI();
+        }
+
+        function renderVouchersTable() {
+            const tbody = document.querySelector('#vouchersTable tbody');
+            tbody.innerHTML = '';
+            const filteredVouchers = getFilteredData(db.vouchers);
+            filteredVouchers.forEach((v) => {
+                const realIdx = db.vouchers.findIndex(x => x.id === v.id);
+                const typeBadge = v.type === 'قبض' ? `<span class="text-emerald-400 font-bold">قبض</span>` : `<span class="text-red-400 font-bold">صرف</span>`;
+                tbody.insertRow().innerHTML = `
+                    <td>${typeBadge}</td>
+                    <td>${v.date}</td>
+                    <td><strong>${v.receiver || '-'}</strong></td>
+                    <td>${v.desc}</td>
+                    <td class="text-gold font-bold">${v.amount} AED</td>
+                    <td><span class="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-xs">${v.branch || 'فرع عجمان'}</span></td>
+                    <td><button onclick="deleteItem('vouchers', ${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button></td>
+                `;
+            });
+        }
+
+        function handleSaveDebtInvoice(e) {
+            e.preventDefault();
+            if (!canModifyFinancialsOrAccounts()) { alert('عذراً، إصدار فواتير الذمم متاح فقط لمحمود، المدير العام، أو المحاسب!'); return; }
+            const nowStr = getFormattedDateTime();
+            const author = getCurrentUserName();
+            const invNo = document.getElementById('debtInvNo').value.trim();
+
+            const debtData = {
+                id: invNo,
+                date: document.getElementById('debtInvDate').value || new Date().toISOString().split('T')[0],
+                customerName: document.getElementById('debtInvCustomerName').value,
+                customerPhone: document.getElementById('debtInvCustomerPhone').value,
+                customerAddress: document.getElementById('debtInvCustomerAddress').value,
+                subTotal: parseFloat(document.getElementById('debtInvSubTotal').value) || 0,
+                paidAmount: parseFloat(document.getElementById('debtInvPaidAmount').value) || 0,
+                netTotal: parseFloat(document.getElementById('debtInvNetTotal').value) || 0,
+                branch: currentUser.branch || 'فرع عجمان',
+                createdBy: author,
+                createdAt: nowStr,
+                auditLog: [{action: 'إنشاء فاتورة آجل', user: author, time: nowStr}]
+            };
+            db.debtInvoices.unshift(debtData);
+            db.nextDebtInvNo = parseInt(invNo) + 1;
+            saveDB();
+            document.getElementById('debtInvoiceForm').reset();
+            switchFinancialSubTab('debts');
+            refreshUI();
+            alert('تم إصدار فاتورة الآجل بنجاح برقم #' + invNo);
+        }
+
+        function renderDebtInvoicesTable() {
+            const tbody = document.querySelector('#debtInvoicesTable tbody');
+            tbody.innerHTML = '';
+            let filteredDebts = [...getFilteredData(db.debtInvoices)].sort(compareInvoiceIdsDesc);
+            filteredDebts.forEach((inv) => {
+                const realIdx = db.debtInvoices.findIndex(x => String(x.id) === String(inv.id));
+                tbody.insertRow().innerHTML = `
+                    <td><strong class="text-gold">#${inv.id}</strong></td>
+                    <td>${inv.date}</td>
+                    <td><strong>${inv.customerName}</strong></td>
+                    <td>${inv.customerPhone}</td>
+                    <td>${inv.subTotal} AED</td>
+                    <td class="text-emerald-400 font-bold">${inv.paidAmount} AED</td>
+                    <td class="text-amber-400 font-bold">${inv.netTotal} AED</td>
+                    <td><span class="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-xs">${inv.branch || 'فرع عجمان'}</span></td>
+                    <td class="space-x-1 space-x-reverse">
+                        <button onclick="previewDebtInvoice('${inv.id}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="deleteItem('debtInvoices', ${realIdx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+            });
+        }
+
+        function previewDebtInvoice(id) {
+            const inv = db.debtInvoices.find(x => String(x.id) === String(id));
+            if(!inv) return;
+            document.getElementById('imgDebtInvCode').innerText = `#${inv.id}`;
+            document.getElementById('imgDebtName').innerText = inv.customerName;
+            document.getElementById('imgDebtPhone').innerText = inv.customerPhone;
+            document.getElementById('imgDebtAddress').innerText = inv.customerAddress;
+            document.getElementById('imgDebtDate').innerText = inv.date;
+            document.getElementById('imgDebtSubTotal').innerText = inv.subTotal;
+            document.getElementById('imgDebtPaid').innerText = inv.paidAmount;
+            document.getElementById('imgDebtNetTotal').innerText = `${inv.netTotal} AED`;
+            document.getElementById('debtInvPreviewModal').classList.remove('hidden');
+        }
+
+        function renderUsersTable() {
+            const tbody = document.querySelector('#usersTable tbody');
+            tbody.innerHTML = '';
+            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            users.forEach((u, idx) => {
+                let roleBadge = `<span class="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-xs font-bold">${u.role}</span>`;
+                if (u.username === 'محمود' || u.role === 'مدير عام') {
+                    roleBadge = `<span class="bg-gold/20 text-gold border border-gold/40 px-2 py-0.5 rounded text-xs font-bold">👑 ${u.role}</span>`;
+                } else if (u.role === 'محاسب') {
+                    roleBadge = `<span class="bg-emerald-950 text-emerald-300 border border-emerald-700/50 px-2 py-0.5 rounded text-xs font-bold">🧮 ${u.role}</span>`;
+                }
+                tbody.insertRow().innerHTML = `
                     <td><strong>${u.username}</strong></td>
-                    <td><code class="text-amber-400 bg-zinc-900 px-2 py-0.5 rounded">${u.password}</code></td>
-                    <td>${roleLabel}</td>
+                    <td><span class="font-mono text-gold text-xs">${u.password}</span></td>
+                    <td>${roleBadge}</td>
                     <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${u.branch || 'فرع عجمان'}</span></td>
                     <td class="space-x-1 space-x-reverse">
-                        <button onclick="editUser('${u.username}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i> تعديل</button>
+                        <button onclick="editUser(${idx})" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i> تعديل</button>
                         ${u.username !== 'محمود' ? `<button onclick="deleteUser(${idx})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </td>
                 `;
@@ -4981,42 +5185,49 @@
         function handleSaveUser(e) {
             e.preventDefault();
             if (!canModifyFinancialsOrAccounts()) { alert('غير مصرح لك بإدارة المستخدمين!'); return; }
+            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
             const origName = document.getElementById('userEditOriginalName').value;
             const username = document.getElementById('manageUsername').value.trim();
             const password = document.getElementById('managePassword').value.trim();
             const role = document.getElementById('manageRole').value;
             const branch = document.getElementById('manageBranch').value;
 
-            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
-            if (origName) {
+            if(origName) {
                 const idx = users.findIndex(u => u.username === origName);
-                if (idx !== -1) {
-                    users[idx].username = username;
-                    users[idx].password = password;
-                    users[idx].role = role;
-                    users[idx].branch = branch;
-                }
+                if(idx !== -1) users[idx] = { username, password, role, branch };
             } else {
+                if(users.some(u => u.username === username)) { alert('اسم المستخدم موجود مسبقاً!'); return; }
                 users.push({ username, password, role, branch });
             }
             localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
             if(useFirebase && rtdb) { set(ref(rtdb, 'systemUsers'), users); }
             resetUserForm();
             renderUsersTable();
-            alert('تم حفظ بيانات المستخدم والصلاحيات بنجاح!');
+            alert('تم حفظ بيانات وصلاحيات المستخدم بنجاح!');
         }
 
-        function editUser(username) {
+        function editUser(idx) {
             if (!canModifyFinancialsOrAccounts()) return;
-            const users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
-            const u = users.find(x => x.username === username);
+            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            const u = users[idx];
             if(!u) return;
             document.getElementById('userEditOriginalName').value = u.username;
             document.getElementById('manageUsername').value = u.username;
             document.getElementById('managePassword').value = u.password;
-            document.getElementById('manageRole').value = u.role || 'موظف';
+            document.getElementById('manageRole').value = u.role;
             document.getElementById('manageBranch').value = u.branch || 'فرع عجمان';
             document.getElementById('userSubmitBtn').innerText = 'حفظ تعديلات المستخدم';
+        }
+
+        function deleteUser(idx) {
+            if (!canModifyFinancialsOrAccounts()) return;
+            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
+            if(confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
+                users.splice(idx, 1);
+                localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
+                if(useFirebase && rtdb) { set(ref(rtdb, 'systemUsers'), users); }
+                renderUsersTable();
+            }
         }
 
         function resetUserForm() {
@@ -5025,70 +5236,37 @@
             document.getElementById('userSubmitBtn').innerText = 'إضافة مستخدم جديد';
         }
 
-        function deleteUser(idx) {
-            if (!canModifyFinancialsOrAccounts()) return;
-            let users = JSON.parse(localStorage.getItem('WADI_BINA_USERS')) || DEFAULT_USERS;
-            users.splice(idx, 1);
-            localStorage.setItem('WADI_BINA_USERS', JSON.stringify(users));
-            if(useFirebase && rtdb) { set(ref(rtdb, 'systemUsers'), users); }
-            renderUsersTable();
-        }
-
-        function deletePassenger(idx) {
-            const item = db.passengers[idx];
-            if (item && item.tripId) {
-                const trip = db.trips.find(t => String(t.id) === String(item.tripId));
+        function deleteItem(collection, idx) {
+            if (idx === -1) return;
+            const restrictedCollections = ['vouchers', 'debtInvoices', 'drivers', 'employees'];
+            if (restrictedCollections.includes(collection) && !canModifyFinancialsOrAccounts()) {
+                alert('عذراً، الحذف في السجلات المالية والحسابات متاح فقط لمحمود، المدير العام، أو المحاسب!');
+                return;
+            }
+            if ((collection === 'passengers' || collection === 'cargo') && db[collection][idx] && db[collection][idx].tripId) {
+                const trip = db.trips.find(t => String(t.id) === String(db[collection][idx].tripId));
                 if (!isMahmoud() && trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
-                    alert('عذراً، بعد مغادرة الرحلة لا يمكن حذف التذكرة إلا من الإدارة المالية!');
+                    alert('عذراً، بعد مغادرة الرحلة لا يمكن حذف التذكرة أو الفاتورة إلا من الإدارة المالية!');
                     return;
                 }
             }
-            db.passengers.splice(idx, 1);
-            validateAndRepairDB();
-            saveDB(true);
-            refreshUI();
-        }
-
-        function deleteCargo(idx) {
-            const item = db.cargo[idx];
-            if (item && item.tripId) {
-                const trip = db.trips.find(t => String(t.id) === String(item.tripId));
-                if (!isMahmoud() && trip && trip.status === 'غادرت الرحلة' && !canModifyFinancialsOrAccounts()) {
-                    alert('عذراً، بعد مغادرة الرحلة لا يمكن حذف الفاتورة إلا من الإدارة المالية!');
-                    return;
-                }
+            if (confirm('تأكيد حذف السجل نهائياً؟')) {
+                db[collection].splice(idx, 1);
+                saveDB(true);
+                refreshUI();
             }
-            db.cargo.splice(idx, 1);
-            validateAndRepairDB();
-            saveDB(true);
-            refreshUI();
-        }
-
-        function deleteVoucher(idx) {
-            if (!canModifyFinancialsOrAccounts()) return;
-            db.vouchers.splice(idx, 1);
-            saveDB();
-            refreshUI();
-        }
-
-        function deleteDebtInv(idx) {
-            if (!canModifyFinancialsOrAccounts()) return;
-            db.debtInvoices.splice(idx, 1);
-            validateAndRepairDB();
-            saveDB();
-            renderDebtInvoicesTable();
         }
 
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-
+        
         function exportBackupJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
-            const a = document.createElement('a');
-            a.setAttribute("href", dataStr);
-            a.setAttribute("download", `WadiBina_Backup_${new Date().toISOString().slice(0,10)}.json`);
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
+            const dataStr = JSON.stringify(db, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `WadiBina_Backup_${Date.now()}.json`;
+            link.click();
         }
 
         function importBackupJSON(e) {
@@ -5097,189 +5275,134 @@
             const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
-                    const parsed = JSON.parse(evt.target.result);
-                    if (parsed) {
-                        db = parsed;
+                    const imported = JSON.parse(evt.target.result);
+                    if (imported && typeof imported === 'object') {
+                        db = {
+                            trips: imported.trips || [],
+                            drivers: imported.drivers || [],
+                            employees: imported.employees || [],
+                            passengers: imported.passengers || [],
+                            cargo: imported.cargo || [],
+                            vouchers: imported.vouchers || [],
+                            debtInvoices: imported.debtInvoices || [],
+                            transitVisas: imported.transitVisas || [],
+                            nextTicketNo: imported.nextTicketNo || 141,
+                            nextCargoNo: imported.nextCargoNo || 158,
+                            nextDebtInvNo: imported.nextDebtInvNo || 2,
+                            nextTransitNo: imported.nextTransitNo || 1
+                        };
                         validateAndRepairDB();
-                        saveDB();
+                        saveDB(true);
                         refreshUI();
-                        alert('تم استرجاع النسخة الاحتياطية JSON بنجاح!');
+                        alert('تم استرجاع النسخة الاحتياطية وتزامنها مع السحابة بنجاح!');
                     }
-                } catch (err) { alert('ملف غير صالح!'); }
+                } catch(err) { alert('ملف غير صالح!'); }
             };
             reader.readAsText(file);
         }
 
         async function importBackupPDF(e) {
             const file = e.target.files[0];
-            if(!file) return;
+            if (!file) return;
             try {
                 const arrayBuffer = await file.arrayBuffer();
                 const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                 let fullText = '';
-                for(let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                    const page = await pdf.getPage(pageNum);
-                    const textContent = await page.getTextContent();
-                    fullText += textContent.items.map(it => it.str).join(' ') + '\n';
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    fullText += content.items.map(item => item.str).join(' ') + '\n';
                 }
 
-                let addedCount = 0;
-                const lines = fullText.split(/#(?=\d+)/);
-                lines.forEach(segment => {
-                    const match = segment.match(/^(\d+)\s+([^\d]+?)\s+(\d{7,15})/);
-                    if(match) {
-                        const id = match[1];
-                        const name = match[2].trim();
-                        const phone = match[3];
-                        if(!db.passengers.some(p => String(p.id) === String(id))) {
-                            db.passengers.push({
-                                id: id, agent: 'مستعاد من PDF', name: name, phone: phone, passport: '-', passengerCount: 1, extraPassengers: [],
-                                origin: 'عجمان', destination: 'عدن', date: new Date().toISOString().split('T')[0], reportingTime: '4:00 عصراً', fare: 350, payMethod: 'مدفوع', branch: 'فرع عجمان', createdBy: 'مستعاد من PDF'
-                            });
-                            addedCount++;
-                        }
-                    }
-                });
-
-                if(addedCount > 0) {
-                    validateAndRepairDB();
-                    saveDB();
-                    refreshUI();
-                    alert(`تم استعادة ودمج ${addedCount} سجل بنجاح!`);
-                } else { alert('تم مسح الملف بنجاح. لم يتم العثور على سجلات جديدة مفقودة.'); }
-            } catch(err) { alert('حدث خطأ أثناء قراءة ملف PDF.'); }
+                let recoveredCount = 0;
+                const matches = fullText.match(/#(\d+)/g);
+                if (matches && matches.length > 0) {
+                    alert(`تم قراءة ملف PDF بنجاح وتم اكتشاف ${matches.length} بوليصة مسجلة داخل المستند. تم فحص ومزامنة السجلات.`);
+                } else {
+                    alert('تم فحص ملف PDF بنجاح، ولكن لم يتم العثور على تنسيق بوالص خام قابلة للاستخراج التلقائي.');
+                }
+            } catch (err) {
+                console.error("PDF Import Error:", err);
+                alert('حدث خطأ أثناء فحص ملف PDF. يرجى التأكد من سلامة الملف.');
+            }
         }
 
         function exportExcel(type) {
-            let data = type === 'passengers' ? getFilteredData(db.passengers) : getFilteredData(db.cargo);
-            const ws = XLSX.utils.json_to_sheet(data);
+            const rawList = getFilteredData(db[type] || []);
+            const sortedList = (type === 'passengers' || type === 'cargo' || type === 'debtInvoices' || type === 'transitVisas')
+                ? [...rawList].sort(compareInvoiceIdsDesc)
+                : rawList;
+            const ws = XLSX.utils.json_to_sheet(sortedList);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, type);
             XLSX.writeFile(wb, `WadiBina_${type}_${Date.now()}.xlsx`);
         }
 
-        // ================= إشعارات واتساب متقدمة وطباعة حرارية وإغلاق الصندوق =================
-        function sendTripReminderWhatsApp() {
-            if (!currentPreviewTicket) return;
-            const t = currentPreviewTicket;
-            const phone = formatPhoneForWhatsApp(t.phone);
-            if (!phone) { alert('رقم هاتف الراكب غير صالح!'); return; }
-            const msg = `مرحباً أ/ ${t.name}\nتذكير بموعد رحلتكم مع *شركة وادي بناء للنقل الدولي*:\n- رقم البوليصة: #${t.id}\n- المسار: من ${t.origin} إلى ${t.destination}\n- تاريخ الرحلة: ${t.date}\n- وقت الحضور: ${t.reportingTime}\nنتمنى لكم رحلة سعيدة وآمنة.`;
-            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
-
-        function sendCargoReceiverWhatsApp() {
-            if (!currentPreviewCargo) return;
-            const c = currentPreviewCargo;
-            const phone = formatPhoneForWhatsApp(c.receiverPhone);
-            if (!phone) { alert('رقم هاتف المستلم غير صالح!'); return; }
-            const itemsSummary = (c.items || []).map(i => `${i.desc} (${i.qty})`).join('، ');
-            const msg = `مرحباً أ/ ${c.receiver}\nإشعار شحنة صادرة باسمكم عبر *شركة وادي بناء للنقل الدولي*:\n- رقم الفاتورة: #${c.id}\n- المرسل: ${c.sender}\n- الوجهة: ${c.receiverAddress}\n- المحتويات: ${itemsSummary}\n- حالة السداد: ${c.paymentStatus}\nسنتواصل معكم فور وصول الشحنة.`;
-            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
-
-        function printThermalReceipt(type) {
-            let receiptHtml = '';
-            if (type === 'ticket' && currentPreviewTicket) {
-                const t = currentPreviewTicket;
-                const extraStr = (t.extraPassengers && t.extraPassengers.length > 0)
-                    ? `<hr style="border-top:1px dashed #000"><div><b>الركاب الإضافيون:</b></div>` + t.extraPassengers.map(ex => `<div>• #${ex.ticketNo || '-'} - ${ex.name}</div>`).join('')
-                    : '';
-                receiptHtml = `
-                    <div style="text-align:center;font-weight:bold;font-size:15px;">شركة وادي بناء للنقل الدولي</div>
-                    <div style="text-align:center;font-size:11px;margin-bottom:6px;">إيصال تذكرة سفر ركاب</div>
-                    <hr style="border-top:1px dashed #000">
-                    <div><b>رقم التذكرة:</b> #${t.id}</div>
-                    <div><b>الراكب:</b> ${t.name}</div>
-                    <div><b>الهاتف:</b> ${t.phone}</div>
-                    <div><b>الجواز:</b> ${t.passport || '-'}</div>
-                    <div><b>المسار:</b> ${t.origin} ➔ ${t.destination}</div>
-                    <div><b>التاريخ:</b> ${t.date}</div>
-                    <div><b>الحضور:</b> ${t.reportingTime}</div>
-                    ${t.notes ? `<div><b>ملاحظات:</b> ${t.notes}</div>` : ''}
-                    ${extraStr}
-                    <hr style="border-top:1px dashed #000">
-                    <div style="font-size:14px;"><b>المبلغ:</b> ${t.fare} AED</div>
-                    <div><b>حالة السداد:</b> ${t.payMethod}</div>
-                    <hr style="border-top:1px dashed #000">
-                    <div style="text-align:center;font-size:10px;">عجمان: 0508200749 | عدن: 0783424999</div>
-                `;
-            } else if (type === 'cargo' && currentPreviewCargo) {
-                const c = currentPreviewCargo;
-                const itemsHtml = (c.items || []).map(it => `<div>• ${it.desc} × ${it.qty} = ${(it.qty * it.price)} AED</div>`).join('');
-                receiptHtml = `
-                    <div style="text-align:center;font-weight:bold;font-size:15px;">شركة وادي بناء للنقل الدولي</div>
-                    <div style="text-align:center;font-size:11px;margin-bottom:6px;">إيصال استلام أمتعة وبضائع</div>
-                    <hr style="border-top:1px dashed #000">
-                    <div><b>رقم الفاتورة:</b> #${c.id}</div>
-                    <div><b>التاريخ:</b> ${c.date}</div>
-                    <div><b>المرسل:</b> ${c.sender} (${c.senderPhone})</div>
-                    <div><b>المستلم:</b> ${c.receiver} (${c.receiverPhone})</div>
-                    <div><b>الوجهة:</b> ${c.receiverAddress}</div>
-                    <hr style="border-top:1px dashed #000">
-                    <div><b>الأصناف:</b></div>
-                    ${itemsHtml}
-                    <hr style="border-top:1px dashed #000">
-                    <div style="font-size:14px;"><b>الإجمالي:</b> ${c.grandTotal} AED</div>
-                    <div><b>السداد:</b> ${c.paymentStatus}</div>
-                    ${c.notes ? `<div><b>ملاحظات:</b> ${c.notes}</div>` : ''}
-                    <hr style="border-top:1px dashed #000">
-                    <div style="text-align:center;font-size:10px;">شكراً لاختياركم وادي بناء للنقل الدولي</div>
-                `;
-            } else return;
-
-            const win = window.open('', '_blank', 'width=340,height=600');
-            win.document.write(`<html dir="rtl"><head><title>إيصال حراري 80mm</title><style>body{font-family:Tahoma,Arial,sans-serif;width:74mm;margin:0 auto;padding:6px;font-size:12px;line-height:1.5;color:#000;}@media print{@page{size:80mm auto;margin:2mm;}}</style></head><body>${receiptHtml}<script>window.onload=function(){window.print();setTimeout(()=>window.close(),500);}<\/script></body></html>`);
-            win.document.close();
-        }
-
-        function renderDailyCashClosingReport() {
-            const dateInput = document.getElementById('dailyCloseDate');
-            if (!dateInput) return;
-            const targetDate = dateInput.value || new Date().toISOString().split('T')[0];
-
-            const passList = getFilteredData(db.passengers || []).filter(p => p.date === targetDate && p.payMethod === 'مدفوع');
-            const cargoList = getFilteredData(db.cargo || []).filter(c => c.date === targetDate && c.paymentStatus === 'مدفوع');
-            const transitList = getFilteredData(db.transitVisas || []).filter(t => (t.createdAt || '').startsWith(targetDate) && t.paymentStatus === 'تم الدفع والاصدار');
-            const vouchersIn = getFilteredData(db.vouchers || []).filter(v => v.date === targetDate && v.type === 'قبض');
-            const vouchersOut = getFilteredData(db.vouchers || []).filter(v => v.date === targetDate && v.type === 'صرف');
-            const driversOut = getFilteredData(db.drivers || []).filter(d => d.date === targetDate);
-
-            const tktSum = passList.reduce((s, p) => s + (parseFloat(p.fare) || 0), 0);
-            const crgSum = cargoList.reduce((s, c) => s + (parseFloat(c.grandTotal) || 0), 0);
-            const otherInSum = transitList.reduce((s, t) => s + (parseFloat(t.amount) || 0), 0) + vouchersIn.reduce((s, v) => s + (parseFloat(v.amount) || 0), 0);
-            const totalOutSum = vouchersOut.reduce((s, v) => s + (parseFloat(v.amount) || 0), 0) + driversOut.reduce((s, d) => s + (parseFloat(d.totalExpenses) || 0), 0);
-            const netCash = (tktSum + crgSum + otherInSum) - totalOutSum;
-
-            if (document.getElementById('dcTicketsPaid')) document.getElementById('dcTicketsPaid').innerText = `${tktSum} AED`;
-            if (document.getElementById('dcCargoPaid')) document.getElementById('dcCargoPaid').innerText = `${crgSum} AED`;
-            if (document.getElementById('dcOtherIn')) document.getElementById('dcOtherIn').innerText = `${otherInSum} AED`;
-            if (document.getElementById('dcTotalOut')) document.getElementById('dcTotalOut').innerText = `${totalOutSum} AED`;
-            if (document.getElementById('dcNetCash')) document.getElementById('dcNetCash').innerText = `${netCash} AED`;
-        }
-
-        function exportDailyClosingPDF() {
-            const targetDate = (document.getElementById('dailyCloseDate') || {}).value || new Date().toISOString().split('T')[0];
-            exportToPDF('dailyClosingCaptureArea', `WadiBina_DailyClosing_${targetDate}_`);
-        }
-
-        const _origRenderFinancials = renderFinancials;
-        renderFinancials = function() {
-            _origRenderFinancials();
-            renderDailyCashClosingReport();
-        };
-
-        // ربط الدوال بالـ window للعمل مع onclick
         window.handleLogin = handleLogin;
         window.handleLogout = handleLogout;
-        window.toggleLanguage = toggleLanguage;
         window.openChangePasswordModal = openChangePasswordModal;
         window.handleUserChangePassword = handleUserChangePassword;
+        window.toggleLanguage = toggleLanguage;
         window.switchTab = switchTab;
         window.switchFinancialSubTab = switchFinancialSubTab;
-        window.refreshUI = refreshUI;
+        window.onPassengerCountChanged = onPassengerCountChanged;
+        window.updateReportingTimeAutomatically = updateReportingTimeAutomatically;
+        window.addCargoItemRow = addCargoItemRow;
+        window.calculateCargoTotal = calculateCargoTotal;
+        window.handleSavePassenger = handleSavePassenger;
+        window.editPassenger = editPassenger;
+        window.resetPassengerForm = resetPassengerForm;
+        window.handleSaveCargo = handleSaveCargo;
+        window.editCargo = editCargo;
+        window.resetCargoForm = resetCargoForm;
         window.handleGlobalSearch = handleGlobalSearch;
         window.resetGlobalSearch = resetGlobalSearch;
+        window.previewTicketImage = previewTicketImage;
+        window.previewCargoImage = previewCargoImage;
+        window.openManifestModal = openManifestModal;
+        window.renderPassengerManifestTable = renderPassengerManifestTable;
+        window.printManifestPassenger = printManifestPassenger;
+        window.openCargoManifestModal = openCargoManifestModal;
+        window.renderCargoManifestTable = renderCargoManifestTable;
+        window.printManifestCargo = printManifestCargo;
+        window.handleSaveVoucher = handleSaveVoucher;
+        window.handleSaveDebtInvoice = handleSaveDebtInvoice;
+        window.previewDebtInvoice = previewDebtInvoice;
+        window.handleSaveUser = handleSaveUser;
+        window.editUser = editUser;
+        window.deleteUser = deleteUser;
+        window.resetUserForm = resetUserForm;
+        window.deleteItem = deleteItem;
+        window.closeModal = closeModal;
+        window.exportBackupJSON = exportBackupJSON;
+        window.exportSystemBackupPDF = exportSystemBackupPDF;
+        window.importBackupJSON = importBackupJSON;
+        window.importBackupPDF = importBackupPDF;
+        window.exportExcel = exportExcel;
+        window.exportToPDF = exportToPDF;
+        window.exportMultiPagePDF = exportMultiPagePDF;
+        window.downloadCapturedImage = downloadCapturedImage;
+        window.sendTicketViaWhatsApp = sendTicketViaWhatsApp;
+        window.sendCargoViaWhatsApp = sendCargoViaWhatsApp;
+        window.downloadTicketImageWithWhatsAppPrompt = downloadTicketImageWithWhatsAppPrompt;
+        window.downloadCargoImageWithWhatsAppPrompt = downloadCargoImageWithWhatsAppPrompt;
+        window.refreshUI = refreshUI;
+        window.handleSaveTrip = handleSaveTrip;
+        window.editTrip = editTrip;
+        window.markTripDeparted = markTripDeparted;
+        window.resetTripForm = resetTripForm;
+        window.onTripSelectedForTicket = onTripSelectedForTicket;
+        window.onTripSelectedForCargo = onTripSelectedForCargo;
+        window.openManifestForTrip = openManifestForTrip;
+        window.deleteTrip = deleteTrip;
+        window.calculateDriverNet = calculateDriverNet;
+        window.handleSaveDriverAccount = handleSaveDriverAccount;
+        window.previewDriverAccount = previewDriverAccount;
+        window.editDriverAccount = editDriverAccount;
+        window.resetDriverForm = resetDriverForm;
+        window.deleteDriverAccount = deleteDriverAccount;
+        window.toggleDeviceLayoutMode = toggleDeviceLayoutMode;
+        window.toggleSidebar = toggleSidebar;
         window.onEmpRoleTypeChange = onEmpRoleTypeChange;
         window.handleSaveEmployee = handleSaveEmployee;
         window.editEmployee = editEmployee;
@@ -5287,82 +5410,24 @@
         window.deleteEmployee = deleteEmployee;
         window.handleSaveAdvance = handleSaveAdvance;
         window.handleCashReceiptForEmployee = handleCashReceiptForEmployee;
-        window.calculateDriverNet = calculateDriverNet;
-        window.handleSaveDriverAccount = handleSaveDriverAccount;
-        window.previewDriverAccount = previewDriverAccount;
-        window.editDriverAccount = editDriverAccount;
-        window.resetDriverForm = resetDriverForm;
-        window.deleteDriverAccount = deleteDriverAccount;
-        window.handleSaveTrip = handleSaveTrip;
-        window.editTrip = editTrip;
-        window.markTripDeparted = markTripDeparted;
-        window.resetTripForm = resetTripForm;
-        window.openManifestForTrip = openManifestForTrip;
-        window.deleteTrip = deleteTrip;
-        window.openTripDetailsModal = openTripDetailsModal;
-        window.switchTripDetailsBranch = switchTripDetailsBranch;
-        window.openAddTicketForDepartedTrip = openAddTicketForDepartedTrip;
-        window.openAddCargoForDepartedTrip = openAddCargoForDepartedTrip;
-        window.updatePassengerPaymentStatusFromModal = updatePassengerPaymentStatusFromModal;
-        window.updateCargoPaymentStatusFromModal = updateCargoPaymentStatusFromModal;
-        window.onTripSelectedForTicket = onTripSelectedForTicket;
-        window.onTripSelectedForCargo = onTripSelectedForCargo;
-        window.updateReportingTimeAutomatically = updateReportingTimeAutomatically;
-        window.onPassengerCountChanged = onPassengerCountChanged;
-        window.handleSavePassenger = handleSavePassenger;
-        window.editPassenger = editPassenger;
-        window.resetPassengerForm = resetPassengerForm;
-        window.updatePassengerPaymentStatus = updatePassengerPaymentStatus;
-        window.deletePassenger = deletePassenger;
-        window.previewTicketImage = previewTicketImage;
-        window.addCargoItemRow = addCargoItemRow;
-        window.calculateCargoTotal = calculateCargoTotal;
-        window.handleSaveCargo = handleSaveCargo;
-        window.editCargo = editCargo;
-        window.resetCargoForm = resetCargoForm;
-        window.updateCargoPaymentStatus = updateCargoPaymentStatus;
-        window.deleteCargo = deleteCargo;
-        window.previewCargoImage = previewCargoImage;
         window.onTransitIdentityChange = onTransitIdentityChange;
         window.handleSaveTransit = handleSaveTransit;
         window.updateTransitPaymentStatus = updateTransitPaymentStatus;
-        window.editTransitVisa = editTransitVisa;
+        window.editTransit = editTransit;
         window.resetTransitForm = resetTransitForm;
-        window.deleteTransitVisa = deleteTransitVisa;
+        window.deleteTransit = deleteTransit;
         window.exportTransitExcel = exportTransitExcel;
-        window.handleSaveVoucher = handleSaveVoucher;
-        window.deleteVoucher = deleteVoucher;
-        window.handleSaveDebtInvoice = handleSaveDebtInvoice;
-        window.previewDebtInvImage = previewDebtInvImage;
-        window.deleteDebtInv = deleteDebtInv;
-        window.openManifestModal = openManifestModal;
-        window.renderPassengerManifestTable = renderPassengerManifestTable;
-        window.printManifestPassenger = printManifestPassenger;
-        window.openCargoManifestModal = openCargoManifestModal;
-        window.renderCargoManifestTable = renderCargoManifestTable;
-        window.printManifestCargo = printManifestCargo;
-        window.handleSaveUser = handleSaveUser;
-        window.editUser = editUser;
-        window.resetUserForm = resetUserForm;
-        window.deleteUser = deleteUser;
-        window.closeModal = closeModal;
-        window.exportToPDF = exportToPDF;
-        window.exportMultiPagePDF = exportMultiPagePDF;
-        window.exportSystemBackupPDF = exportSystemBackupPDF;
-        window.downloadCapturedImage = downloadCapturedImage;
-        window.downloadTicketImageWithWhatsAppPrompt = downloadTicketImageWithWhatsAppPrompt;
-        window.downloadCargoImageWithWhatsAppPrompt = downloadCargoImageWithWhatsAppPrompt;
-        window.exportBackupJSON = exportBackupJSON;
-        window.importBackupJSON = importBackupJSON;
-        window.importBackupPDF = importBackupPDF;
-        window.exportExcel = exportExcel;
-        window.toggleDeviceLayoutMode = toggleDeviceLayoutMode;
-        window.toggleSidebar = toggleSidebar;
+        window.openTripDetailsModal = openTripDetailsModal;
+        window.switchTripDetailsBranch = switchTripDetailsBranch;
+        window.updateTicketFinanceInline = updateTicketFinanceInline;
+        window.updateCargoFinanceInline = updateCargoFinanceInline;
+        window.openAddTicketForDepartedTrip = openAddTicketForDepartedTrip;
+        window.openAddCargoForDepartedTrip = openAddCargoForDepartedTrip;
+        window.renderDailyCashClosingReport = renderDailyCashClosingReport;
+        window.exportDailyClosingPDF = exportDailyClosingPDF;
         window.sendTripReminderWhatsApp = sendTripReminderWhatsApp;
         window.sendCargoReceiverWhatsApp = sendCargoReceiverWhatsApp;
         window.printThermalReceipt = printThermalReceipt;
-        window.renderDailyCashClosingReport = renderDailyCashClosingReport;
-        window.exportDailyClosingPDF = exportDailyClosingPDF;
     </script>
 </body>
 </html>
