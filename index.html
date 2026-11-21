@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title id="pageTitle">شركة وادي بناء للنقل الدولي | لوحة التحكم والنظام الموحد</title>
+    <title id="pageTitle">شركة وادي بناء للنقل الدولي | لوحة التحكم والنظام الموحد (سحابي فقط)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -2799,26 +2799,29 @@
             </main>
         </div> <!-- End of sidebar + main wrapper -->
 
-        <script src="app-compat.js"></script>
-
-        <!-- FIREBASE MODULAR SDK v13.2.0 & APP LOGIC -->
+        <!-- FIREBASE MODULAR SDK v13.2.0 & APP LOGIC (CLOUD-ONLY SYNC) -->
         <script type="module">
             import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
             import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-database.js";
 
             const { jsPDF } = window.jspdf;
 
-            const firebaseConfig = window.firebaseConfig;
+            // الإعدادات السحابية المباشرة لـ Firebase Realtime Database
+            const firebaseConfig = {
+                apiKey: "AIzaSyCX0AnjNnffeRCFGDugKeOI8k8adJC1aqs",
+                authDomain: "wadi-bana-b585b.firebaseapp.com",
+                databaseURL: "https://wadi-bana-b585b-default-rtdb.firebaseio.com",
+                projectId: "wadi-bana-b585b",
+                storageBucket: "wadi-bana-b585b.firebasestorage.app",
+                messagingSenderId: "57806694102",
+                appId: "1:57806694102:web:8b2f38f1b86c0240290b77",
+                measurementId: "G-DR3Y513XP9"
+            };
 
-            let useFirebase = true;
-            let rtdb = null;
-            try {
-                const app = initializeApp(firebaseConfig);
-                rtdb = getDatabase(app);
-            } catch (e) {
-                console.warn("Firebase init fallback:", e);
-                useFirebase = false;
-            }
+            const app = initializeApp(firebaseConfig);
+            const rtdb = getDatabase(app);
+            const cloudDataRef = ref(rtdb, 'systemUnifiedData');
+            const useFirebase = true;
 
             let currentUser = JSON.parse(localStorage.getItem('WADI_BINA_USER')) || null;
             let currentLang = localStorage.getItem('WADI_BINA_LANG') || 'ar';
@@ -5045,7 +5048,7 @@
                 document.getElementById('imgTktName').innerText = tkt.name;
                 document.getElementById('imgTktPhone').innerText = tkt.phone;
                 document.getElementById('imgTktPassport').innerText = tkt.passport;
-                document.getElementById('imgTktRoute').innerText = `${tkt.origin} ➔ ${tkt.destination}`;
+                document.getElementById('imgTktRoute').innerText = `${tkt.origin} âž" ${tkt.destination}`;
                 document.getElementById('imgTktDate').innerText = tkt.date;
                 document.getElementById('imgTktTime').innerText = tkt.reportingTime || '4:00 عصراً';
                 document.getElementById('imgTktFare').innerText = `${tkt.fare} AED`;
@@ -5116,7 +5119,7 @@
                     <td class="border border-slate-300 p-2 text-xs font-bold text-emerald-700">راكب رئيسي</td>
                     <td class="border border-slate-300 p-2">${p.phone}</td>
                     <td class="border border-slate-300 p-2 font-mono text-xs">${p.passport}</td>
-                    <td class="border border-slate-300 p-2">${p.origin} ➔ ${p.destination}</td>
+                    <td class="border border-slate-300 p-2">${p.origin} âž" ${p.destination}</td>
                     <td class="border border-slate-300 p-2 font-bold man-price-col">${p.fare} AED</td>
                     <td class="border border-slate-300 p-2 font-bold">${p.payMethod}</td>
                 `;
@@ -5132,7 +5135,7 @@
                             <td class="border border-slate-300 p-2 text-xs font-bold text-amber-800 bg-slate-50">مرافق (${i + 1})</td>
                             <td class="border border-slate-300 p-2 text-xs bg-slate-50">${ex.phone || p.phone} <span class="text-slate-500">(تابع لـ: ${p.name})</span></td>
                             <td class="border border-slate-300 p-2 font-mono text-xs bg-slate-50">${ex.passport}</td>
-                            <td class="border border-slate-300 p-2 bg-slate-50">${p.origin} ➔ ${p.destination}</td>
+                            <td class="border border-slate-300 p-2 bg-slate-50">${p.origin} âž" ${p.destination}</td>
                             <td class="border border-slate-300 p-2 text-xs text-slate-500 man-price-col bg-slate-50">مشمول بتذكرة #${p.id}</td>
                             <td class="border border-slate-300 p-2 font-bold bg-slate-50">${p.payMethod}</td>
                         `;
@@ -5916,7 +5919,7 @@ Status: Payment Received - Pending Approval`,
                     t.amount,
                     t.paymentStatus
                 ].join(','));
-                const csvContent = '﻿' + [headers.join(','), ...rows].join('\n');
+                const csvContent = '' + [headers.join(','), ...rows].join('\n');
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
@@ -6519,7 +6522,7 @@ Status: Payment Received - Pending Approval`,
                         <td>${p.phone}</td>
                         <td class="font-mono text-xs">${p.passport}</td>
                         <td class="text-xs text-amber-300">${extraText}</td>
-                        <td>${p.origin} ➔ ${p.destination}</td>
+                        <td>${p.origin} âž" ${p.destination}</td>
                         <td class="font-bold text-emerald-400">${p.fare} AED</td>
                         <td>${payCell}</td>
                         <td class="space-x-1 space-x-reverse">
@@ -6780,7 +6783,7 @@ Status: Payment Received - Pending Approval`,
                     <td><strong>${p.name}</strong> <span class="text-[10px] text-zinc-400">(${p.passengerCount})</span></td>
                     <td class="text-xs text-amber-300">${extraNames}</td>
                     <td>${p.phone}</td>
-                    <td>${p.origin} ➔ ${p.destination}</td>
+                    <td>${p.origin} âž" ${p.destination}</td>
                     <td><strong class="text-gold">${p.date}</strong></td>
                     <td><strong>${p.fare} AED</strong></td>
                     <td class="text-xs text-zinc-300 max-w-[160px] truncate" title="${p.notes || ''}">${p.notes || '-'}</td>
@@ -6902,7 +6905,7 @@ Status: Payment Received - Pending Approval`,
                     <td class="border border-slate-300 p-2 font-bold">#${p.id}</td>
                     <td class="border border-slate-300 p-2">${p.name}</td>
                     <td class="border border-slate-300 p-2">${p.phone}</td>
-                    <td class="border border-slate-300 p-2">${p.origin} ➔ ${p.destination}</td>
+                    <td class="border border-slate-300 p-2">${p.origin} âž" ${p.destination}</td>
                     <td class="border border-slate-300 p-2 font-bold">${p.fare} AED</td>
                     <td class="border border-slate-300 p-2">${p.payMethod}</td>
                 `;
@@ -7016,3 +7019,4 @@ Status: Payment Received - Pending Approval`,
 </body>
 
 </html>
+
