@@ -61,7 +61,6 @@ window.firebaseConfig = Object.assign({}, window.firebaseConfig || {}, firebaseC
             .replace(/'/g, '&#39;');
     }
 
-    // مزامنة سحابية مباشرة دون استخدام localStorage
     function syncCloudToLocalMemory(snapshotVal) {
         const db = getDB();
         const data = snapshotVal && typeof snapshotVal === 'object' ? snapshotVal : {};
@@ -120,7 +119,6 @@ window.firebaseConfig = Object.assign({}, window.firebaseConfig || {}, firebaseC
         });
     }
 
-    // استبدال دوال الحفظ السحابية لتكون سحابية فقط
     window.saveDB = function () {
         return pushFullStateToCloud();
     };
@@ -131,6 +129,13 @@ window.firebaseConfig = Object.assign({}, window.firebaseConfig || {}, firebaseC
 
     window.getCloudUsers = function () {
         return cloudUsersCache.length ? cloudUsersCache : DEFAULT_USERS.slice();
+    };
+
+    window.saveCloudUsers = function (usersArray) {
+        if (Array.isArray(usersArray) && usersArray.length > 0) {
+            cloudUsersCache = usersArray;
+        }
+        return pushFullStateToCloud();
     };
 
     function initRealtimeCloudListener() {
@@ -693,7 +698,6 @@ window.firebaseConfig = Object.assign({}, window.firebaseConfig || {}, firebaseC
         event.target.value = '';
     };
 
-    // إدارة المستخدمين عبر السحابة مباشرة
     window.renderUsersTable = function () {
         const tbody = document.querySelector('#usersTable tbody');
         if (!tbody) return;
@@ -737,8 +741,7 @@ window.firebaseConfig = Object.assign({}, window.firebaseConfig || {}, firebaseC
             users.push({ username, password, role, branch });
         }
 
-        cloudUsersCache = users;
-        window.saveDB().then(() => {
+        window.saveCloudUsers(users).then(() => {
             window.resetUserForm();
             window.renderUsersTable();
         });
@@ -765,8 +768,7 @@ window.firebaseConfig = Object.assign({}, window.firebaseConfig || {}, firebaseC
         }
         if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return;
         users.splice(idx, 1);
-        cloudUsersCache = users;
-        window.saveDB().then(() => {
+        window.saveCloudUsers(users).then(() => {
             window.renderUsersTable();
         });
     };
