@@ -1,7 +1,5 @@
 package com.wadibana.service;
 
-import com.wadibana.model.Passenger;
-
 public class PassengerService {
     public void bookTicket(Passenger passenger) {
         // Logic to book a ticket
