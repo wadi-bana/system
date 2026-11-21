@@ -41,7 +41,7 @@ BEGIN
         price VARCHAR(50),
         price_value DECIMAL(10,2),
         payment_method VARCHAR(50),
-        created_at DATETIME DEFAULT GET DATE()
+        created_at DATETIME DEFAULT GETDATE()
     );
 END;
 GO
