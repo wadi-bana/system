@@ -18,6 +18,17 @@
     measurementId: "G-DR3Y513XP9"
   };
 
+  // Initialize Firebase with the compatibility SDK when it is available.
+  if (window.firebase && typeof window.firebase.initializeApp === 'function') {
+    window.firebaseApp = window.firebase.apps.length
+      ? window.firebase.app()
+      : window.firebase.initializeApp(window.firebaseConfig);
+
+    if (typeof window.firebase.database === 'function') {
+      window.firebaseDatabase = window.firebase.database(window.firebaseApp);
+    }
+  }
+
   const pageStyle = () => document.getElementById('dynamicPrintPageStyle');
   let restoreTimer;
 
