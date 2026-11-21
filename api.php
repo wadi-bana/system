@@ -108,7 +108,7 @@ function sendResponse(array $payload, int $statusCode = 200): void
 /**
  * تهيئة المصفوفات القادمة من Firebase (تجنب القيم الفارغة أو المفاتيح المتقطعة)
  */
-function normalizeList($val): array
+function normalizeList(mixed $val): array
 {
     if (!is_array($val)) {
         return [];
