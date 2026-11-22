@@ -714,7 +714,7 @@ header('Content-Type: text/html; charset=utf-8');
     <div class="modal-overlay" id="loginOverlay">
         <div class="modal-card" style="max-width: 400px;">
             <div class="text-center mb-4">
-                <img src="logo_2.jpeg" alt="Logo" class="w-20 h-20 object-cover rounded-full mx-auto border-2 border-gold shadow-lg mb-2" onerror="this.src='https://via.placeholder.com/80?text=Logo'">
+                <img src="assets/images/wadi-bina-logo.jpeg" alt="Logo" class="w-20 h-20 object-cover rounded-full mx-auto border-2 border-gold shadow-lg mb-2" onerror="this.src='https://via.placeholder.com/80?text=Logo'">
                 <h2 id="lgTitle" class="text-xl font-black text-gold">تسجيل الدخول للنظام الموحد</h2>
                 <p id="lgSub" class="text-zinc-400 text-xs mt-1">أدخل بيانات الحساب المعتمدة للوصول للوحة التحكم</p>
             </div>
@@ -759,7 +759,7 @@ header('Content-Type: text/html; charset=utf-8');
             <div id="ticketCaptureArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl" style="direction: inherit; text-align: inherit;">
                 <div class="flex justify-between items-center border-b-2 border-slate-300 pb-3 mb-4">
                     <div class="flex items-center gap-3">
-                        <img src="logo_2.jpeg" alt="Logo" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
+                        <img src="assets/images/wadi-bina-logo.jpeg" alt="Logo" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
                         <div>
                             <h2 id="tktCoName" class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
                             <p id="tktCoSub" class="text-[11px] text-slate-500">بوليصة حجز تذكرة سفر ركاب</p>
@@ -837,7 +837,7 @@ header('Content-Type: text/html; charset=utf-8');
                             <h2 id="cargoCoName" class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
                             <p id="cargoCoSub" class="text-[11px] text-slate-500">فاتورة استلام أمتعة وبضائع</p>
                         </div>
-                        <img src="logo_2.jpeg" alt="Logo" class="w-12 h-12 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/50?text=Logo'">
+                        <img src="assets/images/wadi-bina-logo.jpeg" alt="Logo" class="w-12 h-12 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/50?text=Logo'">
                     </div>
                 </div>
 
@@ -916,7 +916,7 @@ header('Content-Type: text/html; charset=utf-8');
             <div id="debtInvCaptureArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl" style="direction: inherit; text-align: inherit;">
                 <div class="flex justify-between items-center border-b-2 border-slate-300 pb-3 mb-4">
                     <div class="flex items-center gap-3">
-                        <img src="logo_2.jpeg" alt="Logo" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
+                        <img src="assets/images/wadi-bina-logo.jpeg" alt="Logo" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
                         <div>
                             <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
                             <p class="text-[11px] text-slate-500 font-bold">فاتورة حسابات وآجال مالية</p>
@@ -979,7 +979,7 @@ header('Content-Type: text/html; charset=utf-8');
             <div id="driverAccountPrintArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl" style="direction: rtl; text-align: right;">
                 <div class="flex justify-between items-center border-b-2 border-slate-800 pb-3 mb-4">
                     <div class="flex items-center gap-3">
-                        <img src="logo_2.jpeg" alt="Logo" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
+                        <img src="assets/images/wadi-bina-logo.jpeg" alt="Logo" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
                         <div>
                             <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
                             <p class="text-[11px] text-slate-600 font-bold">جدول حساب الرحلة (الروحة والرجعة) وتصفيات السائقين</p>
@@ -1063,7 +1063,7 @@ header('Content-Type: text/html; charset=utf-8');
             <div id="manifestPrintArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl" style="direction: inherit; text-align: inherit;">
                 <div class="flex justify-between items-center border-b-2 border-slate-800 pb-3 mb-4">
                     <div class="flex items-center gap-3">
-                        <img src="logo_2.jpeg" alt="Logo" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
+                        <img src="assets/images/wadi-bina-logo.jpeg" alt="Logo" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
                         <div>
                             <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
                             <p id="manifestTypeSubtitle" class="text-[11px] text-slate-600 font-bold">كشف ركاب الرحلة الرسمي (Passenger Manifest)</p>
@@ -1124,7 +1124,7 @@ header('Content-Type: text/html; charset=utf-8');
             <div id="cargoManifestPrintArea" class="bg-white text-slate-900 p-6 rounded-xl relative shadow-2xl" style="direction: inherit; text-align: inherit;">
                 <div class="flex justify-between items-center border-b-2 border-slate-800 pb-3 mb-4">
                     <div class="flex items-center gap-3">
-                        <img src="logo_2.jpeg" alt="Logo" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
+                        <img src="assets/images/wadi-bina-logo.jpeg" alt="Logo" class="w-14 h-14 object-cover rounded-full border border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
                         <div>
                             <h2 class="text-base font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
                             <p id="cargoManifestTypeSubtitle" class="text-[11px] text-slate-600 font-bold">كشف مانفيستو الشحن الرسمي (Cargo Manifest)</p>
@@ -1249,7 +1249,7 @@ header('Content-Type: text/html; charset=utf-8');
             <button onclick="toggleSidebar()" title="إظهار / إخفاء القائمة الجانبية" class="bg-zinc-800 text-gold border border-gold/40 w-10 h-10 rounded-xl flex items-center justify-center hover:bg-gold/20 transition text-base">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            <img src="logo_2.jpeg" alt="Logo" class="w-11 h-11 object-cover rounded-full border border-gold shadow" onerror="this.src='https://via.placeholder.com/44?text=Logo'">
+            <img src="assets/images/wadi-bina-logo.jpeg" alt="Logo" class="w-11 h-11 object-cover rounded-full border border-gold shadow" onerror="this.src='https://via.placeholder.com/44?text=Logo'">
             <div>
                 <h1 id="headTitle" class="text-base sm:text-lg font-black gold-gradient-text leading-tight">شركة وادي بناء للنقل الدولي</h1>
                 <p id="headSub" class="text-[11px] text-zinc-400">النظام الموحد الشامل (Firebase v13.2.0)</p>
@@ -1358,7 +1358,7 @@ header('Content-Type: text/html; charset=utf-8');
         <div id="systemReportPrintArea" class="hidden bg-white text-slate-900 p-8 rounded-xl shadow-2xl" style="direction: rtl; text-align: right; width: 210mm;">
             <div class="flex justify-between items-center border-b-2 border-amber-600 pb-4 mb-6">
                 <div class="flex items-center gap-3">
-                    <img src="logo_2.jpeg" alt="Logo" class="w-16 h-16 object-cover rounded-full border-2 border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
+                    <img src="assets/images/wadi-bina-logo.jpeg" alt="Logo" class="w-16 h-16 object-cover rounded-full border-2 border-amber-500 shadow" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
                     <div>
                         <h2 class="text-lg font-black text-slate-900 leading-tight">شركة وادي بناء للنقل الدولي</h2>
                         <p class="text-xs text-slate-600">تقرير النسخة الاحتياطية الشاملة للنظام الموحد</p>
