@@ -11,6 +11,11 @@ let rtdb = null;
 let auth = null;
 let firebaseInitError = null;
 try {
+    const requiredFirebaseKeys = ['apiKey', 'authDomain', 'databaseURL', 'projectId', 'appId'];
+    const missingFirebaseKeys = requiredFirebaseKeys.filter(key => !firebaseConfig?.[key]);
+    if (missingFirebaseKeys.length) {
+        throw new Error(`إعدادات Firebase ناقصة: ${missingFirebaseKeys.join(', ')}`);
+    }
     const app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     rtdb = getDatabase(app);
@@ -455,20 +460,36 @@ async function handleLogin(e) {
         showCloudError('تعذر تهيئة Firebase Authentication أو Realtime Database.');
         return;
     }
+    const loginButton = document.getElementById('lgBtn');
+    const loginUserInput = document.getElementById('loginUser');
+    const loginPassInput = document.getElementById('loginPass');
+    if (loginButton) {
+        loginButton.disabled = true;
+        loginButton.textContent = 'جاري تسجيل الدخول...';
+    }
     let email;
     try {
-        email = usernameToAuthEmail(document.getElementById('loginUser').value);
+        email = usernameToAuthEmail(loginUserInput?.value);
     } catch (error) {
         showCloudError(error.message);
+        if (loginButton) {
+            loginButton.disabled = false;
+            loginButton.textContent = 'دخول النظام';
+        }
         return;
     }
-    const password = document.getElementById('loginPass').value;
+    const password = loginPassInput?.value || '';
     try {
         const credential = await signInWithEmailAndPassword(auth, email, password);
         await activateAuthenticatedUser(credential.user);
-        document.getElementById('loginPass').value = '';
+        if (loginPassInput) loginPassInput.value = '';
     } catch (error) {
         showCloudError(getAuthErrorMessage(error));
+    } finally {
+        if (loginButton) {
+            loginButton.disabled = false;
+            loginButton.textContent = 'دخول النظام';
+        }
     }
 }
 
@@ -984,6 +1005,45 @@ function toggleSidebar() {
         overlay.classList.toggle('hidden', !sidebar.classList.contains('mobile-open'));
     }
 }
+
+const inlineHandlerNames = [
+    'add', 'addCargoItemRow', 'calculateDriverNet', 'clearAllTransitRecords',
+    'closeModal', 'copyTransitTableToClipboard', 'downloadCapturedImage',
+    'downloadCargoImageWithWhatsAppPrompt', 'downloadTicketImageWithWhatsAppPrompt',
+    'exportBackupJSON', 'exportDailyClosingPDF', 'exportExcel', 'exportMultiPagePDF',
+    'exportSystemBackupPDF', 'exportToPDF', 'exportTransitCSV', 'exportTransitExcel',
+    'getCargoFileName', 'getDebtFileName', 'getTicketFileName',
+    'handleCargoImagesSelect', 'handleGlobalSearch', 'handleLogin',
+    'handleLogout', 'handleSaveAdvance', 'handleSaveBus', 'handleSaveCargo',
+    'handleSaveDebtInvoice', 'handleSaveDriverAccount', 'handleSaveEmployee',
+    'handleSavePassenger', 'handleSaveTransit', 'handleSaveTrip', 'handleSaveUser',
+    'handleSaveVoucher', 'handleTransitPdfFiles', 'handleUserChangePassword',
+    'importBackupJSON', 'importBackupPDF', 'loadSampleTransitVisas',
+    'onBusColorSelectChange', 'onBusSelectedForTrip', 'onEmpRoleTypeChange',
+    'onPassengerCountChanged', 'onTransitIdentityChange', 'onTripSelectedForCargo',
+    'onTripSelectedForTicket', 'openAddCargoForDepartedTrip',
+    'openAddTicketForDepartedTrip', 'openCargoManifestModal',
+    'openChangePasswordModal', 'openManifestModal', 'printDocumentA5',
+    'printDocumentLandscape', 'printManifestCargo', 'printManifestPassenger',
+    'printThermalReceipt', 'printTransitTableOnly', 'refreshUI',
+    'renderCargoManifestTable', 'renderDailyCashClosingReport',
+    'renderPassengerManifestTable', 'renderTransitTable', 'resetBusForm',
+    'resetCargoForm', 'resetDriverForm', 'resetEmployeeForm', 'resetGlobalSearch',
+    'resetPassengerForm', 'resetTransitForm', 'resetTripForm', 'resetUserForm',
+    'sendCargoReceiverWhatsApp', 'sendTripReminderWhatsApp',
+    'switchFinancialSubTab', 'switchTab', 'switchTripDetailsBranch',
+    'toggleDeviceLayoutMode', 'toggleLanguage', 'toggleManualTransitForm',
+    'toggleSidebar', 'updateReportingTimeAutomatically'
+];
+
+inlineHandlerNames.forEach(name => {
+    try {
+        const handler = eval(name);
+        if (typeof handler === 'function') window[name] = handler;
+    } catch {
+        // The handler is not present in this build.
+    }
+});
 
 if (auth) {
     onAuthStateChanged(auth, handleAuthStateChange);
