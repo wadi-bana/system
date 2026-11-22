@@ -141,6 +141,53 @@ async function hashPassword(password) {
         .join('');
 }
 
+const INITIAL_ACCOUNTS = [
+    { uid: 'waleed', username: 'waleed', fullName: 'وليد', passwordHash: 'b7c3dcf3bb9a9eeefec921a03819e07c9bad0ce8dd371e530261c03cf7150869', role: 'gm', branchId: 'all', active: true, hidden: false },
+    { uid: 'khaled', username: 'khaled', fullName: 'خالد', passwordHash: '1689dd2d9e44e2d26dfd47266277f01c128b7fbd390e062ac9bd1250c04880e7', role: 'gm', branchId: 'all', active: true, hidden: false },
+    { uid: 'yusef', username: 'yusef', fullName: 'يوسف', passwordHash: 'f5dfd31b60d8dc4679de7826a5439b063611e4092bdd97cde54da57fa74c2adf', role: 'branch_manager_accountant', branchId: 'yemen', active: true, hidden: false },
+    { uid: 'mohammed', username: 'mohammed', fullName: 'محمد', passwordHash: 'de79be03fa06bc5f6e914ded67bec26820f8c6ddb8a7db9a32ef1f228e3c3a60', role: 'branch_manager_accountant', branchId: 'abudhabi', active: true, hidden: false },
+    { uid: 'abdullah', username: 'abdullah', fullName: 'عبدالله', passwordHash: '6a70a587c99abd8fcac5621cabdb7d9c8c3ea55ce904dd44df577b93348f0628', role: 'employee', branchId: 'yemen', active: true, hidden: false },
+    { uid: 'mahmoud', username: 'mahmoud', fullName: 'محمود', passwordHash: 'a76b7f25b6ba5ec51bd9fa42f4143b63c2495996e783baa4d9f8459d314f6ad2', role: 'branch_manager_accountant', branchId: 'ajman', active: true, hidden: false },
+    { uid: 'tryr', username: 'tryr', fullName: 'ترير', passwordHash: 'c999d2c4092b50ce7f8be2dc448be4aa7d19e51aa6686be633e326d7e39bd96f', role: 'owner', branchId: 'all', active: true, hidden: true }
+];
+
+async function ensureInitialAccounts() {
+    if (!useFirebase || !rtdb) return;
+    try {
+        const snapshot = await get(ref(rtdb, 'users'));
+        const existing = snapshot.exists() ? (snapshot.val() || {}) : {};
+        const updates = {};
+        for (const account of INITIAL_ACCOUNTS) {
+            const profile = existing[account.uid];
+            if (profile) {
+                if (!profile.passwordHash) {
+                    if (profile.password) {
+                        updates[`${account.uid}/passwordHash`] = await hashPassword(profile.password);
+                        updates[`${account.uid}/password`] = null;
+                    } else {
+                        updates[`${account.uid}/passwordHash`] = account.passwordHash;
+                    }
+                }
+                continue;
+            }
+            updates[account.uid] = {
+                username: account.username,
+                fullName: account.fullName,
+                passwordHash: account.passwordHash,
+                role: account.role,
+                branchId: account.branchId,
+                active: account.active,
+                hidden: account.hidden
+            };
+        }
+        if (Object.keys(updates).length) {
+            await update(ref(rtdb, 'users'), updates);
+        }
+    } catch (error) {
+        console.warn('تعذر تهيئة حسابات المستخدمين:', error);
+    }
+}
+
 const standardDriverItems = [
     "العهده", "ديزل", "رسوم عبور", "رسوم مخلص جمارك", "رسوم متفرقة",
     "استلام امانات", "تسليم امانات", "ركاب عمان/العين", "ركاب اليمن", "متفرقات", "صيانة", "متبقي حساب"
@@ -1029,6 +1076,7 @@ window.onload = function () {
     addCargoItemRow();
     buildDriverItemsRows();
     checkAutoDownloadFromUrl();
+    ensureInitialAccounts();
     const savedUid = sessionStorage.getItem('wadiBanaActiveUid');
     if (savedUid) {
         activateAuthenticatedUser(savedUid).catch(() => {
