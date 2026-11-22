@@ -23,7 +23,32 @@
   }
   ```
 
-  العناوين المرتبطة بأسماء المستخدمين هي `tryr@wadibana.local`, `waleed@wadibana.local`, `khaled.waleed@wadibana.local`, `yusef@wadibana.local`, `mohammed@wadibana.local`, `mohamod@wadibana.local`, و`abod@wadibana.local`. أدخل كلمات المرور التي اخترتها في Firebase Authentication فقط؛ Firebase يتطلب كلمة مرور من 6 أحرف على الأقل، لذا كلمة المرور ذات 4 أرقام في القائمة تحتاج إلى تغيير. الأدوار المدعومة: `owner`, `gm`, `chief_accountant`, `branch_manager_accountant`, `branch_manager`, `branch_accountant`, `employee`. قيم الفروع هي `all`, `ajman`, `abudhabi`, `yemen`, `muscat`, `oman`, `ain`, `mukalla`, `aden`. أنشئ حساب المالك وملفه أولاً من Firebase Console، ثم سجّل دخوله.
+  أنشئ حسابات Email/Password في Firebase Authentication بالعناوين الداخلية التالية، واستخدم كلمات مرور جديدة لا تقل عن 6 أحرف. كلمات المرور التي أُرسلت في المحادثة لا تُخزّن في ملفات المشروع أو قاعدة البيانات، ويُنصح بتغييرها لأنها كُشفت هنا.
+
+  | اسم المستخدم | الاسم المعروض | البريد الداخلي في Firebase | الدور | الفرع |
+  | --- | --- | --- | --- | --- |
+  | `tryr` | ترير | `tryr@wadibana.local` | `owner` | `all` |
+  | `waleed` | وليد السيد | `waleed@wadibana.local` | `gm` | `all` |
+  | `khaled waleed` | خالد وليد السيد | `khaled.waleed@wadibana.local` | `gm` | `all` |
+  | `yusef` | يوسف مختار | `yusef@wadibana.local` | `branch_manager_accountant` | `yemen` |
+  | `mohammed` | محمد ياسر | `mohammed@wadibana.local` | `branch_manager_accountant` | `abudhabi` |
+  | `mohamod` | محمود عبد الكريم | `mohamod@wadibana.local` | `branch_manager_accountant` | `ajman` |
+  | `abod` | عبدالله | `abod@wadibana.local` | `employee` | `yemen` |
+
+  بعد إنشاء كل حساب، انسخ UID الخاص به وأنشئ ملف الصلاحيات تحت `users/{UID}` (وليس تحت اسم المستخدم). مثال لحساب `tryr`:
+
+  ```json
+  {
+    "username": "tryr",
+    "fullName": "ترير",
+    "role": "owner",
+    "branchId": "all",
+    "active": true,
+    "hidden": true
+  }
+  ```
+
+  كرر الملف لبقية الحسابات مع بيانات الجدول. يجب إنشاء حساب المالك وملفه أولاً. الأدوار المدعومة: `owner`, `gm`, `chief_accountant`, `branch_manager_accountant`, `branch_manager`, `branch_accountant`, `employee`. قيم الفروع المدعومة: `all`, `ajman`, `abudhabi`, `yemen`, `muscat`, `oman`, `ain`, `mukalla`, `aden`.
 - قواعد بداية متوافقة مع مسارات التطبيق موجودة في `firebase.database.rules.json`. راجعها ثم انسخها إلى Firebase Console → Realtime Database → Rules وانشرها. بعد ترحيل الحسابات إلى Authentication و`users/{uid}`، احذف بيانات `systemUsers` القديمة من محرر Firebase Console لأنها قد تحتوي كلمات مرور سابقة.
 - مخطط `systemUnifiedData` الحالي موحد على كل الفروع؛ لذلك القواعد تسمح للمستخدم النشط ذي الدور المسجل بقراءة وكتابة هذا المسار كاملاً، ولا توفر عزل فروع على مستوى الخادم. صلاحيات الفرع في الواجهة ليست حاجزاً أمنياً. يلزم تقسيم البيانات إلى مسارات مستقلة حسب الفرع قبل فرض عزل فرعي موثوق.
 
