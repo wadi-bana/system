@@ -86,47 +86,68 @@ const FIREBASE_BRANCH_LABELS = {
     mukalla: 'فرع اليمن',
     aden: 'فرع اليمن'
 };
+const BRANCH_FIREBASE_VALUES = {
+    'جميع الفروع': 'all',
+    'فرع عجمان': 'ajman',
+    'فرع ابوظبي': 'abudhabi',
+    'فرع اليمن': 'yemen',
+    'فرع عمان': 'muscat'
+};
 const ROLE_FIREBASE_VALUES = Object.fromEntries(
     Object.entries(FIREBASE_ROLE_LABELS).map(([key, value]) => [value, key])
 );
 ROLE_FIREBASE_VALUES['محاسب'] = 'chief_accountant';
-const BRANCH_FIREBASE_VALUES = Object.fromEntries(
-    Object.entries(FIREBASE_BRANCH_LABELS).map(([key, value]) => [value, key])
-);
 
 function normalizeUserProfile(profile, uid) {
     const role = profile.role || 'employee';
     return {
         ...profile,
         uid,
-        username: profile.username || profile.fullName || auth?.currentUser?.email || uid,
-        fullName: profile.fullName || profile.username || '',
+        username: profile.username || profile.fullName || profile.name || auth?.currentUser?.email || uid,
+        fullName: profile.fullName || profile.name || profile.username || '',
         role: FIREBASE_ROLE_LABELS[role] || role,
-        branch: profile.branch || FIREBASE_BRANCH_LABELS[profile.branchId] || profile.branchId || 'فرع عجمان',
+        branch: FIREBASE_BRANCH_LABELS[profile.branchId || profile.branch]
+            || profile.branch
+            || profile.branchId
+            || 'فرع عجمان',
         active: profile.active === true,
         hidden: profile.hidden === true
     };
 }
 
 function serializeUserProfile(profile) {
+    const branchCode = BRANCH_FIREBASE_VALUES[profile.branch]
+        || (FIREBASE_BRANCH_LABELS[profile.branchId] ? profile.branchId : null)
+        || 'ajman';
     return {
         fullName: String(profile.fullName || profile.username || '').trim(),
         username: String(profile.username || '').trim(),
         role: ROLE_FIREBASE_VALUES[profile.role] || profile.role,
-        branchId: BRANCH_FIREBASE_VALUES[profile.branch] || profile.branchId || 'ajman',
+        branchId: branchCode,
         active: profile.active !== false,
         hidden: profile.hidden === true
     };
 }
 
+function usernameToAuthEmail(username) {
+    const normalized = String(username || '').trim().toLowerCase();
+    if (!normalized || normalized.includes('@')) {
+        throw new Error('أدخل اسم المستخدم فقط، دون بريد إلكتروني.');
+    }
+    return `${normalized.replace(/\s+/g, '.')}@wadibana.local`;
+}
+
 function getAuthErrorMessage(error) {
     const messages = {
-        'auth/invalid-credential': 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
-        'auth/user-not-found': 'لا يوجد حساب Firebase لهذا البريد الإلكتروني.',
-        'auth/wrong-password': 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
+        'auth/invalid-credential': 'اسم المستخدم أو كلمة المرور غير صحيحة.',
+        'auth/user-not-found': 'لا يوجد حساب Firebase مرتبط باسم المستخدم هذا.',
+        'auth/wrong-password': 'اسم المستخدم أو كلمة المرور غير صحيحة.',
         'auth/too-many-requests': 'تم إيقاف محاولات الدخول مؤقتاً. حاول لاحقاً.',
         'auth/network-request-failed': 'تعذر الاتصال بخدمة المصادقة. تحقق من الإنترنت.',
-        'auth/email-already-in-use': 'هذا البريد الإلكتروني مرتبط بحساب موجود.'
+        'auth/email-already-in-use': 'اسم المستخدم مرتبط بحساب Firebase موجود.',
+        'auth/weak-password': 'كلمة المرور يجب ألا تقل عن 6 أحرف أو أرقام.',
+        'auth/api-key-not-found.-please-pass-a-valid-api-key.': 'مفتاح Firebase API غير موجود أو غير صالح. حدّث إعدادات تطبيق الويب في Firebase Console.',
+        'auth/api-key-not-valid.-please-pass-a-valid-api-key.': 'مفتاح Firebase API غير صالح. حدّث إعدادات تطبيق الويب في Firebase Console.'
     };
     return messages[error?.code] || `تعذر تسجيل الدخول إلى Firebase: ${error?.message || 'خطأ غير معروف'}`;
 }
@@ -183,7 +204,7 @@ const translations = {
         pageTitle: 'شركة وادي بناء للنقل الدولي | لوحة التحكم والنظام الموحد',
         lgTitle: 'تسجيل الدخول للنظام الموحد',
         lgSub: 'أدخل بيانات الحساب المعتمدة للوصول للوحة التحكم',
-        lgUserLbl: 'البريد الإلكتروني', lgPassLbl: 'كلمة المرور', lgBtn: 'دخول النظام',
+        lgUserLbl: 'اسم المستخدم', lgPassLbl: 'كلمة المرور', lgBtn: 'دخول النظام',
         headTitle: 'شركة وادي بناء للنقل الدولي', headSub: 'النظام الموحد الشامل (Firebase v13.2.0)',
         btnBackup: 'نسخة JSON', btnBackupPDF: 'نسخة احتياطية PDF', btnRestore: 'استرجاع JSON', btnRestorePDF: 'استعادة من PDF', btnLogout: 'خروج',
         tDashboard: 'لوحة التحكم', tPassengers: 'التذاكر والركاب', tCargo: 'فواتير الشحن', tFin: 'الإدارة المالية',
@@ -196,7 +217,7 @@ const translations = {
         pageTitle: 'Wadi Bina Overland Transport | Unified System & Dashboard',
         lgTitle: 'Unified System Login',
         lgSub: 'Enter approved credentials to access the control panel',
-        lgUserLbl: 'Email address', lgPassLbl: 'Password', lgBtn: 'Login',
+        lgUserLbl: 'Username', lgPassLbl: 'Password', lgBtn: 'Login',
         headTitle: 'Wadi Bina Overland Transport', headSub: 'Comprehensive Unified System (Firebase v13.2.0)',
         btnBackup: 'JSON Backup', btnBackupPDF: 'PDF Backup', btnRestore: 'Restore JSON', btnRestorePDF: 'Restore PDF', btnLogout: 'Logout',
         tDashboard: 'Dashboard', tPassengers: 'Tickets & Passengers', tCargo: 'Cargo Invoices', tFin: 'Financial Management',
@@ -434,7 +455,13 @@ async function handleLogin(e) {
         showCloudError('تعذر تهيئة Firebase Authentication أو Realtime Database.');
         return;
     }
-    const email = document.getElementById('loginUser').value.trim();
+    let email;
+    try {
+        email = usernameToAuthEmail(document.getElementById('loginUser').value);
+    } catch (error) {
+        showCloudError(error.message);
+        return;
+    }
     const password = document.getElementById('loginPass').value;
     try {
         const credential = await signInWithEmailAndPassword(auth, email, password);
