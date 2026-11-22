@@ -62,9 +62,9 @@
             }
 
             const DEFAULT_USERS = [
-                { username: 'محمود', password: '102030', role: 'مدير عام', branch: 'فرع عجمان' },
-                { username: 'وليد السيد', password: '708090', role: 'مدير عام', branch: 'فرع عجمان' },
-                { username: 'يوسف', password: '405060', role: 'موظف', branch: 'فرع اليمن' }
+                { username: 'محمود', password: '102030', role: 'مدير عام', branch: 'جميع الفروع', fullName: 'محمود عبد الكريم', active: true, hidden: false },
+                { username: 'وليد السيد', password: '708090', role: 'مدير عام', branch: 'جميع الفروع', fullName: 'وليد السيد', active: true, hidden: false },
+                { username: 'يوسف', password: '405060', role: 'مدير فرع ومحاسب', branch: 'فرع اليمن', fullName: 'يوسف مختار', active: true, hidden: false }
             ];
 
             const standardDriverItems = [
@@ -150,12 +150,14 @@
 
             function isMahmoudOrGeneralManager() {
                 if (!currentUser) return false;
-                return isMahmoud() || currentUser.role === 'مدير عام';
+                return isMahmoud() || ['مالك', 'مدير عام'].includes(currentUser.role);
             }
 
             function canModifyFinancialsOrAccounts() {
                 if (!currentUser) return false;
-                return isMahmoudOrGeneralManager() || currentUser.role === 'محاسب';
+                return isMahmoudOrGeneralManager() || [
+                    'محاسب', 'محاسب رئيسي', 'محاسب فرع', 'مدير فرع ومحاسب'
+                ].includes(currentUser.role);
             }
 
             function isUserAtTripDestinationBranch(trip) {
@@ -310,6 +312,10 @@
                 const pInput = document.getElementById('loginPass').value.trim();
                 const found = cloudUsers.find(u => u.username === uInput && u.password === pInput);
                 if (found) {
+                    if (found.active === false) {
+                        alert('تم إيقاف حسابك. يرجى التواصل مع الإدارة.');
+                        return;
+                    }
                     currentUser = found;
                     if (!cloudDataExists) saveDB(true);
                     document.getElementById('loginOverlay').style.display = 'none';
@@ -391,6 +397,7 @@
                 currentUser.password = newPass;
                 saveCloudUsers(users).then(saved => {
                     if (saved) {
+                        writeUserAuditLog('CHANGE_PASSWORD', currentUser.username, { changedBy: currentUser.username });
                         alert('تم تغيير كلمة المرور بنجاح!');
                         closeModal('changePassModal');
                     } else {
@@ -550,6 +557,25 @@
                 cloudUsers = users;
                 hasPendingUsersWrite = true;
                 return pushCloudUsers();
+            }
+
+            function writeUserAuditLog(action, targetUsername, details = {}) {
+                if (!useFirebase || !rtdb) return Promise.resolve(false);
+                const actor = currentUser ? (currentUser.fullName || currentUser.username) : 'النظام';
+                const logId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+                const entry = {
+                    actor,
+                    actorUsername: currentUser?.username || null,
+                    action,
+                    targetUsername,
+                    details,
+                    timestamp: Date.now()
+                };
+                return set(ref(rtdb, `systemAuditLogs/${logId}`), sanitizeForFirebase(entry))
+                    .catch(error => {
+                        console.warn('تعذر تسجيل حركة إدارة المستخدمين:', error);
+                        return false;
+                    });
             }
 
             function normalizeArray(val) {
@@ -4077,17 +4103,29 @@ Status: Payment Received - Pending Approval`,
                 const role = document.getElementById('manageRole').value;
                 const branch = document.getElementById('manageBranch').value;
 
+                if (role === 'مالك' && currentUser.role !== 'مالك') {
+                    alert('لا يمكن منح صلاحية المالك إلا لحساب مالك موجود.');
+                    return;
+                }
+
                 let users = [...cloudUsers];
 
                 if (origName) {
                     const idx = users.findIndex(u => u.username === origName);
                     if (idx !== -1) {
-                        users[idx] = { username, password, role, branch };
+                        const active = users[idx].active !== false;
+                        const previous = { ...users[idx] };
+                        users[idx] = { ...users[idx], username, password, role, branch, active };
+                        writeUserAuditLog('UPDATE_PERMISSIONS', username, {
+                            from: { username: origName, role: previous.role, branch: previous.branch },
+                            to: { username, role, branch }
+                        });
                     }
                     alert('تم تحديث بيانات المستخدم وصلاحياته بنجاح!');
                 } else {
                     if (users.some(u => u.username === username)) { alert('اسم المستخدم موجود بالفعل!'); return; }
-                    users.push({ username, password, role, branch });
+                    users.push({ username, password, role, branch, fullName: username, active: true, hidden: role === 'مالك' });
+                    writeUserAuditLog('CREATE_USER', username, { role, branch, active: true });
                     alert('تم إضافة المستخدم الجديد بنجاح!');
                 }
 
@@ -4114,8 +4152,30 @@ Status: Payment Received - Pending Approval`,
                 if (username === currentUser.username) { alert('لا يمكنك حذف حسابك النشط حالياً!'); return; }
                 if (username === 'محمود') { alert('لا يمكن حذف الحساب الرئيسي للمدير العام محمود!'); return; }
                 let users = [...cloudUsers];
+                const target = users.find(u => u.username === username);
+                if (target?.role === 'مالك' && currentUser.role !== 'مالك') {
+                    alert('لا يمكن حذف حساب المالك.');
+                    return;
+                }
                 users = users.filter(u => u.username !== username);
                 saveCloudUsers(users);
+                writeUserAuditLog('DELETE_USER', username, { role: target?.role || null });
+                renderUsersTable();
+            }
+
+            function toggleUserActive(username) {
+                if (!canModifyFinancialsOrAccounts()) return;
+                if (username === currentUser.username) { alert('لا يمكنك إيقاف حسابك النشط حالياً!'); return; }
+                let users = [...cloudUsers];
+                const target = users.find(u => u.username === username);
+                if (!target) return;
+                if (target.role === 'مالك' && currentUser.role !== 'مالك') {
+                    alert('لا يمكن تغيير حالة حساب المالك.');
+                    return;
+                }
+                target.active = target.active === false;
+                saveCloudUsers(users);
+                writeUserAuditLog(target.active ? 'ACTIVATE_USER' : 'DEACTIVATE_USER', username, { active: target.active });
                 renderUsersTable();
             }
 
@@ -4131,14 +4191,20 @@ Status: Payment Received - Pending Approval`,
                 tbody.innerHTML = '';
                 let users = [...cloudUsers];
                 users.forEach(u => {
+                    if (u.role === 'مالك' && u.hidden && currentUser.role !== 'مالك') return;
+                    const protectedOwner = u.role === 'مالك';
+                    const canEditTarget = !protectedOwner || currentUser.role === 'مالك';
                     tbody.insertRow().innerHTML = `
                     <td><strong>${u.username}</strong></td>
                     <td><span class="bg-zinc-900 border border-zinc-700 px-2 py-0.5 rounded font-mono text-xs text-amber-400">${u.password}</span></td>
                     <td><span class="bg-amber-950 text-gold px-2 py-0.5 rounded text-xs font-bold">${u.role}</span></td>
                     <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${u.branch || 'فرع عجمان'}</span></td>
+                    <td><span class="${u.active === false ? 'text-red-400' : 'text-emerald-400'} font-bold">${u.active === false ? 'موقوف' : 'نشط'}</span></td>
                     <td class="space-x-1 space-x-reverse">
+                        ${canEditTarget ? `
                         <button onclick="editUser('${u.username}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i> تعديل</button>
-                        <button onclick="deleteUser('${u.username}')" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="toggleUserActive('${u.username}')" class="bg-zinc-700 text-zinc-100 px-2 py-1 rounded text-xs font-bold">${u.active === false ? 'تفعيل' : 'إيقاف'}</button>
+                        <button onclick="deleteUser('${u.username}')" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i> حذف</button>` : '<span class="text-zinc-500 text-xs">محمي</span>'}
                     </td>
                 `;
                 });
@@ -4407,7 +4473,7 @@ Status: Payment Received - Pending Approval`,
                 copyTransitTableToClipboard, exportTransitCSV, printTransitTableOnly, clearAllTransitRecords, renderTransitTable,
                 onTransitIdentityChange, handleSaveTransit, updateTransitPaymentStatus, editTransitVisa, resetTransitForm, exportTransitExcel,
                 handleSaveVoucher, handleSaveDebtInvoice,
-                handleSaveUser, editUser, deleteUser, resetUserForm,
+                handleSaveUser, editUser, deleteUser, toggleUserActive, resetUserForm,
                 previewTicketImage, previewCargoImage, previewDebtInvoice, openManifestModal, openCargoManifestModal,
                 renderPassengerManifestTable, renderCargoManifestTable, printManifestPassenger, printManifestCargo,
                 printDocumentA5, printDocumentLandscape,

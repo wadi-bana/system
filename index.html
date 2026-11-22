@@ -2448,7 +2448,7 @@
                         <h3
                             class="text-gold font-bold text-sm border-b border-zinc-800 pb-3 flex items-center justify-between">
                             <span><i class="fa-solid fa-users-gear ml-1"></i> لوحة إدارة المستخدمين وصلاحيات الأفرع
-                                (مدير عام / محاسب / مدير فرع / موظف)</span>
+                                (مالك / إدارة عامة / محاسبون / مدراء الفروع / موظفون)</span>
                         </h3>
 
                         <form id="userForm" onsubmit="handleSaveUser(event)"
@@ -2471,9 +2471,13 @@
                                     <label class="block text-xs text-zinc-400 mb-1 font-bold">الدور والصلاحية</label>
                                     <select id="manageRole"
                                         class="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200 font-bold">
-                                        <option value="مدير عام">👑 مدير عام (كل الأفرع والصلاحيات)</option>
-                                        <option value="محاسب">🧮 محاسب (المالية والرواتب والسائقين)</option>
+                                        <option value="مالك">👑 مالك النظام (سري ومحمى)</option>
+                                        <option value="مدير عام">⭐ مدير عام (كل الفروع والصلاحيات)</option>
+                                        <option value="محاسب رئيسي">🧮 محاسب رئيسي</option>
+                                        <option value="مدير فرع ومحاسب">⭐🧮 مدير فرع ومحاسب</option>
                                         <option value="مدير فرع">⭐ مدير فرع</option>
+                                        <option value="محاسب فرع">🧮 محاسب فرع</option>
+                                        <option value="محاسب">🧮 محاسب (دور تقليدي متوافق)</option>
                                         <option value="موظف">👤 موظف</option>
                                     </select>
                                 </div>
@@ -2481,6 +2485,7 @@
                                     <label class="block text-xs text-zinc-400 mb-1 font-bold">فرع الشركة</label>
                                     <select id="manageBranch"
                                         class="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-200 font-bold">
+                                        <option value="جميع الفروع">جميع الفروع</option>
                                         <option value="فرع عجمان">فرع عجمان</option>
                                         <option value="فرع ابوظبي">فرع ابوظبي</option>
                                         <option value="فرع عمان">فرع عمان</option>
@@ -2505,6 +2510,7 @@
                                         <th>كلمة المرور</th>
                                         <th>الصلاحية والوظيفة</th>
                                         <th>الفرع التابع له</th>
+                                        <th>الحالة</th>
                                         <th>إجراءات</th>
                                     </tr>
                                 </thead>
