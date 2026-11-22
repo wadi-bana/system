@@ -1,0 +1,48 @@
+{
+  "rules": {
+    ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'owner'",
+    ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'owner'",
+
+    "users": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && (root.child('users').child(auth.uid).child('role').val() === 'owner' || root.child('users').child(auth.uid).child('role').val() === 'gm')",
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && (root.child('users').child(auth.uid).child('role').val() === 'owner' || (root.child('users').child(auth.uid).child('role').val() === 'gm' && (!data.exists() || data.child('role').val() !== 'owner') && (!newData.exists() || newData.child('role').val() !== 'owner')))",
+        ".validate": "!newData.exists() || (newData.hasChildren(['fullName', 'username', 'role', 'branchId', 'active']) && newData.child('role').val().matches(/^(owner|gm|branch_manager_accountant|branch_manager|branch_accountant|chief_accountant|employee)$/))"
+      }
+    },
+
+    "branches": {
+      "$branchId": {
+        ".read": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && (root.child('users').child(auth.uid).child('role').val().matches(/^(owner|gm|chief_accountant)$/) || root.child('users').child(auth.uid).child('branchId').val() === $branchId)",
+        ".write": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && root.child('users').child(auth.uid).child('role').val().matches(/^(owner|gm)$/)"
+      }
+    },
+
+    "operations": {
+      "$branchId": {
+        ".read": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && (root.child('users').child(auth.uid).child('role').val().matches(/^(owner|gm|chief_accountant)$/) || root.child('users').child(auth.uid).child('branchId').val() === $branchId)",
+        "$docId": {
+          ".write": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && (root.child('users').child(auth.uid).child('role').val().matches(/^(owner|gm)$/) || (root.child('users').child(auth.uid).child('branchId').val() === $branchId && root.child('users').child(auth.uid).child('role').val().matches(/^(branch_manager_accountant|branch_manager|branch_accountant|employee)$/) && (!data.exists() || data.child('locked').val() !== true)))"
+        }
+      }
+    },
+
+    "accounting": {
+      "$branchId": {
+        ".read": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && (root.child('users').child(auth.uid).child('role').val().matches(/^(owner|gm|chief_accountant)$/) || (root.child('users').child(auth.uid).child('branchId').val() === $branchId && root.child('users').child(auth.uid).child('role').val().matches(/^(branch_manager_accountant|branch_manager|branch_accountant)$/)))",
+        "$entryId": {
+          ".write": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && (root.child('users').child(auth.uid).child('role').val().matches(/^(owner|gm|chief_accountant)$/) || (root.child('users').child(auth.uid).child('branchId').val() === $branchId && root.child('users').child(auth.uid).child('role').val().matches(/^(branch_manager_accountant|branch_accountant)$/) && (!data.exists() || data.child('approved').val() !== true)))"
+        }
+      }
+    },
+
+    "audit_logs": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && root.child('users').child(auth.uid).child('role').val().matches(/^(owner|gm|chief_accountant)$/)",
+      "$logId": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && !data.exists()",
+        ".validate": "newData.hasChildren(['uid', 'action', 'timestamp']) && newData.child('uid').val() === auth.uid"
+      }
+    }
+  }
+}

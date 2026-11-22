@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>إدارة المستخدمين والصلاحيات - شركة وادي بنا</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --primary: #0f4c81;
+      --primary-hover: #0a355c;
+      --success: #15803d;
+      --danger: #b91c1c;
+      --muted: #64748b;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: var(--bg);
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      color: var(--primary);
+    }
+
+    .badge {
+      background: #e0f2fe;
+      color: var(--primary);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 1.05rem;
+      color: #0f172a;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: #334155;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background: #fff;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 0.78rem;
+      background: #f1f5f9;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+    }
+
+    .btn-sm:hover {
+      background: #e2e8f0;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: right;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+    }
+
+    .status-active {
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .status-inactive {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .alert {
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .alert-error {
+      background: #fef2f2;
+      color: var(--danger);
+      border: 1px solid #fecaca;
+    }
+
+    .alert-success {
+      background: #f0fdf4;
+      color: var(--success);
+      border: 1px solid #bbf7d0;
+    }
+
+    .no-access {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--danger);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>إدارة المستخدمين والصلاحيات</h1>
+      <span class="badge" id="currentUserBadge">جاري التحقق من الصلاحية...</span>
+    </div>
+
+    <div id="accessDeniedBox" class="card no-access" style="display: none;">
+      عذراً، هذه الشاشة مخصصة للمدير العام فقط ولا تتوفر لصلاحيتك الحالية.
+    </div>
+
+    <div id="adminPanel" class="grid" style="display: none;">
+      <!-- نموذج إضافة مستخدم جديد -->
+      <div class="card">
+        <h2>إضافة مستخدم جديد</h2>
+        <div id="formAlert" class="alert"></div>
+
+        <form id="addUserForm">
+          <div class="form-group">
+            <label for="fullName">الاسم الكامل</label>
+            <input type="text" id="fullName" required placeholder="مثال: أحمد علي" />
+          </div>
+
+          <div class="form-group">
+            <label for="username">اسم المستخدم (Username)</label>
+            <input type="text" id="username" required placeholder="مثال: ahmed_ali" />
+          </div>
+
+          <div class="form-group">
+            <label for="password">كلمة المرور (6 خانات فأكثر)</label>
+            <input type="password" id="password" minlength="6" required placeholder="******" />
+          </div>
+
+          <div class="form-group">
+            <label for="roleSelect">الصلاحية / الدور</label>
+            <select id="roleSelect" required>
+              <option value="employee">موظف</option>
+              <option value="branch_manager">مدير فرع</option>
+              <option value="branch_accountant">محاسب فرع</option>
+              <option value="branch_manager_accountant">مدير فرع ومحاسب</option>
+              <option value="chief_accountant">محاسب رئيسي</option>
+              <option value="gm">مدير عام</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="branchGroup">
+            <label for="branchSelect">الفرع</label>
+            <select id="branchSelect">
+              <option value="yemen">اليمن</option>
+              <option value="abudhabi">أبوظبي</option>
+              <option value="ajman">عجمان</option>
+              <option value="dubai">دبي</option>
+              <option value="muscat">مسقط</option>
+              <option value="mukalla">المكلا</option>
+              <option value="aden">عدن</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="submitUserBtn">إضافة المستخدم</button>
+        </form>
+      </div>
+
+      <!-- جدول المستخدمين وتعديل الصلاحيات -->
+      <div class="card">
+        <h2>قائمة المستخدمين وتعديل الصلاحيات</h2>
+        <div id="tableAlert" class="alert"></div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>الاسم</th>
+                <th>اسم المستخدم</th>
+                <th>الصلاحية</th>
+                <th>الفرع</th>
+                <th>الحالة</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="6">جاري تحميل المستخدمين...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- تأكد من تضمين Firebase SDK (Compat أو Modular) وتهيئة firebase.initializeApp(...) قبل هذا السكربت -->
+  <script>
+    const ROLE_LABELS = {
+      owner: "المالك",
+      gm: "مدير عام",
+      chief_accountant: "محاسب رئيسي",
+      branch_manager_accountant: "مدير فرع ومحاسب",
+      branch_manager: "مدير فرع",
+      branch_accountant: "محاسب فرع",
+      employee: "موظف"
+    };
+
+    const BRANCH_LABELS = {
+      all: "جميع الفروع",
+      yemen: "اليمن",
+      abudhabi: "أبوظبي",
+      ajman: "عجمان",
+      dubai: "دبي",
+      muscat: "مسقط",
+      mukalla: "المكلا",
+      aden: "عدن"
+    };
+
+    let currentSessionUser = null;
+
+    function showAlert(elId, message, type = "error") {
+      const el = document.getElementById(elId);
+      el.textContent = message;
+      el.className = `alert show alert-${type}`;
+    }
+
+    function hideAlert(elId) {
+      const el = document.getElementById(elId);
+      el.className = "alert";
+    }
+
+    // إخفاء حقل الفرع إذا تم اختيار مدير عام
+    document.getElementById("roleSelect").addEventListener("change", (e) => {
+      const isGM = e.target.value === "gm";
+      document.getElementById("branchGroup").style.display = isGM ? "none" : "block";
+    });
+
+    // تهيئة الشاشة بناءً على المستخدم الحالي
+    async function initUsersManagement(userProfile) {
+      currentSessionUser = userProfile;
+      const badge = document.getElementById("currentUserBadge");
+      badge.textContent = `${userProfile.fullName} (${ROLE_LABELS[userProfile.role] || userProfile.role})`;
+
+      const canManage = userProfile.role === "gm" || userProfile.role === "owner";
+      if (!canManage) {
+        document.getElementById("accessDeniedBox").style.display = "block";
+        document.getElementById("adminPanel").style.display = "none";
+        return;
+      }
+
+      document.getElementById("accessDeniedBox").style.display = "none";
+      document.getElementById("adminPanel").style.display = "grid";
+
+      // الاستماع الفوري لتغييرات المستخدمين مع إخفاء المالك عن غير المالك
+      firebase.database().ref("users").on("value", (snapshot) => {
+        const raw = snapshot.val() || {};
+        const list = Object.entries(raw)
+          .map(([uid, data]) => ({ uid, ...data }))
+          .filter((u) => {
+            // إخفاء المالك تماماً لأي مستخدم آخر
+            if (u.role === "owner" && currentSessionUser.role !== "owner") {
+              return false;
+            }
+            return true;
+          });
+
+        renderUsersTable(list);
+      });
+    }
+
+    function renderUsersTable(users) {
+      const tbody = document.getElementById("usersTableBody");
+      if (!users.length) {
+        tbody.innerHTML = `<tr><td colspan="6">لا يوجد مستخدمون معروضون.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = users.map((u) => {
+        const isTargetOwner = u.role === "owner";
+        const canEditTarget = currentSessionUser.role === "owner" || !isTargetOwner;
+
+        const roleOptions = Object.entries(ROLE_LABELS)
+          .filter(([key]) => key !== "owner" || currentSessionUser.role === "owner")
+          .map(([key, label]) => `<option value="${key}" ${u.role === key ? "selected" : ""}>${label}</option>`)
+          .join("");
+
+        const branchOptions = Object.entries(BRANCH_LABELS)
+          .filter(([key]) => key !== "all" || u.role === "gm" || u.role === "owner")
+          .map(([key, label]) => `<option value="${key}" ${u.branchId === key ? "selected" : ""}>${label}</option>`)
+          .join("");
+
+        return `
+          <tr data-uid="${u.uid}">
+            <td><strong>${escapeHtml(u.fullName || "")}</strong></td>
+            <td><code>${escapeHtml(u.username || "")}</code></td>
+            <td>
+              <select class="row-role" ${canEditTarget ? "" : "disabled"}>
+                ${roleOptions}
+              </select>
+            </td>
+            <td>
+              <select class="row-branch" ${canEditTarget ? "" : "disabled"}>
+                ${branchOptions}
+              </select>
+            </td>
+            <td>
+              <span class="${u.active ? "status-active" : "status-inactive"}">
+                ${u.active ? "نشط" : "موقوف"}
+              </span>
+            </td>
+            <td>
+              ${canEditTarget ? `
+                <button class="btn btn-sm" onclick="saveRowUser('${u.uid}', this)">حفظ</button>
+                <button class="btn btn-sm" onclick="toggleUserActive('${u.uid}', ${!u.active})">
+                  ${u.active ? "إيقاف" : "تفعيل"}
+                </button>
+              ` : `<span>محمي</span>`}
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // حفظ تعديل الصلاحية والفرع لمستخدم
+    async function saveRowUser(uid, btnEl) {
+      hideAlert("tableAlert");
+      const tr = btnEl.closest("tr");
+      const newRole = tr.querySelector(".row-role").value;
+      const newBranch = newRole === "gm" ? "all" : tr.querySelector(".row-branch").value;
+
+      try {
+        await updateUserPermissions(currentSessionUser.role, uid, {
+          role: newRole,
+          branchId: newBranch
+        });
+        showAlert("tableAlert", "تم تحديث صلاحيات المستخدم بنجاح.", "success");
+      } catch (err) {
+        showAlert("tableAlert", err.message || "تعذر تحديث الصلاحيات.", "error");
+      }
+    }
+
+    // تفعيل أو إيقاف حساب مستخدم
+    async function toggleUserActive(uid, nextActive) {
+      hideAlert("tableAlert");
+      try {
+        await updateUserPermissions(currentSessionUser.role, uid, { active: nextActive });
+        showAlert("tableAlert", nextActive ? "تم تفعيل الحساب." : "تم إيقاف الحساب.", "success");
+      } catch (err) {
+        showAlert("tableAlert", err.message || "تعذر تغيير حالة الحساب.", "error");
+      }
+    }
+
+    // إضافة مستخدم جديد عبر النموذج
+    document.getElementById("addUserForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hideAlert("formAlert");
+
+      const btn = document.getElementById("submitUserBtn");
+      btn.disabled = true;
+      btn.textContent = "جاري الإضافة...";
+
+      const fullName = document.getElementById("fullName").value.trim();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const role = document.getElementById("roleSelect").value;
+      const branchId = role === "gm" ? "all" : document.getElementById("branchSelect").value;
+
+      try {
+        await addNewSystemUser(currentSessionUser.role, {
+          fullName,
+          username,
+          password,
+          role,
+          branchId
+        });
+        e.target.reset();
+        document.getElementById("branchGroup").style.display = "block";
+        showAlert("formAlert", "تم إنشاء حساب المستخدم وإضافته بنجاح.", "success");
+      } catch (err) {
+        showAlert("formAlert", err.message || "حدث خطأ أثناء إضافة المستخدم.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "إضافة المستخدم";
+      }
+    });
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    // ربط تلقائي عند تسجيل الدخول في Firebase Auth
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) return;
+      const snap = await firebase.database().ref(`users/${user.uid}`).once("value");
+      const profile = snap.val();
+      if (profile && profile.active) {
+        initUsersManagement(profile);
+      }
+    });
+  </script>
+</body>
+</html>
