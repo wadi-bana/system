@@ -7,7 +7,7 @@
       "$uid": {
         ".read": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val().matches(/^(owner|gm)$/))",
         ".write": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && (root.child('users').child(auth.uid).child('role').val() === 'owner' || (root.child('users').child(auth.uid).child('role').val() === 'gm' && (!data.exists() || data.child('role').val() !== 'owner') && (!newData.exists() || newData.child('role').val() !== 'owner')))",
-        ".validate": "!newData.exists() || (newData.hasChildren(['username', 'fullName', 'role', 'branchId', 'active']) && newData.child('role').val().matches(/^(owner|gm|branch_manager_accountant|branch_manager|branch_accountant|chief_accountant|employee)$/) && newData.child('branchId').val().matches(/^(all|ajman|abudhabi|yemen|muscat|oman|ain|mukalla|aden)$/))"
+        ".validate": "!newData.exists() || (newData.hasChildren(['username', 'fullName', 'role', 'branchId', 'active']) && newData.child('username').isString() && newData.child('fullName').isString() && newData.child('role').isString() && newData.child('role').val().matches(/^(owner|gm|branch_manager_accountant|branch_manager|branch_accountant|chief_accountant|employee)$/) && newData.child('branchId').isString() && newData.child('branchId').val().matches(/^(all|ajman|abudhabi|yemen|muscat|oman|ain|mukalla|aden)$/) && newData.child('active').isBoolean() && (!newData.hasChild('hidden') || newData.child('hidden').isBoolean()))"
       }
     },
     "systemUnifiedData": {
