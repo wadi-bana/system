@@ -1,5 +1,4 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 import { getDatabase, ref, onValue, set, get, update } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-database.js";
 
 const { jsPDF } = window.jspdf;
@@ -17,7 +16,6 @@ try {
         throw new Error(`إعدادات Firebase ناقصة: ${missingFirebaseKeys.join(', ')}`);
     }
     const app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
     rtdb = getDatabase(app);
 } catch (e) {
     console.error("Firebase initialization failed:", e);
@@ -108,7 +106,7 @@ function normalizeUserProfile(profile, uid) {
     return {
         ...profile,
         uid,
-        username: profile.username || profile.fullName || profile.name || auth?.currentUser?.email || uid,
+        username: profile.username || profile.fullName || profile.name || uid,
         fullName: profile.fullName || profile.name || profile.username || '',
         role: FIREBASE_ROLE_LABELS[role] || role,
         branch: FIREBASE_BRANCH_LABELS[profile.branchId || profile.branch]
@@ -130,31 +128,17 @@ function serializeUserProfile(profile) {
         role: ROLE_FIREBASE_VALUES[profile.role] || profile.role,
         branchId: branchCode,
         active: profile.active !== false,
-        hidden: profile.hidden === true
+        hidden: profile.hidden === true,
+        passwordHash: profile.passwordHash || null
     };
 }
 
-function usernameToAuthEmail(username) {
-    const normalized = String(username || '').trim().toLowerCase();
-    if (!normalized || normalized.includes('@')) {
-        throw new Error('أدخل اسم المستخدم فقط، دون بريد إلكتروني.');
-    }
-    return `${normalized.replace(/\s+/g, '.')}@wadibana.local`;
-}
-
-function getAuthErrorMessage(error) {
-    const messages = {
-        'auth/invalid-credential': 'اسم المستخدم أو كلمة المرور غير صحيحة.',
-        'auth/user-not-found': 'لا يوجد حساب Firebase مرتبط باسم المستخدم هذا.',
-        'auth/wrong-password': 'اسم المستخدم أو كلمة المرور غير صحيحة.',
-        'auth/too-many-requests': 'تم إيقاف محاولات الدخول مؤقتاً. حاول لاحقاً.',
-        'auth/network-request-failed': 'تعذر الاتصال بخدمة المصادقة. تحقق من الإنترنت.',
-        'auth/email-already-in-use': 'اسم المستخدم مرتبط بحساب Firebase موجود.',
-        'auth/weak-password': 'كلمة المرور يجب ألا تقل عن 6 أحرف أو أرقام.',
-        'auth/api-key-not-found.-please-pass-a-valid-api-key.': 'مفتاح Firebase API غير موجود أو غير صالح. حدّث إعدادات تطبيق الويب في Firebase Console.',
-        'auth/api-key-not-valid.-please-pass-a-valid-api-key.': 'مفتاح Firebase API غير صالح. حدّث إعدادات تطبيق الويب في Firebase Console.'
-    };
-    return messages[error?.code] || `تعذر تسجيل الدخول إلى Firebase: ${error?.message || 'خطأ غير معروف'}`;
+async function hashPassword(password) {
+    const bytes = new TextEncoder().encode(password);
+    const digest = await crypto.subtle.digest('SHA-256', bytes);
+    return Array.from(new Uint8Array(digest))
+        .map(byte => byte.toString(16).padStart(2, '0'))
+        .join('');
 }
 
 const standardDriverItems = [
@@ -391,14 +375,14 @@ function applyLanguage() {
     refreshUI();
 }
 
-async function activateAuthenticatedUser(firebaseUser) {
-    if (activeAuthUid === firebaseUser.uid && currentUser) return;
+async function activateAuthenticatedUser(profileUid) {
+    if (activeAuthUid === profileUid && currentUser) return;
     if (authActivationPromise) return authActivationPromise;
 
     authActivationPromise = (async () => {
-        const snapshot = await get(ref(rtdb, `users/${firebaseUser.uid}`));
+        const snapshot = await get(ref(rtdb, `users/${profileUid}`));
         if (!snapshot.exists()) {
-            throw new Error('تم تسجيل الدخول، لكن لا يوجد ملف صلاحيات لهذا الحساب. اطلب من المسؤول إعداد users/{uid} في Firebase.');
+            throw new Error('لا يوجد ملف صلاحيات لهذا الحساب.');
         }
 
         const profile = snapshot.val();
@@ -406,8 +390,10 @@ async function activateAuthenticatedUser(firebaseUser) {
             throw new Error('هذا الحساب موقوف أو غير مفعّل في Firebase.');
         }
 
-        currentUser = normalizeUserProfile(profile, firebaseUser.uid);
-        activeAuthUid = firebaseUser.uid;
+        currentUser = normalizeUserProfile(profile, profileUid);
+        activeAuthUid = profileUid;
+        auth = { currentUser: { uid: profileUid } };
+        sessionStorage.setItem('wadiBanaActiveUid', profileUid);
         document.getElementById('cloudInitError')?.classList.add('hidden');
         updateUserBadge();
         initSync();
@@ -418,46 +404,19 @@ async function activateAuthenticatedUser(firebaseUser) {
     } catch (error) {
         currentUser = null;
         activeAuthUid = null;
+        auth = null;
+        sessionStorage.removeItem('wadiBanaActiveUid');
         showCloudError(error.message);
-        await signOut(auth);
         throw error;
     } finally {
         authActivationPromise = null;
     }
 }
 
-function handleAuthStateChange(firebaseUser) {
-    if (!firebaseUser) {
-        const signedOutActiveUser = Boolean(activeAuthUid);
-        if (signedOutActiveUser) {
-            syncUnsubscribers.forEach(unsubscribe => unsubscribe());
-            syncUnsubscribers = [];
-            isFirebaseInitialized = false;
-            hasPendingOfflineWrites = false;
-        }
-        activeAuthUid = null;
-        currentUser = null;
-        cloudUsers = [];
-        cloudUsersLoaded = false;
-        cloudDataLoaded = false;
-        cloudDataExists = false;
-        if (signedOutActiveUser) {
-            location.reload();
-            return;
-        }
-        updateUserBadge();
-        return;
-    }
-
-    activateAuthenticatedUser(firebaseUser).catch(error => {
-        console.error('Firebase profile initialization failed:', error);
-    });
-}
-
 async function handleLogin(e) {
     e.preventDefault();
-    if (!useFirebase || !auth || !rtdb) {
-        showCloudError('تعذر تهيئة Firebase Authentication أو Realtime Database.');
+    if (!useFirebase || !rtdb) {
+        showCloudError('تعذر تهيئة Realtime Database.');
         return;
     }
     const loginButton = document.getElementById('lgBtn');
@@ -467,24 +426,31 @@ async function handleLogin(e) {
         loginButton.disabled = true;
         loginButton.textContent = 'جاري تسجيل الدخول...';
     }
-    let email;
-    try {
-        email = usernameToAuthEmail(loginUserInput?.value);
-    } catch (error) {
-        showCloudError(error.message);
-        if (loginButton) {
-            loginButton.disabled = false;
-            loginButton.textContent = 'دخول النظام';
-        }
-        return;
-    }
+    const username = String(loginUserInput?.value || '').trim();
     const password = loginPassInput?.value || '';
     try {
-        const credential = await signInWithEmailAndPassword(auth, email, password);
-        await activateAuthenticatedUser(credential.user);
+        if (!username || !password) throw new Error('أدخل اسم المستخدم وكلمة المرور.');
+        const snapshot = await get(ref(rtdb, 'users'));
+        if (!snapshot.exists()) throw new Error('لا توجد حسابات مسجلة في النظام.');
+        const users = snapshot.val();
+        const match = Object.entries(users).find(([, profile]) =>
+            String(profile.username || '').trim().toLocaleLowerCase('ar') === username.toLocaleLowerCase('ar')
+        );
+        if (!match) throw new Error('اسم المستخدم أو كلمة المرور غير صحيحة.');
+        const [uid, profile] = match;
+        if (profile.active !== true) throw new Error('هذا الحساب موقوف أو غير مفعّل.');
+        const passwordHash = await hashPassword(password);
+        const validPassword = profile.passwordHash
+            ? profile.passwordHash === passwordHash
+            : profile.password === password;
+        if (!validPassword) throw new Error('اسم المستخدم أو كلمة المرور غير صحيحة.');
+        if (!profile.passwordHash) {
+            await update(ref(rtdb, `users/${uid}`), { passwordHash, password: null });
+        }
+        await activateAuthenticatedUser(uid);
         if (loginPassInput) loginPassInput.value = '';
     } catch (error) {
-        showCloudError(getAuthErrorMessage(error));
+        showCloudError(error.message || 'تعذر تسجيل الدخول.');
     } finally {
         if (loginButton) {
             loginButton.disabled = false;
@@ -494,12 +460,14 @@ async function handleLogin(e) {
 }
 
 function handleLogout() {
-    signOut(auth)
-        .then(() => location.reload())
-        .catch(error => {
-            console.error('Firebase sign-out failed:', error);
-            showCloudError('تعذر تسجيل الخروج من Firebase. أعد تحميل الصفحة.');
-        });
+    syncUnsubscribers.forEach(unsubscribe => unsubscribe());
+    syncUnsubscribers = [];
+    isFirebaseInitialized = false;
+    activeAuthUid = null;
+    currentUser = null;
+    auth = null;
+    sessionStorage.removeItem('wadiBanaActiveUid');
+    location.reload();
 }
 
 function showCloudError(message) {
@@ -569,7 +537,7 @@ function openChangePasswordModal() {
     document.getElementById('changePassModal').classList.remove('hidden');
 }
 
-function handleUserChangePassword(e) {
+async function handleUserChangePassword(e) {
     e.preventDefault();
     const newPass = document.getElementById('newPassInput').value.trim();
     if (newPass.length < 6) {
@@ -577,19 +545,17 @@ function handleUserChangePassword(e) {
         return;
     }
 
-    updatePassword(auth.currentUser, newPass)
-        .then(() => {
-            writeUserAuditLog('CHANGE_PASSWORD', currentUser.username, { changedBy: currentUser.username });
-            document.getElementById('newPassInput').value = '';
-            alert('تم تغيير كلمة المرور بنجاح.');
-            closeModal('changePassModal');
-        })
-        .catch(error => {
-            console.error('Firebase password update failed:', error);
-            alert(error.code === 'auth/requires-recent-login'
-                ? 'لأمان حسابك، سجّل الخروج ثم الدخول مجدداً قبل تغيير كلمة المرور.'
-                : getAuthErrorMessage(error));
-        });
+    try {
+        const passwordHash = await hashPassword(newPass);
+        await update(ref(rtdb, `users/${activeAuthUid}`), { passwordHash, password: null });
+        await writeUserAuditLog('CHANGE_PASSWORD', currentUser.username, { changedBy: currentUser.username });
+        document.getElementById('newPassInput').value = '';
+        alert('تم تغيير كلمة المرور بنجاح.');
+        closeModal('changePassModal');
+    } catch (error) {
+        console.error('Password update failed:', error);
+        alert('تعذر تغيير كلمة المرور.');
+    }
 }
 
 function calculateNextSequenceNumbers() {
@@ -720,14 +686,14 @@ function sanitizeForFirebase(obj) {
 }
 
 function pushCloudUsers(removedUserUids = []) {
-    if (!useFirebase || !rtdb || !auth?.currentUser || !['مالك', 'مدير عام'].includes(currentUser?.role)) {
+    if (!useFirebase || !rtdb || !activeAuthUid || !['مالك', 'مدير عام'].includes(currentUser?.role)) {
         return Promise.reject(new Error('لا توجد صلاحية مصادقة لإدارة ملفات المستخدمين.'));
     }
     if (!navigator.onLine) return Promise.reject(new Error('لا يوجد اتصال بالإنترنت.'));
     const profileUpdates = {};
     cloudUsers.forEach(user => {
         if (!user.uid) {
-            throw new Error('لا يمكن حفظ ملف مستخدم دون UID من Firebase Authentication.');
+            throw new Error('لا يمكن حفظ ملف مستخدم دون معرّف داخلي صالح.');
         }
         profileUpdates[user.uid] = sanitizeForFirebase(serializeUserProfile(user));
     });
@@ -749,9 +715,9 @@ function pushCloudUsers(removedUserUids = []) {
 
 function saveCloudUsers(users) {
     if (users.some(user => !user.uid)) {
-        return Promise.reject(new Error('أنشئ حساب المستخدم أولاً في Firebase Authentication، ثم أضف ملفه في users/{uid}.'));
+        return Promise.reject(new Error('أنشئ حساب المستخدم أولاً من لوحة إدارة المستخدمين.'));
     }
-    if (!auth?.currentUser || !['مالك', 'مدير عام'].includes(currentUser?.role)) {
+    if (!activeAuthUid || !['مالك', 'مدير عام'].includes(currentUser?.role)) {
         return Promise.reject(new Error('لا تملك صلاحية إدارة المستخدمين.'));
     }
     const removedUsers = cloudUsers.filter(user => !users.some(next => next.uid === user.uid));
@@ -769,7 +735,7 @@ function writeUserAuditLog(action, targetUsername, details = {}) {
     const actor = currentUser ? (currentUser.fullName || currentUser.username) : 'النظام';
     const logId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     const entry = {
-        uid: auth?.currentUser?.uid || null,
+        uid: activeAuthUid || null,
         actor,
         actorUsername: currentUser?.username || null,
         action,
@@ -821,7 +787,7 @@ function applyRemoteSnapshot(val) {
 }
 
 function pushLocalToFirebase() {
-    if (!useFirebase || !rtdb || !auth?.currentUser || !activeAuthUid || !navigator.onLine) {
+    if (!useFirebase || !rtdb || !activeAuthUid || !navigator.onLine) {
         hasPendingOfflineWrites = true;
         return Promise.resolve(false);
     }
@@ -839,7 +805,7 @@ function pushLocalToFirebase() {
 }
 
 function forcePullFromFirebase() {
-    if (!useFirebase || !rtdb || !auth?.currentUser || !activeAuthUid || !navigator.onLine) return;
+    if (!useFirebase || !rtdb || !activeAuthUid || !navigator.onLine) return;
     if (hasPendingOfflineWrites) {
         pushLocalToFirebase();
         return;
@@ -863,8 +829,8 @@ function initSync() {
         showCloudError('تعذر تهيئة Firebase. لم يتم تحميل بيانات محلية كبديل.');
         return;
     }
-    if (!auth?.currentUser || !activeAuthUid) {
-        showCloudError('سجّل الدخول عبر Firebase Authentication قبل مزامنة البيانات.');
+    if (!activeAuthUid) {
+        showCloudError('سجّل الدخول قبل مزامنة البيانات.');
         return;
     }
     if (isFirebaseInitialized) {
@@ -887,7 +853,7 @@ function initSync() {
         const profile = snapshot.val();
         if (!profile || profile.active !== true) {
             showCloudError('تم إيقاف الحساب أو حذف ملف الصلاحيات.');
-            signOut(auth).catch(error => console.error('Firebase sign-out failed:', error));
+            handleLogout();
             return;
         }
         currentUser = normalizeUserProfile(profile, activeAuthUid);
@@ -1045,9 +1011,6 @@ inlineHandlerNames.forEach(name => {
     }
 });
 
-if (auth) {
-    onAuthStateChanged(auth, handleAuthStateChange);
-}
 
 window.onload = function () {
     detectAndApplyDeviceLayout();
@@ -1066,6 +1029,12 @@ window.onload = function () {
     addCargoItemRow();
     buildDriverItemsRows();
     checkAutoDownloadFromUrl();
+    const savedUid = sessionStorage.getItem('wadiBanaActiveUid');
+    if (savedUid) {
+        activateAuthenticatedUser(savedUid).catch(() => {
+            document.getElementById('loginOverlay').style.display = 'flex';
+        });
+    }
 };
 
 let autoDownloadHandled = false;
@@ -4351,14 +4320,51 @@ function renderDepartedTripsFinanceTable() {
 // ================= إدارة المستخدمين =================
 async function handleSaveUser(e) {
     e.preventDefault();
-    if (!canManageSystemUsers()) { alert('إدارة حسابات Firebase مخصصة للمالك والمدير العام.'); return; }
+    if (!canManageSystemUsers()) { alert('إدارة الحسابات مخصصة للمالك والمدير العام.'); return; }
     const origName = document.getElementById('userEditOriginalName').value;
     const username = document.getElementById('manageUsername').value.trim();
+    const password = document.getElementById('managePassword')?.value.trim() || '';
     const role = document.getElementById('manageRole').value;
     const branch = document.getElementById('manageBranch').value;
 
     if (!origName) {
-        alert('أنشئ حساب الدخول أولاً من Firebase Authentication، ثم أضف ملفه في Realtime Database تحت users/{UID}. يمكن تعديل الحسابات الموجودة هنا فقط.');
+        if (!username || !password) {
+            alert('أدخل اسم المستخدم وكلمة المرور لإنشاء الحساب.');
+            return;
+        }
+        if (password.length < 6) {
+            alert('كلمة المرور يجب ألا تقل عن 6 أحرف.');
+            return;
+        }
+        if (role === 'مالك' && currentUser.role !== 'مالك') {
+            alert('لا يمكن منح صلاحية المالك إلا لحساب مالك موجود.');
+            return;
+        }
+        if (cloudUsers.some(user => String(user.username).trim().toLocaleLowerCase('ar') === username.toLocaleLowerCase('ar'))) {
+            alert('اسم المستخدم موجود بالفعل.');
+            return;
+        }
+        const uid = `local_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+        const passwordHash = await hashPassword(password);
+        const users = [...cloudUsers, {
+            uid,
+            username,
+            fullName: username,
+            role,
+            branch,
+            active: true,
+            passwordHash
+        }];
+        try {
+            await saveCloudUsers(users);
+            await writeUserAuditLog('CREATE_USER', username, { role, branch });
+            resetUserForm();
+            renderUsersTable();
+            alert('تم إنشاء الحساب بنجاح.');
+        } catch (error) {
+            console.error('User creation failed:', error);
+            alert(error.message || 'تعذر إنشاء الحساب.');
+        }
         return;
     }
     if (role === 'مالك' && currentUser.role !== 'مالك') {
@@ -4385,6 +4391,14 @@ async function handleSaveUser(e) {
         role,
         branch
     };
+    if (password) {
+        if (password.length < 6) {
+            alert('كلمة المرور يجب ألا تقل عن 6 أحرف.');
+            return;
+        }
+        users[idx].passwordHash = await hashPassword(password);
+        users[idx].password = null;
+    }
 
     try {
         const saved = await saveCloudUsers(users);
@@ -4395,7 +4409,7 @@ async function handleSaveUser(e) {
         });
         resetUserForm();
         renderUsersTable();
-        alert('تم تحديث ملف المستخدم. كلمات المرور تُدار من Firebase Authentication.');
+        alert('تم تحديث ملف المستخدم.');
     } catch (error) {
         console.error('User profile update failed:', error);
         alert(error.message || 'تعذر تحديث ملف المستخدم.');

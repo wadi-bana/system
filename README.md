@@ -4,13 +4,13 @@
 
 - `index.html`: نقطة الدخول للتطبيق الثابت أحادي الصفحة.
 - `assets/css/app.css`: أنماط الواجهة وتنسيقات الطباعة.
-- `assets/js/app.js`: ملف JavaScript التشغيلي المرتبط بالصفحة، ويهيئ Firebase Authentication وRealtime Database.
+- `assets/js/app.js`: ملف JavaScript التشغيلي المرتبط بالصفحة، ويستخدم اسم المستخدم وكلمة المرور مع Realtime Database دون Firebase Email/Password.
 - `assets/images/wadi-bina-logo.jpeg`: شعار وادي بناء المستخدم في الواجهة والتقارير.
 - تستخدم الصفحة الملفات ذات الأسماء الأساسية أعلاه؛ الملفات التي تحمل `(2)` نسخ مكررة غير مرتبطة.
 - `app-compat.js`: ملف توافق قديم مستقل؛ لا تضفه إلى الصفحة الرئيسية، إذ يكرر أسماء دوال موجودة في التطبيق.
 - `wadi_bana_unified.php` و`api.php`: بدائل PHP تتصل بـFirebase عبر REST، وتحتاج استضافة PHP مع امتداد cURL.
 - لوحة إدارة المستخدمين تدعم الأدوار الإدارية الموسعة، تفعيل/إيقاف الحسابات، وحماية حسابات المالك، مع تسجيل عمليات الإدارة في `systemAuditLogs` داخل Firebase.
-- واجهة الدخول تقبل اسم المستخدم وكلمة المرور، وتحوّل اسم المستخدم داخلياً إلى معرّف Email/Password في Firebase Authentication: `username@wadibana.local`، مع تحويل المسافات إلى نقاط (مثال `khaled waleed` يصبح `khaled.waleed@wadibana.local`). فعّل Authentication → Sign-in method → Email/Password، وأنشئ حسابات المصادقة بهذه العناوين. بعد إنشاء كل حساب، انسخ UID وأنشئ ملفه في Realtime Database تحت `users/{uid}`؛ لا تستخدم اسم المستخدم كمفتاح ولا تخزن كلمة المرور في قاعدة البيانات:
+- واجهة الدخول تقبل اسم المستخدم وكلمة المرور مباشرةً من عقدة `users` في Realtime Database. تُحفظ كلمة المرور كـ SHA-256 hash ولا تُحفظ كنص صريح عند إنشاء حساب جديد أو تغيير كلمة المرور:
 
   ```json
   {
@@ -23,19 +23,9 @@
   }
   ```
 
-  أنشئ حسابات Email/Password في Firebase Authentication بالعناوين الداخلية التالية، واستخدم كلمات مرور جديدة لا تقل عن 6 أحرف. كلمات المرور التي أُرسلت في المحادثة لا تُخزّن في ملفات المشروع أو قاعدة البيانات، ويُنصح بتغييرها لأنها كُشفت هنا.
+  أنشئ الحسابات من لوحة إدارة المستخدمين باسم مستخدم وكلمة مرور لا تقل عن 6 أحرف. يتم تحويل كلمة المرور إلى SHA-256 hash قبل حفظها في `users/{UID}`. لا تدخل كلمات مرور فعلية في ملفات المشروع أو الأكواد.
 
-  | اسم المستخدم | الاسم المعروض | البريد الداخلي في Firebase | الدور | الفرع |
-  | --- | --- | --- | --- | --- |
-  | `tryr` | ترير | `tryr@wadibana.local` | `owner` | `all` |
-  | `waleed` | وليد السيد | `waleed@wadibana.local` | `gm` | `all` |
-  | `khaled waleed` | خالد وليد السيد | `khaled.waleed@wadibana.local` | `gm` | `all` |
-  | `yusef` | يوسف مختار | `yusef@wadibana.local` | `branch_manager_accountant` | `yemen` |
-  | `mohammed` | محمد ياسر | `mohammed@wadibana.local` | `branch_manager_accountant` | `abudhabi` |
-  | `mohamod` | محمود عبد الكريم | `mohamod@wadibana.local` | `branch_manager_accountant` | `ajman` |
-  | `abod` | عبدالله | `abod@wadibana.local` | `employee` | `yemen` |
-
-  بعد إنشاء كل حساب، انسخ UID الخاص به وأنشئ ملف الصلاحيات تحت `users/{UID}` (وليس تحت اسم المستخدم). مثال لحساب `tryr`:
+  مثال لملف حساب `tryr`:
 
   ```json
   {
@@ -44,13 +34,14 @@
     "role": "owner",
     "branchId": "all",
     "active": true,
-    "hidden": true
+    "hidden": true,
+    "passwordHash": "..."
   }
   ```
 
-  كرر الملف لبقية الحسابات مع بيانات الجدول. يجب إنشاء حساب المالك وملفه أولاً. الأدوار المدعومة: `owner`, `gm`, `chief_accountant`, `branch_manager_accountant`, `branch_manager`, `branch_accountant`, `employee`. قيم الفروع المدعومة: `all`, `ajman`, `abudhabi`, `yemen`, `muscat`, `oman`, `ain`, `mukalla`, `aden`.
-- قواعد بداية متوافقة مع مسارات التطبيق موجودة في `firebase.database.rules.json`. راجعها ثم انسخها إلى Firebase Console → Realtime Database → Rules وانشرها. بعد ترحيل الحسابات إلى Authentication و`users/{uid}`، احذف بيانات `systemUsers` القديمة من محرر Firebase Console لأنها قد تحتوي كلمات مرور سابقة.
-- مخطط `systemUnifiedData` الحالي موحد على كل الفروع؛ لذلك القواعد تسمح للمستخدم النشط ذي الدور المسجل بقراءة وكتابة هذا المسار كاملاً، ولا توفر عزل فروع على مستوى الخادم. صلاحيات الفرع في الواجهة ليست حاجزاً أمنياً. يلزم تقسيم البيانات إلى مسارات مستقلة حسب الفرع قبل فرض عزل فرعي موثوق.
+  الأدوار المدعومة: `owner`, `gm`, `chief_accountant`, `branch_manager_accountant`, `branch_manager`, `branch_accountant`, `employee`. قيم الفروع المدعومة: `all`, `ajman`, `abudhabi`, `yemen`, `muscat`, `oman`, `ain`, `mukalla`, `aden`.
+- قواعد المسارات الحالية موجودة في `firebase.database.rules.json`. عندما يُستبدل Firebase Authentication، يجب مراجعة القواعد بدقة لأن القراءة والكتابة العامة تُعد ثغرة أمنية ولا توفر عزل الصلاحيات على الخادم.
+- مخطط `systemUnifiedData` الحالي موحد على كل الفروع؛ لذلك صلاحيات الفرع في الواجهة ليست حاجزاً أمنياً. يلزم تقسيم البيانات إلى مسارات مستقلة حسب الفرع قبل فرض عزل فرعي موثوق.
 
 ## التشغيل
 
