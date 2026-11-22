@@ -1,0 +1,25 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "users": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && root.child('users').child(auth.uid).child('role').val().matches(/^(owner|gm)$/)",
+      "$uid": {
+        ".read": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val().matches(/^(owner|gm)$/))",
+        ".write": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && (root.child('users').child(auth.uid).child('role').val() === 'owner' || (root.child('users').child(auth.uid).child('role').val() === 'gm' && (!data.exists() || data.child('role').val() !== 'owner') && (!newData.exists() || newData.child('role').val() !== 'owner')))",
+        ".validate": "!newData.exists() || (newData.hasChildren(['username', 'fullName', 'role', 'branchId', 'active']) && newData.child('role').val().matches(/^(owner|gm|branch_manager_accountant|branch_manager|branch_accountant|chief_accountant|employee)$/) && newData.child('branchId').val().matches(/^(all|ajman|abudhabi|yemen|muscat|oman|ain|mukalla|aden)$/))"
+      }
+    },
+    "systemUnifiedData": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('active').val() === true",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && root.child('users').child(auth.uid).child('role').val().matches(/^(owner|gm|branch_manager_accountant|branch_manager|branch_accountant|chief_accountant|employee)$/)"
+    },
+    "systemAuditLogs": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && root.child('users').child(auth.uid).child('role').val().matches(/^(owner|gm|chief_accountant)$/)",
+      "$logId": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('active').val() === true && !data.exists() && newData.child('uid').val() === auth.uid",
+        ".validate": "newData.hasChildren(['uid', 'action', 'timestamp'])"
+      }
+    }
+  }
+}

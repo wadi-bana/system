@@ -9,6 +9,22 @@
 - `app-compat.js`: ملف توافق قديم مستقل؛ لا تضفه إلى الصفحة الرئيسية، إذ يكرر أسماء دوال موجودة في التطبيق.
 - `wadi_bana_unified.php` و`api.php`: بدائل PHP تتصل بـFirebase عبر REST، وتحتاج استضافة PHP مع امتداد cURL.
 - لوحة إدارة المستخدمين تدعم الأدوار الإدارية الموسعة، تفعيل/إيقاف الحسابات، وحماية حسابات المالك، مع تسجيل عمليات الإدارة في `systemAuditLogs` داخل Firebase.
+- تسجيل الدخول ومزامنة البيانات يستخدمان Firebase Authentication. من Firebase Console فعّل Authentication → Sign-in method → Email/Password، وأنشئ حساباً لكل مستخدم. بعد إنشاء الحساب، انسخ UID وأنشئ في Realtime Database ملف `users/{uid}` بهذه البنية:
+
+  ```json
+  {
+    "username": "اسم المستخدم",
+    "fullName": "الاسم الكامل",
+    "role": "owner",
+    "branchId": "all",
+    "active": true,
+    "hidden": false
+  }
+  ```
+
+  الأدوار المدعومة: `owner`, `gm`, `chief_accountant`, `branch_manager_accountant`, `branch_manager`, `branch_accountant`, `employee`. الفروع: `all`, `ajman`, `abudhabi`, `yemen`, `muscat`, `oman`, `ain`, `mukalla`, `aden`. أنشئ ملف المالك الأول من محرر Firebase Console بامتيازات المشروع، ثم سجّل دخوله؛ لا تسمح للواجهة بإنشاء مستخدم Firebase أو تخزين كلمات المرور في قاعدة البيانات.
+- قواعد بداية متوافقة مع مسارات التطبيق موجودة في `firebase.database.rules.json`. راجعها ثم انسخها إلى Firebase Console → Realtime Database → Rules وانشرها. بعد ترحيل الحسابات إلى Authentication و`users/{uid}`، احذف بيانات `systemUsers` القديمة من محرر Firebase Console لأنها قد تحتوي كلمات مرور سابقة.
+- مخطط `systemUnifiedData` الحالي موحد على كل الفروع؛ لذلك القواعد تسمح للمستخدم النشط ذي الدور المسجل بقراءة وكتابة هذا المسار كاملاً، ولا توفر عزل فروع على مستوى الخادم. صلاحيات الفرع في الواجهة ليست حاجزاً أمنياً. يلزم تقسيم البيانات إلى مسارات مستقلة حسب الفرع قبل فرض عزل فرعي موثوق.
 
 ## التشغيل
 

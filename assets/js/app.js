@@ -1,5 +1,6 @@
             import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-            import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-database.js";
+            import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+            import { getDatabase, ref, onValue, set, get, update } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-database.js";
 
             const { jsPDF } = window.jspdf;
 
@@ -7,9 +8,11 @@
 
             let useFirebase = true;
             let rtdb = null;
+            let auth = null;
             let firebaseInitError = null;
             try {
                 const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
                 rtdb = getDatabase(app);
             } catch (e) {
                 console.error("Firebase initialization failed:", e);
@@ -18,6 +21,8 @@
             }
 
             let currentUser = null;
+            let activeAuthUid = null;
+            let authActivationPromise = null;
             let currentLang = 'ar';
             let cloudUsers = [];
             let cloudUsersLoaded = false;
@@ -61,11 +66,70 @@
                 return idB.localeCompare(idA, ['ar', 'en'], { numeric: true, sensitivity: 'base' });
             }
 
-            const DEFAULT_USERS = [
-                { username: 'محمود', password: '102030', role: 'مدير عام', branch: 'جميع الفروع', fullName: 'محمود عبد الكريم', active: true, hidden: false },
-                { username: 'وليد السيد', password: '708090', role: 'مدير عام', branch: 'جميع الفروع', fullName: 'وليد السيد', active: true, hidden: false },
-                { username: 'يوسف', password: '405060', role: 'مدير فرع ومحاسب', branch: 'فرع اليمن', fullName: 'يوسف مختار', active: true, hidden: false }
-            ];
+            const FIREBASE_ROLE_LABELS = {
+                owner: 'مالك',
+                gm: 'مدير عام',
+                chief_accountant: 'محاسب رئيسي',
+                branch_manager_accountant: 'مدير فرع ومحاسب',
+                branch_manager: 'مدير فرع',
+                branch_accountant: 'محاسب فرع',
+                employee: 'موظف'
+            };
+            const FIREBASE_BRANCH_LABELS = {
+                all: 'جميع الفروع',
+                ajman: 'فرع عجمان',
+                abudhabi: 'فرع ابوظبي',
+                yemen: 'فرع اليمن',
+                muscat: 'فرع عمان',
+                oman: 'فرع عمان',
+                ain: 'فرع العين',
+                mukalla: 'فرع اليمن',
+                aden: 'فرع اليمن'
+            };
+            const ROLE_FIREBASE_VALUES = Object.fromEntries(
+                Object.entries(FIREBASE_ROLE_LABELS).map(([key, value]) => [value, key])
+            );
+            ROLE_FIREBASE_VALUES['محاسب'] = 'chief_accountant';
+            const BRANCH_FIREBASE_VALUES = Object.fromEntries(
+                Object.entries(FIREBASE_BRANCH_LABELS).map(([key, value]) => [value, key])
+            );
+
+            function normalizeUserProfile(profile, uid) {
+                const role = profile.role || 'employee';
+                return {
+                    ...profile,
+                    uid,
+                    username: profile.username || profile.fullName || auth?.currentUser?.email || uid,
+                    fullName: profile.fullName || profile.username || '',
+                    role: FIREBASE_ROLE_LABELS[role] || role,
+                    branch: profile.branch || FIREBASE_BRANCH_LABELS[profile.branchId] || profile.branchId || 'فرع عجمان',
+                    active: profile.active === true,
+                    hidden: profile.hidden === true
+                };
+            }
+
+            function serializeUserProfile(profile) {
+                return {
+                    fullName: String(profile.fullName || profile.username || '').trim(),
+                    username: String(profile.username || '').trim(),
+                    role: ROLE_FIREBASE_VALUES[profile.role] || profile.role,
+                    branchId: BRANCH_FIREBASE_VALUES[profile.branch] || profile.branchId || 'ajman',
+                    active: profile.active !== false,
+                    hidden: profile.hidden === true
+                };
+            }
+
+            function getAuthErrorMessage(error) {
+                const messages = {
+                    'auth/invalid-credential': 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
+                    'auth/user-not-found': 'لا يوجد حساب Firebase لهذا البريد الإلكتروني.',
+                    'auth/wrong-password': 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
+                    'auth/too-many-requests': 'تم إيقاف محاولات الدخول مؤقتاً. حاول لاحقاً.',
+                    'auth/network-request-failed': 'تعذر الاتصال بخدمة المصادقة. تحقق من الإنترنت.',
+                    'auth/email-already-in-use': 'هذا البريد الإلكتروني مرتبط بحساب موجود.'
+                };
+                return messages[error?.code] || `تعذر تسجيل الدخول إلى Firebase: ${error?.message || 'خطأ غير معروف'}`;
+            }
 
             const standardDriverItems = [
                 "العهده", "ديزل", "رسوم عبور", "رسوم مخلص جمارك", "رسوم متفرقة",
@@ -119,7 +183,7 @@
                     pageTitle: 'شركة وادي بناء للنقل الدولي | لوحة التحكم والنظام الموحد',
                     lgTitle: 'تسجيل الدخول للنظام الموحد',
                     lgSub: 'أدخل بيانات الحساب المعتمدة للوصول للوحة التحكم',
-                    lgUserLbl: 'اسم المستخدم', lgPassLbl: 'كلمة المرور', lgBtn: 'دخول النظام',
+                    lgUserLbl: 'البريد الإلكتروني', lgPassLbl: 'كلمة المرور', lgBtn: 'دخول النظام',
                     headTitle: 'شركة وادي بناء للنقل الدولي', headSub: 'النظام الموحد الشامل (Firebase v13.2.0)',
                     btnBackup: 'نسخة JSON', btnBackupPDF: 'نسخة احتياطية PDF', btnRestore: 'استرجاع JSON', btnRestorePDF: 'استعادة من PDF', btnLogout: 'خروج',
                     tDashboard: 'لوحة التحكم', tPassengers: 'التذاكر والركاب', tCargo: 'فواتير الشحن', tFin: 'الإدارة المالية',
@@ -132,7 +196,7 @@
                     pageTitle: 'Wadi Bina Overland Transport | Unified System & Dashboard',
                     lgTitle: 'Unified System Login',
                     lgSub: 'Enter approved credentials to access the control panel',
-                    lgUserLbl: 'Username', lgPassLbl: 'Password', lgBtn: 'Login',
+                    lgUserLbl: 'Email address', lgPassLbl: 'Password', lgBtn: 'Login',
                     headTitle: 'Wadi Bina Overland Transport', headSub: 'Comprehensive Unified System (Firebase v13.2.0)',
                     btnBackup: 'JSON Backup', btnBackupPDF: 'PDF Backup', btnRestore: 'Restore JSON', btnRestorePDF: 'Restore PDF', btnLogout: 'Logout',
                     tDashboard: 'Dashboard', tPassengers: 'Tickets & Passengers', tCargo: 'Cargo Invoices', tFin: 'Financial Management',
@@ -144,13 +208,12 @@
 
             // ================= دوال التحقق من الصلاحيات =================
             function isMahmoud() {
-                if (!currentUser) return false;
-                return String(currentUser.username || '').trim() === 'محمود';
+                return Boolean(currentUser && currentUser.role === 'مالك');
             }
 
             function isMahmoudOrGeneralManager() {
                 if (!currentUser) return false;
-                return isMahmoud() || ['مالك', 'مدير عام'].includes(currentUser.role);
+                return ['مالك', 'مدير عام'].includes(currentUser.role);
             }
 
             function canModifyFinancialsOrAccounts() {
@@ -158,6 +221,10 @@
                 return isMahmoudOrGeneralManager() || [
                     'محاسب', 'محاسب رئيسي', 'محاسب فرع', 'مدير فرع ومحاسب'
                 ].includes(currentUser.role);
+            }
+
+            function canManageSystemUsers() {
+                return Boolean(currentUser && ['مالك', 'مدير عام'].includes(currentUser.role));
             }
 
             function isUserAtTripDestinationBranch(trip) {
@@ -298,34 +365,93 @@
                 refreshUI();
             }
 
-            function handleLogin(e) {
-                e.preventDefault();
-                if (!useFirebase) {
-                    showCloudError('تعذر تهيئة Firebase. لا يمكن تسجيل الدخول دون اتصال بالسحابة.');
-                    return;
+            async function activateAuthenticatedUser(firebaseUser) {
+                if (activeAuthUid === firebaseUser.uid && currentUser) return;
+                if (authActivationPromise) return authActivationPromise;
+
+                authActivationPromise = (async () => {
+                    const snapshot = await get(ref(rtdb, `users/${firebaseUser.uid}`));
+                    if (!snapshot.exists()) {
+                        throw new Error('تم تسجيل الدخول، لكن لا يوجد ملف صلاحيات لهذا الحساب. اطلب من المسؤول إعداد users/{uid} في Firebase.');
+                    }
+
+                    const profile = snapshot.val();
+                    if (profile.active !== true) {
+                        throw new Error('هذا الحساب موقوف أو غير مفعّل في Firebase.');
+                    }
+
+                    currentUser = normalizeUserProfile(profile, firebaseUser.uid);
+                    activeAuthUid = firebaseUser.uid;
+                    document.getElementById('cloudInitError')?.classList.add('hidden');
+                    updateUserBadge();
+                    initSync();
+                })();
+
+                try {
+                    await authActivationPromise;
+                } catch (error) {
+                    currentUser = null;
+                    activeAuthUid = null;
+                    showCloudError(error.message);
+                    await signOut(auth);
+                    throw error;
+                } finally {
+                    authActivationPromise = null;
                 }
-                if (!cloudUsersLoaded || !cloudDataLoaded) {
-                    alert('يرجى الانتظار حتى يكتمل تحميل بيانات المستخدمين والنظام من السحابة.');
-                    return;
-                }
-                const uInput = document.getElementById('loginUser').value.trim();
-                const pInput = document.getElementById('loginPass').value.trim();
-                const found = cloudUsers.find(u => u.username === uInput && u.password === pInput);
-                if (found) {
-                    if (found.active === false) {
-                        alert('تم إيقاف حسابك. يرجى التواصل مع الإدارة.');
+            }
+
+            function handleAuthStateChange(firebaseUser) {
+                if (!firebaseUser) {
+                    const signedOutActiveUser = Boolean(activeAuthUid);
+                    if (signedOutActiveUser) {
+                        syncUnsubscribers.forEach(unsubscribe => unsubscribe());
+                        syncUnsubscribers = [];
+                        isFirebaseInitialized = false;
+                        hasPendingOfflineWrites = false;
+                    }
+                    activeAuthUid = null;
+                    currentUser = null;
+                    cloudUsers = [];
+                    cloudUsersLoaded = false;
+                    cloudDataLoaded = false;
+                    cloudDataExists = false;
+                    if (signedOutActiveUser) {
+                        location.reload();
                         return;
                     }
-                    currentUser = found;
-                    if (!cloudDataExists) saveDB(true);
-                    document.getElementById('loginOverlay').style.display = 'none';
                     updateUserBadge();
-                } else { alert('بيانات الدخول غير صحيحة!'); }
+                    return;
+                }
+
+                activateAuthenticatedUser(firebaseUser).catch(error => {
+                    console.error('Firebase profile initialization failed:', error);
+                });
+            }
+
+            async function handleLogin(e) {
+                e.preventDefault();
+                if (!useFirebase || !auth || !rtdb) {
+                    showCloudError('تعذر تهيئة Firebase Authentication أو Realtime Database.');
+                    return;
+                }
+                const email = document.getElementById('loginUser').value.trim();
+                const password = document.getElementById('loginPass').value;
+                try {
+                    const credential = await signInWithEmailAndPassword(auth, email, password);
+                    await activateAuthenticatedUser(credential.user);
+                    document.getElementById('loginPass').value = '';
+                } catch (error) {
+                    showCloudError(getAuthErrorMessage(error));
+                }
             }
 
             function handleLogout() {
-                currentUser = null;
-                location.reload();
+                signOut(auth)
+                    .then(() => location.reload())
+                    .catch(error => {
+                        console.error('Firebase sign-out failed:', error);
+                        showCloudError('تعذر تسجيل الخروج من Firebase. أعد تحميل الصفحة.');
+                    });
             }
 
             function showCloudError(message) {
@@ -335,13 +461,25 @@
                 errorEl.classList.remove('hidden');
             }
 
+            function reportFirebaseSyncError(message, error) {
+                console.error(message, error);
+                const permissionDenied = error?.code === 'PERMISSION_DENIED'
+                    || /permission[_ ]denied/i.test(error?.message || '');
+                showCloudError(permissionDenied
+                    ? `${message} رفضت قواعد Firebase العملية.`
+                    : message);
+                if (permissionDenied) {
+                    document.getElementById('loginOverlay').style.display = 'flex';
+                }
+            }
+
             function updateUserBadge() {
                 if (currentUser) {
                     document.getElementById('userInfoBadge').innerText = `${currentUser.username} (${currentUser.role} - ${currentUser.branch || 'فرع عجمان'})`;
                     document.getElementById('loginOverlay').style.display = 'none';
 
                     const privileged = canModifyFinancialsOrAccounts();
-                    const restrictedTabs = ['tab-drivers', 'tab-financials', 'tab-salaries', 'tab-users'];
+                    const restrictedTabs = ['tab-drivers', 'tab-financials', 'tab-salaries'];
 
                     restrictedTabs.forEach(tId => {
                         const el = document.getElementById(tId);
@@ -350,6 +488,7 @@
                             else el.classList.add('hidden');
                         }
                     });
+                    document.getElementById('tab-users')?.classList.toggle('hidden', !canManageSystemUsers());
 
                     if (privileged || currentUser.role === 'مدير' || currentUser.role === 'مدير فرع') {
                         document.getElementById('managerBranchFilterContainer').classList.remove('hidden');
@@ -367,7 +506,8 @@
                         }
                     }
 
-                    const restrictedModules = ['drivers', 'financials', 'salaries', 'users'];
+                    const restrictedModules = ['drivers', 'financials', 'salaries'];
+                    if (!canManageSystemUsers() && currentTab === 'users') switchTab('dashboard');
                     if (!privileged && restrictedModules.includes(currentTab)) {
                         switchTab('dashboard');
                     }
@@ -384,26 +524,24 @@
             function handleUserChangePassword(e) {
                 e.preventDefault();
                 const newPass = document.getElementById('newPassInput').value.trim();
-                if (!newPass) return;
-
-                const users = [...cloudUsers];
-                const userObj = users.find(u => u.username === currentUser.username);
-                if (userObj) {
-                    userObj.password = newPass;
-                } else {
-                    currentUser.password = newPass;
-                    users.push(currentUser);
+                if (newPass.length < 6) {
+                    alert('كلمة المرور يجب ألا تقل عن 6 أحرف أو أرقام.');
+                    return;
                 }
-                currentUser.password = newPass;
-                saveCloudUsers(users).then(saved => {
-                    if (saved) {
+
+                updatePassword(auth.currentUser, newPass)
+                    .then(() => {
                         writeUserAuditLog('CHANGE_PASSWORD', currentUser.username, { changedBy: currentUser.username });
-                        alert('تم تغيير كلمة المرور بنجاح!');
+                        document.getElementById('newPassInput').value = '';
+                        alert('تم تغيير كلمة المرور بنجاح.');
                         closeModal('changePassModal');
-                    } else {
-                        alert('تم تسجيل تغيير كلمة المرور مؤقتاً في الجلسة، وستتم مزامنته عند عودة الاتصال.');
-                    }
-                });
+                    })
+                    .catch(error => {
+                        console.error('Firebase password update failed:', error);
+                        alert(error.code === 'auth/requires-recent-login'
+                            ? 'لأمان حسابك، سجّل الخروج ثم الدخول مجدداً قبل تغيير كلمة المرور.'
+                            : getAuthErrorMessage(error));
+                    });
             }
 
             function calculateNextSequenceNumbers() {
@@ -525,6 +663,7 @@
 
             let isSyncListenerAttached = false;
             let isFirebaseInitialized = false;
+            let syncUnsubscribers = [];
             let hasPendingOfflineWrites = false;
             let isApplyingRemote = false;
 
@@ -532,31 +671,49 @@
                 return JSON.parse(JSON.stringify(obj, (key, value) => value === undefined ? null : value));
             }
 
-            let hasPendingUsersWrite = false;
-
-            function pushCloudUsers() {
-                if (!useFirebase || !rtdb || !navigator.onLine) {
-                    hasPendingUsersWrite = true;
-                    return Promise.resolve(false);
+            function pushCloudUsers(removedUserUids = []) {
+                if (!useFirebase || !rtdb || !auth?.currentUser || !['مالك', 'مدير عام'].includes(currentUser?.role)) {
+                    return Promise.reject(new Error('لا توجد صلاحية مصادقة لإدارة ملفات المستخدمين.'));
                 }
-                return set(ref(rtdb, 'systemUsers'), sanitizeForFirebase(cloudUsers))
+                if (!navigator.onLine) return Promise.reject(new Error('لا يوجد اتصال بالإنترنت.'));
+                const profileUpdates = {};
+                cloudUsers.forEach(user => {
+                    if (!user.uid) {
+                        throw new Error('لا يمكن حفظ ملف مستخدم دون UID من Firebase Authentication.');
+                    }
+                    profileUpdates[user.uid] = sanitizeForFirebase(serializeUserProfile(user));
+                });
+                removedUserUids.forEach(uid => {
+                    profileUpdates[uid] = null;
+                });
+                if (!Object.keys(profileUpdates).length) return Promise.resolve(true);
+                return update(ref(rtdb, 'users'), profileUpdates)
                     .then(() => {
-                        hasPendingUsersWrite = false;
                         cloudUsersLoaded = true;
                         return true;
                     })
                     .catch(error => {
                         console.error('Users sync push error:', error);
-                        hasPendingUsersWrite = true;
                         showCloudError('تعذر مزامنة المستخدمين مع Firebase. ستُعاد المحاولة عند عودة الاتصال.');
-                        return false;
+                        throw error;
                     });
             }
 
             function saveCloudUsers(users) {
+                if (users.some(user => !user.uid)) {
+                    return Promise.reject(new Error('أنشئ حساب المستخدم أولاً في Firebase Authentication، ثم أضف ملفه في users/{uid}.'));
+                }
+                if (!auth?.currentUser || !['مالك', 'مدير عام'].includes(currentUser?.role)) {
+                    return Promise.reject(new Error('لا تملك صلاحية إدارة المستخدمين.'));
+                }
+                const removedUsers = cloudUsers.filter(user => !users.some(next => next.uid === user.uid));
+                const previousUsers = cloudUsers;
                 cloudUsers = users;
-                hasPendingUsersWrite = true;
-                return pushCloudUsers();
+                return pushCloudUsers(removedUsers.map(user => user.uid)).catch(error => {
+                    cloudUsers = previousUsers;
+                    renderUsersTable();
+                    throw error;
+                });
             }
 
             function writeUserAuditLog(action, targetUsername, details = {}) {
@@ -564,6 +721,7 @@
                 const actor = currentUser ? (currentUser.fullName || currentUser.username) : 'النظام';
                 const logId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
                 const entry = {
+                    uid: auth?.currentUser?.uid || null,
                     actor,
                     actorUsername: currentUser?.username || null,
                     action,
@@ -615,7 +773,7 @@
             }
 
             function pushLocalToFirebase() {
-                if (!useFirebase || !rtdb || !navigator.onLine) {
+                if (!useFirebase || !rtdb || !auth?.currentUser || !activeAuthUid || !navigator.onLine) {
                     hasPendingOfflineWrites = true;
                     return Promise.resolve(false);
                 }
@@ -626,15 +784,14 @@
                         return true;
                     })
                     .catch(err => {
-                        console.error("Sync push error:", err);
                         hasPendingOfflineWrites = true;
-                        showCloudError('تعذر مزامنة التغييرات مع Firebase. ستُعاد المحاولة عند عودة الاتصال.');
+                        reportFirebaseSyncError('تعذر مزامنة التغييرات مع Firebase.', err);
                         return false;
                     });
             }
 
             function forcePullFromFirebase() {
-                if (!useFirebase || !rtdb || !navigator.onLine) return;
+                if (!useFirebase || !rtdb || !auth?.currentUser || !activeAuthUid || !navigator.onLine) return;
                 if (hasPendingOfflineWrites) {
                     pushLocalToFirebase();
                     return;
@@ -650,12 +807,16 @@
                             pushLocalToFirebase();
                         }
                     }
-                }).catch(err => console.warn("Force pull error:", err));
+                }).catch(err => reportFirebaseSyncError('تعذر جلب بيانات النظام من Firebase.', err));
             }
 
             function initSync() {
                 if (!useFirebase || !rtdb) {
                     showCloudError('تعذر تهيئة Firebase. لم يتم تحميل بيانات محلية كبديل.');
+                    return;
+                }
+                if (!auth?.currentUser || !activeAuthUid) {
+                    showCloudError('سجّل الدخول عبر Firebase Authentication قبل مزامنة البيانات.');
                     return;
                 }
                 if (isFirebaseInitialized) {
@@ -664,59 +825,63 @@
                 }
                 isFirebaseInitialized = true;
 
-                onValue(ref(rtdb, '.info/connected'), (snap) => {
+                syncUnsubscribers.push(onValue(ref(rtdb, '.info/connected'), (snap) => {
                     if (snap.val() === true) {
-                        if (hasPendingUsersWrite) pushCloudUsers();
                         if (hasPendingOfflineWrites) {
                             pushLocalToFirebase();
                         } else {
                             forcePullFromFirebase();
                         }
                     }
-                });
+                }));
 
-                onValue(ref(rtdb, 'systemUsers'), (snapshot) => {
-                    const val = snapshot.val();
-                    if (val) {
-                        if (hasPendingUsersWrite) {
-                            pushCloudUsers();
-                            return;
-                        }
-                        cloudUsers = normalizeArray(val);
-                        if (cloudUsers.length) {
-                            cloudUsersLoaded = true;
-                            document.getElementById('cloudInitError')?.classList.add('hidden');
-                            if (currentTab === 'users' && canModifyFinancialsOrAccounts()) renderUsersTable();
-                        } else {
-                            saveCloudUsers([...DEFAULT_USERS]);
-                        }
-                    } else {
-                        saveCloudUsers([...DEFAULT_USERS]);
+                syncUnsubscribers.push(onValue(ref(rtdb, `users/${activeAuthUid}`), snapshot => {
+                    const profile = snapshot.val();
+                    if (!profile || profile.active !== true) {
+                        showCloudError('تم إيقاف الحساب أو حذف ملف الصلاحيات.');
+                        signOut(auth).catch(error => console.error('Firebase sign-out failed:', error));
+                        return;
                     }
-                }, (error) => {
-                    console.error("Users sync error:", error);
-                    showCloudError('تعذر تحميل المستخدمين من Firebase.');
-                });
+                    currentUser = normalizeUserProfile(profile, activeAuthUid);
+                    updateUserBadge();
+                }, error => {
+                    reportFirebaseSyncError('تعذر قراءة ملف صلاحيات الحساب من Firebase.', error);
+                }));
 
-                onValue(ref(rtdb, 'systemUnifiedData'), (snapshot) => {
-                    const val = snapshot.val();
-                    if (val) {
+                if (['مالك', 'مدير عام'].includes(currentUser.role)) {
+                    syncUnsubscribers.push(onValue(ref(rtdb, 'users'), snapshot => {
+                        const value = snapshot.val() || {};
+                        cloudUsers = Object.entries(value)
+                            .map(([uid, profile]) => normalizeUserProfile(profile, uid));
+                        cloudUsersLoaded = true;
+                        if (currentTab === 'users') renderUsersTable();
+                    }, error => {
+                        reportFirebaseSyncError('تعذر تحميل ملفات المستخدمين. تحقق من قواعد users في Firebase.', error);
+                    }));
+                } else {
+                    cloudUsers = [];
+                    cloudUsersLoaded = true;
+                }
+
+                syncUnsubscribers.push(onValue(ref(rtdb, 'systemUnifiedData'), snapshot => {
+                    const value = snapshot.val();
+                    if (value) {
                         cloudDataExists = true;
                         cloudDataLoaded = true;
                         if (hasPendingOfflineWrites) {
                             pushLocalToFirebase();
                         } else {
-                            applyRemoteSnapshot(val);
+                            applyRemoteSnapshot(value);
                         }
                     } else {
                         cloudDataExists = false;
                         cloudDataLoaded = true;
+                        saveDB(true);
                         refreshUI();
                     }
                 }, (error) => {
-                    console.error("Firebase Sync Error:", error);
-                    showCloudError('تعذر تحميل بيانات النظام من Firebase.');
-                });
+                    reportFirebaseSyncError('تعذر تحميل بيانات النظام من Firebase. تحقق من قواعد systemUnifiedData.', error);
+                }));
 
                 if (!isSyncListenerAttached) {
                     isSyncListenerAttached = true;
@@ -793,6 +958,10 @@
                 }
             }
 
+            if (auth) {
+                onAuthStateChanged(auth, handleAuthStateChange);
+            }
+
             window.onload = function () {
                 detectAndApplyDeviceLayout();
                 updateUserBadge();
@@ -809,7 +978,6 @@
                 updateReportingTimeAutomatically();
                 addCargoItemRow();
                 buildDriverItemsRows();
-                initSync();
                 checkAutoDownloadFromUrl();
             };
 
@@ -4094,78 +4262,99 @@ Status: Payment Received - Pending Approval`,
             }
 
             // ================= إدارة المستخدمين =================
-            function handleSaveUser(e) {
+            async function handleSaveUser(e) {
                 e.preventDefault();
-                if (!canModifyFinancialsOrAccounts()) { alert('عذراً، إدارة المستخدمين مخصصة للإدارة العليا والمحاسبة فقط!'); return; }
+                if (!canManageSystemUsers()) { alert('إدارة حسابات Firebase مخصصة للمالك والمدير العام.'); return; }
                 const origName = document.getElementById('userEditOriginalName').value;
                 const username = document.getElementById('manageUsername').value.trim();
-                const password = document.getElementById('managePassword').value.trim();
                 const role = document.getElementById('manageRole').value;
                 const branch = document.getElementById('manageBranch').value;
 
+                if (!origName) {
+                    alert('أنشئ حساب الدخول أولاً من Firebase Authentication، ثم أضف ملفه في Realtime Database تحت users/{UID}. يمكن تعديل الحسابات الموجودة هنا فقط.');
+                    return;
+                }
                 if (role === 'مالك' && currentUser.role !== 'مالك') {
                     alert('لا يمكن منح صلاحية المالك إلا لحساب مالك موجود.');
                     return;
                 }
 
-                let users = [...cloudUsers];
-
-                if (origName) {
-                    const idx = users.findIndex(u => u.username === origName);
-                    if (idx !== -1) {
-                        const active = users[idx].active !== false;
-                        const previous = { ...users[idx] };
-                        users[idx] = { ...users[idx], username, password, role, branch, active };
-                        writeUserAuditLog('UPDATE_PERMISSIONS', username, {
-                            from: { username: origName, role: previous.role, branch: previous.branch },
-                            to: { username, role, branch }
-                        });
-                    }
-                    alert('تم تحديث بيانات المستخدم وصلاحياته بنجاح!');
-                } else {
-                    if (users.some(u => u.username === username)) { alert('اسم المستخدم موجود بالفعل!'); return; }
-                    users.push({ username, password, role, branch, fullName: username, active: true, hidden: role === 'مالك' });
-                    writeUserAuditLog('CREATE_USER', username, { role, branch, active: true });
-                    alert('تم إضافة المستخدم الجديد بنجاح!');
+                const users = [...cloudUsers];
+                const idx = users.findIndex(user => user.username === origName);
+                if (idx === -1) {
+                    alert('المستخدم غير موجود أو لم يتم تحميل قائمته من Firebase.');
+                    return;
+                }
+                if (users.some((user, userIdx) => userIdx !== idx && user.username === username)) {
+                    alert('اسم المستخدم موجود بالفعل.');
+                    return;
                 }
 
-                saveCloudUsers(users);
-                resetUserForm();
-                renderUsersTable();
+                const previous = users[idx];
+                users[idx] = {
+                    ...previous,
+                    username,
+                    fullName: previous.uid === currentUser.uid ? previous.fullName : (previous.fullName || username),
+                    role,
+                    branch
+                };
+
+                try {
+                    const saved = await saveCloudUsers(users);
+                    if (!saved) throw new Error('لم يقبل Firebase حفظ التغييرات.');
+                    await writeUserAuditLog('UPDATE_PERMISSIONS', username, {
+                        from: { username: origName, role: previous.role, branch: previous.branch },
+                        to: { username, role, branch }
+                    });
+                    resetUserForm();
+                    renderUsersTable();
+                    alert('تم تحديث ملف المستخدم. كلمات المرور تُدار من Firebase Authentication.');
+                } catch (error) {
+                    console.error('User profile update failed:', error);
+                    alert(error.message || 'تعذر تحديث ملف المستخدم.');
+                }
             }
 
             function editUser(username) {
-                if (!canModifyFinancialsOrAccounts()) return;
+                if (!canManageSystemUsers()) return;
                 let users = [...cloudUsers];
                 const u = users.find(x => x.username === username);
                 if (!u) return;
                 document.getElementById('userEditOriginalName').value = u.username;
                 document.getElementById('manageUsername').value = u.username;
-                document.getElementById('managePassword').value = u.password;
                 document.getElementById('manageRole').value = u.role || 'موظف';
                 document.getElementById('manageBranch').value = u.branch || 'فرع عجمان';
                 document.getElementById('userSubmitBtn').innerText = 'حفظ التعديلات';
             }
 
-            function deleteUser(username) {
-                if (!canModifyFinancialsOrAccounts()) return;
+            async function deleteUser(username) {
+                if (!canManageSystemUsers()) return;
                 if (username === currentUser.username) { alert('لا يمكنك حذف حسابك النشط حالياً!'); return; }
-                if (username === 'محمود') { alert('لا يمكن حذف الحساب الرئيسي للمدير العام محمود!'); return; }
-                let users = [...cloudUsers];
-                const target = users.find(u => u.username === username);
-                if (target?.role === 'مالك' && currentUser.role !== 'مالك') {
-                    alert('لا يمكن حذف حساب المالك.');
+                const target = cloudUsers.find(u => u.username === username);
+                if (!target) return;
+                if (target.uid === currentUser.uid) { alert('لا يمكنك حذف ملف حسابك النشط.'); return; }
+                if (target.role === 'مالك' && currentUser.role !== 'مالك') {
+                    alert('لا يمكن حذف ملف المالك.');
                     return;
                 }
+                let users = [...cloudUsers];
                 users = users.filter(u => u.username !== username);
-                saveCloudUsers(users);
-                writeUserAuditLog('DELETE_USER', username, { role: target?.role || null });
+                try {
+                    await saveCloudUsers(users);
+                    await writeUserAuditLog('REMOVE_USER_PROFILE', username, { uid: target.uid });
+                } catch (error) {
+                    console.error('User profile removal failed:', error);
+                    alert(error.message || 'تعذر حذف ملف المستخدم.');
+                }
                 renderUsersTable();
             }
 
-            function toggleUserActive(username) {
-                if (!canModifyFinancialsOrAccounts()) return;
-                if (username === currentUser.username) { alert('لا يمكنك إيقاف حسابك النشط حالياً!'); return; }
+            async function toggleUserActive(username) {
+                if (!canManageSystemUsers()) return;
+                if (username === currentUser.username || cloudUsers.find(user => user.username === username)?.uid === currentUser.uid) {
+                    alert('لا يمكنك إيقاف حسابك النشط حالياً!');
+                    return;
+                }
                 let users = [...cloudUsers];
                 const target = users.find(u => u.username === username);
                 if (!target) return;
@@ -4174,40 +4363,59 @@ Status: Payment Received - Pending Approval`,
                     return;
                 }
                 target.active = target.active === false;
-                saveCloudUsers(users);
-                writeUserAuditLog(target.active ? 'ACTIVATE_USER' : 'DEACTIVATE_USER', username, { active: target.active });
-                renderUsersTable();
+                try {
+                    await saveCloudUsers(users);
+                    await writeUserAuditLog(target.active ? 'ACTIVATE_USER' : 'DEACTIVATE_USER', username, { active: target.active });
+                    renderUsersTable();
+                } catch (error) {
+                    console.error('User status update failed:', error);
+                    alert(error.message || 'تعذر تغيير حالة المستخدم.');
+                }
             }
 
             function resetUserForm() {
                 document.getElementById('userForm').reset();
                 document.getElementById('userEditOriginalName').value = '';
-                document.getElementById('userSubmitBtn').innerText = 'إضافة مستخدم جديد';
+                document.getElementById('userSubmitBtn').innerText = 'حفظ ملف المستخدم';
             }
 
             function renderUsersTable() {
                 const tbody = document.querySelector('#usersTable tbody');
                 if (!tbody) return;
                 tbody.innerHTML = '';
+                if (!canManageSystemUsers()) return;
                 let users = [...cloudUsers];
                 users.forEach(u => {
                     if (u.role === 'مالك' && u.hidden && currentUser.role !== 'مالك') return;
                     const protectedOwner = u.role === 'مالك';
                     const canEditTarget = !protectedOwner || currentUser.role === 'مالك';
+                    const username = escapeUserTableValue(u.username);
+                    const role = escapeUserTableValue(u.role);
+                    const branch = escapeUserTableValue(u.branch || 'فرع عجمان');
+                    const usernameArg = JSON.stringify(u.username).replace(/</g, '\\u003c');
                     tbody.insertRow().innerHTML = `
-                    <td><strong>${u.username}</strong></td>
-                    <td><span class="bg-zinc-900 border border-zinc-700 px-2 py-0.5 rounded font-mono text-xs text-amber-400">${u.password}</span></td>
-                    <td><span class="bg-amber-950 text-gold px-2 py-0.5 rounded text-xs font-bold">${u.role}</span></td>
-                    <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${u.branch || 'فرع عجمان'}</span></td>
+                    <td><strong>${username}</strong></td>
+                    <td><span class="bg-amber-950 text-gold px-2 py-0.5 rounded text-xs font-bold">${role}</span></td>
+                    <td><span class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded text-xs font-bold">${branch}</span></td>
                     <td><span class="${u.active === false ? 'text-red-400' : 'text-emerald-400'} font-bold">${u.active === false ? 'موقوف' : 'نشط'}</span></td>
                     <td class="space-x-1 space-x-reverse">
                         ${canEditTarget ? `
-                        <button onclick="editUser('${u.username}')" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i> تعديل</button>
-                        <button onclick="toggleUserActive('${u.username}')" class="bg-zinc-700 text-zinc-100 px-2 py-1 rounded text-xs font-bold">${u.active === false ? 'تفعيل' : 'إيقاف'}</button>
-                        <button onclick="deleteUser('${u.username}')" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i> حذف</button>` : '<span class="text-zinc-500 text-xs">محمي</span>'}
+                        <button onclick="editUser(${usernameArg})" class="bg-amber-600 text-black px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-pen"></i> تعديل</button>
+                        <button onclick="toggleUserActive(${usernameArg})" class="bg-zinc-700 text-zinc-100 px-2 py-1 rounded text-xs font-bold">${u.active === false ? 'تفعيل' : 'إيقاف'}</button>
+                        <button onclick="deleteUser(${usernameArg})" class="bg-red-900 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i> حذف الملف</button>` : '<span class="text-zinc-500 text-xs">محمي</span>'}
                     </td>
                 `;
                 });
+            }
+
+            function escapeUserTableValue(value) {
+                return String(value || '').replace(/[&<>"']/g, character => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                })[character]);
             }
 
             // ================= البحث الذكي والترتيب التنازلي وإخفاء تذاكر وفواتير الرحلات المغادرة من الأقسام العادية =================
