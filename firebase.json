@@ -1,0 +1,17 @@
+{
+  "database": {
+    "rules": "firebase.database.rules.json"
+  },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs20"
+  },
+  "emulators": {
+    "database": {
+      "port": 9000
+    },
+    "functions": {
+      "port": 5001
+    }
+  }
+}
